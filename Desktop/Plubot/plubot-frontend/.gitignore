@@ -7,18 +7,47 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
+# Node.js y dependencias
+node_modules/
 *.local
+
+# Directorios de compilación
+dist/
+dist-ssr/
+build/
+
+# Entorno
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# macOS
+.DS_Store
 
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
 .idea
-.DS_Store
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
+
+# Vite
+.vite/
+
+# Opcional: Cobertura de tests
+coverage/
+*.lcov
+.nyc_output
+
+# Opcional: Cache de herramientas
+.npm/
+.eslintcache/
+.stylelintcache/
+
+# Yarn v2 (si usas Yarn)
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.yarn/install-state.gz
+.pnp.*
+.vercel

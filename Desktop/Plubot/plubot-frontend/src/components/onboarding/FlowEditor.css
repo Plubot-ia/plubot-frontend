@@ -1,0 +1,580 @@
+.ts-flow-editor {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  background: #1a1a2e;
+  overflow: hidden;
+}
+
+.ts-flow-editor .ts-flow-error-banner {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #ff4d4f;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  z-index: 1000;
+}
+
+.ts-flow-editor .ts-flow-error-banner button {
+  margin-left: 10px;
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+}
+
+.ts-flow-editor .ts-zoom-controls {
+  position: absolute;
+  top: 6rem;
+  right: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  z-index: 1001;
+}
+
+.ts-flow-editor .ts-zoom-button {
+  background: rgba(18, 18, 46, 0.7);
+  border: 1px solid #00e0ff;
+  color: #e0e0ff;
+  width: 30px;
+  height: 30px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.ts-flow-editor .ts-zoom-button:hover {
+  background: rgba(0, 224, 255, 0.2);
+  box-shadow: 0 0 5px #00e0ff;
+}
+
+.ts-flow-editor .start-node,
+.ts-flow-editor .end-node,
+.ts-flow-editor .message-node,
+.ts-flow-editor .decision-node,
+.ts-flow-editor .action-node,
+.ts-flow-editor .option-node {
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  font-family: 'Arial', sans-serif;
+  overflow: hidden;
+  position: relative;
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  will-change: transform; /* Optimización para animaciones de arrastre */
+}
+
+.ts-flow-editor .start-node {
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 80px;
+  min-height: 40px;
+}
+
+.ts-flow-editor .end-node {
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 80px;
+  min-height: 40px;
+}
+
+.ts-flow-editor .message-node {
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 180px;
+  min-height: 80px;
+}
+
+.ts-flow-editor .decision-node {
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 140px;
+  min-height: 90px;
+}
+
+.ts-flow-editor .action-node {
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 160px;
+  min-height: 60px;
+}
+
+.ts-flow-editor .option-node {
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 120px;
+  min-height: 60px;
+}
+
+.ts-flow-editor .start-node.selected,
+.ts-flow-editor .end-node.selected,
+.ts-flow-editor .message-node.selected,
+.ts-flow-editor .decision-node.selected,
+.ts-flow-editor .action-node.selected,
+.ts-flow-editor .option-node.selected {
+  border: 2px solid #00e0ff;
+  box-shadow: 0 6px 12px rgba(0, 224, 255, 0.3);
+}
+
+.ts-flow-editor .start-node.editing,
+.ts-flow-editor .end-node.editing,
+.ts-flow-editor .message-node.editing,
+.ts-flow-editor .decision-node.editing,
+.ts-flow-editor .action-node.editing,
+.ts-flow-editor .option-node.editing {
+  border: 2px dashed #00e0ff;
+}
+
+.ts-flow-editor .resize-handle {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 12px;
+  height: 12px;
+  background: #00e0ff;
+  cursor: nwse-resize;
+  border-radius: 0 0 8px 0;
+  z-index: 10;
+}
+
+.ts-flow-editor .start-node {
+  background: linear-gradient(135deg, #4facfe, #00f2fe);
+  color: white;
+  border: 1px solid #4facfe;
+}
+
+.ts-flow-editor .start-node-header {
+  display: flex;
+  align-items: center;
+  padding: 8px;
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.ts-flow-editor .start-node-icon {
+  margin-right: 8px;
+  font-size: 16px;
+}
+
+.ts-flow-editor .start-node-title {
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.ts-flow-editor .start-node-content {
+  padding: 8px;
+  flex-grow: 1;
+}
+
+.ts-flow-editor .start-node-label {
+  font-size: 12px;
+}
+
+.ts-flow-editor .start-node-input {
+  width: 100%;
+  padding: 4px;
+  border: none;
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+.ts-flow-editor .start-node-footer {
+  padding: 4px 8px;
+  background: rgba(0, 0, 0, 0.1);
+  font-size: 10px;
+  color: #ddd;
+}
+
+.ts-flow-editor .end-node {
+  background: linear-gradient(135deg, #ff6b6b, #ff8787);
+  color: white;
+  border: 1px solid #ff6b6b;
+}
+
+.ts-flow-editor .end-node-header {
+  display: flex;
+  align-items: center;
+  padding: 8px;
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.ts-flow-editor .end-node-icon {
+  margin-right: 8px;
+  font-size: 16px;
+}
+
+.ts-flow-editor .end-node-title {
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.ts-flow-editor .end-node-content {
+  padding: 8px;
+  flex-grow: 1;
+}
+
+.ts-flow-editor .end-node-message {
+  font-size: 12px;
+}
+
+.ts-flow-editor .end-node-input {
+  width: 100%;
+  padding: 4px;
+  border: none;
+  border-radius: 4px;
+  font-size: 12px;
+  resize: none;
+}
+
+.ts-flow-editor .end-node-footer {
+  padding: 4px 8px;
+  background: rgba(0, 0, 0, 0.1);
+  font-size: 10px;
+  color: #ddd;
+}
+
+.ts-flow-editor .message-node {
+  background: linear-gradient(135deg, #54d7a3, #7de5b9);
+  color: white;
+  border: 1px solid #54d7a3;
+}
+
+.ts-flow-editor .message-node-header {
+  display: flex;
+  align-items: center;
+  padding: 8px;
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.ts-flow-editor .message-node-icon {
+  margin-right: 8px;
+  font-size: 16px;
+}
+
+.ts-flow-editor .message-node-title {
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.ts-flow-editor .message-node-content {
+  padding: 8px;
+  flex-grow: 1;
+}
+
+.ts-flow-editor .message-node-message {
+  font-size: 12px;
+}
+
+.ts-flow-editor .message-node-input {
+  width: 100%;
+  padding: 4px;
+  border: none;
+  border-radius: 4px;
+  font-size: 12px;
+  resize: none;
+}
+
+.ts-flow-editor .message-node-footer {
+  padding: 4px 8px;
+  background: rgba(0, 0, 0, 0.1);
+  font-size: 10px;
+  color: #ddd;
+}
+
+.ts-flow-editor .decision-node {
+  background: linear-gradient(135deg, #feca57, #ffd07b);
+  color: white;
+  border: 1px solid #feca57;
+}
+
+.ts-flow-editor .decision-node-header {
+  display: flex;
+  align-items: center;
+  padding: 8px;
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.ts-flow-editor .decision-node-icon {
+  margin-right: 8px;
+  font-size: 16px;
+}
+
+.ts-flow-editor .decision-node-title {
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.ts-flow-editor .decision-node-content {
+  padding: 8px;
+  flex-grow: 1;
+}
+
+.ts-flow-editor .decision-node-question {
+  font-size: 12px;
+}
+
+.ts-flow-editor .decision-node-input {
+  width: 100%;
+  padding: 4px;
+  border: none;
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+.ts-flow-editor .decision-node-footer {
+  padding: 4px 8px;
+  background: rgba(0, 0, 0, 0.1);
+  font-size: 10px;
+  color: #ddd;
+}
+
+.ts-flow-editor .decision-node-output-label {
+  position: absolute;
+  bottom: -20px;
+  font-size: 10px;
+  color: white;
+}
+
+.ts-flow-editor .action-node {
+  background: linear-gradient(135deg, #a55eea, #c085f7);
+  color: white;
+  border: 1px solid #a55eea;
+}
+
+.ts-flow-editor .action-node-header {
+  display: flex;
+  align-items: center;
+  padding: 8px;
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.ts-flow-editor .action-node-icon {
+  margin-right: 8px;
+  font-size: 16px;
+}
+
+.ts-flow-editor .action-node-title {
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.ts-flow-editor .action-node-content {
+  padding: 8px;
+  flex-grow: 1;
+}
+
+.ts-flow-editor .action-node-description {
+  font-size: 12px;
+}
+
+.ts-flow-editor .action-node-input {
+  width: 100%;
+  padding: 4px;
+  border: none;
+  border-radius: 4px;
+  font-size: 12px;
+  resize: none;
+}
+
+.ts-flow-editor .action-node-footer {
+  padding: 4px 8px;
+  background: rgba(0, 0, 0, 0.1);
+  font-size: 10px;
+  color: #ddd;
+}
+
+.ts-flow-editor .option-node {
+  background: linear-gradient(135deg, #48dbfb, #70e1f5);
+  color: white;
+  border: 1px solid #48dbfb;
+}
+
+.ts-flow-editor .option-node-header {
+  display: flex;
+  align-items: center;
+  padding: 8px;
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.ts-flow-editor .option-node-icon {
+  margin-right: 8px;
+  font-size: 16px;
+}
+
+.ts-flow-editor .option-node-title {
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.ts-flow-editor .option-node-content {
+  padding: 8px;
+  flex-grow: 1;
+}
+
+.ts-flow-editor .option-node-condition {
+  font-size: 12px;
+}
+
+.ts-flow-editor .option-node-input {
+  width: 100%;
+  padding: 4px;
+  border: none;
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+.ts-flow-editor .option-node-footer {
+  padding: 4px 8px;
+  background: rgba(0, 0, 0, 0.1);
+  font-size: 10px;
+  color: #ddd;
+}
+
+.ts-flow-editor .react-flow__edge-path {
+  stroke-opacity: 0.8;
+  transition: stroke 0.2s ease;
+}
+
+.ts-flow-editor .react-flow__edge-path:hover {
+  stroke-opacity: 1;
+}
+
+.ts-flow-editor .react-flow__handle {
+  width: 12px !important;
+  height: 12px !important;
+  background: #fff;
+  border: 2px solid #000;
+  border-radius: 50%;
+  cursor: pointer;
+  z-index: 10;
+  transition: all 0.2s ease;
+}
+
+.ts-flow-editor .react-flow__handle:hover {
+  background: #00e0ff;
+  transform: scale(1.2);
+}
+
+.ts-flow-editor .start-node-output {
+  background: #4facfe;
+  border-color: #fff;
+}
+
+.ts-flow-editor .end-node-input {
+  background: #ff6b6b;
+  border-color: #fff;
+}
+
+.ts-flow-editor .message-node-input,
+.ts-flow-editor .message-node-output {
+  background: #54d7a3;
+  border-color: #fff;
+}
+
+.ts-flow-editor .decision-node-input,
+.ts-flow-editor .decision-node-output {
+  background: #feca57;
+  border-color: #fff;
+}
+
+.ts-flow-editor .action-node-input,
+.ts-flow-editor .action-node-output {
+  background: #a55eea;
+  border-color: #fff;
+}
+
+.ts-flow-editor .option-node-input,
+.ts-flow-editor .option-node-output {
+  background: #48dbfb;
+  border-color: #fff;
+}
+
+.ts-flow-editor .ts-flow-metadata {
+  background: rgba(0, 0, 0, 0.5);
+  padding: 4px 8px;
+  border-radius: 4px;
+  color: white;
+}
+
+.ts-flow-editor .ts-flow-stats span {
+  margin-right: 8px;
+  font-size: 12px;
+}
+
+.ts-flow-editor .ts-flow-critical-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  background: rgba(18, 18, 46, 0.9);
+  color: #ff2e5b;
+  font-family: 'Arial', sans-serif;
+  text-align: center;
+}
+
+.ts-flow-editor .ts-flow-critical-error h3 {
+  margin-bottom: 1rem;
+}
+
+.ts-flow-editor .ts-flow-critical-error p {
+  margin-bottom: 1rem;
+}
+
+.ts-flow-editor .ts-flow-critical-error small {
+  color: #e0e0ff;
+}
+
+.ts-simulation-panel {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 400px;
+  max-height: 80vh;
+  overflow-y: auto;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+}
+
+/* NEW: Styles for context menu */
+.ts-context-menu {
+  background: #ffffff;
+  border: 1px solid #cccccc;
+  border-radius: 4px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  padding: 5px;
+  min-width: 120px;
+}
+
+.ts-context-menu-button {
+  display: block;
+  width: 100%;
+  padding: 8px 12px;
+  text-align: left;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  color: #333;
+}
+
+.ts-context-menu-button:hover {
+  background: #f0f0f0;
+}
+
+.ts-context-menu-delete {
+  color: #ff0000;
+}
