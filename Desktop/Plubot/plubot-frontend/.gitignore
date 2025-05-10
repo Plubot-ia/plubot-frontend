@@ -25,6 +25,7 @@ build/
 
 # macOS
 .DS_Store
+.Trash/
 
 # Editor directories and files
 .vscode/*
@@ -50,4 +51,73 @@ coverage/
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
-.vercel
+
+# Vercel
+.vercel/
+
+# Archivos y carpetas personales
+.CFUserTextEncoding
+.cache/
+.claude.json
+.claude/
+.codeium/
+.cursor/
+.docker/
+.git-credentials
+.gitconfig
+.gitignore.save
+.idlerc/
+.lesshst
+.matplotlib/
+.npm/
+.nvm/
+.psql_history
+.python_history
+.rediscli_history
+.sentry/
+.sqlite_history
+.ssh/
+.userchain
+.viminfo
+.vscode/
+.windsurf/
+.zcompdump
+.zprofile
+.zsh_history
+.zsh_sessions/
+.zshrc
+.zshrc.save
+
+# Carpetas del sistema
+Documents/
+Downloads/
+Library/
+Movies/
+Music/
+Pictures/
+Public/
+blockchain/
+exchange-project/
+oportunidades_arbitraje.csv
+oportunidades_arbitraje.xlsx
+package-lock.json
+package.json
+Plubot-backup-2025-05-09/
+PlubotTW.jpg
+Pluni.png
+Visual Studio Code.app/
+Windsurf.app/
+carpeta sin título/
+plubot.py
+plubots6.py
+20250429_0346_Awakened AI Plubot_remix_01jt04n2mpfqd9565f5bb1yxsa.png
+ChatGPT Image 3 may 2025, 01_06_21.png
+ChatGPT Image 3 may 2025, 01_46_25.png
+GOOGLESHEETSJSONplubot-457804-dd892f9b8aea.json
+PAGROK
+backup-plubot.sh
+dump.rdb
+static/js/create-claude.js
+
+# Ignorar plubot-backend y otros proyectos
+../plubot-backend/
