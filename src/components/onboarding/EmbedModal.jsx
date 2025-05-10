@@ -24,9 +24,11 @@ const EmbedModal = ({ plubotId, plubotName, onClose }) => {
     if (plubotId) {
       setIsLoading(true);
       
-      setDirectLink(`${window.location.origin}/chat/${plubotId}`);
+      // Usar la URL completa para el chat
+      const chatUrl = `${window.location.origin}/chat/${plubotId}`;
+      setDirectLink(chatUrl);
       setEmbedCode(generateEmbedCodeFromData(plubotId, customization));
-      setQrCode(`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(window.location.origin)}/chat/${plubotId}`);
+      setQrCode(`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(chatUrl)}`);
       
       showNotification('Recursos de embebido generados correctamente', 'success');
       
@@ -48,8 +50,9 @@ const EmbedModal = ({ plubotId, plubotName, onClose }) => {
 
       if (response && response.status === 'success' && response.data) {
         // Si el backend responde correctamente, usar esos datos
-        setDirectLink(`${window.location.origin}/chat/${response.data.publicId}`);
-        setEmbedCode(generateEmbedCodeFromData(response.data.publicId, customization));
+        const baseUrl = window.location.origin.replace('www.', '');
+        setDirectLink(`${baseUrl}/chat/${response.data.publicId}`);
+        setEmbedCode(generateEmbedCodeFromData(response.data.publicId, customization, baseUrl));
         setQrCode(response.data.qrCodeUrl);
         showNotification('Recursos de embebido generados correctamente', 'success');
       } else {
@@ -68,18 +71,19 @@ const EmbedModal = ({ plubotId, plubotName, onClose }) => {
   // Función para usar el ID real del plubot cuando el backend falla
   const useRealPlubotId = () => {
     // Usamos directamente el plubotId real en lugar de generar uno temporal
-    setDirectLink(`${window.location.origin}/chat/${plubotId}`);
-    setEmbedCode(generateEmbedCodeFromData(plubotId, customization));
-    setQrCode(`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(window.location.origin)}/chat/${plubotId}`);
+    const baseUrl = window.location.origin.replace('www.', '');
+    setDirectLink(`${baseUrl}/chat/${plubotId}`);
+    setEmbedCode(generateEmbedCodeFromData(plubotId, customization, baseUrl));
+    setQrCode(`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(baseUrl)}/chat/${plubotId}`);
     
     // Mostrar notificación informativa
     showNotification('Usando ID real del Plubot para el embebido.', 'info');
   };
 
-  const generateEmbedCodeFromData = (publicId, options) => {
+  const generateEmbedCodeFromData = (publicId, options, baseUrl = window.location.origin) => {
     return `<!-- Plubot Widget -->
 <div id="plubot-widget-container"></div>
-<script src="${window.location.origin}/embed/plubot.js" id="plubot-script"
+<script src="${baseUrl}/embed/plubot.js" id="plubot-script"
   data-bot-id="${publicId}"
   data-theme="${options.theme}"
   data-position="${options.position}"
@@ -166,6 +170,21 @@ const EmbedModal = ({ plubotId, plubotName, onClose }) => {
               {activeTab === 'link' && (
                 <div className="embed-section">
                   <h3>Enlace Directo</h3>
+                  <div className="embed-warning" style={{
+                    backgroundColor: '#fff3cd',
+                    color: '#856404',
+                    padding: '10px',
+                    borderRadius: '5px',
+                    marginBottom: '15px',
+                    border: '1px solid #ffeeba'
+                  }}>
+                    <p><strong>⚠️ Aviso importante:</strong> Actualmente hay un problema técnico con el acceso directo al chat embebido. 
+                    Estamos trabajando para solucionarlo. Mientras tanto, puedes acceder al chat de las siguientes maneras:</p>
+                    <ul style={{ paddingLeft: '20px', marginTop: '5px' }}>
+                      <li>Desde la página principal, navega a "Mis Plubots" y selecciona este Plubot</li>
+                      <li>Comparte el código embebido para integrarlo en tu sitio web</li>
+                    </ul>
+                  </div>
                   <p>Comparte este enlace para que cualquier persona pueda acceder a tu Plubot:</p>
                   <div className="embed-code-container">
                     <input 
@@ -190,7 +209,15 @@ const EmbedModal = ({ plubotId, plubotName, onClose }) => {
                       </div>
                       <div className="embed-preview-body">
                         <p>Chatbot creado con Plubot</p>
-                        <a href={directLink} target="_blank" rel="noopener noreferrer" className="embed-preview-link">
+                        <a 
+                          onClick={(e) => {
+                            e.preventDefault();
+                            // Usar window.location.href para forzar una navegación completa
+                            window.location.href = directLink;
+                          }} 
+                          style={{ cursor: 'pointer' }}
+                          className="embed-preview-link"
+                        >
                           <ExternalLink size={14} /> Abrir chat
                         </a>
                       </div>

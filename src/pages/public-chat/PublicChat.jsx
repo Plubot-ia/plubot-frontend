@@ -46,33 +46,70 @@ const PublicChat = () => {
           headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json'
-          }
+          },
+          // Añadir timeout para evitar esperas indefinidas
+          timeout: 10000
         };
 
-        // Usar URL absoluta al backend con el endpoint correcto
-        const chatEndpoint = `${baseURL}/api/plubots/chat/${publicId}`;
-        logDebug('Endpoint de chat:', chatEndpoint);
-        
-        const response = await axios.get(chatEndpoint, axiosConfig);
-        const data = response.data;
+        // Intentar cargar el chatbot desde el backend
+        try {
+          // Usar URL relativa para evitar problemas con dominios
+          const chatEndpoint = `/api/plubots/chat/${publicId}`;
+          logDebug('Endpoint de chat:', chatEndpoint);
+          
+          const response = await axios.get(chatEndpoint, axiosConfig);
+          const data = response.data;
 
-        logDebug('Respuesta del backend:', data);
+          logDebug('Respuesta del backend:', data);
 
-        if (data.status === 'success') {
-          setBotInfo(data.data);
-          // Añadir mensaje inicial del bot
-          const welcomeMessage = {
-            id: 'welcome',
-            text: data.data.initialMessage,
-            sender: 'bot',
-            timestamp: new Date().toISOString()
-          };
+          if (data.status === 'success') {
+            setBotInfo(data.data);
+            // Añadir mensaje inicial del bot
+            const welcomeMessage = {
+              id: 'welcome',
+              text: data.data.initialMessage,
+              sender: 'bot',
+              timestamp: new Date().toISOString()
+            };
 
-          setMessages([welcomeMessage]);
-          logDebug('Mensaje de bienvenida establecido:', welcomeMessage);
-        } else {
-          setError(data.message || 'No se pudo cargar el chatbot');
-          logDebug('Error cargando el chatbot:', data.message);
+            setMessages([welcomeMessage]);
+            logDebug('Mensaje de bienvenida establecido:', welcomeMessage);
+          } else {
+            setError(data.message || 'No se pudo cargar el chatbot');
+            logDebug('Error cargando el chatbot:', data.message);
+          }
+        } catch (apiError) {
+          // Si hay un error con la API relativa, intentar con URL absoluta
+          logDebug('Error al conectar con API relativa, intentando URL absoluta', apiError);
+          
+          try {
+            const absoluteEndpoint = `${baseURL}/api/plubots/chat/${publicId}`;
+            logDebug('Intentando con endpoint absoluto:', absoluteEndpoint);
+            
+            const response = await axios.get(absoluteEndpoint, axiosConfig);
+            const data = response.data;
+            
+            if (data.status === 'success') {
+              setBotInfo(data.data);
+              // Añadir mensaje inicial del bot
+              const welcomeMessage = {
+                id: 'welcome',
+                text: data.data.initialMessage,
+                sender: 'bot',
+                timestamp: new Date().toISOString()
+              };
+
+              setMessages([welcomeMessage]);
+              logDebug('Mensaje de bienvenida establecido con URL absoluta:', welcomeMessage);
+            } else {
+              throw new Error(data.message || 'No se pudo cargar el chatbot');
+            }
+          } catch (absoluteError) {
+            // Si ambos métodos fallan, mostrar un mensaje de error claro
+            logDebug('Error al conectar con ambas URLs', absoluteError);
+            setError('No se pudo conectar con el servidor. Por favor, intenta más tarde o contacta al administrador.');
+            throw absoluteError;
+          }
         }
       } catch (error) {
         console.error('Error cargando el chatbot:', error);
@@ -159,16 +196,28 @@ const PublicChat = () => {
         headers: {
           'Accept': 'application/json',
           'Content-Type': 'application/json'
-        }
+        },
+        timeout: 15000 // 15 segundos de timeout
       };
 
-      // Usar URL absoluta al backend con el endpoint correcto
-      const messageEndpoint = `${baseURL}/api/plubots/chat/${publicId}/message`;
-      logDebug('Endpoint de mensaje:', messageEndpoint);
-      
-      const response = await axios.post(messageEndpoint, requestData, axiosConfig);
-      const data = response.data;
+      // Intentar primero con URL relativa
+      let response;
+      try {
+        const relativeEndpoint = `/api/plubots/chat/${publicId}/message`;
+        logDebug('Intentando con endpoint relativo:', relativeEndpoint);
+        
+        response = await axios.post(relativeEndpoint, requestData, axiosConfig);
+      } catch (relativeError) {
+        logDebug('Error con endpoint relativo, intentando URL absoluta', relativeError);
+        
+        // Si falla, intentar con URL absoluta
+        const absoluteEndpoint = `${baseURL}/api/plubots/chat/${publicId}/message`;
+        logDebug('Endpoint absoluto de mensaje:', absoluteEndpoint);
+        
+        response = await axios.post(absoluteEndpoint, requestData, axiosConfig);
+      }
 
+      const data = response.data;
       logDebug('Respuesta del backend:', data);
 
       // Eliminar indicador de escritura
