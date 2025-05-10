@@ -4,6 +4,7 @@ import path from 'path';
 
 export default defineConfig({
   plugins: [react()],
+  base: '/',
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
@@ -40,10 +41,18 @@ export default defineConfig({
     },
   },
   build: {
-    outDir: 'build',
-    chunkSizeWarningLimit: 1000, // Aumentado para evitar advertencias con dependencias grandes
+    outDir: 'dist', 
+    chunkSizeWarningLimit: 1000,
     minify: 'esbuild',
     target: 'esnext',
-    sourcemap: false, // Desactivado para builds más rápidos, actívalo si necesitas depurar
+    sourcemap: false,
+    rollupOptions: {
+      output: {
+        chunkFileNames: 'assets/[name].[hash].js',
+        entryFileNames: 'assets/[name].[hash].js',
+        assetFileNames: 'assets/[name].[hash].[ext]'
+      }
+    },
+    assetsInlineLimit: 4096,
   },
 });

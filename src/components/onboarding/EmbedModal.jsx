@@ -22,7 +22,15 @@ const EmbedModal = ({ plubotId, plubotName, onClose }) => {
 
   useEffect(() => {
     if (plubotId) {
-      generateEmbedResources();
+      setIsLoading(true);
+      
+      setDirectLink(`${window.location.origin}/chat/${plubotId}`);
+      setEmbedCode(generateEmbedCodeFromData(plubotId, customization));
+      setQrCode(`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(window.location.origin)}/chat/${plubotId}`);
+      
+      showNotification('Recursos de embebido generados correctamente', 'success');
+      
+      setIsLoading(false);
     }
   }, [plubotId, customization]);
 
@@ -342,7 +350,7 @@ const EmbedModal = ({ plubotId, plubotName, onClose }) => {
               } else if (activeTab === 'embed') {
                 copyToClipboard(embedCode, 'Código');
               } else if (activeTab === 'customize') {
-                generateEmbedResources();
+                useRealPlubotId();
                 showNotification('Cambios aplicados', 'success');
               }
             }}

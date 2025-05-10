@@ -374,7 +374,7 @@ const TrainingScreen = () => {
     const userMessages = nodes.map((node, index) => ({
       user_message: node.data.label || `Nodo ${index + 1}`,
       position: index,
-      nodeId: node.id,
+      nodeId: node.id // Guardar el ID original del nodo
     }));
     const duplicates = userMessages.reduce((acc, curr, index, arr) => {
       const isDuplicated = arr.some(
@@ -448,13 +448,25 @@ const TrainingScreen = () => {
             condition: node.type === 'option' ? node.data.condition : undefined,
             position_x: node.position.x,
             position_y: node.position.y,
+            node_id: node.id // Guardar el ID original del nodo
           };
         }),
-        edges: edges.map((edge) => ({
-          source: edge.source.replace('node-', ''),
-          target: edge.target.replace('node-', ''),
-          sourceHandle: edge.sourceHandle,
-        })),
+        edges: edges.map((edge) => {
+          // Extraer los índices numéricos de los IDs de los nodos
+          const sourceMatch = edge.source.match(/node-(\d+)/);
+          const targetMatch = edge.target.match(/node-(\d+)/);
+          
+          // Si los IDs tienen el formato esperado (node-X), extraer el número
+          // Si no, intentar usar el ID directamente (podría ser un número o un string)
+          const sourceIndex = sourceMatch ? sourceMatch[1] : edge.source.replace('node-', '');
+          const targetIndex = targetMatch ? targetMatch[1] : edge.target.replace('node-', '');
+          
+          return {
+            source: sourceIndex,
+            target: targetIndex,
+            sourceHandle: edge.sourceHandle,
+          };
+        }),
       };
       const response = await request('PUT', `/api/plubots/update/${plubotIdFromUrl}`, payload);
       if (response.status !== 'success') {
@@ -550,7 +562,7 @@ const TrainingScreen = () => {
           const newNodes = flows.map((flow, index) => {
             const position = flow.position !== undefined ? flow.position : index;
             return {
-              id: `node-${position}`,
+              id: flow.node_id || `node-${position}`, // Usar el ID original si existe
               type: flow.intent || 'message',
               position: {
                 x: flow.position_x ?? 100 * (index % 5),
@@ -577,6 +589,13 @@ const TrainingScreen = () => {
             };
           });
 
+          // Crear un mapa de IDs de nodos para facilitar la búsqueda
+          const nodeIdMap = {};
+          newNodes.forEach(node => {
+            nodeIdMap[node.id] = node;
+          });
+
+          // Crear un mapa de posiciones para compatibilidad con el código existente
           const flowIdToPosition = {};
           flows.forEach((flow, index) => {
             const position = flow.position !== undefined ? flow.position : index;
@@ -585,6 +604,19 @@ const TrainingScreen = () => {
 
           const newEdges = edges
             .map((edge, index) => {
+              // Si tenemos los IDs originales, usarlos directamente
+              if (edge.source && edge.target && nodeIdMap[edge.source] && nodeIdMap[edge.target]) {
+                return {
+                  id: edge.id || `edge-${index}-${edge.source}-${edge.target}`,
+                  source: edge.source,
+                  target: edge.target,
+                  type: 'default',
+                  animated: false,
+                  sourceHandle: edge.sourceHandle,
+                };
+              }
+
+              // Fallback al método anterior si no tenemos IDs originales
               const sourcePosition = Object.keys(flowIdToPosition).find(
                 (key) => flows[flowIdToPosition[key]].position === parseInt(edge.source, 10)
               );
