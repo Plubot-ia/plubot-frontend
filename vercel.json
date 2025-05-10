@@ -18,6 +18,17 @@
       }
     },
     {
+      "src": "/api/(.*)",
+      "dest": "https://plubot-backend.onrender.com/api/$1"
+    },
+    {
+      "src": "/chat/(.*)",
+      "dest": "/index.html",
+      "headers": {
+        "cache-control": "public, max-age=0, must-revalidate"
+      }
+    },
+    {
       "src": "/(.*)",
       "dest": "/index.html",
       "headers": {
