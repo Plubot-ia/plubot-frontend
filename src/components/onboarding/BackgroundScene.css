@@ -1,0 +1,41 @@
+.ts-background-scene-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -3;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.ts-background-scene-container .ts-background-scene {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+.ts-background-scene-container .ts-static-layer {
+    z-index: -2;
+}
+
+.ts-background-scene-container .ts-dynamic-layer {
+    z-index: -1;
+    filter: blur(0.5px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .ts-background-scene-container .ts-dynamic-layer {
+        animation: ts-pulse 5s ease-in-out infinite;
+    }
+}
+
+/* Animations */
+@keyframes ts-pulse {
+    0% { opacity: 0.8; }
+    50% { opacity: 1; }
+    100% { opacity: 0.8; }
+}

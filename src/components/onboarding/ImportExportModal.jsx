@@ -1,0 +1,219 @@
+import React from 'react';
+import './ImportExportModal.css';
+
+const ImportExportModal = ({
+  nodes,
+  edges,
+  setNodes,
+  setEdges,
+  plubotData,
+  updatePlubotData,
+  exportFormat,
+  setExportFormat,
+  importData,
+  setImportData,
+  setExportMode,
+  setByteMessage,
+}) => {
+  const exportFlow = () => {
+    try {
+      const flowData = {
+        metadata: {
+          version: '1.0',
+          plubotName: plubotData?.name || 'Unnamed Plubot',
+          createdAt: new Date().toISOString(),
+          nodeCount: nodes.length,
+          edgeCount: edges.length,
+        },
+        nodes: nodes.map((node) => ({
+          ...node,
+          __rf: undefined,
+          dragging: undefined,
+          selected: undefined,
+        })),
+        edges,
+      };
+      let exportString = JSON.stringify(flowData, null, 2);
+      const blob = new Blob([exportString], { type: 'text/plain;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const downloadLink = document.createElement('a');
+      downloadLink.href = url;
+      downloadLink.download = `${plubotData?.name || 'plubot'}_flow_${new Date().toISOString().split('T')[0]}.${exportFormat}`;
+      document.body.appendChild(downloadLink);
+      downloadLink.click();
+      document.body.removeChild(downloadLink);
+      setByteMessage(`¡Flujo exportado con éxito! Se guardó como ${downloadLink.download}`);
+    } catch (error) {
+      console.error('Error al exportar flujo:', error);
+      setByteMessage('Error al exportar el flujo. Por favor, intenta de nuevo.');
+    }
+  };
+
+  const importFlow = () => {
+    try {
+      if (!importData.trim()) {
+        setByteMessage('Por favor, ingresa datos de flujo para importar.');
+        return;
+      }
+      const parsedData = JSON.parse(importData);
+      if (!parsedData.nodes || !Array.isArray(parsedData.nodes) || !parsedData.edges || !Array.isArray(parsedData.edges)) {
+        throw new Error('Formato de datos inválido. El flujo debe contener arrays de nodos y aristas.');
+      }
+      const hasStart = parsedData.nodes.some((node) => node.type === 'start');
+      const hasMessage = parsedData.nodes.some((node) => node.type === 'message');
+      if (!hasStart || !hasMessage) {
+        setByteMessage('Precaución: El flujo importado puede estar incompleto. Asegúrate de tener nodos de inicio y mensaje.');
+      }
+      const validNodes = parsedData.nodes.filter(
+        (node) =>
+          node &&
+          node.id &&
+          node.type &&
+          node.position &&
+          typeof node.position.x === 'number' &&
+          typeof node.position.y === 'number' &&
+          node.data &&
+          typeof node.data.label === 'string'
+      );
+      const validNodeIds = validNodes.map((node) => node.id);
+      const validEdges = parsedData.edges.filter(
+        (edge) =>
+          edge &&
+          edge.id &&
+          edge.source &&
+          edge.target &&
+          validNodeIds.includes(edge.source) &&
+          validNodeIds.includes(edge.target)
+      );
+      if (validNodes.length < parsedData.nodes.length || validEdges.length < parsedData.edges.length) {
+        if (
+          !confirm(
+            `Advertencia: ${parsedData.nodes.length - validNodes.length} nodos y ${
+              parsedData.edges.length - validEdges.length
+            } conexiones son inválidos y serán ignorados. ¿Deseas continuar?`
+          )
+        ) {
+          return;
+        }
+      }
+      setNodes(validNodes);
+      setEdges(validEdges);
+      setExportMode(false);
+      setImportData('');
+      setByteMessage(
+        `¡Flujo importado con éxito! Se cargaron ${validNodes.length} nodos y ${validEdges.length} conexiones.`
+      );
+      if (updatePlubotData) {
+        updatePlubotData({ flowData: { nodes: validNodes, edges: validEdges } });
+      }
+    } catch (error) {
+      console.error('Error al importar flujo:', error);
+      setByteMessage(`Error al importar el flujo: ${error.message}`);
+    }
+  };
+
+  const importFromFile = (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      setImportData(e.target.result);
+    };
+    reader.readAsText(file);
+  };
+
+  return (
+    <div className="ts-import-export-modal">
+      <div className="ts-modal-content">
+        <div className="ts-modal-header">
+          <h3>{importData ? 'Importar Flujo' : 'Exportar Flujo'}</h3>
+          <button onClick={() => setExportMode(false)} className="ts-close-button">
+            ✕
+          </button>
+        </div>
+        
+        <div className="ts-modal-tabs">
+          <button
+            className={importData ? '' : 'active'}
+            onClick={() => setImportData('')}
+          >
+            Exportar
+          </button>
+          <button
+            className={importData ? 'active' : ''}
+            onClick={() => setImportData(' ')}
+          >
+            Importar
+          </button>
+        </div>
+        
+        {!importData ? (
+          <div className="ts-export-section">
+            <div className="ts-export-options">
+              <h4>Opciones de Exportación</h4>
+              <div className="ts-format-selection">
+                <label>
+                  <input
+                    type="radio"
+                    name="exportFormat"
+                    value="json"
+                    checked={exportFormat === 'json'}
+                    onChange={() => setExportFormat('json')}
+                  />
+                  JSON
+                </label>
+              </div>
+            </div>
+            <div className="ts-import-actions">
+              <button onClick={exportFlow} className="ts-primary-button">
+                <i className="fas fa-download"></i> Exportar Flujo
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div className="ts-import-section">
+            <div className="ts-import-options">
+              <h4>Importar Flujo</h4>
+              <p>Puedes pegar el contenido del flujo directamente o seleccionar un archivo:</p>
+              <div className="ts-file-input-container">
+                <input
+                  type="file"
+                  accept=".json,.txt"
+                  onChange={importFromFile}
+                  id="flow-file-input"
+                />
+                <label htmlFor="flow-file-input" className="ts-file-input-label">
+                  <i className="fas fa-file-upload"></i> Seleccionar archivo
+                </label>
+              </div>
+              <textarea
+                placeholder="Pega aquí el contenido del flujo para importar..."
+                value={importData}
+                onChange={(e) => setImportData(e.target.value)}
+                rows={10}
+                className="ts-import-textarea"
+              />
+            </div>
+            <div className="ts-warning-message">
+              <i className="fas fa-exclamation-triangle"></i>
+              <p>
+                La importación reemplazará tu flujo actual. Asegúrate de hacer una copia de seguridad
+                si no quieres perder tu trabajo actual.
+              </p>
+            </div>
+            <div className="ts-import-actions">
+              <button onClick={() => setImportData('')} className="ts-secondary-button">
+                Cancelar
+              </button>
+              <button onClick={importFlow} className="ts-primary-button">
+                <i className="fas fa-file-import"></i> Importar Flujo
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default ImportExportModal;

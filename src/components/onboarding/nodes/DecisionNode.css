@@ -1,0 +1,950 @@
+/* DecisionNode.css - Versión optimizada con mejores prácticas de dimensionamiento */
+.decision-node {
+  /* Dimensiones base usando unidades relativas para mejor escalabilidad */
+  width: clamp(180px, 100%, 320px); /* Mínimo 180px, máximo 320px, adaptable */
+  min-height: 110px;
+  
+  /* Padding usando rem para consistencia entre dispositivos */
+  padding: 0.75rem; /* 12px convertido a rem para mejor escalabilidad */
+  
+  /* Aspecto visual mejorado */
+  background: linear-gradient(145deg, #1f2236, #282c44);
+  border: 2px solid #667eea;
+  border-radius: 12px;
+  
+  /* Modelo de caja */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  box-sizing: border-box;
+  
+  /* Tipografía optimizada */
+  font-size: 0.875rem; /* 14px */
+  line-height: 1.4;
+  color: #ffffff;
+  font-weight: 500;
+  
+  /* Efectos */
+  position: relative;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  user-select: none;
+  animation: nodeAppear 0.3s ease-out;
+}
+
+/* Mejora en la gestión de estados para controlar tamaños */
+.decision-node.selected {
+  border-color: #ff6b6b;
+  box-shadow: 0 0 18px rgba(255, 107, 107, 0.5);
+  transform: translateY(-2px);
+  z-index: 10; /* Asegura que el nodo seleccionado esté por encima */
+}
+
+.decision-node.hovered {
+  background: linear-gradient(145deg, #282c44, #31365b);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.35);
+  z-index: 5; /* Eleva ligeramente el elemento al pasar el cursor */
+}
+
+.decision-node.editing {
+  border-color: #4ea0ff;
+  box-shadow: 0 0 15px rgba(78, 160, 255, 0.5);
+  z-index: 15; /* Prioridad máxima al editar */
+}
+
+/* Comportamiento responsivo mejorado para el nodo colapsado */
+.decision-node.collapsed {
+  min-height: 2.5rem; /* 40px */
+  padding: 0.375rem 0.75rem; /* 6px 12px */
+  transform: scale(0.92);
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+/* Estilos de estado con indicadores visuales mejorados */
+.decision-node.status-success {
+  border-color: #4ecca3;
+  border-width: 2px;
+}
+
+.decision-node.status-warning {
+  border-color: #ffcc5c;
+  border-width: 2px;
+}
+
+.decision-node.status-error {
+  border-color: #ff5c5c;
+  border-width: 2px;
+}
+
+.decision-node.status-info {
+  border-color: #5cabff;
+  border-width: 2px;
+}
+
+/* Header del nodo optimizado */
+.decision-node-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 0.5rem; /* 8px */
+  padding-bottom: 0.25rem; /* 4px */
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.decision-node-title {
+  font-weight: 600;
+  font-size: 0.75rem; /* 12px */
+  text-transform: uppercase;
+  letter-spacing: 0.03125rem; /* 0.5px */
+  opacity: 0.9;
+  margin-left: 0.375rem; /* 6px */
+  flex-grow: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.decision-node-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #667eea;
+  font-size: 1rem; /* 16px */
+}
+
+.decision-node-controls {
+  display: flex;
+  gap: 0.25rem; /* 4px */
+  align-items: center;
+}
+
+.decision-node-collapse-btn {
+  background: transparent;
+  border: none;
+  border-radius: 0.25rem; /* 4px */
+  color: #ffffff;
+  opacity: 0.7;
+  padding: 0.125rem; /* 2px */
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem; /* 24px - tamaño consistente para mejor interacción */
+  height: 1.5rem; /* 24px */
+}
+
+.decision-node-collapse-btn:hover {
+  opacity: 1;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Prioridad */
+.decision-node-priority {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.priority-high {
+  color: #ff5c5c;
+}
+
+.priority-medium {
+  color: #ffcc5c;
+}
+
+.priority-low {
+  color: #5cabff;
+}
+
+.priority-normal {
+  color: #667eea;
+}
+
+/* Badge de estado con dimensiones optimizadas */
+.decision-node-badge {
+  font-size: 0.625rem; /* 10px */
+  padding: 0.125rem 0.375rem; /* 2px 6px */
+  border-radius: 0.625rem; /* 10px */
+  margin-left: 0.375rem; /* 6px */
+  text-transform: uppercase;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.badge-success {
+  background-color: #4ecca3;
+  color: #1a1a2e;
+}
+
+.badge-warning {
+  background-color: #ffcc5c;
+  color: #1a1a2e;
+}
+
+.badge-error {
+  background-color: #ff5c5c;
+  color: #ffffff;
+}
+
+.badge-info {
+  background-color: #5cabff;
+  color: #ffffff;
+}
+
+.badge-default {
+  background-color: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+}
+
+/* Contenido del nodo con scroll inteligente */
+.decision-node-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  overflow: hidden;
+  margin: 0.25rem 0; /* 4px */
+  flex-grow: 1;
+  transition: height 0.3s ease;
+}
+
+/* Mejora en la presentación de la pregunta para evitar desbordamiento */
+.decision-node-question {
+  font-size: 0.875rem; /* 14px */
+  font-weight: 400;
+  padding: 0.25rem 0; /* 4px */
+  width: 100%;
+  text-align: center;
+  word-wrap: break-word;
+  white-space: pre-wrap;
+  max-height: 9.375rem; /* 150px */
+  overflow-y: auto;
+  
+  /* Scroll personalizado para mejor experiencia */
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.2) rgba(0, 0, 0, 0.1);
+}
+
+/* Personalización del scrollbar para WebKit */
+.decision-node-question::-webkit-scrollbar {
+  width: 0.375rem; /* 6px */
+}
+
+.decision-node-question::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 0.1875rem; /* 3px */
+}
+
+.decision-node-question::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 0.1875rem; /* 3px */
+}
+
+.decision-node-question::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.decision-node-placeholder {
+  opacity: 0.6;
+  font-style: italic;
+  font-size: 0.8125rem; /* 13px */
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.decision-node-context {
+  margin-top: 0.375rem; /* 6px */
+  font-size: 0.75rem; /* 12px */
+  opacity: 0.7;
+  text-align: center;
+  font-style: italic;
+  max-width: 90%;
+}
+
+/* Variables destacadas con mejor contraste */
+.node-variable {
+  display: inline-block;
+  padding: 0 0.25rem; /* 0 4px */
+  background: rgba(102, 126, 234, 0.25);
+  border-radius: 0.1875rem; /* 3px */
+  color: #98a4ff; /* Color más brillante para mejor legibilidad */
+  font-weight: 500;
+}
+
+/* Editor de nodo optimizado para facilitar la edición */
+.decision-node-edit-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem; /* 8px */
+  position: relative;
+}
+
+.decision-node-textarea {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 0.25rem; /* 4px */
+  color: #ffffff;
+  font-size: 0.875rem; /* 14px */
+  padding: 0.375rem 0.5rem; /* 6px 8px */
+  width: 100%;
+  max-width: 100%;
+  min-height: 3.75rem; /* 60px */
+  box-sizing: border-box;
+  resize: vertical;
+  outline: none;
+  transition: all 0.2s ease;
+  overflow-x: hidden;
+  line-height: 1.4;
+}
+
+.decision-node-textarea:focus {
+  border-color: #4ea0ff;
+  background: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 0 0 2px rgba(78, 160, 255, 0.25);
+}
+
+.decision-node-editing-toolbar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.375rem; /* 6px */
+  margin-top: 0.25rem; /* 4px */
+}
+
+.decision-node-tool-btn {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 0.25rem; /* 4px */
+  color: #ffffff;
+  padding: 0.25rem; /* 4px */
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem; /* 28px - tamaño adecuado para click touch */
+  height: 1.75rem; /* 28px */
+}
+
+.decision-node-tool-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.decision-node-tool-btn.active {
+  background: rgba(78, 160, 255, 0.3);
+  border-color: #4ea0ff;
+}
+
+/* Editor de variables */
+.decision-node-variable-editor {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  background: #31365b;
+  border-radius: 0.375rem; /* 6px */
+  padding: 0.625rem; /* 10px */
+  box-shadow: 0 0.375rem 1rem rgba(0, 0, 0, 0.4); /* 6px 16px */
+  z-index: 100;
+  margin-top: 0.5rem; /* 8px */
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  animation: fadeIn 0.2s ease;
+}
+
+.decision-node-variable-editor::before {
+  content: '';
+  position: absolute;
+  top: -0.375rem; /* -6px */
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 0 0.375rem 0.375rem 0.375rem; /* 0 6px 6px 6px */
+  border-style: solid;
+  border-color: transparent transparent #31365b transparent;
+}
+
+.decision-node-variable-editor-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem; /* 8px */
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 0.375rem; /* 6px */
+}
+
+.decision-node-variable-editor-header h4 {
+  font-size: 0.75rem; /* 12px */
+  margin: 0;
+  opacity: 0.9;
+}
+
+.decision-node-variable-add {
+  background: rgba(78, 204, 163, 0.2);
+  border: 1px solid #4ecca3;
+  color: #4ecca3;
+  border-radius: 0.25rem; /* 4px */
+  padding: 0.125rem 0.375rem; /* 2px 6px */
+  font-size: 0.6875rem; /* 11px */
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem; /* 4px */
+  height: 1.5rem; /* 24px - altura fija para clickabilidad */
+}
+
+.decision-node-variable-add:hover {
+  background: rgba(78, 204, 163, 0.3);
+}
+
+.decision-node-variable-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem; /* 6px */
+  max-height: 9.375rem; /* 150px */
+  overflow-y: auto;
+  margin-bottom: 0.5rem; /* 8px */
+  padding-right: 0.25rem; /* 4px */
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.2) rgba(0, 0, 0, 0.1);
+}
+
+.decision-node-variable-list::-webkit-scrollbar {
+  width: 0.375rem; /* 6px */
+}
+
+.decision-node-variable-list::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 0.1875rem; /* 3px */
+}
+
+.decision-node-variable-list::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 0.1875rem; /* 3px */
+}
+
+.decision-node-variable-list::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.decision-node-variable-item {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem; /* 6px */
+}
+
+.decision-node-variable-input {
+  flex-grow: 1;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 0.25rem; /* 4px */
+  color: #ffffff;
+  font-size: 0.75rem; /* 12px */
+  padding: 0.25rem 0.375rem; /* 4px 6px */
+  outline: none;
+  transition: all 0.2s ease;
+  max-width: 8.125rem; /* 130px */
+  height: 1.75rem; /* 28px - altura fija para equilibrio visual */
+}
+
+.decision-node-variable-input:focus {
+  border-color: #4ea0ff;
+  background: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 0 0 2px rgba(78, 160, 255, 0.25);
+}
+
+.decision-node-variable-remove {
+  background: transparent;
+  border: 1px solid rgba(255, 77, 77, 0.5);
+  border-radius: 0.25rem; /* 4px */
+  color: #ff5c5c;
+  padding: 0.125rem; /* 2px */
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem; /* 24px */
+  height: 1.5rem; /* 24px */
+  flex-shrink: 0;
+}
+
+.decision-node-variable-remove:hover {
+  background: rgba(255, 77, 77, 0.1);
+  border-color: #ff5c5c;
+}
+
+.decision-node-variable-empty {
+  font-size: 0.75rem; /* 12px */
+  opacity: 0.6;
+  text-align: center;
+  padding: 0.375rem 0; /* 6px 0 */
+}
+
+.decision-node-variable-help {
+  font-size: 0.6875rem; /* 11px */
+  opacity: 0.7;
+  text-align: center;
+  font-style: italic;
+}
+
+/* Footer del nodo */
+.decision-node-footer {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 0.25rem; /* 4px */
+  opacity: 0.7;
+  font-size: 0.6875rem; /* 11px */
+  padding-top: 0.25rem; /* 4px */
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.decision-node-hint {
+  font-style: italic;
+}
+
+.decision-node-metadata {
+  display: flex;
+  gap: 0.375rem; /* 6px */
+  align-items: center;
+}
+
+.decision-node-date,
+.decision-node-owner {
+  font-size: 0.625rem; /* 10px */
+}
+
+.decision-node-owner {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.25rem; /* 20px */
+  height: 1.25rem; /* 20px */
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  font-weight: 600;
+}
+
+/* Controles de edición */
+.decision-node-editing-controls {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem; /* 8px */
+  margin-top: 0.5rem; /* 8px */
+}
+
+.decision-node-add-option {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem; /* 4px */
+  background: rgba(78, 204, 163, 0.2);
+  border: 1px solid #4ecca3;
+  color: #4ecca3;
+  border-radius: 0.25rem; /* 4px */
+  font-size: 0.75rem; /* 12px */
+  padding: 0.25rem 0.5rem; /* 4px 8px */
+  cursor: pointer;
+  transition: all 0.2s ease;
+  height: 2rem; /* 32px - altura adecuada para touch */
+  justify-content: center;
+}
+
+.decision-node-add-option:hover {
+  background: rgba(78, 204, 163, 0.3);
+}
+
+.decision-node-edit-actions {
+  display: flex;
+  gap: 0.375rem; /* 6px */
+}
+
+.decision-node-cancel-btn,
+.decision-node-save-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem; /* 4px */
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 0.25rem; /* 4px */
+  color: #ffffff;
+  font-size: 0.75rem; /* 12px */
+  padding: 0.25rem 0.5rem; /* 4px 8px */
+  cursor: pointer;
+  transition: all 0.2s ease;
+  height: 2rem; /* 32px */
+  justify-content: center;
+  min-width: 4.375rem; /* 70px - ancho mínimo para mayor clickabilidad */
+}
+
+.decision-node-cancel-btn {
+  border-color: rgba(255, 77, 77, 0.5);
+  color: #ff5c5c;
+}
+
+.decision-node-cancel-btn:hover {
+  background: rgba(255, 77, 77, 0.1);
+  border-color: #ff5c5c;
+}
+
+.decision-node-save-btn {
+  border-color: #4ecca3;
+  color: #4ecca3;
+}
+
+.decision-node-save-btn:hover {
+  background: rgba(78, 204, 163, 0.2);
+  border-color: #4ecca3;
+}
+
+/* Handles de conexión con dimensionamiento mejorado */
+.decision-node-input {
+  background: #667eea;
+  width: 0.625rem; /* 10px */
+  height: 0.625rem; /* 10px */
+  border: 2px solid rgba(0, 0, 0, 0.2);
+  top: -0.375rem; /* -6px */
+  position: absolute;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.decision-node-input.active {
+  background: #4ea0ff;
+}
+
+.decision-node-input:hover {
+  background: #8794ff;
+  transform: scale(1.2);
+}
+
+.decision-node-output {
+  width: 0.75rem; /* 12px */
+  height: 0.75rem; /* 12px */
+  background: #667eea;
+  border: 1px solid #fff;
+  border-radius: 50%;
+  position: absolute;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.decision-node-output.active {
+  background: #4ea0ff;
+}
+
+.decision-node-output:hover {
+  background: #8794ff;
+  transform: scale(1.2);
+}
+
+/* Etiquetas de salida */
+.decision-node-output-label {
+  position: absolute;
+  bottom: -1.875rem; /* -30px */
+  font-size: 0.75rem; /* 12px */
+  color: #666;
+  text-align: center;
+  white-space: nowrap;
+  transform: translateX(-50%);
+}
+
+.decision-node-output-text {
+  display: inline-block;
+  max-width: 6.25rem; /* 100px */
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.decision-node-output-edit {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem; /* 4px */
+}
+
+.decision-node-output-input {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 0.25rem; /* 4px */
+  color: #ffffff;
+  font-size: 0.75rem; /* 12px */
+  padding: 0.125rem 0.25rem; /* 2px 4px */
+  width: 5rem; /* 80px */
+  text-align: center;
+  outline: none;
+  transition: all 0.2s ease;
+  height: 1.5rem; /* 24px */
+}
+
+.decision-node-output-input:focus {
+  border-color: #4ea0ff;
+  background: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 0 0 2px rgba(78, 160, 255, 0.25);
+}
+
+.decision-node-remove-option {
+  background: transparent;
+  border: 1px solid rgba(255, 77, 77, 0.5);
+  border-radius: 0.25rem; /* 4px */
+  color: #ff5c5c;
+  padding: 0.125rem; /* 2px */
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem; /* 24px */
+  height: 1.5rem; /* 24px */
+}
+
+.decision-node-remove-option:hover {
+  background: rgba(255, 77, 77, 0.1);
+  border-color: #ff5c5c;
+}
+
+/* Sistema de cuadrícula para redimensionamiento */
+.decision-node.resizable {
+  /* Implementa CSS Grid para un mejor control del redimensionamiento */
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  align-items: start;
+  resize: both; /* Permite redimensionar en navegadores modernos */
+  overflow: hidden;
+  min-width: 180px;
+  max-width: 400px; /* Limitamos el ancho máximo para mantener usabilidad */
+  min-height: 110px;
+  max-height: 500px; /* Limitamos la altura máxima */
+}
+
+/* Handle de redimensionamiento mejor posicionado */
+.resize-handle {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 1rem; /* 16px */
+  height: 1rem; /* 16px */
+  background: transparent;
+  cursor: nwse-resize;
+  transition: all 0.2s ease;
+  opacity: 0.7;
+  
+  /* Mejoramos el diseño con un triángulo en la esquina */
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+}
+
+.resize-handle::after {
+  content: '';
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 0 0 0.625rem 0.625rem; /* 0 0 10px 10px */
+  border-color: transparent transparent #667eea transparent;
+}
+
+.resize-handle:hover::after,
+.resize-handle:focus::after {
+  border-color: transparent transparent #ff6b6b transparent;
+}
+
+/* Mensaje de error */
+.decision-node-error {
+  position: absolute;
+  top: -1.875rem; /* -30px */
+  left: 50%;
+  transform: translateX(-50%);
+  background: #ff4d4d;
+  color: white;
+  padding: 0.25rem 0.625rem; /* 4px 10px */
+  border-radius: 0.375rem; /* 6px */
+  font-size: 0.75rem; /* 12px */
+  z-index: 10;
+  box-shadow: 0 0.125rem 0.5rem rgba(255, 77, 77, 0.4); /* 2px 8px */
+  animation: errorPulse 2s infinite;
+  white-space: nowrap;
+  max-width: 90%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Media queries para comportamiento responsivo */
+@media (max-width: 768px) {
+  .decision-node {
+    min-width: 160px;
+    width: clamp(160px, 100%, 280px);
+    font-size: 0.8125rem; /* 13px */
+  }
+  
+  .decision-node-title {
+    font-size: 0.6875rem; /* 11px */
+  }
+  
+  /* Ajustes responsivos para pantallas medianas */
+  .decision-node-variable-input {
+    max-width: 7.5rem; /* 120px */
+  }
+  
+  .decision-node-output-text {
+    max-width: 5rem; /* 80px */
+  }
+  
+  /* Reducción de espacios en modo responsive */
+  .decision-node-header {
+    margin-bottom: 0.375rem; /* 6px */
+  }
+  
+  .decision-node-footer {
+    margin-top: 0.1875rem; /* 3px */
+  }
+}
+
+@media (max-width: 480px) {
+  .decision-node {
+    min-width: 140px;
+    width: clamp(140px, 100%, 240px);
+    padding: 0.625rem; /* 10px */
+  }
+  
+  .decision-node-question {
+    font-size: 0.8125rem; /* 13px */
+  }
+  
+  /* Ajustes adicionales para pantallas pequeñas */
+  .decision-node-variable-input {
+    max-width: 6.25rem; /* 100px */
+  }
+  
+  .decision-node-output-text {
+    max-width: 4.375rem; /* 70px */
+  }
+  
+  /* Botones más compactos pero con buena área táctil */
+  .decision-node-tool-btn,
+  .decision-node-variable-remove,
+  .decision-node-remove-option {
+    width: 1.625rem; /* 26px */
+    height: 1.625rem; /* 26px */
+  }
+  
+  .decision-node-add-option,
+  .decision-node-cancel-btn,
+  .decision-node-save-btn {
+    padding: 0.25rem 0.375rem; /* 4px 6px */
+    font-size: 0.6875rem; /* 11px */
+    height: 1.75rem; /* 28px */
+    min-width: 3.75rem; /* 60px */
+  }
+}
+
+/* Animaciones clave para mejorar la experiencia */
+@keyframes nodeAppear {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-0.25rem); /* -4px */
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes errorPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(255, 77, 77, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 0.625rem rgba(255, 77, 77, 0); /* 10px */
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(255, 77, 77, 0);
+  }
+}
+
+/* Asegurar compatibilidad con navegadores modernos */
+@supports (display: grid) {
+  .decision-node {
+    grid-template-rows: auto 1fr auto;
+  }
+}
+
+/* Asegurar que el redimensionamiento sea suave */
+@supports (resize: both) {
+  .decision-node.resizable {
+    resize: both;
+    overflow: hidden;
+  }
+}
+
+/* Mejorar la accesibilidad */
+.decision-node:focus {
+  outline: 2px solid #4ea0ff;
+  outline-offset: 2px;
+}
+
+.decision-node:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* Estilos para navegadores con soporte de pointer-events */
+@supports (pointer-events: auto) {
+  .decision-node-collapse-btn,
+  .decision-node-tool-btn,
+  .decision-node-variable-add,
+  .decision-node-variable-remove,
+  .decision-node-add-option,
+  .decision-node-cancel-btn,
+  .decision-node-save-btn,
+  .decision-node-remove-option {
+    pointer-events: auto;
+  }
+}
+
+/* Ajustes para pantallas de alta densidad (Retina) */
+@media (min-resolution: 2dppx) {
+  .decision-node {
+    border-width: 1.5px;
+  }
+  
+  .decision-node-input,
+  .decision-node-output {
+    border-width: 1.5px;
+  }
+  
+  .resize-handle::after {
+    border-width: 0 0 0.5rem 0.5rem; /* 0 0 8px 8px */
+  }
+}
+
+/* Soporte para temas oscuros */
+@media (prefers-color-scheme: dark) {
+  .decision-node {
+    background: linear-gradient(145deg, #1f2236, #282c44);
+  }
+  
+  .decision-node.hovered {
+    background: linear-gradient(145deg, #282c44, #31365b);
+  }
+  
+  .decision-node-variable-editor {
+    background: #31365b;
+  }
+}

@@ -1,0 +1,30 @@
+/* Layout.css */
+body, html {
+  margin: 0 !important;
+  margin-left: 0 !important;
+  padding: 0 !important;
+  padding-left: 0 !important;
+  width: 100% !important;
+}
+
+.layout {
+  position: relative;
+  z-index: 1;
+  width: 100% !important;
+  margin: 0 !important;
+  margin-left: 0 !important;
+  padding: 0 !important;
+  padding-left: 0 !important;
+  box-sizing: border-box !important;
+}
+
+main {
+  position: relative;
+  z-index: 2;
+  width: 100% !important;
+  margin: 0 !important;
+  margin-left: 0 !important;
+  padding: 0 !important;
+  padding-left: 0 !important;
+  box-sizing: border-box !important;
+}
