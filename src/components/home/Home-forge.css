@@ -92,15 +92,13 @@
   }
   
   .plubot-forge .holo-icon.nucleus {
-    background-image: url('../assets/img/nucleus-icon.png');
+    background-image: url('/assets/img/nucleus-icon.png');
   }
-  
   .plubot-forge .holo-icon.essence {
-    background-image: url('../assets/img/essence-icon.png');
+    background-image: url('/assets/img/essence-icon.png');
   }
-  
   .plubot-forge .holo-icon.galaxy {
-    background-image: url('../assets/img/galaxy-icon.png');
+    background-image: url('/assets/img/galaxy-icon.png');
   }
   
   .plubot-forge .forge-card h3 {
