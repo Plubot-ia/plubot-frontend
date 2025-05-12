@@ -287,7 +287,7 @@ function AppWrapper() {
           <Route path="/plubot/about-chat-byte" element={<ByteEmbajador />} />
           <Route path="/historyverse" element={<Historyverse />} />
           <Route path="/tu-opinion" element={<TuOpinion />} /> {/* Nueva ruta */}
-          <Route path="/plubot/create" element={<CreatePlubot />}>
+          <Route path="/plubot/create/*" element={<CreatePlubot />}>
             <Route index element={<WelcomeSequence />} />
             <Route path="welcome" element={<WelcomeSequence />} />
             <Route path="factory" element={<PrivateRoute><FactoryScreen /></PrivateRoute>} />

@@ -10,7 +10,14 @@ const ByteAssistant = ({ simulationMode }) => {
   const [isVisible, setIsVisible] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
-  const [messages, setMessages] = useState([]);
+  const [messages, setMessages] = useState([
+    {
+      text: '¡Hola! Soy Byte, tu experto en nodos y flujos. Pregúntame lo que necesites.',
+      sender: 'byte',
+      type: 'info',
+      id: 'initial-byte-message'
+    }
+  ]);
   const [userInput, setUserInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [byteState, setByteState] = useState('normal');

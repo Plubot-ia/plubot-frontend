@@ -11,6 +11,7 @@ import useDebounce from '@/hooks/useDebounce';
 import FlowEditor from './FlowEditor';
 import NodePalette from './NodePalette';
 import ByteAssistant from './ByteAssistant';
+import StatusBubble from './StatusBubble';
 import logo from '@/assets/img/plubot.svg';
 import './TrainingScreen.css';
 
@@ -124,6 +125,7 @@ const TrainingScreen = () => {
     suggestions: [],
     showSuggestionsModal: false,
     showEmbedModal: false,
+    showVersionHistoryPanel: false, 
   });
 
   // Simplified node and edge templates
@@ -472,6 +474,11 @@ const TrainingScreen = () => {
       if (response.status !== 'success') {
         throw new Error(response.message || 'Respuesta inválida');
       }
+      // Guardado exitoso, establecer mensaje para ByteAssistant (StatusBubble)
+      setState((prev) => ({
+        ...prev,
+        byteMessage: '💾 ¡Flujo guardado con éxito!',
+      }));
     } catch (error) {
       setState((prev) => ({
         ...prev,
@@ -835,26 +842,32 @@ const TrainingScreen = () => {
     setState((prev) => ({ ...prev, byteMessage: 'Puedes compartir tu Plubot con un enlace directo o embeber el chatbot en tu sitio web.' }));
   }, []);
 
-  if (state.errorMessage) {
-    return (
-      <div className="ts-critical-error" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100vh', background: 'rgba(10, 20, 35, 0.95)', color: '#ff4444', textAlign: 'center', padding: '2rem' }}>
-        <h2 style={{ fontSize: '1.5rem', marginBottom: '1rem', textShadow: '0 0 5px #ff4444' }}>Error</h2>
-        <p style={{ fontSize: '1rem', marginBottom: '1.5rem', color: 'rgba(0, 224, 255, 0.8)' }}>{state.errorMessage}</p>
-        <button className="ts-training-action-btn" onClick={() => navigate('/profile')} style={{ background: 'rgba(0, 40, 80, 0.8)', border: '2px solid #00e0ff', padding: '0.8rem 1.5rem', fontSize: '1rem', color: '#e0e0ff' }}>
-          ← Volver al Perfil
-        </button>
-      </div>
-    );
-  }
+  const handleSetByteMessage = useCallback((msg) => {
+    // No hacer nada aquí para evitar que mensajes generales de FlowEditor
+    // (como 'Nodo seleccionado') se muestren en la StatusBubble.
+    // Los mensajes de guardado se establecen directamente en saveFlowData.
+    console.log('Mensaje de FlowEditor (ignorado por StatusBubble):', msg); // Para depuración
+  }, []);
 
-  if (state.isLoading) {
-    return (
-      <div className="ts-loading" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100vh', background: 'rgba(10, 20, 35, 0.95)' }}>
-        <div className="loading-spinner" style={{ width: '50px', height: '50px', border: '5px solid rgba(0, 224, 255, 0.3)', borderTop: '5px solid #00e0ff', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>
-        <h2 style={{ color: '#00e0ff', textShadow: '0 0 10px rgba(0, 224, 255, 0.7)', marginTop: '1rem' }}>Cargando datos del Plubot...</h2>
-      </div>
-    );
-  }
+  const handleSetShowConnectionEditor = useCallback((val) => {
+    setState((prev) => ({ ...prev, showConnectionEditor: val }));
+  }, []);
+
+  const handleSetSelectedConnection = useCallback((conn) => {
+    setState((prev) => ({ ...prev, selectedConnection: conn }));
+  }, []);
+
+  const handleSetConnectionProperties = useCallback((props) => {
+    setState((prev) => ({ ...prev, connectionProperties: props }));
+  }, []);
+
+  const handleSetShowSimulation = useCallback((val) => {
+    setState((prev) => ({ ...prev, showSimulation: val }));
+  }, []);
+
+  const handleSetEdges = useCallback((edgesOrUpdater) => {
+    setEdges(edgesOrUpdater);
+  }, [setEdges]);
 
   const modalProps = {
     templateSelector: {
@@ -872,12 +885,21 @@ const TrainingScreen = () => {
       importData: state.importData,
       setImportData: (data) => setState((prev) => ({ ...prev, importData: data })),
       setExportFormat: (format) => setState((prev) => ({ ...prev, exportFormat: format })),
-      onImport: (data) => {
-        setNodes(data.nodes);
-        setEdges(data.edges);
-        setState((prev) => ({ ...prev, byteMessage: '📋 Datos importados.' }));
-        saveFlowData();
-        triggerSaveOnSignificantChange();
+      onImport: () => {
+        try {
+          const data = JSON.parse(state.importData);
+          if (data.nodes && data.edges) {
+            setNodes(data.nodes);
+            setEdges(data.edges);
+            setState((prev) => ({ ...prev, byteMessage: '📋 Datos importados.' }));
+            saveFlowData();
+            triggerSaveOnSignificantChange();
+          } else {
+            setState((prev) => ({ ...prev, byteMessage: '⚠️ Formato de datos inválido.' }));
+          }
+        } catch (error) {
+          setState((prev) => ({ ...prev, byteMessage: `⚠️ Error al importar datos: ${error.message}` }));
+        }
       },
       onExport: () => {
         const flowData = { nodes, edges };
@@ -951,6 +973,27 @@ const TrainingScreen = () => {
     showEmbedModal: state.showEmbedModal,
   };
 
+  if (state.errorMessage) {
+    return (
+      <div className="ts-critical-error" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100vh', background: 'rgba(10, 20, 35, 0.95)', color: '#ff4444', textAlign: 'center', padding: '2rem' }}>
+        <h2 style={{ fontSize: '1.5rem', marginBottom: '1rem', textShadow: '0 0 5px #ff4444' }}>Error</h2>
+        <p style={{ fontSize: '1rem', marginBottom: '1.5rem', color: 'rgba(0, 224, 255, 0.8)' }}>{state.errorMessage}</p>
+        <button className="ts-training-action-btn" onClick={() => navigate('/profile')} style={{ background: 'rgba(0, 40, 80, 0.8)', border: '2px solid #00e0ff', padding: '0.8rem 1.5rem', fontSize: '1rem', color: '#e0e0ff' }}>
+          ← Volver al Perfil
+        </button>
+      </div>
+    );
+  }
+
+  if (state.isLoading) {
+    return (
+      <div className="ts-loading" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100vh', background: 'rgba(10, 20, 35, 0.95)' }}>
+        <div className="loading-spinner" style={{ width: '50px', height: '50px', border: '5px solid rgba(0, 224, 255, 0.3)', borderTop: '5px solid #00e0ff', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>
+        <h2 style={{ color: '#00e0ff', textShadow: '0 0 10px rgba(0, 224, 255, 0.7)', marginTop: '1rem' }}>Cargando datos del Plubot...</h2>
+      </div>
+    );
+  }
+
   return (
     <div className="ts-training-screen">
       {state.notification && (
@@ -984,41 +1027,43 @@ const TrainingScreen = () => {
           nodes={nodes}
           edges={edges}
           setNodes={setNodes}
-          setEdges={(newEdges) => {
-            setEdges(newEdges);
-            triggerSaveOnSignificantChange();
-          }}
+          setEdges={setEdges}
           selectedNode={selectedNode}
           setSelectedNode={setSelectedNode}
-          setByteMessage={(msg) => setState((prev) => ({ ...prev, byteMessage: msg }))}
-          setShowConnectionEditor={(val) => setState((prev) => ({ ...prev, showConnectionEditor: val }))}
-          setSelectedConnection={(conn) => setState((prev) => ({ ...prev, selectedConnection: conn }))}
-          setConnectionProperties={(props) => setState((prev) => ({ ...prev, connectionProperties: props }))}
+          setByteMessage={handleSetByteMessage}
+          setShowConnectionEditor={handleSetShowConnectionEditor}
+          setSelectedConnection={handleSetSelectedConnection}
+          setConnectionProperties={handleSetConnectionProperties}
           handleError={handleError}
           showSimulation={state.showSimulation}
-          setShowSimulation={(val) => setState((prev) => ({ ...prev, showSimulation: val }))}
+          setShowSimulation={handleSetShowSimulation}
+          showVersionHistoryPanel={state.showVersionHistoryPanel}
+          setShowVersionHistoryPanel={(value) => setState(prev => ({ ...prev, showVersionHistoryPanel: value }))}
           className="ts-flow-editor"
           plubotId={plubotData?.id}
           name={plubotData?.name || 'Sin nombre'}
           notifyByte={notifyByte}
           onNodeDragStop={triggerSaveOnSignificantChange}
+          saveFlowData={saveFlowData}
         />
       )}
 
-      <NodePalette setNodes={setNodes} setByteMessage={(msg) => setState((prev) => ({ ...prev, byteMessage: msg }))} className="ts-node-palette" />
+      <NodePalette setNodes={setNodes} setByteMessage={() => {}} className="ts-node-palette" /> 
 
-      <Suspense fallback={<div>Loading...</div>}>
-        <VersionHistory
-          versions={plubotData.flowVersions}
-          onRestore={(versionData) => {
-            setNodes(versionData.nodes);
-            setEdges(versionData.edges);
-            setState((prev) => ({ ...prev, byteMessage: '🔄 Versión restaurada.' }));
-            triggerSaveOnSignificantChange();
-          }}
-          className="ts-version-history"
-        />
-      </Suspense>
+      {state.showVersionHistoryPanel && (
+        <Suspense fallback={<div>Loading...</div>}>
+          <VersionHistory
+            versions={plubotData.flowVersions}
+            onRestore={(versionData) => {
+              setNodes(versionData.nodes);
+              setEdges(versionData.edges);
+              setState((prev) => ({ ...prev, byteMessage: '🔄 Versión restaurada.' }));
+              triggerSaveOnSignificantChange();
+            }}
+            className="ts-version-history" // Este className puede necesitar ajustes de estilo más tarde
+          />
+        </Suspense>
+      )}
 
       <ModalManager
         modals={modals}
@@ -1026,7 +1071,8 @@ const TrainingScreen = () => {
         onClose={(key) => setState((prev) => ({ ...prev, [key]: false }))}
       />
 
-      <ByteAssistant message={state.byteMessage} simulationMode={state.showSimulation} />
+      <ByteAssistant simulationMode={state.showSimulation} /> 
+      <StatusBubble message={state.byteMessage} />
     </div>
   );
 };

@@ -6,7 +6,7 @@ export const usePermissions = () => {
     const canDelete = true;
     const isAdmin = true;
 
-    console.log('Checking permissions', { canEdit, canDelete, isAdmin });
+    // console.log('Checking permissions', { canEdit, canDelete, isAdmin });
 
     return { canEdit, canDelete, isAdmin };
   }, []); // Dependencias vacías porque los valores son estáticos

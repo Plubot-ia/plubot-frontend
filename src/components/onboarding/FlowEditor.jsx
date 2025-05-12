@@ -2,15 +2,17 @@ import React, { useRef, useState, useCallback, useMemo, useEffect, lazy, Suspens
 import { useNavigate } from 'react-router-dom';
 import ReactFlow, {
   ReactFlowProvider,
-  useReactFlow,
+  useReactFlow, // Importar useReactFlow
   MarkerType,
   applyNodeChanges,
   applyEdgeChanges,
+  Background,
+  Panel, // <--- Agregado Panel aquí
 } from 'reactflow';
 import { emitEvent, onEvent } from '@/utils/eventBus';
 import { validateNode, createEdge } from '@/utils/flowUtils';
 import { NODE_TYPES, EDGE_TYPES, EDGE_COLORS } from '@/utils/nodeConfig';
-import BackgroundScene from './BackgroundScene';
+import BackgroundScene from './BackgroundScene'; // <--- Restaurar importación
 import CustomMiniMap from './CustomMiniMap';
 import SimulationInterface from './SimulationInterface';
 import './FlowEditor.css';
@@ -24,6 +26,8 @@ const MessageNode = lazy(() => import('./nodes/MessageNode'));
 const DecisionNode = lazy(() => import('./nodes/DecisionNode'));
 const ActionNode = lazy(() => import('./nodes/ActionNode'));
 const OptionNode = lazy(() => import('./nodes/OptionNode'));
+const HttpRequestNode = lazy(() => import('./nodes/HttpRequestNode')); 
+const PowerNode = lazy(() => import('./PowerNode')); // Nuevo nodo de poder
 
 // Error Boundary for Node Components
 class NodeErrorBoundary extends React.Component {
@@ -148,8 +152,11 @@ const FlowEditorInner = React.memo(
     plubotId,
     name,
     notifyByte,
+    showVersionHistoryPanel,
+    setShowVersionHistoryPanel,
+    saveFlowData, // <--- Recibir saveFlowData aquí
   }) => {
-    const { screenToFlowPosition, setViewport, getViewport, fitView } = useReactFlow();
+    const { screenToFlowPosition, setViewport, getViewport, fitView } = useReactFlow(); // Obtener reactFlowInstance (project es un alias común para screenToFlowPosition)
     const reactFlowWrapper = useRef(null);
     const [error, setError] = useState(null);
     const [isMiniMapExpanded, setIsMiniMapExpanded] = useState(false);
@@ -385,54 +392,96 @@ const FlowEditorInner = React.memo(
       setByteMessage('🔄 Acción rehecha');
     }, [redoStack, setNodes, setEdges, setByteMessage, nodesMap, edgesMap]);
 
+    // Definición de los tipos de nodos personalizados
+    // Primero, creamos wrappers memoizadas para cada componente de nodo
+    const startNodeWrapper = useCallback((props) => (
+      <NodeErrorBoundary>
+        <Suspense fallback={<div>Cargando Inicio...</div>}>
+          <StartNode {...props} setNodes={setNodes} setEdges={setEdges} handleError={handleError} />
+        </Suspense>
+      </NodeErrorBoundary>
+    ), [setNodes, setEdges, handleError]);
+
+    const endNodeWrapper = useCallback((props) => (
+      <NodeErrorBoundary>
+        <Suspense fallback={<div>Cargando Fin...</div>}>
+          <EndNode {...props} setNodes={setNodes} setEdges={setEdges} handleError={handleError} />
+        </Suspense>
+      </NodeErrorBoundary>
+    ), [setNodes, setEdges, handleError]);
+
+    const messageNodeWrapper = useCallback((props) => (
+      <NodeErrorBoundary>
+        <Suspense fallback={<div>Cargando Mensaje...</div>}>
+          <MessageNode {...props} setNodes={setNodes} setEdges={setEdges} setSelectedNode={setSelectedNode} handleError={handleError} />
+        </Suspense>
+      </NodeErrorBoundary>
+    ), [setNodes, setEdges, setSelectedNode, handleError]);
+
+    const decisionNodeWrapper = useCallback((props) => (
+      <NodeErrorBoundary>
+        <Suspense fallback={<div>Cargando Decisión...</div>}>
+          <DecisionNode {...props} setNodes={setNodes} setEdges={setEdges} handleError={handleError} />
+        </Suspense>
+      </NodeErrorBoundary>
+    ), [setNodes, setEdges, handleError]);
+
+    const actionNodeWrapper = useCallback((props) => (
+      <NodeErrorBoundary>
+        <Suspense fallback={<div>Cargando Acción...</div>}>
+          <ActionNode {...props} setNodes={setNodes} setEdges={setEdges} handleError={handleError} />
+        </Suspense>
+      </NodeErrorBoundary>
+    ), [setNodes, setEdges, handleError]);
+
+    const optionNodeWrapper = useCallback((props) => (
+      <NodeErrorBoundary>
+        <Suspense fallback={<div>Cargando Opción...</div>}>
+          <OptionNode {...props} setNodes={setNodes} setEdges={setEdges} handleError={handleError} />
+        </Suspense>
+      </NodeErrorBoundary>
+    ), [setNodes, setEdges, handleError]);
+
+    const httpRequestNodeWrapper = useCallback((props) => (
+      <NodeErrorBoundary>
+        <Suspense fallback={<div>Cargando Solicitud HTTP...</div>}>
+          <HttpRequestNode {...props} setNodes={setNodes} setEdges={setEdges} handleError={handleError} />
+        </Suspense>
+      </NodeErrorBoundary>
+    ), [setNodes, setEdges, handleError]);
+
+    const powerNodeWrapper = useCallback((props) => (
+      <NodeErrorBoundary>
+        <Suspense fallback={<div>Cargando Poder...</div>}>
+          <PowerNode {...props} setNodes={setNodes} setEdges={setEdges} handleError={handleError} />
+        </Suspense>
+      </NodeErrorBoundary>
+    ), [setNodes, setEdges, handleError]);
+
     const nodeTypes = useMemo(
       () => ({
-        [NODE_TYPES.start]: React.memo((props) => (
-          <NodeErrorBoundary>
-            <Suspense fallback={<div>Loading...</div>}>
-              <StartNode {...props} setNodes={setNodes} handleError={handleError} />
-            </Suspense>
-          </NodeErrorBoundary>
-        )),
-        [NODE_TYPES.end]: React.memo((props) => (
-          <NodeErrorBoundary>
-            <Suspense fallback={<div>Loading...</div>}>
-              <EndNode {...props} setNodes={setNodes} handleError={handleError} />
-            </Suspense>
-          </NodeErrorBoundary>
-        )),
-        [NODE_TYPES.message]: React.memo((props) => (
-          <NodeErrorBoundary>
-            <Suspense fallback={<div>Loading...</div>}>
-              <MessageNode {...props} setNodes={setNodes} handleError={handleError} />
-            </Suspense>
-          </NodeErrorBoundary>
-        )),
-        [NODE_TYPES.decision]: React.memo((props) => (
-          <NodeErrorBoundary>
-            <Suspense fallback={<div>Loading...</div>}>
-              <DecisionNode {...props} setNodes={setNodes} handleError={handleError} />
-            </Suspense>
-          </NodeErrorBoundary>
-        )),
-        [NODE_TYPES.action]: React.memo((props) => (
-          <NodeErrorBoundary>
-            <Suspense fallback={<div>Loading...</div>}>
-              <ActionNode {...props} setNodes={setNodes} handleError={handleError} />
-            </Suspense>
-          </NodeErrorBoundary>
-        )),
-        [NODE_TYPES.option]: React.memo((props) => (
-          <NodeErrorBoundary>
-            <Suspense fallback={<div>Loading...</div>}>
-              <OptionNode {...props} setNodes={setNodes} />
-            </Suspense>
-          </NodeErrorBoundary>
-        )),
+        [NODE_TYPES.start]: startNodeWrapper,
+        [NODE_TYPES.end]: endNodeWrapper,
+        [NODE_TYPES.message]: messageNodeWrapper,
+        [NODE_TYPES.decision]: decisionNodeWrapper,
+        [NODE_TYPES.action]: actionNodeWrapper,
+        [NODE_TYPES.option]: optionNodeWrapper,
+        [NODE_TYPES.HTTP_REQUEST_NODE]: httpRequestNodeWrapper,
+        [NODE_TYPES.POWER_NODE]: powerNodeWrapper,
       }),
-      [setNodes, handleError]
+      [
+        startNodeWrapper,
+        endNodeWrapper,
+        messageNodeWrapper,
+        decisionNodeWrapper,
+        actionNodeWrapper,
+        optionNodeWrapper,
+        httpRequestNodeWrapper,
+        powerNodeWrapper,
+      ]
     );
 
+    // Definición de los tipos de aristas personalizados (si los tienes)
     const edgeTypes = useMemo(
       () => ({
         [EDGE_TYPES.default]: DefaultEdge,
@@ -528,6 +577,21 @@ const FlowEditorInner = React.memo(
                   parentDecisionId: sourceNode?.type === 'decision' ? source : null,
                 };
                 break;
+              case NODE_TYPES.httpRequest:
+                initialData = {
+                  ...initialData,
+                  url: 'https://example.com/api/endpoint',
+                  method: 'GET',
+                  headers: {},
+                  body: {},
+                };
+                break;
+              case NODE_TYPES.POWER_NODE:
+                initialData = {
+                  ...initialData,
+                  power: '100',
+                };
+                break;
             }
 
             const newNode = {
@@ -561,8 +625,8 @@ const FlowEditorInner = React.memo(
               });
 
               edgesMap.set(newEdge.id, newEdge);
-              setEdges(Array.from(edgesMap.values()));
-              setInternalEdges(Array.from(edgesMap.values()));
+              setEdges((prevEdges) => [...prevEdges, newEdge]);
+              setInternalEdges((prevEdges) => [...prevEdges, newEdge]);
               addToHistory({ action: 'add_edge', edge: newEdge });
             }
 
@@ -572,7 +636,7 @@ const FlowEditorInner = React.memo(
           }
         }
       },
-      [nodesMap, edgesMap, setNodes, setEdges, setSelectedNode, handleError, screenToFlowPosition, getViewport, addToHistory, setByteMessage]
+      [nodesMap, edgesMap, setNodes, setSelectedNode, handleError, screenToFlowPosition, getViewport, addToHistory, setByteMessage]
     );
 
     const onNodesDelete = useCallback(
@@ -612,7 +676,7 @@ const FlowEditorInner = React.memo(
         setSelectedNode(null);
         setByteMessage(`${deletedNodes.length} nodo${deletedNodes.length > 1 ? 's' : ''} eliminado${deletedNodes.length > 1 ? 's' : ''}`);
       },
-      [nodesMap, edgesMap, setNodes, setEdges, setByteMessage, setSelectedNode, handleError, addToHistory]
+      [nodesMap, edgesMap, setNodes, setByteMessage, setSelectedNode, handleError, addToHistory]
     );
 
     const onDragOver = useCallback((event) => {
@@ -623,74 +687,109 @@ const FlowEditorInner = React.memo(
     const onDrop = useCallback(
       (event) => {
         event.preventDefault();
-        try {
-          const reactFlowBounds = reactFlowWrapper.current.getBoundingClientRect();
-          const type = event.dataTransfer.getData('application/reactflow');
+        const reactFlowBounds = reactFlowWrapper.current.getBoundingClientRect(); // Definir reactFlowBounds aquí
 
-          if (!type) {
-            throw new Error('No se especificó un tipo de nodo en el evento de drop.');
+        const serializedNodeData = event.dataTransfer.getData('application/reactflow');
+
+        if (serializedNodeData) {
+          try {
+            const dragData = JSON.parse(serializedNodeData);
+            const { nodeInfo } = dragData; 
+
+            console.log('[FlowEditor] Parsed nodeInfo from dragData:', nodeInfo); 
+
+            if (!screenToFlowPosition || !nodeInfo || !nodeInfo.nodeType) { // Verificar screenToFlowPosition directamente
+              console.error('React Flow instance (screenToFlowPosition) no disponible o nodeInfo/nodeType inválido:', screenToFlowPosition, nodeInfo);
+              return;
+            }
+
+            const actualNodeType = nodeInfo.nodeType;
+            const actualNodeLabel = nodeInfo.label;
+
+            const position = screenToFlowPosition({ // Llamar directamente a screenToFlowPosition
+              x: event.clientX - reactFlowBounds.left,
+              y: event.clientY - reactFlowBounds.top
+            });
+
+            nodeCounters.current[actualNodeType] = (nodeCounters.current[actualNodeType] || 0) + 1;
+            const newNodeId = `${actualNodeType}-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+
+            let initialData = {
+              label: actualNodeLabel || `${actualNodeType.charAt(0).toUpperCase() + actualNodeType.slice(1)} ${nodeCounters.current[actualNodeType]}`,
+            };
+            
+            switch (actualNodeType) { 
+              case NODE_TYPES.message:
+                initialData = { ...initialData, message: 'Ingresa un mensaje aquí', variables: [] };
+                break;
+              case NODE_TYPES.decision:
+                initialData = { ...initialData, question: '¿Qué opción deseas tomar?', outputs: ['Sí', 'No'] };
+                break;
+              case NODE_TYPES.action:
+                initialData = {
+                  ...initialData,
+                  description: 'Describe la acción aquí',
+                  actionType: 'sendEmail',
+                  parameters: {},
+                };
+                break;
+              case NODE_TYPES.option:
+                initialData = {
+                  ...initialData,
+                  condition: 'Contiene: palabra_clave',
+                  parentDecisionId: null,
+                };
+                break;
+              case NODE_TYPES.httpRequest:
+                initialData = {
+                  ...initialData,
+                  url: 'https://example.com/api/endpoint',
+                  method: 'GET',
+                  headers: {},
+                  body: {},
+                };
+                break;
+              case NODE_TYPES.POWER_NODE:
+                initialData = {
+                  ...initialData,
+                  power: '100',
+                };
+                break;
+            }
+
+            const newNode = {
+              id: newNodeId,
+              type: actualNodeType, 
+              position,
+              data: initialData,
+              width: 150,
+              height: 150,
+              draggable: true,
+              zIndex: 1000,
+            };
+
+            const validation = validateNode(newNode);
+            if (!validation.valid) {
+              handleError(`Nodo inválido: ${validation.errors.join(', ')}`);
+              return;
+            }
+
+            nodesMap.set(newNode.id, newNode);
+            const updatedNodes = Array.from(nodesMap.values());
+
+            console.log('[FlowEditor] Attempting to add new node:', newNode);
+            setNodes(updatedNodes);
+            setInternalNodes(updatedNodes);
+            addToHistory({ action: 'add_node', node: newNode });
+            setSelectedNode(newNode);
+
+            setByteMessage(`🆕 Nodo de tipo ${actualNodeType} añadido!`);
+          } catch (error) {
+            handleError(`Error al añadir nodo: ${error.message}`, error);
           }
-
-          const position = screenToFlowPosition({
-            x: event.clientX - reactFlowBounds.left,
-            y: event.clientY - reactFlowBounds.top,
-          });
-
-          nodeCounters.current[type] = (nodeCounters.current[type] || 0) + 1;
-          const newNodeId = `${type}-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
-          let initialData = {
-            label: `${type.charAt(0).toUpperCase() + type.slice(1)} Node ${nodeCounters.current[type]}`,
-          };
-
-          switch (type) {
-            case NODE_TYPES.message:
-              initialData = { ...initialData, message: 'Ingresa un mensaje aquí', variables: [] };
-              break;
-            case NODE_TYPES.decision:
-              initialData = { ...initialData, question: '¿Qué opción deseas tomar?', outputs: ['Sí', 'No'] };
-              break;
-            case NODE_TYPES.action:
-              initialData = {
-                ...initialData,
-                description: 'Describe la acción aquí',
-                actionType: 'sendEmail',
-                parameters: {},
-              };
-              break;
-            case NODE_TYPES.option:
-              initialData = { ...initialData, condition: 'Contiene: palabra_clave' };
-              break;
-          }
-
-          const nodeSize = { width: 150, height: 150 };
-          const newNode = {
-            id: newNodeId,
-            type,
-            position,
-            data: initialData,
-            width: nodeSize.width,
-            height: nodeSize.height,
-            draggable: true,
-            selectable: true,
-            zIndex: 1000,
-          };
-
-          const validation = validateNode(newNode);
-          if (!validation.valid) {
-            throw new Error(`Nodo inválido: ${validation.errors.join(', ')}`);
-          }
-
-          nodesMap.set(newNode.id, newNode);
-          setNodes(Array.from(nodesMap.values()));
-          setInternalNodes(Array.from(nodesMap.values()));
-          addToHistory({ action: 'add_node', node: newNode });
-          setSelectedNode(newNode);
-          setByteMessage(`🆕 Nodo de tipo ${type} añadido! Ahora puedes configurar sus propiedades.`);
-        } catch (error) {
-          handleError('Error al añadir un nodo', error);
         }
       },
-      [screenToFlowPosition, setNodes, setSelectedNode, setByteMessage, handleError, addToHistory, nodesMap]
+      [screenToFlowPosition, reactFlowWrapper, nodesMap, setNodes, setSelectedNode, handleError, addToHistory, setByteMessage]
     );
 
     const onNodeClick = useCallback(
@@ -791,7 +890,7 @@ const FlowEditorInner = React.memo(
           setInternalEdges((eds) => {
             const updatedEdges = applyEdgeChanges(changes, eds);
             updatedEdges.forEach((edge) => edgesMap.set(edge.id, edge));
-            setEdges(Array.from(edgesMap.values()));
+            setEdges((prevEdges) => [...prevEdges, ...updatedEdges]);
             changes.forEach((change) => {
               if (change.type === 'remove') {
                 const edge = edgesMap.get(change.id);
@@ -822,7 +921,11 @@ const FlowEditorInner = React.memo(
           }
 
           const connectionExists = Array.from(edgesMap.values()).some(
-            (edge) => edge.source === params.source && edge.target === params.target
+            (edge) =>
+              edge.source === params.source &&
+              edge.target === params.target &&
+              (edge.sourceHandle === params.sourceHandle || (!edge.sourceHandle && !params.sourceHandle)) &&
+              (edge.targetHandle === params.targetHandle || (!edge.targetHandle && !params.targetHandle))
           );
 
           if (connectionExists) {
@@ -838,15 +941,23 @@ const FlowEditorInner = React.memo(
             return;
           }
 
-          const newEdge = createEdge({
+          const preliminaryEdge = createEdge({
             source: params.source,
             target: params.target,
             sourceNodeType: sourceNode.type,
           });
 
+          const newEdge = {
+            ...preliminaryEdge,
+            source: params.source,
+            target: params.target,
+            sourceHandle: params.sourceHandle,
+            targetHandle: params.targetHandle,
+          };
+
           edgesMap.set(newEdge.id, newEdge);
-          setEdges(Array.from(edgesMap.values()));
-          setInternalEdges(Array.from(edgesMap.values()));
+          setEdges((prevEdges) => [...prevEdges, newEdge]);
+          setInternalEdges((prevEdges) => [...prevEdges, newEdge]);
           addToHistory({ action: 'add_edge', edge: newEdge });
 
           setByteMessage(`🔗 Conexión creada: ${sourceNode.data.label} → ${targetNode.data.label}`);
@@ -937,95 +1048,6 @@ const FlowEditorInner = React.memo(
     }, [setViewport]);
 
     useEffect(() => {
-      const handleResize = ({ nodeId, width, height }) => {
-        const node = nodesMap.get(nodeId);
-        if (node) {
-          const oldDimensions = { width: node.width, height: node.height };
-          const updatedNode = {
-            ...node,
-            width: Math.max(150, Math.min(250, width)),
-            height: Math.max(150, Math.min(250, height)),
-          };
-          nodesMap.set(nodeId, updatedNode);
-          if (oldDimensions.width !== updatedNode.width || oldDimensions.height !== updatedNode.height) {
-            addToHistory({
-              action: 'update_node',
-              nodeId,
-              oldNode: { ...node },
-              newNode: updatedNode,
-            });
-          }
-          setNodes(Array.from(nodesMap.values()));
-          setDimensionsUpdated((prev) => !prev);
-        }
-      };
-
-      const handleDragDrop = ({ type, position }) => {
-        try {
-          nodeCounters.current[type] = (nodeCounters.current[type] || 0) + 1;
-          const newNodeId = `${type}-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
-          let initialData = {
-            label: `${type.charAt(0).toUpperCase() + type.slice(1)} Node ${nodeCounters.current[type]}`,
-          };
-
-          switch (type) {
-            case NODE_TYPES.message:
-              initialData = { ...initialData, message: 'Ingresa un mensaje aquí', variables: [] };
-              break;
-            case NODE_TYPES.decision:
-              initialData = { ...initialData, question: '¿Qué opción deseas tomar?', outputs: ['Sí', 'No'] };
-              break;
-            case NODE_TYPES.action:
-              initialData = {
-                ...initialData,
-                description: 'Describe la acción aquí',
-                actionType: 'sendEmail',
-                parameters: {},
-              };
-              break;
-            case NODE_TYPES.option:
-              initialData = { ...initialData, condition: 'Contiene: palabra_clave' };
-              break;
-          }
-
-          const nodeSize = { width: 150, height: 150 };
-          const newNode = {
-            id: newNodeId,
-            type,
-            position,
-            data: initialData,
-            width: nodeSize.width,
-            height: nodeSize.height,
-            draggable: true,
-            zIndex: 1000,
-          };
-
-          const validation = validateNode(newNode);
-          if (!validation.valid) throw new Error(`Nodo inválido: ${validation.errors.join(', ')}`);
-
-          nodesMap.set(newNode.id, newNode);
-          setNodes(Array.from(nodesMap.values()));
-          setInternalNodes(Array.from(nodesMap.values()));
-          addToHistory({ action: 'add_node', node: newNode });
-          setSelectedNode(newNode);
-          setByteMessage(`🆕 Nodo de tipo ${type} añadido! Ahora puedes configurar sus propiedades.`);
-        } catch (error) {
-          handleError('Error al añadir un nodo', error);
-        }
-      };
-
-      const unsubscribeResize = onEvent('nodeResize', handleResize);
-      const unsubscribeDragDrop = onEvent('nodeDragDrop', handleDragDrop);
-
-      return () => {
-        if (window.plubotUpdateTimeout) clearTimeout(window.plubotUpdateTimeout);
-        if (window.resizeUpdateTimeout) clearTimeout(window.resizeUpdateTimeout);
-        unsubscribeResize();
-        unsubscribeDragDrop();
-      };
-    }, [setNodes, setSelectedNode, setByteMessage, handleError, addToHistory, nodesMap]);
-
-    useEffect(() => {
       if (internalNodes.length > 0 && !hasFitView) {
         const timer = setTimeout(() => {
           try {
@@ -1082,361 +1104,299 @@ const FlowEditorInner = React.memo(
     }, [selectedNode, setShowConnectionEditor, undo, redo, setByteMessage, setShowSimulation, closeContextMenu]);
 
     return (
-      <div
-        className="ts-flow-editor"
-        ref={reactFlowWrapper}
-        style={{ position: 'relative', width: '100%', height: '100%' }}
-        onDragOver={onDragOver}
-        onDrop={onDrop}
-        onTouchEnd={handleTouchEnd}
-        onClick={closeContextMenu}
-      >
-        <BackgroundScene />
-        {isLoading && (
-          <div
-            style={{
-              position: 'absolute',
-              top: '50%',
-              left: '50%',
-              transform: 'translate(-50%, -50%)',
-              background: 'white',
-              padding: 20,
-              border: '1px solid black',
-            }}
+      <> {/* Envolver en fragmento */}
+        <BackgroundScene /> {/* Mover BackgroundScene aquí, como hermano del editor */}
+        <div className="ts-zoom-controls">
+          <button onClick={zoomIn} className="ts-zoom-button" title="Zoom In" aria-label="Aumentar zoom">
+            +
+          </button>
+          <button onClick={zoomOut} className="ts-zoom-button" title="Zoom Out" aria-label="Reducir zoom">
+            −
+          </button>
+          <button
+            onClick={() => fitView({ padding: 0.3, duration: 500 })}
+            className="ts-zoom-button"
+            title="Ajustar diagrama"
+            aria-label="Ajustar diagrama"
           >
-            Cargando datos del flujo...
-          </div>
-        )}
-        {error && (
-          <div className="ts-flow-error-banner">
-            <span>⚠️ {error}</span>
-            <button onClick={() => setError(null)}>✕</button>
-          </div>
-        )}
-        {internalNodes.length === 0 && !isLoading && !error && (
-          <div
-            style={{
-              position: 'absolute',
-              top: 20,
-              left: 20,
-              background: 'white',
-              padding: 10,
-              border: '1px solid black',
-            }}
+            ⟲
+          </button>
+          <button onClick={() => undo()} className="ts-zoom-button" title="Deshacer" aria-label="Deshacer">
+            ↩
+          </button>
+          <button onClick={() => redo()} className="ts-zoom-button" title="Rehacer" aria-label="Rehacer">
+            ↪
+          </button>
+          {/* Botón para el Historial de Versiones (movido aquí) */}
+          <button
+            onClick={() => setShowVersionHistoryPanel(!showVersionHistoryPanel)}
+            className="ts-zoom-button"
+            title={showVersionHistoryPanel ? "Ocultar Historial" : "Mostrar Historial"}
+            aria-label={showVersionHistoryPanel ? "Ocultar Historial de Versiones" : "Mostrar Historial de Versiones"}
           >
-            No hay nodos para mostrar. Se creó un nodo inicial.
-          </div>
-        )}
-        {process.env.NODE_ENV === 'development' && internalNodes.length > 0 && (
-          <div
-            style={{
-              position: 'absolute',
-              top: 20,
-              left: 20,
-              background: 'white',
-              padding: 10,
-              border: '1px solid black',
-            }}
+            📜
+          </button>
+          {/* Botón para Simular */}
+          <button
+            onClick={() => setShowSimulation((prev) => !prev)}
+            className="ts-zoom-button"
+            title="Alternar Simulador"
+            aria-label="Alternar Simulador"
           >
-            Renderizando {internalNodes.length} nodos
-          </div>
-        )}
-        <ReactFlow
-          nodes={internalNodes}
-          edges={internalEdges}
-          nodeTypes={nodeTypes}
-          edgeTypes={edgeTypes}
-          onNodesChange={onNodesChange}
-          onEdgesChange={onEdgesChange}
-          onNodeClick={onNodeClick}
-          onNodeDoubleClick={onNodeDoubleClick}
-          onEdgeClick={onEdgeClick}
-          onNodesDelete={onNodesDelete}
-          onSelectionChange={onSelectionChange}
-          onConnect={onConnect}
-          onNodeDragStart={onNodeDragStart}
-          onNodeDrag={onNodeDrag}
-          onNodeDragStop={onNodeDragStop}
-          onPaneClick={onPaneClick}
-          onMove={onMove}
-          snapToGrid={true}
-          snapGrid={SNAP_GRID}
-          fitView={false}
-          attributionPosition="bottom-right"
-          proOptions={{ hideAttribution: true }}
-          style={REACT_FLOW_STYLE}
-          panOnScroll={false}
-          panOnDrag={true}
-          nodesDraggable={true}
-          nodesConnectable={true}
-          elementsSelectable={true}
-          deleteKeyCode={DELETE_KEYS}
-          multiSelectionKeyCode="Shift"
-          selectionOnDrag={false}
-          selectionMode="partial"
-          minZoom={0.1}
-          maxZoom={2}
-          defaultViewport={{ x: 0, y: 0, zoom: 1 }}
-          nodeExtent={[[-10000, -10000], [10000, 10000]]}
-          elevateNodesOnSelect={true}
+            🖥️
+          </button>
+          {/* Botón para Guardar */}
+          <button
+            onClick={async () => {
+              console.log('[FlowEditor] Botón Guardar: onClick iniciado.');
+              try {
+                console.log('[FlowEditor] Botón Guardar: plubotId =', plubotId);
+                if (!plubotId) {
+                  console.warn('[FlowEditor] Botón Guardar: plubotId no encontrado.');
+                  setByteMessage('⚠️ No se ha encontrado el ID del Plubot. Redirigiendo al perfil...');
+                  setTimeout(() => navigate('/profile'), 2000);
+                  return;
+                }
+                console.log('[FlowEditor] Botón Guardar: Llamando a saveFlowData...');
+                console.log('[FlowEditor] Botón Guardar: internalNodes:', internalNodes);
+                console.log('[FlowEditor] Botón Guardar: internalEdges:', internalEdges);
+                await saveFlowData(plubotId, internalNodes, internalEdges, nodesMap, edgesMap);
+                console.log('[FlowEditor] Botón Guardar: saveFlowData completado (promesa resuelta).');
+                setByteMessage('💾 Progreso guardado exitosamente!');
+              } catch (err) {
+                console.error('[FlowEditor] Botón Guardar: Error en el bloque catch.', err);
+                handleError(`Error al guardar: ${err.message}`);
+                setByteMessage(`⛔ Error al guardar: ${err.message}. Intenta de nuevo.`);
+              }
+              console.log('[FlowEditor] Botón Guardar: onClick finalizado.');
+            }}
+            className="ts-zoom-button"
+            title="Guardar Progreso"
+            aria-label="Guardar Progreso"
+          >
+            💾
+          </button>
+        </div>
+
+        <div
+          className="ts-flow-editor"
+          ref={reactFlowWrapper}
+          onDragOver={onDragOver}
+          onDrop={onDrop}
+          style={{ position: 'relative', width: '100%', height: '100%' /* zIndex: 1 eliminado */ }}
         >
-          <CustomMiniMap
+          {/* BackgroundScene ya NO está aquí */}
+          {isLoading && (
+            <div
+              style={{
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                transform: 'translate(-50%, -50%)',
+                background: 'rgba(255, 255, 255, 0.9)',
+                padding: 20,
+                borderRadius: 8,
+                boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
+                zIndex: 1000
+              }}
+            >
+              Cargando datos del flujo...
+            </div>
+          )}
+          {error && (
+            <div className="ts-flow-error-banner">
+              <span>⚠️ {error}</span>
+              <button onClick={() => setError(null)}>✕</button>
+            </div>
+          )}
+          <ReactFlow
             nodes={internalNodes}
             edges={internalEdges}
-            isExpanded={isMiniMapExpanded}
-            toggleMiniMap={toggleMiniMap}
-            setByteMessage={setByteMessage}
-            dimensionsUpdated={dimensionsUpdated}
-            viewport={viewport}
-          />
-          <div className="ts-zoom-controls">
-            <button onClick={zoomIn} className="ts-zoom-button" title="Zoom In" aria-label="Aumentar zoom">
-              +
-            </button>
-            <button onClick={zoomOut} className="ts-zoom-button" title="Zoom Out" aria-label="Reducir zoom">
-              −
-            </button>
-            <button
-              onClick={() => fitView({ padding: 0.3, duration: 500 })}
-              className="ts-zoom-button"
-              title="Ajustar diagrama"
-              aria-label="Ajustar diagrama"
-            >
-              ⟲
-            </button>
-            <button onClick={() => undo()} className="ts-zoom-button" title="Deshacer" aria-label="Deshacer">
-              ↩
-            </button>
-            <button onClick={() => redo()} className="ts-zoom-button" title="Rehacer" aria-label="Rehacer">
-              ↪
-            </button>
-            <button
-              onClick={() => setShowSimulation((prev) => !prev)}
-              className="ts-zoom-button"
-              title="Alternar Simulador"
-              aria-label="Alternar Simulador"
-            >
-              🖥️
-            </button>
-            <button
-              onClick={async () => {
-                try {
-                  if (!plubotId) {
-                    setByteMessage('⚠️ No se ha encontrado el ID del Plubot. Redirigiendo al perfil...');
-                    setError('No se ha encontrado el ID del Plubot.');
-                    setTimeout(() => navigate('/profile'), 2000);
-                    return;
-                  }
-
-                  const userMessages = Array.from(nodesMap.values()).map((node, index) => ({
-                    user_message: node.data.label || `Nodo ${index + 1}`,
-                    position: index,
-                    nodeId: node.id,
-                  }));
-                  const duplicates = userMessages.reduce((acc, curr, index, arr) => {
-                    const isDuplicated = arr.some(
-                      (other, otherIndex) => otherIndex !== index && other.user_message.toLowerCase() === curr.user_message.toLowerCase()
-                    );
-                    if (isDuplicated) {
-                      acc.push({ position: curr.position, user_message: curr.user_message, nodeId: curr.nodeId });
-                    }
-                    return acc;
-                  }, []);
-
-                  if (duplicates.length > 0) {
-                    const usedLabels = new Set(Array.from(nodesMap.values()).map((n) => n.data.label.toLowerCase()));
-                    duplicates.forEach((duplicate) => {
-                      const node = nodesMap.get(duplicate.nodeId);
-                      let newLabel = duplicate.user_message;
-                      let counter = 1;
-                      const uuidSuffix = uuidv4().slice(0, 4);
-                      while (usedLabels.has(newLabel.toLowerCase())) {
-                        newLabel = `${duplicate.user_message}-${counter}-${uuidSuffix}`;
-                        counter++;
-                      }
-                      usedLabels.add(newLabel.toLowerCase());
-                      nodesMap.set(duplicate.nodeId, {
-                        ...node,
-                        data: { ...node.data, label: newLabel },
-                      });
-                      addToHistory({
-                        action: 'update_node',
-                        nodeId: duplicate.nodeId,
-                        oldNode: node,
-                        newNode: nodesMap.get(duplicate.nodeId),
-                      });
-                    });
-                    setNodes(Array.from(nodesMap.values()));
-                    setInternalNodes(Array.from(nodesMap.values()));
-                    setByteMessage('🔄 Duplicados detectados y resueltos automáticamente. Guardando...');
-                  }
-
-                  const data = {
-                    name: name || 'Plubot sin nombre',
-                    flows: Array.from(nodesMap.values()).map((node, index) => {
-                      let botResponse;
-                      switch (node.type) {
-                        case 'message':
-                          botResponse = node.data.message || 'Mensaje predeterminado';
-                          break;
-                        case 'decision':
-                          botResponse = node.data.question || 'Pregunta predeterminada';
-                          break;
-                        case 'action':
-                          botResponse = node.data.description || 'Acción predeterminada';
-                          break;
-                        case 'option':
-                          botResponse = node.data.condition || 'Condición predeterminada';
-                          break;
-                        case 'start':
-                          botResponse = node.data.label || 'Inicio del flujo';
-                          break;
-                        case 'end':
-                          botResponse = node.data.message || 'Fin del flujo';
-                          break;
-                        default:
-                          botResponse = 'N/A';
-                      }
-                      return {
-                        position: index,
-                        intent: node.type,
-                        user_message: node.data.label || `Nodo ${index + 1}`,
-                        bot_response: botResponse,
-                        condition: node.type === 'option' ? node.data.condition : undefined,
-                        position_x: typeof node.position.x === 'number' ? node.position.x : 0,
-                        position_y: typeof node.position.y === 'number' ? node.position.y : 0,
-                      };
-                    }),
-                    edges: Array.from(edgesMap.values()).map((edge) => ({
-                      source: edge.source.replace('node-', ''),
-                      target: edge.target.replace('node-', ''),
-                      sourceHandle: edge.sourceHandle,
-                    })),
-                  };
-                  const response = await request('PUT', `/api/plubots/update/${plubotId}`, data);
-                  if (response.status === 'success') {
-                    setByteMessage('✅ Flujo guardado correctamente en el servidor.');
-                    setError(null);
-                    if (notifyByte) {
-                      notifyByte('✅ Flujo guardado correctamente en el servidor.');
-                    }
-                    setTimeout(() => setByteMessage(''), 5000);
-                  } else {
-                    const errorMsg = response.message || 'Respuesta inválida del servidor';
-                    setByteMessage(`⚠️ Error al guardar el flujo: ${errorMsg}`);
-                    setError(`Error al guardar el flujo: ${errorMsg}`);
-                  }
-                } catch (err) {
-                  const errorMsg = err.message || 'Error desconocido al guardar el flujo';
-                  setByteMessage(`⚠️ Error al guardar el flujo: ${errorMsg}`);
-                  setError(`Error al guardar el flujo: ${errorMsg}`);
-                  if (err.message.includes('404')) {
-                    setByteMessage('⚠️ Plubot no encontrado. Redirigiendo al perfil...');
-                    setError('Plubot no encontrado.');
-                    setTimeout(() => navigate('/profile'), 2000);
-                  }
-                }
+            nodeTypes={nodeTypes}
+            edgeTypes={edgeTypes}
+            onNodesChange={onNodesChange}
+            onEdgesChange={onEdgesChange}
+            onNodeClick={onNodeClick}
+            onNodeDoubleClick={onNodeDoubleClick}
+            onEdgeClick={onEdgeClick}
+            onNodesDelete={onNodesDelete}
+            onSelectionChange={onSelectionChange}
+            onConnect={onConnect}
+            onNodeDragStart={onNodeDragStart}
+            onNodeDrag={onNodeDrag}
+            onNodeDragStop={onNodeDragStop}
+            onPaneClick={onPaneClick}
+            onMove={onMove}
+            snapToGrid={true}
+            snapGrid={SNAP_GRID}
+            fitView={true}
+            attributionPosition="bottom-right"
+            proOptions={{ hideAttribution: true }}
+            style={REACT_FLOW_STYLE}
+            zoomOnScroll={true}
+            panOnScroll={false} // Deshabilitar paneo con rueda del mouse
+            panOnDrag={true}
+            nodesDraggable={true}
+            nodesConnectable={true}
+            elementsSelectable={true}
+            deleteKeyCode={DELETE_KEYS}
+            multiSelectionKeyCode="Shift"
+            selectionOnDrag={false}
+            minZoom={0.1}
+            maxZoom={2}
+            defaultViewport={{ x: 0, y: 0, zoom: 1 }}
+            nodeExtent={[[-10000, -10000], [10000, 10000]]}
+            elevateNodesOnSelect={true}
+          >
+            {/* CustomMiniMap con posicionamiento explícito para garantizar visibilidad */}
+            <div 
+              style={{
+                position: 'absolute', 
+                bottom: '20px', 
+                left: '20px', 
+                zIndex: 1010,
+                pointerEvents: 'auto'
               }}
-              className="ts-zoom-button"
-              title="Guardar Progreso"
-              aria-label="Guardar Progreso"
             >
-              💾
-            </button>
-          </div>
-          {contextMenu && (
-            <ContextMenu
-              x={contextMenu.x}
-              y={contextMenu.y}
-              onDelete={() => onNodesDelete([contextMenu.node])}
-              onClose={closeContextMenu}
-            />
+              <CustomMiniMap
+                nodes={internalNodes}
+                edges={internalEdges}
+                isExpanded={isMiniMapExpanded}
+                toggleMiniMap={toggleMiniMap}
+                setByteMessage={setByteMessage}
+                dimensionsUpdated={dimensionsUpdated}
+                viewport={viewport}
+              />
+            </div>
+            {internalNodes.length === 0 && !isLoading && !error && (
+              <Panel position="top-left" style={{ margin: '20px' }}>
+                <div
+                  style={{
+                    background: 'rgba(255, 255, 255, 0.8)',
+                    padding: 10,
+                    borderRadius: 4,
+                    boxShadow: '0 1px 4px rgba(0,0,0,0.1)',
+                    fontSize: '14px',
+                  }}
+                >
+                  No hay nodos para mostrar. Arrastra un nodo desde la paleta para comenzar.
+                </div>
+              </Panel>
+            )}
+            {process.env.NODE_ENV === 'development' && internalNodes.length > 0 && (
+              <Panel position="top-left" style={{ margin: '20px' }}>
+                <div
+                  style={{
+                    background: 'rgba(255, 255, 255, 0.8)',
+                    padding: 10,
+                    borderRadius: 4,
+                    boxShadow: '0 1px 4px rgba(0,0,0,0.1)',
+                    fontSize: '14px',
+                  }}
+                >
+                  Renderizando {internalNodes.length} nodos
+                </div>
+              </Panel>
+            )}
+            {contextMenu && (
+              <ContextMenu
+                x={contextMenu.x}
+                y={contextMenu.y}
+                onDelete={() => onNodesDelete([contextMenu.node])}
+                onClose={closeContextMenu}
+              />
+            )}
+          </ReactFlow>
+          {showSimulation && (
+            <div className="ts-simulation-panel">
+              <SimulationInterface
+                nodes={internalNodes}
+                edges={internalEdges}
+                onClose={handleCloseSimulation}
+                analyticsTracker={(event, data) => console.log('Analytics:', event, data)}
+              />
+            </div>
           )}
-        </ReactFlow>
-        {showSimulation && (
-          <div className="ts-simulation-panel">
-            <SimulationInterface
-              nodes={internalNodes}
-              edges={internalEdges}
-              onClose={handleCloseSimulation}
-              analyticsTracker={(event, data) => console.log('Analytics:', event, data)}
-            />
-          </div>
-        )}
-      </div>
+        </div>
+      </>
     );
   }
 );
 
-const FlowEditor = React.memo(
-  ({
-    nodes,
-    edges,
-    setNodes,
-    setEdges,
-    selectedNode,
-    setSelectedNode,
-    setByteMessage,
-    showSimulation,
-    setShowSimulation,
-    setShowConnectionEditor,
-    setSelectedConnection,
-    setConnectionProperties,
-    handleError,
-    plubotId,
-    name,
-    notifyByte,
-  }) => {
-    const [localSelectedConnection, setLocalSelectedConnection] = useState(null);
-    const [localShowConnectionEditor, setLocalShowConnectionEditor] = useState(false);
-    const [connectionProperties, setLocalConnectionProperties] = useState({
-      label: '',
-      style: DEFAULT_EDGE_STYLE,
-      animated: false,
-      priority: 1,
-    });
+// Componente principal FlowEditor que envuelve ReactFlowProvider
+const FlowEditor = ({
+  nodes,
+  edges,
+  setNodes,
+  setEdges,
+  selectedNode,
+  setSelectedNode,
+  setByteMessage,
+  setShowConnectionEditor,
+  setSelectedConnection,
+  setConnectionProperties,
+  handleError,
+  showSimulation,
+  setShowSimulation,
+  showVersionHistoryPanel,
+  setShowVersionHistoryPanel,
+  plubotId,
+  name,
+  notifyByte,
+  saveFlowData, // <--- Recibir saveFlowData aquí también
+}) => {
+  const [localSelectedConnection, setLocalSelectedConnection] = useState(null);
+  const [localShowConnectionEditor, setLocalShowConnectionEditor] = useState(false);
+  const [connectionProperties, setLocalConnectionProperties] = useState({
+    label: '',
+    style: DEFAULT_EDGE_STYLE,
+    animated: false,
+    priority: 1,
+  });
 
-    try {
-      return (
-        <ReactFlowProvider>
-          <FlowEditorInner
-            nodes={nodes}
-            edges={edges}
-            setNodes={setNodes}
-            setEdges={setEdges}
-            selectedNode={selectedNode}
-            setSelectedNode={setSelectedNode}
-            setByteMessage={setByteMessage}
-            showSimulation={showSimulation}
-            setShowSimulation={setShowSimulation}
-            setShowConnectionEditor={setLocalShowConnectionEditor}
-            setSelectedConnection={setLocalSelectedConnection}
-            setConnectionProperties={setLocalConnectionProperties}
-            handleError={handleError}
-            plubotId={plubotId}
-            name={name}
-            notifyByte={notifyByte}
-          />
-          {localShowConnectionEditor && (
-            <div className="ts-connection-editor">
-              <button onClick={() => setLocalShowConnectionEditor(false)}>Cerrar</button>
-            </div>
-          )}
-        </ReactFlowProvider>
-      );
-    } catch (error) {
-      console.error('Error crítico al renderizar FlowEditor:', error);
-      return (
-        <div className="ts-flow-critical-error">
-          <h3>Error al renderizar el flujo</h3>
-          <p>Se ha producido un error crítico. Por favor, recarga la página.</p>
-          <pre className="error-details">{error.message}</pre>
-          <button onClick={() => window.location.reload()}>Recargar página</button>
-        </div>
-      );
-    }
+  try {
+    return (
+      <ReactFlowProvider>
+        <FlowEditorInner
+          nodes={nodes}
+          edges={edges}
+          setNodes={setNodes}
+          setEdges={setEdges}
+          selectedNode={selectedNode}
+          setSelectedNode={setSelectedNode}
+          setByteMessage={setByteMessage} // <--- AÑADIR ESTA LÍNEA
+          showSimulation={showSimulation}
+          setShowSimulation={setShowSimulation}
+          setShowConnectionEditor={setLocalShowConnectionEditor}
+          setSelectedConnection={setLocalSelectedConnection}
+          setConnectionProperties={setLocalConnectionProperties}
+          handleError={handleError}
+          showVersionHistoryPanel={showVersionHistoryPanel}
+          setShowVersionHistoryPanel={setShowVersionHistoryPanel}
+          plubotId={plubotId}
+          name={name}
+          notifyByte={notifyByte}
+          saveFlowData={saveFlowData} // <--- Pasar saveFlowData a FlowEditorInner
+        />
+        {localShowConnectionEditor && (
+          <div className="ts-connection-editor">
+            <button onClick={() => setLocalShowConnectionEditor(false)}>Cerrar</button>
+          </div>
+        )}
+      </ReactFlowProvider>
+    );
+  } catch (error) {
+    console.error('Error crítico al renderizar FlowEditor:', error);
+    return (
+      <div className="ts-flow-critical-error">
+        <h3>Error al renderizar el flujo</h3>
+        <p>Se ha producido un error crítico. Por favor, recarga la página.</p>
+        <pre className="error-details">{error.message}</pre>
+        <button onClick={() => window.location.reload()}>Recargar página</button>
+      </div>
+    );
   }
-);
+};
 
 FlowEditor.displayName = 'FlowEditor';
 

@@ -2,8 +2,7 @@
   width: 100%;
   height: 100%;
   position: relative;
-  background: #1a1a2e;
-  overflow: hidden;
+  background: transparent;
 }
 
 .ts-flow-editor .ts-flow-error-banner {
@@ -28,20 +27,20 @@
   cursor: pointer;
 }
 
-.ts-flow-editor .ts-zoom-controls {
+.ts-zoom-controls {
   position: absolute;
-  top: 6rem;
+  top: 4.5rem;
   right: 1rem;
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-  z-index: 1001;
+  z-index: 1000;
 }
 
-.ts-flow-editor .ts-zoom-button {
+.ts-zoom-controls .ts-zoom-button {
   background: rgba(18, 18, 46, 0.7);
-  border: 1px solid #00e0ff;
-  color: #e0e0ff;
+  border: 1px solid var(--primary-color);
+  color: var(--text-color);
   width: 30px;
   height: 30px;
   border-radius: 4px;
@@ -53,9 +52,10 @@
   transition: all 0.2s ease;
 }
 
-.ts-flow-editor .ts-zoom-button:hover {
+.ts-zoom-controls .ts-zoom-button:hover {
   background: rgba(0, 224, 255, 0.2);
-  box-shadow: 0 0 5px #00e0ff;
+  box-shadow: var(--neon-shadow);
+  transform: translateY(-2px);
 }
 
 .ts-flow-editor .start-node,
