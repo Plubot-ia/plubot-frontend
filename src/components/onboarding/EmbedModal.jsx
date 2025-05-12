@@ -1,9 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import { X, Copy, Link, Code, ExternalLink, Settings, Globe } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { X, Copy, Link, Code, ExternalLink, Settings, Globe, Download, Share2, Award, Zap, Gift, Heart, Star, Trophy } from 'lucide-react';
 import useAPI from '@/hooks/useAPI';
 import './EmbedModal.css';
+import confetti from 'canvas-confetti';
+// Si no tienes canvas-confetti, puedes instalarlo con: npm install canvas-confetti
 
-const EmbedModal = ({ plubotId, plubotName, onClose }) => {
+const EmbedModal = ({ plubotId, plubotName, onClose, onExport, flowData }) => {
   const [embedCode, setEmbedCode] = useState('');
   const [directLink, setDirectLink] = useState('');
   const [qrCode, setQrCode] = useState('');
@@ -20,6 +22,18 @@ const EmbedModal = ({ plubotId, plubotName, onClose }) => {
   });
   const { request } = useAPI();
 
+  // Referencia para el elemento donde lanzar confetti
+  const confettiRef = useRef(null);
+  
+  // Estado para gamificación
+  const [shareCount, setShareCount] = useState(0);
+  const [achievements, setAchievements] = useState({
+    firstShare: false,
+    socialMedia: false,
+    embedMaster: false,
+    customizer: false
+  });
+  
   useEffect(() => {
     if (plubotId) {
       setIsLoading(true);
@@ -30,7 +44,18 @@ const EmbedModal = ({ plubotId, plubotName, onClose }) => {
       setEmbedCode(generateEmbedCodeFromData(plubotId, customization));
       setQrCode(`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(chatUrl)}`);
       
-      showNotification('Recursos de embebido generados correctamente', 'success');
+      // Lanzar confetti cuando se genera el código
+      setTimeout(() => {
+        if (confettiRef.current) {
+          confetti({
+            particleCount: 150,
+            spread: 70,
+            origin: { y: 0.6 }
+          });
+        }
+      }, 500);
+      
+      showNotification('¡Recursos generados! ¡Comparte tu Plubot con el mundo!', 'success');
       
       setIsLoading(false);
     }
@@ -98,10 +123,37 @@ const EmbedModal = ({ plubotId, plubotName, onClose }) => {
   const copyToClipboard = (text, type) => {
     navigator.clipboard.writeText(text)
       .then(() => {
-        showNotification(`${type} copiado al portapapeles`, 'success');
+        // Incrementar contador de comparticiones
+        setShareCount(prev => prev + 1);
+        
+        // Verificar logros
+        const newAchievements = {...achievements};
+        
+        if (!newAchievements.firstShare) {
+          newAchievements.firstShare = true;
+          showNotification('¡Logro desbloqueado! Primera compartición', 'achievement');
+          
+          // Lanzar confetti para celebrar el logro
+          confetti({
+            particleCount: 150,
+            spread: 100,
+            origin: { y: 0.6 },
+            colors: ['#FFD700', '#FFA500', '#FF4500']
+          });
+        }
+        
+        if (shareCount >= 5 && !newAchievements.embedMaster) {
+          newAchievements.embedMaster = true;
+          showNotification('¡Logro desbloqueado! Maestro del Embebido', 'achievement');
+        }
+        
+        setAchievements(newAchievements);
+        
+        showNotification(`${type} copiado al portapapeles! ¡Comparte tu creación!`, 'success');
       })
-      .catch(() => {
-        showNotification('Error al copiar', 'error');
+      .catch(err => {
+        console.error('Error al copiar:', err);
+        showNotification(`Error al copiar ${type.toLowerCase()}`, 'error');
       });
   };
 
@@ -112,50 +164,160 @@ const EmbedModal = ({ plubotId, plubotName, onClose }) => {
     }));
   };
 
+  // Componente de estrellas y nebulosas para el fondo de universo
+  const UniverseBackground = () => {
+    // Generar estrellas con diferentes tamaños, opacidades y velocidades de parpadeo
+    const renderStars = () => {
+      const stars = [];
+      const starCount = 100; // Cantidad de estrellas
+      
+      for (let i = 0; i < starCount; i++) {
+        // Tamaño aleatorio para las estrellas
+        const size = Math.random() * 3 + 1;
+        // Colores para las estrellas
+        const colors = ['#fff', '#8df9ff', '#c8f4ff', '#e6fbff', '#d9e8ff'];
+        const color = colors[Math.floor(Math.random() * colors.length)];
+        // Duración del parpadeo
+        const twinkleDuration = 3 + Math.random() * 7 + 's';
+        // Retraso del parpadeo
+        const twinkleDelay = Math.random() * 10 + 's';
+        // Opacidad base
+        const opacity = 0.3 + Math.random() * 0.7;
+        // Tamaño del brillo
+        const glowSize = size * (1 + Math.random());
+        
+        stars.push(
+          <div 
+            key={`star-${i}`} 
+            className="star"
+            style={{
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+              '--star-size': `${size}px`,
+              '--star-opacity': opacity,
+              '--twinkle-duration': twinkleDuration,
+              '--twinkle-delay': twinkleDelay,
+              '--glow-size': `${glowSize}px`,
+              '--glow-color': color,
+              backgroundColor: color
+            }}
+          />
+        );
+      }
+      
+      return stars;
+    };
+    
+    return (
+      <div className="stars-container">
+        {renderStars()}
+        <div className="nebula nebula-1"></div>
+        <div className="nebula nebula-2"></div>
+        <div className="nebula nebula-3"></div>
+      </div>
+    );
+  };
+
   return (
-    <div className="embed-modal-overlay">
+    <div className="embed-modal-overlay" ref={confettiRef}>
+      <UniverseBackground />
       <div className="embed-modal">
         <div className="embed-modal-header">
-          <h2>Compartir y Embeber {plubotName}</h2>
-          <button className="embed-close-button" onClick={onClose}>
+          <h2><Share2 size={24} className="share-icon" /> ¡Comparte tu Plubot!</h2>
+          <button className="close-button" onClick={onClose}>
             <X size={20} />
           </button>
         </div>
 
         {notification && (
-          <div className={`embed-notification embed-notification-${notification.type}`}>
+          <div className={`notification ${notification.type}`}>
             {notification.message}
           </div>
         )}
+        
+        {/* Panel de logros */}
+        <div className="achievements-panel">
+          <h3><Trophy size={20} /> Tus Logros</h3>
+          <div className="achievements-grid">
+            <div className={`achievement ${achievements.firstShare ? 'unlocked' : 'locked'}`}>
+              <Award size={24} />
+              <span>Primera Compartición</span>
+            </div>
+            <div className={`achievement ${achievements.embedMaster ? 'unlocked' : 'locked'}`}>
+              <Star size={24} />
+              <span>Maestro del Embebido</span>
+            </div>
+            <div className={`achievement ${achievements.socialMedia ? 'unlocked' : 'locked'}`}>
+              <Zap size={24} />
+              <span>Influencer Social</span>
+            </div>
+            <div className={`achievement ${achievements.customizer ? 'unlocked' : 'locked'}`}>
+              <Settings size={24} />
+              <span>Personalizador</span>
+            </div>
+          </div>
+        </div>
 
         <div className="embed-tabs">
           <button 
-            className={`embed-tab ${activeTab === 'link' ? 'active' : ''}`}
-            onClick={() => setActiveTab('link')}
+            className={`embed-tab-button ${activeTab === 'link' ? 'active' : ''}`}
+            onClick={() => {
+              setActiveTab('link');
+              if (achievements.firstShare) {
+                confetti({
+                  particleCount: 30,
+                  spread: 50,
+                  origin: { y: 0.6 }
+                });
+              }
+            }}
           >
-            <Link size={16} />
+            <Link size={18} />
             Enlace Directo
           </button>
           <button 
-            className={`embed-tab ${activeTab === 'embed' ? 'active' : ''}`}
-            onClick={() => setActiveTab('embed')}
+            className={`embed-tab-button ${activeTab === 'embed' ? 'active' : ''}`}
+            onClick={() => {
+              setActiveTab('embed');
+              if (achievements.embedMaster) {
+                confetti({
+                  particleCount: 30,
+                  spread: 50,
+                  origin: { y: 0.6 }
+                });
+              }
+            }}
           >
-            <Code size={16} />
+            <Code size={18} />
             Código Embebido
           </button>
           <button 
-            className={`embed-tab ${activeTab === 'qr' ? 'active' : ''}`}
-            onClick={() => setActiveTab('qr')}
+            className={`embed-tab-button ${activeTab === 'customize' ? 'active' : ''}`}
+            onClick={() => {
+              setActiveTab('customize');
+              // Desbloquear logro de personalización al visitar esta pestaña
+              if (!achievements.customizer) {
+                const newAchievements = {...achievements, customizer: true};
+                setAchievements(newAchievements);
+                showNotification('¡Logro desbloqueado! Personalizador', 'achievement');
+                confetti({
+                  particleCount: 100,
+                  spread: 70,
+                  origin: { y: 0.6 },
+                  colors: ['#4facfe', '#00f2fe', '#00c6fb']
+                });
+              }
+            }}
           >
-            <Globe size={16} />
-            Código QR
+            <Settings size={18} />
+            Personalizar
           </button>
           <button 
-            className={`embed-tab ${activeTab === 'customize' ? 'active' : ''}`}
-            onClick={() => setActiveTab('customize')}
+            className={`embed-tab-button ${activeTab === 'qr' ? 'active' : ''}`}
+            onClick={() => setActiveTab('qr')}
           >
-            <Settings size={16} />
-            Personalizar
+            <Globe size={18} />
+            Código QR
           </button>
         </div>
 
@@ -301,6 +463,33 @@ const EmbedModal = ({ plubotId, plubotName, onClose }) => {
                 </div>
               )}
 
+              {activeTab === 'export' && (
+                <div className="embed-section">
+                  <h3>Exportar Flujo</h3>
+                  <p>Exporta tu flujo en formato JSON para respaldarlo o compartirlo con otros usuarios:</p>
+                  <div className="embed-export-actions" style={{ marginTop: '20px', display: 'flex', justifyContent: 'center' }}>
+                    <button 
+                      className="embed-action-button primary"
+                      style={{ padding: '10px 20px', display: 'flex', alignItems: 'center', gap: '8px' }}
+                      onClick={onExport}
+                    >
+                      <Download size={18} />
+                      Descargar JSON
+                    </button>
+                  </div>
+                  <div style={{ marginTop: '20px', backgroundColor: '#f8f9fa', padding: '15px', borderRadius: '5px', border: '1px solid #e9ecef' }}>
+                    <h4 style={{ marginTop: '0', color: '#495057' }}>¿Qué contiene el archivo exportado?</h4>
+                    <ul style={{ paddingLeft: '20px', color: '#6c757d' }}>
+                      <li>Todos los nodos de tu flujo con sus configuraciones</li>
+                      <li>Todas las conexiones entre nodos</li>
+                      <li>Posiciones de los elementos en el editor</li>
+                      <li>Propiedades y datos específicos de cada nodo</li>
+                    </ul>
+                    <p style={{ marginBottom: '0', color: '#6c757d' }}>Este archivo puede ser importado posteriormente para restaurar tu flujo exactamente como lo dejaste.</p>
+                  </div>
+                </div>
+              )}
+
               {activeTab === 'customize' && (
                 <div className="embed-section">
                   <h3>Personalizar Apariencia</h3>
@@ -382,7 +571,7 @@ const EmbedModal = ({ plubotId, plubotName, onClose }) => {
               }
             }}
           >
-            {activeTab === 'customize' ? 'Aplicar Cambios' : 'Copiar'}
+            {activeTab === 'customize' ? 'Aplicar Cambios' : activeTab === 'export' ? 'Exportar' : 'Copiar'}
           </button>
         </div>
       </div>

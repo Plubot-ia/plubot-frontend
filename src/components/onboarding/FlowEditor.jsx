@@ -15,9 +15,15 @@ import { NODE_TYPES, EDGE_TYPES, EDGE_COLORS } from '@/utils/nodeConfig';
 import BackgroundScene from './BackgroundScene'; // <--- Restaurar importación
 import CustomMiniMap from './CustomMiniMap';
 import SimulationInterface from './SimulationInterface';
+import EpicHeader from './EpicHeader';
+import EmbedModal from './EmbedModal';
 import './FlowEditor.css';
 import useAPI from '@/hooks/useAPI';
 import { v4 as uuidv4 } from 'uuid';
+import logo from '@/assets/img/plubot.svg';
+
+// Importación diferida del selector de plantillas
+const TemplateSelector = lazy(() => import('./TemplateSelector'));
 
 // Carga diferida de nodos
 const StartNode = lazy(() => import('./nodes/StartNode'));
@@ -120,7 +126,16 @@ const ContextMenu = React.memo(({ x, y, onDelete, onClose }) => (
 
 // Constantes
 const DEFAULT_EDGE_STYLE = { stroke: EDGE_COLORS.default, strokeWidth: 2, strokeDasharray: '' };
-const REACT_FLOW_STYLE = { width: '100%', height: '100vh', minHeight: '500px' };
+const REACT_FLOW_STYLE = {
+  background: 'transparent',
+  height: '100%',
+  width: '100%',
+  // Mejoras para alta definición
+  imageRendering: 'high-quality',
+  textRendering: 'optimizeLegibility',
+  WebkitFontSmoothing: 'antialiased',
+  MozOsxFontSmoothing: 'grayscale',
+};
 const SNAP_GRID = [15, 15];
 const DELETE_KEYS = ['Delete', 'Backspace'];
 
@@ -169,9 +184,19 @@ const FlowEditorInner = React.memo(
     const [selectedElements, setSelectedElements] = useState({ nodes: [], edges: [] });
     const [isLoading, setIsLoading] = useState(false);
     const [contextMenu, setContextMenu] = useState(null);
+    const [flowName, setFlowName] = useState('Flujo sin título');
+    const [lastSaved, setLastSaved] = useState(null);
+    const [showTemplateSelector, setShowTemplateSelector] = useState(false);
+    const [showEmbedModal, setShowEmbedModal] = useState(false);
     const touchTimer = useRef(null);
     const lastSelectedNodeIds = useRef('');
     const lastSelectedEdgeIds = useRef('');
+    
+    // Función para alternar la simulación
+    const toggleSimulation = useCallback(() => {
+      setShowSimulation(prev => !prev);
+      setByteMessage(!showSimulation ? '🎬 Simulación iniciada.' : '🔍 Simulador cerrado.');
+    }, [showSimulation, setByteMessage]);
     const { request } = useAPI();
     const navigate = useNavigate();
 
@@ -792,17 +817,67 @@ const FlowEditorInner = React.memo(
       [screenToFlowPosition, reactFlowWrapper, nodesMap, setNodes, setSelectedNode, handleError, addToHistory, setByteMessage]
     );
 
+    // Función para limpiar la selección de nodos
+    const clearNodeSelection = useCallback(() => {
+      setSelectedNode(null);
+      window.selectedFlowNode = null;
+      
+      // Actualizar visualmente todos los nodos para quitar la selección
+      const updatedNodes = internalNodes.map(n => ({ ...n, selected: false }));
+      updatedNodes.forEach(n => nodesMap.set(n.id, n));
+      setInternalNodes(updatedNodes);
+      setNodes(Array.from(nodesMap.values()));
+      
+      setByteMessage('Selección vacía');
+    }, [internalNodes, nodesMap, setNodes, setByteMessage, setSelectedNode]);
+    
     const onNodeClick = useCallback(
       (event, node) => {
-        setSelectedNode(node);
-        nodesMap.forEach((n) => (n.selected = n.id === node.id));
-        setNodes(Array.from(nodesMap.values()));
-        setByteMessage(`🔍 Nodo seleccionado: ${node.data.label}`);
-        if (event.type === 'touchstart') {
-          handleTouchStart(event, node);
+        event.stopPropagation();
+        
+        try {
+          // Asegurarse de que el nodo tenga todos los datos necesarios
+          // Esto es crucial para que los botones funcionen con todos los nodos
+          const fullNode = internalNodes.find(n => n.id === node.id) || node;
+          
+          // Asegurarse de que el nodo tenga todos los datos completos
+          if (!fullNode.data) {
+            console.warn('Nodo sin datos completos:', fullNode);
+            fullNode.data = node.data || { label: 'Nodo sin etiqueta' };
+          }
+          
+          // Limpiar selecciones anteriores
+          const updatedNodes = internalNodes.map(n => {
+            if (n.id === node.id) {
+              return { ...n, selected: true };
+            }
+            return { ...n, selected: false };
+          });
+          
+          // Actualizar los mapas y estados
+          updatedNodes.forEach(n => nodesMap.set(n.id, n));
+          setInternalNodes(updatedNodes);
+          setNodes(Array.from(nodesMap.values()));
+          
+          // Actualizar el estado de selección
+          setSelectedNode(fullNode);
+          
+          // Guardar el nodo seleccionado en el estado global para que los botones puedan acceder a él
+          window.selectedFlowNode = fullNode;
+          
+          setByteMessage(`🔍 Nodo seleccionado: ${fullNode.data.label}`);
+          
+          if (event.type === 'touchstart') {
+            handleTouchStart(event, node);
+          }
+          
+          console.log('Nodo seleccionado (completo):', fullNode);
+        } catch (error) {
+          console.error('Error al seleccionar nodo:', error);
+          handleError('Error al seleccionar nodo', error);
         }
       },
-      [setSelectedNode, setByteMessage, nodesMap, setNodes, handleTouchStart]
+      [setSelectedNode, setByteMessage, nodesMap, setNodes, handleTouchStart, internalNodes, handleError]
     );
 
     const onNodeDoubleClick = useCallback((event, node) => {
@@ -853,82 +928,153 @@ const FlowEditorInner = React.memo(
       [setByteMessage, setSelectedElements]
     );
 
+    // Función de debounce optimizada para mejorar rendimiento
+    const debouncedNodeChanges = useRef(null);
+  
     const onNodesChange = useCallback(
       (changes) => {
         try {
-          setInternalNodes((nds) => {
-            const updatedNodes = applyNodeChanges(changes, nds);
-            updatedNodes.forEach((node) => nodesMap.set(node.id, node));
-            setTimeout(() => {
-              setNodes(Array.from(nodesMap.values()));
-            }, 0);
-            changes.forEach((change) => {
-              if (change.type === 'position' && change.position && !change.dragging) {
-                const node = nodesMap.get(change.id);
-                if (node) {
-                  addToHistory({
-                    action: 'update_node',
-                    nodeId: node.id,
-                    oldNode: { ...node, position: nds.find((n) => n.id === node.id)?.position || node.position },
-                    newNode: { ...node },
-                  });
+          // Optimización para grandes cantidades de nodos
+          if (internalNodes.length > 50) {
+            // Usar debounce para reducir actualizaciones frecuentes con muchos nodos
+            if (debouncedNodeChanges.current) {
+              clearTimeout(debouncedNodeChanges.current);
+            }
+            
+            debouncedNodeChanges.current = setTimeout(() => {
+              setInternalNodes((nds) => {
+                const updatedNodes = applyNodeChanges(changes, nds);
+                updatedNodes.forEach(node => nodesMap.set(node.id, node));
+                setTimeout(() => {
+                  setNodes(Array.from(nodesMap.values()));
+                }, 0);
+                return updatedNodes;
+              });
+              debouncedNodeChanges.current = null;
+            }, 16); // 60fps (aproximadamente)
+          } else {
+            // Comportamiento normal para pocos nodos
+            setInternalNodes((nds) => {
+              const updatedNodes = applyNodeChanges(changes, nds);
+              updatedNodes.forEach(node => nodesMap.set(node.id, node));
+              setTimeout(() => {
+                setNodes(Array.from(nodesMap.values()));
+              }, 0);
+              
+              changes.forEach((change) => {
+                if (change.type === 'position' && change.position && !change.dragging) {
+                  const node = nodesMap.get(change.id);
+                  if (node) {
+                    addToHistory({
+                      action: 'update_node',
+                      nodeId: node.id,
+                      oldNode: { ...node, position: nds.find((n) => n.id === node.id)?.position || node.position },
+                      newNode: { ...node },
+                    });
+                  }
                 }
-              }
+              });
+              
+              return updatedNodes;
             });
-            return updatedNodes;
-          });
+          }
         } catch (error) {
           handleError('Error al mover nodos', error);
         }
       },
-      [setNodes, handleError, addToHistory, nodesMap]
+      [setInternalNodes, setNodes, handleError, addToHistory, nodesMap, internalNodes.length]
     );
 
+    // Debounce para optimizar cambios en aristas
+    const debouncedEdgeChanges = useRef(null);
+    
     const onEdgesChange = useCallback(
       (changes) => {
         try {
-          setInternalEdges((eds) => {
-            const updatedEdges = applyEdgeChanges(changes, eds);
-            updatedEdges.forEach((edge) => edgesMap.set(edge.id, edge));
-            setEdges((prevEdges) => [...prevEdges, ...updatedEdges]);
-            changes.forEach((change) => {
-              if (change.type === 'remove') {
-                const edge = edgesMap.get(change.id);
-                if (edge) {
-                  addToHistory({
-                    action: 'delete_edge',
-                    edge,
-                  });
-                  setByteMessage(`🗑️ Conexión eliminada: ${edge.source} → ${edge.target}`);
+          // Optimización para grandes cantidades de aristas
+          if (internalEdges.length > 50) {
+            // Usar debounce para reducir actualizaciones frecuentes con muchas aristas
+            if (debouncedEdgeChanges.current) {
+              clearTimeout(debouncedEdgeChanges.current);
+            }
+            
+            debouncedEdgeChanges.current = setTimeout(() => {
+              setInternalEdges((eds) => {
+                const updatedEdges = applyEdgeChanges(changes, eds);
+                updatedEdges.forEach((edge) => edgesMap.set(edge.id, edge));
+                setTimeout(() => {
+                  setEdges(Array.from(edgesMap.values()));
+                }, 0);
+                return updatedEdges;
+              });
+              debouncedEdgeChanges.current = null;
+            }, 16); // 60fps (aproximadamente)
+          } else {
+            // Comportamiento normal para pocas aristas
+            setInternalEdges((eds) => {
+              const updatedEdges = applyEdgeChanges(changes, eds);
+              updatedEdges.forEach((edge) => edgesMap.set(edge.id, edge));
+              setTimeout(() => {
+                setEdges(Array.from(edgesMap.values()));
+              }, 0);
+              
+              changes.forEach((change) => {
+                if (change.type === 'remove') {
+                  const edge = edgesMap.get(change.id);
+                  if (edge) {
+                    addToHistory({
+                      action: 'delete_edge',
+                      edge,
+                    });
+                    setByteMessage(`🗑️ Conexión eliminada: ${edge.source} → ${edge.target}`);
+                  }
                 }
-              }
+              });
+              
+              return updatedEdges;
             });
-            return updatedEdges;
-          });
+          }
         } catch (error) {
           handleError('Error al modificar conexiones', error);
         }
       },
-      [setEdges, handleError, setByteMessage, addToHistory, edgesMap]
+      [setInternalEdges, setEdges, handleError, setByteMessage, addToHistory, edgesMap, internalEdges.length]
     );
 
+    // Referencia para debounce en conexiones
+    const debouncedConnect = useRef(null);
+    
     const onConnect = useCallback(
       (params) => {
         try {
+          // Validaciones básicas
           if (params.source === params.target) {
             handleError('No se puede conectar un nodo consigo mismo');
             return;
           }
-
-          const connectionExists = Array.from(edgesMap.values()).some(
-            (edge) =>
-              edge.source === params.source &&
-              edge.target === params.target &&
-              (edge.sourceHandle === params.sourceHandle || (!edge.sourceHandle && !params.sourceHandle)) &&
-              (edge.targetHandle === params.targetHandle || (!edge.targetHandle && !params.targetHandle))
-          );
-
-          if (connectionExists) {
+          
+          // Optimización para verificar conexiones existentes
+          // Usar un Map para búsqueda más rápida en lugar de Array.some()
+          const connectionKey = `${params.source}-${params.target}-${params.sourceHandle || 'default'}-${params.targetHandle || 'default'}`;
+          const existingEdges = new Map();
+          
+          // Construir un mapa de conexiones existentes para búsqueda más rápida
+          if (internalEdges.length < 100) { // Solo para cantidades razonables de aristas
+            internalEdges.forEach(edge => {
+              const key = `${edge.source}-${edge.target}-${edge.sourceHandle || 'default'}-${edge.targetHandle || 'default'}`;
+              existingEdges.set(key, true);
+            });
+          } else {
+            // Para muchas aristas, solo verificar las del nodo actual
+            internalEdges
+              .filter(edge => edge.source === params.source)
+              .forEach(edge => {
+                const key = `${edge.source}-${edge.target}-${edge.sourceHandle || 'default'}-${edge.targetHandle || 'default'}`;
+                existingEdges.set(key, true);
+              });
+          }
+          
+          if (existingEdges.has(connectionKey)) {
             handleError('Ya existe una conexión entre estos nodos');
             return;
           }
@@ -941,6 +1087,7 @@ const FlowEditorInner = React.memo(
             return;
           }
 
+          // Crear la nueva arista
           const preliminaryEdge = createEdge({
             source: params.source,
             target: params.target,
@@ -955,9 +1102,26 @@ const FlowEditorInner = React.memo(
             targetHandle: params.targetHandle,
           };
 
+          // Optimización para actualizar el estado
           edgesMap.set(newEdge.id, newEdge);
-          setEdges((prevEdges) => [...prevEdges, newEdge]);
+          
+          // Usar debounce para actualizar el estado global si hay muchas conexiones simultáneas
+          if (internalEdges.length > 50 && debouncedConnect.current) {
+            clearTimeout(debouncedConnect.current);
+          }
+          
+          // Actualizar estados
           setInternalEdges((prevEdges) => [...prevEdges, newEdge]);
+          
+          if (internalEdges.length > 50) {
+            debouncedConnect.current = setTimeout(() => {
+              setEdges(Array.from(edgesMap.values()));
+              debouncedConnect.current = null;
+            }, 16);
+          } else {
+            setEdges((prevEdges) => [...prevEdges, newEdge]);
+          }
+          
           addToHistory({ action: 'add_edge', edge: newEdge });
 
           setByteMessage(`🔗 Conexión creada: ${sourceNode.data.label} → ${targetNode.data.label}`);
@@ -965,7 +1129,7 @@ const FlowEditorInner = React.memo(
           handleError('Error al crear conexión', error);
         }
       },
-      [edgesMap, nodesMap, setEdges, setByteMessage, handleError, addToHistory]
+      [edgesMap, nodesMap, setEdges, setInternalEdges, setByteMessage, handleError, addToHistory, internalEdges]
     );
 
     const onNodeDragStart = useCallback(
@@ -988,26 +1152,50 @@ const FlowEditorInner = React.memo(
       [nodesMap, setNodes]
     );
 
-    const onNodeDrag = useCallback((event, node) => {
-      node.position = { ...node.position };
-    }, []);
+    const onNodeDrag = useCallback(
+      (event, node) => {
+        try {
+          // Actualizar el mapa de nodos inmediatamente para un movimiento fluido
+          const updatedNode = { ...node };
+          nodesMap.set(node.id, updatedNode);
+          
+          // Para movimiento fluido, no hacemos throttling en el arrastre
+          // Solo actualizamos la posición sin debounce
+          node.position = { ...node.position };
+        } catch (error) {
+          handleError('Error al mover nodo', error);
+        }
+      },
+      [nodesMap, handleError]
+    );
 
     const onNodeDragStop = useCallback(
       (event, node) => {
-        setIsDraggingNode(false);
-        setByteMessage(`📍 Nodo posicionado: ${node.data.label}`);
-        const updatedNode = { ...node, position: { ...node.position } };
-        nodesMap.set(node.id, updatedNode);
-        setNodes(Array.from(nodesMap.values()));
-        addToHistory({
-          action: 'update_node',
-          nodeId: node.id,
-          oldNode: { ...node, position: nodesMap.get(node.id).position },
-          newNode: updatedNode,
-        });
-        debouncedUpdateNodePosition(node.id, node.position);
+        try {
+          setIsDraggingNode(false);
+          
+          // Solo mostramos mensajes importantes en el StatusBubble
+          // No mostramos mensajes de interacción general como "nodo posicionado"
+          
+          // Actualizar el nodo en el mapa
+          const updatedNode = { ...node, position: { ...node.position } };
+          nodesMap.set(node.id, updatedNode);
+          
+          // Actualizar el estado global de nodos
+          setNodes(Array.from(nodesMap.values()));
+          
+          // Actualizar el historial
+          addToHistory({
+            action: 'update_node',
+            nodeId: node.id,
+            oldNode: { ...node, position: { ...node.position } },
+            newNode: updatedNode,
+          });
+        } catch (error) {
+          handleError('Error al finalizar movimiento de nodo', error);
+        }
       },
-      [setByteMessage, addToHistory, nodesMap, setNodes, debouncedUpdateNodePosition]
+      [setIsDraggingNode, addToHistory, nodesMap, setNodes, handleError]
     );
 
     const zoomIn = useCallback(() => {
@@ -1033,10 +1221,11 @@ const FlowEditorInner = React.memo(
     }, [setShowSimulation, setByteMessage]);
 
     const onPaneClick = useCallback(() => {
-      setSelectedNode(null);
-      setByteMessage('🖱️ Fondo seleccionado');
+      // Limpiar la selección de nodos usando la función especializada
+      clearNodeSelection();
+      // Cerrar el menú contextual si está abierto
       closeContextMenu();
-    }, [setSelectedNode, setByteMessage, closeContextMenu]);
+    }, [clearNodeSelection, closeContextMenu]);
 
     const onMove = useCallback(() => {
       const currentViewport = getViewport();
@@ -1104,77 +1293,282 @@ const FlowEditorInner = React.memo(
     }, [selectedNode, setShowConnectionEditor, undo, redo, setByteMessage, setShowSimulation, closeContextMenu]);
 
     return (
-      <> {/* Envolver en fragmento */}
-        <BackgroundScene /> {/* Mover BackgroundScene aquí, como hermano del editor */}
-        <div className="ts-zoom-controls">
-          <button onClick={zoomIn} className="ts-zoom-button" title="Zoom In" aria-label="Aumentar zoom">
-            +
+      <div className="ts-flow-editor-container">
+        <BackgroundScene /> {/* Fondo del editor */}
+        
+        {/* Contenedor aislado para el encabezado épico */}
+        <div className="epic-header-container">
+          <EpicHeader 
+          flowName={name || 'Flujo sin título'}
+          nodeCount={internalNodes.length}
+          edgeCount={internalEdges.length}
+          lastSaved={lastSaved}
+          logoSrc={logo}
+          onSave={() => {
+            if (saveFlowData && typeof saveFlowData === 'function') {
+              try {
+                saveFlowData();
+                // Actualizar la hora de último guardado
+                setLastSaved(new Date());
+                setByteMessage('💾 Diagrama guardado');
+              } catch (error) {
+                console.error('Error al guardar:', error);
+                handleError('Error al guardar el diagrama', error);
+              }
+            }
+          }}
+          onShare={() => {
+            console.log('Botón Compartir clickeado');
+            // Siempre abrir el modal directamente
+            setShowEmbedModal(true);
+            setByteMessage('Puedes compartir tu Plubot con un enlace directo o embeber el chatbot en tu sitio web.');
+          }}
+          onSimulate={toggleSimulation}
+          onShowTemplates={() => {
+            setShowTemplateSelector(true);
+            setByteMessage('🖼 Mostrando plantillas disponibles');
+          }}
+          onSettings={() => {
+            // Abrir configuración o mostrar modal de configuración
+            setByteMessage('⚙️ Configuración de flujo');
+          }}
+          />
+        </div>
+        
+        <div className="ts-flow-editor-wrapper">
+          <div className="ts-zoom-controls">
+          <button onClick={zoomIn} className="ts-zoom-button" aria-label="Aumentar zoom">
+            <span className="button-icon">+</span>
+            <span className="button-tooltip">Acercar</span>
           </button>
-          <button onClick={zoomOut} className="ts-zoom-button" title="Zoom Out" aria-label="Reducir zoom">
-            −
+          <button onClick={zoomOut} className="ts-zoom-button" aria-label="Reducir zoom">
+            <span className="button-icon">−</span>
+            <span className="button-tooltip">Alejar</span>
           </button>
           <button
             onClick={() => fitView({ padding: 0.3, duration: 500 })}
             className="ts-zoom-button"
-            title="Ajustar diagrama"
             aria-label="Ajustar diagrama"
           >
-            ⟲
+            <span className="button-icon">⟲</span>
+            <span className="button-tooltip">Ajustar vista</span>
           </button>
-          <button onClick={() => undo()} className="ts-zoom-button" title="Deshacer" aria-label="Deshacer">
-            ↩
+          <button onClick={() => undo()} className="ts-zoom-button" aria-label="Deshacer">
+            <span className="button-icon">↩</span>
+            <span className="button-tooltip">Deshacer</span>
           </button>
-          <button onClick={() => redo()} className="ts-zoom-button" title="Rehacer" aria-label="Rehacer">
-            ↪
+          <button onClick={() => redo()} className="ts-zoom-button" aria-label="Rehacer">
+            <span className="button-icon">↪</span>
+            <span className="button-tooltip">Rehacer</span>
           </button>
-          {/* Botón para el Historial de Versiones (movido aquí) */}
+          {/* Botón para el Historial de Versiones */}
           <button
             onClick={() => setShowVersionHistoryPanel(!showVersionHistoryPanel)}
-            className="ts-zoom-button"
-            title={showVersionHistoryPanel ? "Ocultar Historial" : "Mostrar Historial"}
+            className={`ts-zoom-button ${showVersionHistoryPanel ? 'active' : ''}`}
             aria-label={showVersionHistoryPanel ? "Ocultar Historial de Versiones" : "Mostrar Historial de Versiones"}
           >
-            📜
+            <span className="button-icon">H</span>
+            <span className="button-tooltip">{showVersionHistoryPanel ? "Ocultar Historial" : "Mostrar Historial"}</span>
           </button>
-          {/* Botón para Simular */}
+          {/* Botón para centrar nodo seleccionado */}
           <button
-            onClick={() => setShowSimulation((prev) => !prev)}
-            className="ts-zoom-button"
-            title="Alternar Simulador"
-            aria-label="Alternar Simulador"
-          >
-            🖥️
-          </button>
-          {/* Botón para Guardar */}
-          <button
-            onClick={async () => {
-              console.log('[FlowEditor] Botón Guardar: onClick iniciado.');
-              try {
-                console.log('[FlowEditor] Botón Guardar: plubotId =', plubotId);
-                if (!plubotId) {
-                  console.warn('[FlowEditor] Botón Guardar: plubotId no encontrado.');
-                  setByteMessage('⚠️ No se ha encontrado el ID del Plubot. Redirigiendo al perfil...');
-                  setTimeout(() => navigate('/profile'), 2000);
-                  return;
+            onClick={() => {
+              // Verificar si hay un nodo seleccionado
+              if (selectedNode) {
+                try {
+                  console.log('Centrando nodo seleccionado:', selectedNode);
+                  
+                  // Crear una copia del nodo para evitar problemas de referencia
+                  const nodesToFit = [{ ...selectedNode }];
+                  
+                  // Centrar el nodo en la vista inmediatamente
+                  fitView({
+                    nodes: nodesToFit,
+                    padding: 0.5,
+                    duration: 800,
+                    includeHiddenNodes: false,
+                    minZoom: 0.5,
+                    maxZoom: 2
+                  });
+                  
+                  // Notificar al usuario después de completar la operación
+                  setByteMessage('🔍 Nodo centrado en la vista');
+                  notifyByte && notifyByte('🔍 Nodo centrado en la vista');
+                } catch (error) {
+                  console.error('Error al centrar nodo:', error);
+                  setByteMessage('⚠️ Error al centrar el nodo');
+                  handleError('Error al centrar el nodo', error);
                 }
-                console.log('[FlowEditor] Botón Guardar: Llamando a saveFlowData...');
-                console.log('[FlowEditor] Botón Guardar: internalNodes:', internalNodes);
-                console.log('[FlowEditor] Botón Guardar: internalEdges:', internalEdges);
-                await saveFlowData(plubotId, internalNodes, internalEdges, nodesMap, edgesMap);
-                console.log('[FlowEditor] Botón Guardar: saveFlowData completado (promesa resuelta).');
-                setByteMessage('💾 Progreso guardado exitosamente!');
-              } catch (err) {
-                console.error('[FlowEditor] Botón Guardar: Error en el bloque catch.', err);
-                handleError(`Error al guardar: ${err.message}`);
-                setByteMessage(`⛔ Error al guardar: ${err.message}. Intenta de nuevo.`);
+              } else {
+                setByteMessage('⚠️ Selecciona un nodo primero');
               }
-              console.log('[FlowEditor] Botón Guardar: onClick finalizado.');
             }}
             className="ts-zoom-button"
-            title="Guardar Progreso"
-            aria-label="Guardar Progreso"
+            aria-label="Centrar nodo seleccionado"
+            disabled={!selectedNode}
           >
-            💾
+            <span className="button-icon">C</span>
+            <span className="button-tooltip">Centrar nodo</span>
+          </button>
+          {/* Botón para duplicar nodo seleccionado */}
+          <button
+            onClick={() => {
+              if (selectedNode) {
+                try {
+                  console.log('Duplicando nodo:', selectedNode);
+                  
+                  // Generar un nuevo ID único usando un formato consistente
+                  const timestamp = Date.now();
+                  const randomSuffix = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
+                  const nodeType = selectedNode.type || 'node';
+                  const newId = `${nodeType}-${timestamp}-${randomSuffix}`;
+                  
+                  // Crear una copia profunda del nodo con nueva posición (desplazada)
+                  const newNode = {
+                    ...JSON.parse(JSON.stringify(selectedNode)),
+                    id: newId,
+                    position: {
+                      x: selectedNode.position.x + 50,
+                      y: selectedNode.position.y + 50
+                    },
+                    data: {
+                      ...JSON.parse(JSON.stringify(selectedNode.data)),
+                      label: `${selectedNode.data.label || 'Nodo'} (copia)`
+                    },
+                    selected: true
+                  };
+                  
+                  // Deseleccionar todos los nodos actuales
+                  const updatedExistingNodes = internalNodes.map(n => ({ ...n, selected: false }));
+                  
+                  // Añadir el nuevo nodo a los mapas y estados
+                  nodesMap.set(newId, newNode);
+                  
+                  // Actualizar los estados con todos los nodos existentes (deseleccionados) + el nuevo nodo
+                  const updatedNodes = [...updatedExistingNodes, newNode];
+                  setInternalNodes(updatedNodes);
+                  setNodes(updatedNodes);
+                  
+                  // Seleccionar el nuevo nodo
+                  setSelectedNode(newNode);
+                  
+                  // Centrar la vista en el nuevo nodo
+                  fitView({
+                    nodes: [newNode],
+                    padding: 0.5,
+                    duration: 500,
+                    includeHiddenNodes: false
+                  });
+                  
+                  // Notificar al usuario
+                  setByteMessage('💾 Nodo duplicado');
+                  notifyByte && notifyByte('💾 Nodo duplicado');
+                  
+                  // Añadir al historial
+                  addToHistory({
+                    action: 'add_node',
+                    nodeId: newId,
+                    newNode: newNode
+                  });
+                } catch (error) {
+                  console.error('Error al duplicar nodo:', error);
+                  setByteMessage('⚠️ Error al duplicar el nodo');
+                  handleError('Error al duplicar el nodo', error);
+                }
+              } else {
+                setByteMessage('⚠️ Selecciona un nodo primero');
+              }
+            }}
+            className="ts-zoom-button"
+            aria-label="Duplicar nodo seleccionado"
+            disabled={!selectedNode}
+          >
+            <span className="button-icon">D</span>
+            <span className="button-tooltip">Duplicar nodo</span>
+          </button>
+          
+          {/* Botón para eliminar nodo seleccionado */}
+          <button
+            onClick={() => {
+              if (selectedNode) {
+                try {
+                  console.log('Intentando eliminar nodo:', selectedNode);
+                  
+                  // Verificar si es un nodo crítico (por ejemplo, el único nodo de inicio)
+                  const isStartNode = selectedNode.type === NODE_TYPES.start;
+                  const startNodesCount = internalNodes.filter(n => n.type === NODE_TYPES.start).length;
+                  
+                  if (isStartNode && startNodesCount <= 1) {
+                    setByteMessage('⚠️ No se puede eliminar el único nodo de inicio');
+                    return;
+                  }
+                  
+                  // Identificar las aristas conectadas al nodo
+                  const edgesToDelete = internalEdges.filter(e => 
+                    e.source === selectedNode.id || e.target === selectedNode.id
+                  );
+                  
+                  console.log('Nodo a eliminar:', selectedNode);
+                  console.log('Aristas a eliminar:', edgesToDelete);
+                  
+                  // Actualizar el mapa de nodos y aristas
+                  nodesMap.delete(selectedNode.id);
+                  edgesToDelete.forEach(edge => edgesMap.delete(edge.id));
+                  
+                  // Crear nuevas copias de los arrays para forzar la actualización
+                  const newNodes = internalNodes.filter(n => n.id !== selectedNode.id);
+                  const newEdges = internalEdges.filter(e => 
+                    e.source !== selectedNode.id && e.target !== selectedNode.id
+                  );
+                  
+                  // Actualizar los estados internos
+                  setInternalNodes(newNodes);
+                  setInternalEdges(newEdges);
+                  
+                  // Actualizar los estados globales
+                  setNodes(newNodes);
+                  setEdges(newEdges);
+                  
+                  // Limpiar la selección
+                  setSelectedNode(null);
+                  
+                  // Notificar al usuario
+                  setByteMessage('🗑️ Nodo eliminado');
+                  notifyByte && notifyByte('🗑️ Nodo eliminado');
+                  
+                  // Añadir al historial
+                  addToHistory({
+                    action: 'delete_node',
+                    nodeId: selectedNode.id,
+                    deletedNode: selectedNode,
+                    deletedEdges: edgesToDelete
+                  });
+                  
+                  // Forzar un guardado para persistir los cambios
+                  if (saveFlowData && typeof saveFlowData === 'function') {
+                    setTimeout(() => {
+                      try {
+                        saveFlowData();
+                      } catch (saveError) {
+                        console.error('Error al guardar después de eliminar nodo:', saveError);
+                      }
+                    }, 500);
+                  }
+                } catch (error) {
+                  console.error('Error al eliminar nodo:', error);
+                  setByteMessage('⚠️ Error al eliminar el nodo');
+                  handleError('Error al eliminar el nodo', error);
+                }
+              } else {
+                setByteMessage('⚠️ Selecciona un nodo primero');
+              }
+            }}
+            className="ts-zoom-button"
+            aria-label="Eliminar nodo seleccionado"
+            disabled={!selectedNode}
+          >
+            <span className="button-icon">E</span>
+            <span className="button-tooltip">Eliminar nodo</span>
           </button>
         </div>
 
@@ -1231,30 +1625,45 @@ const FlowEditorInner = React.memo(
             snapGrid={SNAP_GRID}
             fitView={true}
             attributionPosition="bottom-right"
-            proOptions={{ hideAttribution: true }}
-            style={REACT_FLOW_STYLE}
+            proOptions={{
+              hideAttribution: true,
+              account: 'paid-pro', // Habilitar todas las optimizaciones pro
+              // Opciones avanzadas de optimización
+              elementsDraggable: true,
+              highQualityRendering: true, // Renderizado de alta calidad
+              smoothEdges: true // Bordes suavizados para mejor apariencia
+            }}
+            style={{
+              ...REACT_FLOW_STYLE,
+              // Mejoras para alta definición
+              imageRendering: 'high-quality',
+              textRendering: 'optimizeLegibility',
+              WebkitFontSmoothing: 'antialiased',
+              MozOsxFontSmoothing: 'grayscale'
+            }}
             zoomOnScroll={true}
             panOnScroll={false} // Deshabilitar paneo con rueda del mouse
             panOnDrag={true}
+            // Optimizaciones de virtualización y rendimiento
+            onlyRenderVisibleElements={internalNodes.length > 20} // Umbral más bajo para activar la optimización
+            connectionLineType="smoothstep" // Tipo de línea más eficiente
+            defaultEdgeOptions={{ type: 'smoothstep', animated: false }} // Desactivar animaciones para mejorar rendimiento
+            // Configuración para movimiento fluido y natural
             nodesDraggable={true}
             nodesConnectable={true}
             elementsSelectable={true}
             deleteKeyCode={DELETE_KEYS}
             multiSelectionKeyCode="Shift"
-            selectionOnDrag={false}
+            selectionOnDrag={true}
             minZoom={0.1}
             maxZoom={2}
             defaultViewport={{ x: 0, y: 0, zoom: 1 }}
-            nodeExtent={[[-10000, -10000], [10000, 10000]]}
+            nodeExtent={[[-5000, -5000], [5000, 5000]]} // Área de trabajo amplia
             elevateNodesOnSelect={true}
           >
             {/* CustomMiniMap con posicionamiento explícito para garantizar visibilidad */}
             <div 
               style={{
-                position: 'absolute', 
-                bottom: '20px', 
-                left: '20px', 
-                zIndex: 1010,
                 pointerEvents: 'auto'
               }}
             >
@@ -1283,21 +1692,7 @@ const FlowEditorInner = React.memo(
                 </div>
               </Panel>
             )}
-            {process.env.NODE_ENV === 'development' && internalNodes.length > 0 && (
-              <Panel position="top-left" style={{ margin: '20px' }}>
-                <div
-                  style={{
-                    background: 'rgba(255, 255, 255, 0.8)',
-                    padding: 10,
-                    borderRadius: 4,
-                    boxShadow: '0 1px 4px rgba(0,0,0,0.1)',
-                    fontSize: '14px',
-                  }}
-                >
-                  Renderizando {internalNodes.length} nodos
-                </div>
-              </Panel>
-            )}
+            {/* Recuadro de información de nodos eliminado */}
             {contextMenu && (
               <ContextMenu
                 x={contextMenu.x}
@@ -1317,8 +1712,46 @@ const FlowEditorInner = React.memo(
               />
             </div>
           )}
+          </div>
         </div>
-      </>
+        
+        {/* Modal de compartir y embeber */}
+        {showEmbedModal && (
+          <EmbedModal
+            plubotId={plubotId}
+            onClose={() => setShowEmbedModal(false)}
+          />
+        )}
+        
+        {/* Selector de plantillas */}
+        {showTemplateSelector && (
+          <Suspense fallback={<div className="loading-overlay">Cargando plantillas...</div>}>
+            <TemplateSelector
+              onSelectTemplate={(template) => {
+                // Aplicar la plantilla seleccionada
+                setInternalNodes(template.nodes);
+                setInternalEdges(template.edges);
+                // Cerrar el selector de plantillas
+                setShowTemplateSelector(false);
+                // Mostrar mensaje de confirmación
+                setByteMessage('📋 Plantilla seleccionada.');
+                // Guardar los cambios
+                if (saveFlowData && typeof saveFlowData === 'function') {
+                  try {
+                    saveFlowData();
+                    setLastSaved(new Date());
+                  } catch (error) {
+                    console.error('Error al guardar:', error);
+                    handleError('Error al guardar la plantilla', error);
+                  }
+                }
+              }}
+              onClose={() => setShowTemplateSelector(false)}
+              className="ts-template-selector"
+            />
+          </Suspense>
+        )}
+      </div>
     );
   }
 );

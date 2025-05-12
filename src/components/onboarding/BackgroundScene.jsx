@@ -2,12 +2,14 @@ import React, { useEffect, useRef } from 'react';
 import './BackgroundScene.css';
 
 const CONFIG = {
-  particleCount: 50,
-  connectionDistance: 70,
+  particleCount: 40, // Reducido para optimizar rendimiento
+  connectionDistance: 60, // Reducido para menos conexiones
   mouseRadius: 100,
-  maxPixelRatio: 1.5,
+  maxPixelRatio: 1, // Limitado a 1 para mejor rendimiento
   blur: 0.5,
   colors: ['rgba(0, 224, 255,', 'rgba(255, 0, 255,'],
+  staticGradientOpacity: 0.03, // Reducido para un fondo más oscuro
+  backgroundColor: 'rgba(8, 10, 15, 0.98)', // Fondo más oscuro
 };
 
 const BackgroundScene = () => {
@@ -49,20 +51,27 @@ const BackgroundScene = () => {
       const width = staticCanvas.width;
       const height = staticCanvas.height;
 
+      // Aplicar un fondo más oscuro primero
+      staticCtx.fillStyle = CONFIG.backgroundColor;
+      staticCtx.fillRect(0, 0, width, height);
+
+      // Gradiente en la esquina superior izquierda (más reducido y sutil)
       const gradient1 = staticCtx.createRadialGradient(
-        width * 0.1, height * 0.2, 0,
-        width * 0.1, height * 0.2, width * 0.4
+        width * 0.05, height * 0.1, 0, // Posición más cercana a la esquina
+        width * 0.05, height * 0.1, width * 0.2 // Radio significativamente reducido
       );
-      gradient1.addColorStop(0, 'rgba(0, 224, 255, 0.08)');
+      gradient1.addColorStop(0, `rgba(0, 224, 255, ${CONFIG.staticGradientOpacity * 0.4})`);
       gradient1.addColorStop(1, 'transparent');
 
+      // Restaurar el gradiente magenta en la parte inferior derecha
       const gradient2 = staticCtx.createRadialGradient(
         width * 0.9, height * 0.8, 0,
         width * 0.9, height * 0.8, width * 0.4
       );
-      gradient2.addColorStop(0, 'rgba(255, 0, 255, 0.08)');
+      gradient2.addColorStop(0, `rgba(255, 0, 255, ${CONFIG.staticGradientOpacity})`);
       gradient2.addColorStop(1, 'transparent');
 
+      // Aplicar los gradientes con menor opacidad
       staticCtx.fillStyle = gradient1;
       staticCtx.fillRect(0, 0, width, height);
       staticCtx.fillStyle = gradient2;
@@ -117,9 +126,20 @@ const BackgroundScene = () => {
     }
 
     const drawConnections = () => {
+      // Optimización: Usar un buffer de líneas y dibujarlas todas juntas
+      const lines = [];
       ctx.lineWidth = 0.4;
+      
+      // Limitar el número de conexiones para mejorar el rendimiento
+      const maxConnections = 100; // Límite de conexiones a dibujar
+      let connectionCount = 0;
+      
       for (let i = 0; i < particles.length; i++) {
-        for (let j = i + 1; j < particles.length; j++) {
+        // Optimización: Solo comprobar partículas cercanas
+        // Usar un paso más grande para saltarse algunas partículas
+        for (let j = i + 2; j < particles.length; j += 2) {
+          if (connectionCount >= maxConnections) break;
+          
           const dx = particles[i].x - particles[j].x;
           const dy = particles[i].y - particles[j].y;
           const distanceSq = dx * dx + dy * dy;
@@ -127,21 +147,46 @@ const BackgroundScene = () => {
 
           if (distanceSq < maxDistSq) {
             const opacity = 1 - Math.sqrt(distanceSq) / CONFIG.connectionDistance;
-            ctx.strokeStyle = `rgba(0, 224, 255, ${opacity * 0.2})`;
-            ctx.beginPath();
-            ctx.moveTo(particles[i].x, particles[i].y);
-            ctx.lineTo(particles[j].x, particles[j].y);
-            ctx.stroke();
+            lines.push({
+              x1: particles[i].x,
+              y1: particles[i].y,
+              x2: particles[j].x,
+              y2: particles[j].y,
+              opacity: opacity * 0.2
+            });
+            connectionCount++;
           }
         }
       }
+      
+      // Dibujar todas las líneas de una vez
+      for (const line of lines) {
+        ctx.strokeStyle = `rgba(0, 224, 255, ${line.opacity})`;
+        ctx.beginPath();
+        ctx.moveTo(line.x1, line.y1);
+        ctx.lineTo(line.x2, line.y2);
+        ctx.stroke();
+      }
     };
 
-    const animate = () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      particles.forEach(p => p.update());
-      drawConnections();
-      particles.forEach(p => p.draw());
+    // Optimización para mejorar el rendimiento
+    let lastFrameTime = 0;
+    const targetFPS = 30; // Limitamos a 30 FPS para ahorrar recursos
+    const frameInterval = 1000 / targetFPS;
+    
+    const animate = (timestamp) => {
+      // Limitar la tasa de frames para optimizar rendimiento
+      const elapsed = timestamp - lastFrameTime;
+      
+      if (elapsed > frameInterval) {
+        lastFrameTime = timestamp - (elapsed % frameInterval);
+        
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        particles.forEach(p => p.update());
+        drawConnections();
+        particles.forEach(p => p.draw());
+      }
+      
       animationFrameId = requestAnimationFrame(animate);
     };
 

@@ -214,7 +214,38 @@ const OptionNode = React.memo(
         <div className="option-node-variable-editor">
           <div className="option-node-variable-editor-header">
             <h4>Variables</h4>
-            <button onClick={addVariable} className="option-node-variable-add" aria-label="Agregar variable">
+            <button 
+              onClick={(e) => {
+                // Efecto visual al hacer clic en el botón
+                const btn = e.currentTarget;
+                btn.style.transform = 'scale(0.95) translateZ(0)';
+                btn.style.transition = 'transform 0.1s cubic-bezier(0.34, 1.56, 0.64, 1)';
+                
+                // Restaurar después de un corto tiempo
+                setTimeout(() => {
+                  btn.style.transform = 'scale(1) translateZ(0)';
+                }, 150);
+                
+                addVariable();
+              }} 
+              className="option-node-variable-add" 
+              aria-label="Agregar variable"
+              onMouseEnter={(e) => {
+                // Efecto al pasar el mouse
+                const btn = e.currentTarget;
+                btn.style.filter = 'brightness(1.1)';
+                btn.style.transform = 'translateY(-2px) translateZ(0)';
+                btn.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.2), inset 0 1px 1px rgba(255, 255, 255, 0.1)';
+                btn.style.transition = 'all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1)';
+              }}
+              onMouseLeave={(e) => {
+                // Restaurar al salir
+                const btn = e.currentTarget;
+                btn.style.filter = '';
+                btn.style.transform = '';
+                btn.style.boxShadow = '';
+              }}
+            >
               + Agregar
             </button>
           </div>
@@ -233,11 +264,36 @@ const OptionNode = React.memo(
                     onDoubleClick={(e) => e.stopPropagation()}
                   />
                   <button
-                    onClick={() => removeVariable(index)}
+                    onClick={(e) => {
+                      // Efecto visual al hacer clic en el botón
+                      const btn = e.currentTarget;
+                      btn.style.transform = 'scale(0.9) rotate(90deg) translateZ(0)';
+                      btn.style.transition = 'all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1)';
+                      
+                      // Eliminar con un pequeño retraso para mostrar la animación
+                      setTimeout(() => {
+                        removeVariable(index);
+                      }, 150);
+                    }}
                     className="option-node-variable-remove"
                     aria-label="Eliminar variable"
                     onMouseDown={(e) => e.stopPropagation()}
                     onDoubleClick={(e) => e.stopPropagation()}
+                    onMouseEnter={(e) => {
+                      // Efecto al pasar el mouse
+                      const btn = e.currentTarget;
+                      btn.style.filter = 'brightness(1.2)';
+                      btn.style.transform = 'scale(1.1) translateZ(0)';
+                      btn.style.boxShadow = '0 0 8px rgba(255, 77, 77, 0.5)';
+                      btn.style.transition = 'all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1)';
+                    }}
+                    onMouseLeave={(e) => {
+                      // Restaurar al salir
+                      const btn = e.currentTarget;
+                      btn.style.filter = '';
+                      btn.style.transform = '';
+                      btn.style.boxShadow = '';
+                    }}
                   >
                     <X size={14} />
                   </button>
@@ -264,6 +320,19 @@ const OptionNode = React.memo(
       console.log(`[OptionNode] Handle dragging for node ${id}, position:`, { x: event.clientX, y: event.clientY });
     }, [id]);
 
+    // Efecto de aparición mejorado con animaciones HD
+    useEffect(() => {
+      if (nodeRef.current) {
+        // Aplicar efecto de aparición con un ligero retraso para escalonar las animaciones
+        const timer = setTimeout(() => {
+          nodeRef.current.style.opacity = '1';
+          nodeRef.current.style.transform = 'translateY(0) scale(1) translateZ(0)';
+        }, Math.random() * 100); // Pequeña variación para que no todos los nodos aparezcan exactamente al mismo tiempo
+        
+        return () => clearTimeout(timer);
+      }
+    }, []);
+
     return (
       <div
         ref={nodeRef}
@@ -275,28 +344,14 @@ const OptionNode = React.memo(
           ${isCollapsed ? 'collapsed' : ''}
           ${isHovered ? 'hovered' : ''}
         `}
-        onClick={(e) => {
-          e.stopPropagation();
-          handleClick(e);
-          console.log(`[OptionNode] Node clicked: ${id}, selected: ${selected}`);
-        }}
-        onDoubleClick={handleDoubleClick}
-        onContextMenu={handleContextMenu}
-        onMouseDown={(e) => {
-          console.log(`[OptionNode] Mouse down on node ${id}, draggable: ${draggable}`);
-        }}
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-        style={{
-          width: isCollapsed ? 150 : (data.width || 150),
-          height: isCollapsed ? 40 : (data.height || 80),
-          transition: 'background-color 0.2s, border-color 0.2s, box-shadow 0.2s',
-        }}
-        role="button"
-        aria-label={`Nodo de opción: ${label}`}
         tabIndex={0}
         data-testid="option-node"
         draggable={draggable}
+        style={{
+          opacity: '0', // Comienza invisible
+          transform: 'translateY(10px) scale(0.98) translateZ(0)', // Comienza ligeramente abajo y más pequeño
+          transition: 'all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)', // Transición suave con rebote
+        }}
       >
         <Handle
           type="target"
@@ -307,6 +362,20 @@ const OptionNode = React.memo(
           onMouseDown={(e) => {
             e.stopPropagation();
             e.preventDefault();
+            // Efecto visual al hacer clic en el conector
+            if (e.target) {
+              // Aplicar efecto de pulso
+              e.target.style.transform = 'scale(1.3) translateZ(0)';
+              e.target.style.boxShadow = '0 0 15px rgba(52, 211, 153, 0.7)';
+              e.target.style.transition = 'all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1)';
+              
+              // Restaurar después de la animación
+              setTimeout(() => {
+                e.target.style.transform = '';
+                e.target.style.boxShadow = '';
+                e.target.style.transition = '';
+              }, 300);
+            }
             console.log(`[OptionNode] Target Handle mouse down: ${id}`);
           }}
           onDragStart={(e) => {
@@ -341,9 +410,34 @@ const OptionNode = React.memo(
           <div className="option-node-controls">
             <button
               className="option-node-collapse-btn"
-              onClick={toggleCollapse}
+              onClick={(e) => {
+                // Efecto visual al hacer clic en el botón
+                const btn = e.currentTarget;
+                btn.style.transform = 'scale(0.9) translateZ(0)';
+                btn.style.transition = 'transform 0.1s cubic-bezier(0.34, 1.56, 0.64, 1)';
+                
+                // Restaurar después de un corto tiempo
+                setTimeout(() => {
+                  btn.style.transform = 'scale(1) translateZ(0)';
+                }, 150);
+                
+                toggleCollapse();
+              }}
               onMouseDown={(e) => e.stopPropagation()}
               onDoubleClick={(e) => e.stopPropagation()}
+              onMouseEnter={(e) => {
+                // Efecto al pasar el mouse
+                const btn = e.currentTarget;
+                btn.style.filter = 'brightness(1.2)';
+                btn.style.transform = 'scale(1.05) translateZ(0)';
+                btn.style.transition = 'all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1)';
+              }}
+              onMouseLeave={(e) => {
+                // Restaurar al salir
+                const btn = e.currentTarget;
+                btn.style.filter = '';
+                btn.style.transform = 'scale(1) translateZ(0)';
+              }}
               aria-label={isCollapsed ? 'Expandir' : 'Colapsar'}
             >
               {isCollapsed ? <ChevronDown size={16} /> : <ChevronUp size={16} />}
@@ -443,10 +537,68 @@ const OptionNode = React.memo(
             ) : (
               <div className="option-node-editing-controls">
                 <div className="option-node-edit-actions">
-                  <button onClick={cancelEditing} className="option-node-cancel-btn" aria-label="Cancelar">
+                  <button 
+                    onClick={(e) => {
+                      // Efecto visual al hacer clic en el botón
+                      const btn = e.currentTarget;
+                      btn.style.transform = 'scale(0.95) translateZ(0)';
+                      btn.style.transition = 'transform 0.1s cubic-bezier(0.34, 1.56, 0.64, 1)';
+                      
+                      // Restaurar después de un corto tiempo
+                      setTimeout(() => {
+                        cancelEditing();
+                      }, 100);
+                    }} 
+                    className="option-node-cancel-btn" 
+                    aria-label="Cancelar"
+                    onMouseEnter={(e) => {
+                      // Efecto al pasar el mouse
+                      const btn = e.currentTarget;
+                      btn.style.filter = 'brightness(1.1)';
+                      btn.style.transform = 'translateY(-2px) translateZ(0)';
+                      btn.style.boxShadow = '0 4px 8px rgba(255, 77, 77, 0.3), inset 0 1px 1px rgba(255, 255, 255, 0.1)';
+                      btn.style.transition = 'all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1)';
+                    }}
+                    onMouseLeave={(e) => {
+                      // Restaurar al salir
+                      const btn = e.currentTarget;
+                      btn.style.filter = '';
+                      btn.style.transform = '';
+                      btn.style.boxShadow = '';
+                    }}
+                  >
                     Cancelar
                   </button>
-                  <button onClick={finishEditing} className="option-node-save-btn" aria-label="Guardar">
+                  <button 
+                    onClick={(e) => {
+                      // Efecto visual al hacer clic en el botón
+                      const btn = e.currentTarget;
+                      btn.style.transform = 'scale(0.95) translateZ(0)';
+                      btn.style.transition = 'transform 0.1s cubic-bezier(0.34, 1.56, 0.64, 1)';
+                      
+                      // Restaurar después de un corto tiempo
+                      setTimeout(() => {
+                        finishEditing();
+                      }, 100);
+                    }} 
+                    className="option-node-save-btn" 
+                    aria-label="Guardar"
+                    onMouseEnter={(e) => {
+                      // Efecto al pasar el mouse
+                      const btn = e.currentTarget;
+                      btn.style.filter = 'brightness(1.1)';
+                      btn.style.transform = 'translateY(-2px) translateZ(0)';
+                      btn.style.boxShadow = '0 4px 8px rgba(78, 204, 163, 0.3), inset 0 1px 1px rgba(255, 255, 255, 0.1)';
+                      btn.style.transition = 'all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1)';
+                    }}
+                    onMouseLeave={(e) => {
+                      // Restaurar al salir
+                      const btn = e.currentTarget;
+                      btn.style.filter = '';
+                      btn.style.transform = '';
+                      btn.style.boxShadow = '';
+                    }}
+                  >
                     Guardar
                   </button>
                 </div>
@@ -463,6 +615,20 @@ const OptionNode = React.memo(
           onMouseDown={(e) => {
             e.stopPropagation();
             e.preventDefault();
+            // Efecto visual al hacer clic en el conector de salida
+            if (e.target) {
+              // Aplicar efecto de pulso
+              e.target.style.transform = 'translateX(-50%) scale(1.3) translateZ(0)';
+              e.target.style.boxShadow = '0 0 15px rgba(52, 211, 153, 0.7)';
+              e.target.style.transition = 'all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1)';
+              
+              // Restaurar después de la animación
+              setTimeout(() => {
+                e.target.style.transform = 'translateX(-50%)';
+                e.target.style.boxShadow = '';
+                e.target.style.transition = '';
+              }, 300);
+            }
             console.log(`[OptionNode] Source Handle mouse down: ${id}`);
           }}
           onDragStart={(e) => {

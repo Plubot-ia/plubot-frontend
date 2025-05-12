@@ -391,7 +391,7 @@
 /* Estilos específicos para tipos de nodos */
 .ts-start-template .ts-node-icon {
   background: transparent;
-  color: #00ff9d;
+  color: #00e0ff; /* Cambiado a color turquesa (antes era verde) */
 }
 
 .ts-end-template .ts-node-icon {
@@ -401,7 +401,7 @@
 
 .ts-message-template .ts-node-icon {
   background: transparent;
-  color: #00e0ff;
+  color: #00ff9d; /* Cambiado a color verde (antes era turquesa) */
 }
 
 .ts-decision-template .ts-node-icon {

@@ -7,6 +7,7 @@
     z-index: 0;
     overflow: hidden;
     pointer-events: none;
+    background-color: #080a0f; /* Fondo base más oscuro */
 }
 
 .ts-background-scene-container .ts-background-scene {
@@ -27,15 +28,10 @@
     filter: blur(0.5px);
 }
 
+/* Eliminamos las animaciones para evitar el efecto de luz que baja constantemente */
 @media (prefers-reduced-motion: reduce) {
     .ts-background-scene-container .ts-dynamic-layer {
-        animation: ts-pulse 5s ease-in-out infinite;
+        /* Sin animación */
+        opacity: 0.9;
     }
-}
-
-/* Animations */
-@keyframes ts-pulse {
-    0% { opacity: 0.8; }
-    50% { opacity: 1; }
-    100% { opacity: 0.8; }
 }

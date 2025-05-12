@@ -44,12 +44,15 @@ const EndNode = memo(({
   const inputRef = useRef(null);
   const variableEditorRef = useRef(null);
 
+  // Estado para la posición del menú contextual
+  const [contextMenuPosition, setContextMenuPosition] = useState({ x: 0, y: 0 });
+
   // Configuración del nodo usando el hook personalizado
   const {
     isResizing,
     isCollapsed,
     showContextMenu,
-    contextMenuPosition,
+    // contextMenuPosition, // Comentado porque ahora usamos el estado local
     errorMessage,
     isHovered,
     nodeRef,
@@ -296,6 +299,19 @@ const EndNode = memo(({
     );
   };
 
+  // Efecto de aparición mejorado con animaciones HD
+  useEffect(() => {
+    if (nodeRef.current) {
+      // Aplicar efecto de aparición con un ligero retraso para escalonar las animaciones
+      const timer = setTimeout(() => {
+        nodeRef.current.style.opacity = '1';
+        nodeRef.current.style.transform = 'translateY(0) scale(1) translateZ(0)';
+      }, Math.random() * 100); // Pequeña variación para que no todos los nodos aparezcan exactamente al mismo tiempo
+      
+      return () => clearTimeout(timer);
+    }
+  }, []);
+
   return (
     <div
       ref={nodeRef}
@@ -315,6 +331,9 @@ const EndNode = memo(({
       style={{
         width: isCollapsed ? 120 : (data.width || initialWidth),
         height: isCollapsed ? 40 : (data.height || initialHeight),
+        opacity: '0', // Comienza invisible
+        transform: 'translateY(10px) scale(0.98) translateZ(0)', // Comienza ligeramente abajo y más pequeño
+        transition: 'all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)', // Transición suave con rebote
       }}
       role="button"
       aria-label={`Nodo de fin: ${label}`}
@@ -334,6 +353,36 @@ const EndNode = memo(({
         isConnectable={isConnectable && !isEditing}
         className={`end-node-input ${data.hasActiveInput ? 'active' : ''}`}
         aria-label="Conexión de entrada"
+        onMouseDown={(e) => {
+          e.stopPropagation();
+          e.preventDefault();
+          // Efecto visual al hacer clic en el conector
+          if (e.target) {
+            // Aplicar efecto de pulso
+            e.target.style.transform = 'scale(1.3) translateZ(0)';
+            e.target.style.boxShadow = '0 0 15px rgba(255, 112, 112, 0.7)';
+            e.target.style.transition = 'all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1)';
+            
+            // Restaurar después de la animación
+            setTimeout(() => {
+              e.target.style.transform = '';
+              e.target.style.boxShadow = '';
+              e.target.style.transition = '';
+            }, 300);
+          }
+        }}
+        onMouseEnter={(e) => {
+          // Efecto al pasar el mouse
+          if (e.target) {
+            e.target.style.filter = 'brightness(1.2)';
+          }
+        }}
+        onMouseLeave={(e) => {
+          // Restaurar al salir
+          if (e.target) {
+            e.target.style.filter = '';
+          }
+        }}
       />
       
       <div className="end-node-header">
@@ -482,7 +531,29 @@ const EndNode = memo(({
       {!isCollapsed && !isEditing && (
         <div
           className="resize-handle"
-          onMouseDown={handleMouseDown}
+          onMouseDown={(e) => {
+            // Efecto visual al iniciar el redimensionamiento
+            if (e.target) {
+              e.target.style.transform = 'scale(1.2) translateZ(0)';
+              e.target.style.boxShadow = '0 0 12px rgba(255, 107, 107, 0.6)';
+              e.target.style.filter = 'brightness(1.1)';
+            }
+            handleMouseDown(e);
+          }}
+          onMouseEnter={(e) => {
+            // Efecto al pasar el mouse
+            if (e.target) {
+              e.target.style.transform = 'scale(1.15) translateZ(0)';
+              e.target.style.transition = 'all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1)';
+            }
+          }}
+          onMouseLeave={(e) => {
+            // Restaurar al salir
+            if (e.target) {
+              e.target.style.transform = '';
+              e.target.style.transition = '';
+            }
+          }}
           onKeyDown={(e) => {
             if (['ArrowRight', 'ArrowLeft', 'ArrowUp', 'ArrowDown'].includes(e.key)) {
               e.preventDefault();
