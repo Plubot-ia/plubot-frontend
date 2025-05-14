@@ -1,17 +1,148 @@
 plubot-frontend/
 ├── .vercel/
+│   ├── output/
+│   │   ├── diagnostics/
+│   │   │   └── cli_traces.json
+│   │   ├── static/
+│   │   │   ├── assets/
+│   │   │   │   ├── img/
+│   │   │   │   │   ├── marketplace/
+│   │   │   │   │   ├── *.png (11 archivos)
+│   │   │   │   │   ├── logo.svg
+│   │   │   │   │   ├── logo.header.svg
+│   │   │   │   │   ├── nodes-lines.svg
+│   │   │   │   │   ├── plubot.svg
+│   │   │   │   │   ├── plubot-birth.webp
+│   │   │   │   │   ├── plubot-core-full.webp
+│   │   │   │   │   ├── plubotpro.svg
+│   │   │   │   │   ├── plubotpro1.svg
+│   │   │   │   │   ├── plubotprot.svg
+│   │   │   │   │   ├── pluniverse-bg.webp
+│   │   │   │   │   ├── pluniverse-map.webp
+│   │   │   │   │   ├── pluniverse-map-full.webp
+│   │   │   │   │   └── poderes-hero.webp
+│   │   │   │   ├── *.css (57 archivos)
+│   │   │   │   ├── *.js (84 archivos)
+│   │   │   │   ├── *.ttf (4 archivos)
+│   │   │   │   ├── *.webp (19 archivos)
+│   │   │   │   ├── *.png (6 archivos)
+│   │   │   │   ├── *.woff2 (4 archivos)
+│   │   │   │   ├── logo.header-Bly-qvk6.svg
+│   │   │   │   └── plubotpro-CjXeQPbb.svg
+│   │   │   ├── backgroundhome/
+│   │   │   │   └── *.webp (5 archivos)
+│   │   │   ├── characters/
+│   │   │   │   ├── seguridad/
+│   │   │   │   │   ├── aegis-seguridad.webp
+│   │   │   │   │   ├── aegis-seguridad1.png
+│   │   │   │   │   └── aegis-seguridadw.png
+│   │   │   │   └── *.webp (11 archivos)
+│   │   │   ├── embed/
+│   │   │   │   └── plubot.js
+│   │   │   ├── home/
+│   │   │   │   ├── homehero2/
+│   │   │   │   │   ├── homehero2.webp
+│   │   │   │   │   ├── homehero2--mayorpeso.webp
+│   │   │   │   │   ├── homehero22.webp
+│   │   │   │   │   └── homehero22 2.webp
+│   │   │   │   └── universo.webp
+│   │   │   ├── marketplace/
+│   │   │   │   └── *.webp (33 archivos)
+│   │   │   ├── plans/
+│   │   │   │   ├── plubot.png
+│   │   │   │   ├── plubotlegend.svg
+│   │   │   │   ├── plubotmaestro.svg
+│   │   │   │   └── plubotpro.png
+│   │   │   ├── social/
+│   │   │   │   ├── facebook.svg
+│   │   │   │   ├── instagram.svg
+│   │   │   │   ├── threads.svg
+│   │   │   │   └── x.svg
+│   │   │   ├── *.png (11 archivos)
+│   │   │   ├── background-poderes.jpg
+│   │   │   ├── favicon.ico
+│   │   │   ├── index.html ✅ SEO optimizado
+│   │   │   ├── logo.svg
+│   │   │   ├── logo.header.svg
+│   │   │   ├── nodes-lines.svg
+│   │   │   ├── plubot.svg
+│   │   │   ├── plubot-birth.webp
+│   │   │   ├── plubot-core-full.webp
+│   │   │   ├── plubotpro.svg
+│   │   │   ├── plubotpro1.svg
+│   │   │   ├── plubotprot.svg
+│   │   │   ├── pluniverse-bg.webp
+│   │   │   ├── pluniverse-map.webp
+│   │   │   ├── pluniverse-map-full.webp
+│   │   │   └── poderes-hero.webp
+│   │   ├── builds.json
+│   │   └── config.json
 │   ├── README.txt
 │   └── project.json
 ├── public/
 │   ├── assets/
 │   │   └── img/
-│   │       └── marketplace/
-│   │           └── *.webp (32 archivos)
-│   ├── *.svg (3 archivos)
-│   ├── byte-normal.png
+│   │       ├── marketplace/
+│   │       ├── *.png (11 archivos)
+│   │       ├── logo.svg
+│   │       ├── logo.header.svg
+│   │       ├── nodes-lines.svg
+│   │       ├── plubot.svg
+│   │       ├── plubot-birth.webp
+│   │       ├── plubot-core-full.webp
+│   │       ├── plubotpro.svg
+│   │       ├── plubotpro1.svg
+│   │       ├── plubotprot.svg
+│   │       ├── pluniverse-bg.webp
+│   │       ├── pluniverse-map.webp
+│   │       ├── pluniverse-map-full.webp
+│   │       └── poderes-hero.webp
+│   ├── backgroundhome/
+│   │   └── *.webp (5 archivos)
+│   ├── characters/
+│   │   ├── seguridad/
+│   │   │   ├── aegis-seguridad.webp
+│   │   │   ├── aegis-seguridad1.png
+│   │   │   └── aegis-seguridadw.png
+│   │   └── *.webp (11 archivos)
+│   ├── embed/
+│   │   └── plubot.js
+│   ├── home/
+│   │   ├── homehero2/
+│   │   │   ├── homehero2.webp
+│   │   │   ├── homehero2--mayorpeso.webp
+│   │   │   ├── homehero22.webp
+│   │   │   └── homehero22 2.webp
+│   │   └── universo.webp
+│   ├── marketplace/
+│   │   └── *.webp (33 archivos)
+│   ├── plans/
+│   │   ├── plubot.png
+│   │   ├── plubotlegend.svg
+│   │   ├── plubotmaestro.svg
+│   │   └── plubotpro.png
+│   ├── social/
+│   │   ├── facebook.svg
+│   │   ├── instagram.svg
+│   │   ├── threads.svg
+│   │   └── x.svg
+│   ├── *.png (11 archivos)
+│   ├── _redirects
+│   ├── background-poderes.jpg
 │   ├── favicon.ico
-│   ├── manifest.json
-│   └── particles.min.js
+│   ├── logo.svg
+│   ├── logo.header.svg
+│   ├── nodes-lines.svg
+│   ├── plubot.svg
+│   ├── plubot-birth.webp
+│   ├── plubot-core-full.webp
+│   ├── plubotpro.svg
+│   ├── plubotpro1.svg
+│   ├── plubotprot.svg
+│   ├── pluniverse-bg.webp
+│   ├── pluniverse-map.webp
+│   ├── pluniverse-map-full.webp
+│   └── poderes-hero.webp
 ├── src/
 │   ├── assets/
 │   │   ├── animations/
@@ -89,7 +220,8 @@ plubot-frontend/
 │   │   │   ├── Footer.css
 │   │   │   ├── Footer.jsx
 │   │   │   ├── Header.css
-│   │   │   └── Header.jsx
+│   │   │   ├── Header.jsx
+│   │   │   └── LazyImage.jsx
 │   │   │   ├── Loader.css
 │   │   │   ├── Loader.jsx
 │   │   │   ├── WhatsAppButton.css
@@ -100,58 +232,153 @@ plubot-frontend/
 │   │   │   ├── *.css (8 archivos)
 │   │   │   └── *.jsx (8 archivos)
 │   │   ├── onboarding/
+│   │   │   ├── common/
+│   │   │   │   ├── ByteAssistant.css
+│   │   │   │   ├── ByteAssistant.jsx
+│   │   │   │   ├── EpicHeader.css
+│   │   │   │   ├── EpicHeader.jsx
+│   │   │   │   ├── NodePalette.css
+│   │   │   │   ├── NodePalette.jsx
+│   │   │   │   └── RouteAnalysisPanel.css
+│   │   │   │   ├── RouteAnalysisPanel.jsx
+│   │   │   │   ├── StatusBubble.css
+│   │   │   │   ├── StatusBubble.jsx
+│   │   │   │   ├── TransparentOverlay.css
+│   │   │   │   ├── TransparentOverlay.jsx
+│   │   │   │   ├── VersionHistory.css
+│   │   │   │   ├── VersionHistory.jsx
+│   │   │   ├── flow-editor/
+│   │   │   │   ├── components/
+│   │   │   │   │   ├── EdgeManagement.jsx
+│   │   │   │   │   ├── FlowEditor.css
+│   │   │   │   │   ├── FlowMain.css
+│   │   │   │   │   ├── FlowMain.jsx
+│   │   │   │   │   ├── HistoryManagement.jsx
+│   │   │   │   │   └── NodeManagement.jsx
+│   │   │   │   │   ├── NodeWrappers.jsx
+│   │   │   │   ├── hooks/
+│   │   │   │   │   ├── useFlowEdges.js
+│   │   │   │   │   ├── useFlowHistory.js
+│   │   │   │   │   ├── useFlowInteractions.js
+│   │   │   │   │   ├── useFlowNodes.js
+│   │   │   │   │   └── useNodeStyles.js
+│   │   │   │   ├── ui/
+│   │   │   │   │   ├── BackgroundScene.css
+│   │   │   │   │   ├── BackgroundScene.jsx
+│   │   │   │   │   ├── ContextMenuComponent.css
+│   │   │   │   │   ├── ContextMenuComponent.jsx
+│   │   │   │   │   ├── CustomMiniMap.css
+│   │   │   │   │   ├── CustomMiniMap.jsx
+│   │   │   │   │   ├── EdgeComponents.jsx
+│   │   │   │   │   ├── FlowControls.css
+│   │   │   │   │   └── HistoryControls.css
+│   │   │   │   │   ├── HistoryControls.jsx
+│   │   │   │   │   ├── PerformanceModeButton.css
+│   │   │   │   │   ├── PerformanceModeButton.jsx
+│   │   │   │   │   ├── VersionHistoryButton.css
+│   │   │   │   │   ├── VersionHistoryButton.jsx
+│   │   │   │   │   ├── ZoomControls.css
+│   │   │   │   │   ├── ZoomControls.jsx
+│   │   │   │   ├── utils/
+│   │   │   │   │   ├── flowEditorConstants.js
+│   │   │   │   │   └── flowEditorUtils.js
+│   │   │   │   ├── BackgroundScene.css
+│   │   │   │   ├── BackgroundScene.jsx
+│   │   │   │   ├── BackgroundSceneAnterior.css
+│   │   │   │   ├── BackgroundSceneAnterior.jsx
+│   │   │   │   └── CustomMiniMap.css
+│   │   │   │   ├── CustomMiniMap.jsx
+│   │   │   │   ├── FlowEditor.css
+│   │   │   │   ├── FlowEditor.jsx
+│   │   │   │   ├── fix-overlay.css
+│   │   │   ├── modals/
+│   │   │   │   ├── EmbedModal.css
+│   │   │   │   ├── EmbedModal.jsx
+│   │   │   │   ├── ImportExportModal.css
+│   │   │   │   └── ImportExportModal.jsx
+│   │   │   │   ├── SuggestionsModal.css
+│   │   │   │   ├── SuggestionsModal.jsx
+│   │   │   │   ├── TemplateSelector.css
+│   │   │   │   ├── TemplateSelector.jsx
 │   │   │   ├── nodes/
-│   │   │   │   ├── ActionNode.css
-│   │   │   │   ├── ActionNode.jsx
-│   │   │   │   ├── CustomEdge.jsx
-│   │   │   │   ├── DecisionNode.css
-│   │   │   │   ├── DecisionNode.jsx
-│   │   │   │   ├── EndNode.css
-│   │   │   │   └── EndNode.jsx
-│   │   │   │   ├── MessageNode.css
-│   │   │   │   ├── MessageNode.jsx
-│   │   │   │   ├── OptionNode.css
-│   │   │   │   ├── OptionNode.jsx
-│   │   │   │   ├── StartNode.css
-│   │   │   │   ├── StartNode.jsx
+│   │   │   │   ├── actionnode/
+│   │   │   │   │   ├── ActionNode.css
+│   │   │   │   │   └── ActionNode.jsx
+│   │   │   │   │   ├── index.js
+│   │   │   │   ├── customedge/
+│   │   │   │   │   ├── CustomEdge.jsx
+│   │   │   │   │   └── index.js
+│   │   │   │   ├── decisionnode/
+│   │   │   │   │   ├── components/
+│   │   │   │   │   │   ├── DecisionNodeConditions.jsx
+│   │   │   │   │   │   ├── DecisionNodeHandles.jsx
+│   │   │   │   │   │   ├── DecisionNodeHeader.jsx
+│   │   │   │   │   │   ├── DecisionNodeOptions.jsx
+│   │   │   │   │   │   └── DecisionNodeQuestion.jsx
+│   │   │   │   │   ├── DecisionNode.css
+│   │   │   │   │   ├── DecisionNode.jsx
+│   │   │   │   │   └── DecisionNode.types.js
+│   │   │   │   │   ├── index.js
+│   │   │   │   ├── endnode/
+│   │   │   │   │   ├── EndNode.css
+│   │   │   │   │   └── EndNode.jsx
+│   │   │   │   │   ├── EndNode.tsx
+│   │   │   │   │   ├── index.js
+│   │   │   │   ├── httprequestnode/
+│   │   │   │   │   ├── HttpRequestNode.css
+│   │   │   │   │   └── HttpRequestNode.jsx
+│   │   │   │   │   ├── index.js
+│   │   │   │   ├── messagenode/
+│   │   │   │   │   ├── MessageNode.css
+│   │   │   │   │   ├── MessageNode.jsx
+│   │   │   │   │   ├── MessageNode.tsx
+│   │   │   │   │   ├── MessageNode.tsx.bak
+│   │   │   │   │   └── MessageNodeFixed.tsx
+│   │   │   │   │   ├── index.js
+│   │   │   │   │   ├── ultraPerformanceLabels.js
+│   │   │   │   ├── optionnode/
+│   │   │   │   │   ├── OptionNode.css
+│   │   │   │   │   └── OptionNode.jsx
+│   │   │   │   │   ├── index.js
+│   │   │   │   ├── powernode/
+│   │   │   │   │   ├── PowerNode.css
+│   │   │   │   │   └── PowerNode.jsx
+│   │   │   │   │   ├── index.js
+│   │   │   │   ├── startnode/
+│   │   │   │   │   ├── StartNode.css
+│   │   │   │   │   ├── StartNode.jsx
+│   │   │   │   │   ├── StartNodeControls.css
+│   │   │   │   │   └── StartNodeControls.jsx
+│   │   │   │   │   ├── StartNodeError.css
+│   │   │   │   │   ├── StartNodeError.jsx
+│   │   │   │   │   ├── index.js
+│   │   │   │   └── README.md
+│   │   │   ├── screens/
+│   │   │   │   ├── FactoryScreen.css
+│   │   │   │   ├── FactoryScreen.jsx
+│   │   │   │   ├── PersonalizationForm.css
+│   │   │   │   └── PersonalizationForm.jsx
+│   │   │   │   ├── TrainingScreen.css
+│   │   │   │   ├── TrainingScreen.jsx
+│   │   │   │   ├── WelcomeSequence.css
+│   │   │   │   ├── WelcomeSequence.jsx
+│   │   │   ├── simulation/
+│   │   │   │   ├── ConnectionEditor.css
+│   │   │   │   ├── ConnectionEditor.jsx
+│   │   │   │   └── SimulationInterface.css
+│   │   │   │   ├── SimulationInterface.jsx
+│   │   │   │   ├── SuggestionsPanel.css
+│   │   │   ├── styles/
+│   │   │   │   └── responsive.css
 │   │   │   ├── ui/
+│   │   │   │   ├── context-menu/
+│   │   │   │   │   └── ContextMenu.css
+│   │   │   │   │   ├── ContextMenu.jsx
 │   │   │   │   ├── ToolTip.css
 │   │   │   │   └── ToolTip.jsx
 │   │   │   │   ├── context-menu.css
 │   │   │   │   ├── context-menu.jsx
-│   │   │   ├── BackgroundScene.css
-│   │   │   ├── BackgroundScene.jsx
-│   │   │   ├── ByteAssistant.css
-│   │   │   ├── ByteAssistant.jsx
-│   │   │   ├── ConnectionEditor.css
-│   │   │   ├── ConnectionEditor.jsx
-│   │   │   ├── CustomMiniMap.css
-│   │   │   ├── CustomMiniMap.jsx
-│   │   │   ├── FactoryScreen.css
-│   │   │   ├── FactoryScreen.jsx
-│   │   │   ├── FlowEditor.css
-│   │   │   ├── FlowEditor.jsx
-│   │   │   ├── ImportExportModal.css
-│   │   │   ├── ImportExportModal.jsx
-│   │   │   ├── NodePalette.css
-│   │   │   ├── NodePalette.jsx
-│   │   │   └── PersonalizationForm.css
-│   │   │   ├── PersonalizationForm.jsx
-│   │   │   ├── RouteAnalysisPanel.css
-│   │   │   ├── RouteAnalysisPanel.jsx
-│   │   │   ├── SimulationInterface.css
-│   │   │   ├── SimulationInterface.jsx
-│   │   │   ├── SuggestionsModal.css
-│   │   │   ├── SuggestionsModal.jsx
-│   │   │   ├── SuggestionsPanel.css
-│   │   │   ├── TemplateSelector.css
-│   │   │   ├── TemplateSelector.jsx
-│   │   │   ├── TrainingScreen.css
-│   │   │   ├── TrainingScreen.jsx
-│   │   │   ├── VersionHistory.css
-│   │   │   ├── VersionHistory.jsx
-│   │   │   ├── WelcomeSequence.css
-│   │   │   ├── WelcomeSequence.jsx
+│   │   │   └── fix-global.css
 │   │   ├── plubot-edit/
 │   │   │   └── PlubotEdit.jsx
 │   │   └── pluniverse/
@@ -182,7 +409,9 @@ plubot-frontend/
 │   │   ├── useNode.js
 │   │   ├── useNodeHistory.js
 │   │   ├── usePermissions.js
-│   │   └── useReadingXP.js
+│   │   ├── useReadingXP.js
+│   │   ├── useToast.js
+│   │   └── useUltraPerformance.js
 │   ├── lib/
 │   │   └── simplified-markdown.jsx
 │   ├── pages/
@@ -246,11 +475,33 @@ plubot-frontend/
 │   │   │   ├── Poderes-about.css
 │   │   │   ├── Poderes-about.jsx
 │   │   ├── profile/
+│   │   │   ├── components/
+│   │   │   │   ├── AchievementPopup.jsx
+│   │   │   │   ├── ActivitySection.jsx
+│   │   │   │   ├── EditPlubotModal.jsx
+│   │   │   │   ├── NotificationSystem.jsx
+│   │   │   │   ├── PlubotDetailsModal.jsx
+│   │   │   │   ├── PlubotSection.jsx
+│   │   │   │   ├── PowersSection.jsx
+│   │   │   │   ├── ProfileHeader.jsx
+│   │   │   │   ├── ProfileMain.jsx
+│   │   │   │   ├── ProfileTabs.jsx
+│   │   │   │   └── VisualEffects.jsx
+│   │   │   ├── hooks/
+│   │   │   │   ├── useAchievements.js
+│   │   │   │   ├── useMouseTracker.js
+│   │   │   │   ├── useNotification.js
+│   │   │   │   └── useProfileData.js
+│   │   │   ├── styles/
+│   │   │   │   └── Profile.css
 │   │   │   ├── Profile.jsx
 │   │   │   ├── ProfileActivity.css
 │   │   │   ├── ProfileMain.css
 │   │   │   ├── ProfilePlubots.css
 │   │   │   └── ProfilePowers.css
+│   │   ├── public-chat/
+│   │   │   └── PublicChat.css
+│   │   │   ├── PublicChat.jsx
 │   │   ├── tuopinion/
 │   │   │   └── TuOpinion.css
 │   │   │   ├── TuOpinion.jsx
@@ -265,11 +516,12 @@ plubot-frontend/
 │   │   │   ├── TutorialesExpansion.jsx
 │   │   │   ├── TutorialesFlujos.css
 │   │   │   ├── TutorialesFlujos.jsx
-│   │   ├── CaseStudies.jsx
-│   │   ├── Chatbot.jsx
-│   │   ├── Particulas.jsx
-│   │   ├── PlubotStudio.jsx
-│   │   └── Services.jsx
+│   │   ├── zquantum/
+│   │   │   ├── CaseStudies.jsx
+│   │   │   ├── Chatbot.jsx
+│   │   │   ├── PlubotStudio.jsx
+│   │   │   └── Services.jsx
+│   │   └── Particulas.jsx
 │   ├── utilities/
 │   │   ├── ParticlesBackground.jsx
 │   │   └── SheetsViewer.css
@@ -278,15 +530,18 @@ plubot-frontend/
 │       ├── aiFlowHelpers.js
 │       ├── axiosConfig.js
 │       ├── date.js
+│       ├── devMode.js
 │       ├── eventBus.js
 │       ├── eventCallback.js
 │       ├── flowUtils.js
 │       ├── flowValidation.js
 │       ├── nodeConfig.js
+│       ├── nodeValidation.js
 │       ├── resizeUtils.js
 │       ├── suggestionProviders.js
 │       ├── suggestionRegistry.js
 │       └── useNodeResize.js
+├── tmp/
 ├── LICENSE
 ├── README.md
 ├── dump.rdb
@@ -294,6 +549,7 @@ plubot-frontend/
 ├── eslint.config.js
 ├── estructura_carpetas.py
 ├── estructura_frontend.txt
+├── fix-message-node.js
 ├── index.html ✅ SEO optimizado
 ├── package.json
 ├── package-lock.json
