@@ -322,8 +322,7 @@ const EndNode = memo(({
         height: isCollapsed ? 40 : (data.height || initialHeight),
         opacity: isUltraPerformanceMode ? '1' : '0', // Comienza invisible
         transform: isUltraPerformanceMode ? 'translateY(0) scale(1) translateZ(0)' : 'translateY(10px) scale(0.98) translateZ(0)', // Comienza ligeramente abajo y más pequeño
-        transition: isUltraPerformanceMode ? 'none' : 'all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)', // Transición suave con rebote
-        transition: 'all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)', // Transición suave con rebote
+        transition: isUltraPerformanceMode ? 'none' : 'all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)' // Transición suave con rebote
       }}
       role="button"
       aria-label={`Nodo de fin: ${label}`}

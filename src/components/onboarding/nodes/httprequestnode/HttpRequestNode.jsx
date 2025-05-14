@@ -11,8 +11,8 @@ import {
   XCircle 
 } from 'lucide-react';
 import PropTypes from 'prop-types';
-import Tooltip from '../ui/ToolTip'; 
-import ContextMenu from '../ui/context-menu'; 
+import Tooltip from '../../ui/ToolTip'; 
+import ContextMenu from '../../ui/context-menu'; 
 import useNode from '@/hooks/useNode';
 import { NODE_TYPES } from '@/utils/nodeConfig'; 
 import { v4 as uuidv4 } from 'uuid'; 
