@@ -78,8 +78,21 @@ const useAPI = () => {
     } catch (err) {
       setLoading(false);
       const status = err.response?.status || 'unknown';
-      const errorMessage = err.response?.data?.message || 'Error en la solicitud';
+      const errorMessage = err.response?.data?.message || err.message || 'Error en la solicitud';
       
+      // Log detallado del error
+      console.error(`Request failed: ${method} ${url}`);
+      console.error(`Status: ${status}`);
+      console.error(`Message: ${errorMessage}`);
+      if (err.response) {
+        console.error('Error Response Data:', err.response.data);
+        console.error('Error Response Headers:', err.response.headers);
+      }
+      if (err.request) {
+        console.error('Error Request Data:', err.request);
+      }
+      console.error('Full Axios Error Object:', err.toJSON ? err.toJSON() : err);
+
       // Manejar específicamente los errores de autenticación
       if (status === 401) {
         console.error('Error de autenticación. Redirigiendo al login...');

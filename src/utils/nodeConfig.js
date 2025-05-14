@@ -16,6 +16,7 @@ export const NODE_TYPES = {
     NLP_NODE: 'nlpNode',
     COMPLEX_CONDITION_NODE: 'complexConditionNode',
     POWER_NODE: 'powerNode',
+    ULTRA_OPTIMIZED_NODE: 'ultraOptimizedNode', // Nodo optimizado para el modo Ultra Rendimiento
 };
 
 export const EDGE_TYPES = {
@@ -23,6 +24,7 @@ export const EDGE_TYPES = {
     success: 'success',
     warning: 'warning',
     danger: 'danger',
+    ULTRA_OPTIMIZED_EDGE: 'ultraOptimizedEdge', // Borde optimizado para el modo Ultra Rendimiento
 };
 
 export const ACTION_TYPES = [

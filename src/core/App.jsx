@@ -19,9 +19,9 @@ const TutorialesAprendizaje = lazy(() => import('../pages/tutoriales/TutorialesA
 const TutorialesFlujos = lazy(() => import('../pages/tutoriales/TutorialesFlujos.jsx'));
 const TutorialesExpansion = lazy(() => import('../pages/tutoriales/TutorialesExpansion.jsx'));
 const Profile = lazy(() => import('../pages/profile/Profile.jsx'));
-const Services = lazy(() => import('../pages/Services.jsx'));
-const CaseStudies = lazy(() => import('../pages/CaseStudies.jsx'));
-const Chatbot = lazy(() => import('../pages/Chatbot.jsx'));
+const Services = lazy(() => import('../pages/zquantum/Services.jsx'));
+const CaseStudies = lazy(() => import('../pages/zquantum/CaseStudies.jsx'));
+const Chatbot = lazy(() => import('../pages/zquantum/Chatbot.jsx'));
 const Contact = lazy(() => import('../pages/contact/Contact.jsx'));
 const Blog = lazy(() => import('../pages/blog/Blog.jsx'));
 const BlogPost = lazy(() => import('../pages/blog/BlogPost.jsx'));
@@ -32,7 +32,7 @@ const Plans = lazy(() => import('../pages/plans/Plans.jsx'));
 const Poderes = lazy(() => import('../pages/poderes/Poderes.jsx'));
 const PoderesAbout = lazy(() => import('../pages/poderes/Poderes-about.jsx'));
 const PluniverseDashboard = lazy(() => import('../pages/pluniversedashboard/PluniverseDashboard.jsx'));
-const PlubotStudio = lazy(() => import('../pages/PlubotStudio.jsx'));
+const PlubotStudio = lazy(() => import('../pages/zquantum/PlubotStudio.jsx'));
 const Academy = lazy(() => import('../pages/pluniverse/Academy.jsx'));
 const Marketplace = lazy(() => import('../pages/marketplace/Marketplace.jsx'));
 const Coliseum = lazy(() => import('../pages/pluniverse/Coliseum.jsx'));
@@ -48,10 +48,11 @@ const ResetPassword = lazy(() => import('../components/auth/ResetPassword.jsx'))
 const ChangePassword = lazy(() => import('../components/auth/ChangePassword.jsx'));
 const Logout = lazy(() => import('../components/auth/Logout.jsx'));
 const CreatePlubot = lazy(() => import('../pages/createplubot/CreatePlubot.jsx'));
-const WelcomeSequence = lazy(() => import('../components/onboarding/WelcomeSequence'));
-const FactoryScreen = lazy(() => import('../components/onboarding/FactoryScreen'));
-const PersonalizationForm = lazy(() => import('../components/onboarding/PersonalizationForm'));
-const TrainingScreen = lazy(() => import('../components/onboarding/TrainingScreen'));
+const WelcomeSequence = lazy(() => import('../components/onboarding/screens/WelcomeSequence'));
+const FactoryScreen = lazy(() => import('../components/onboarding/screens/FactoryScreen'));
+const PersonalizationForm = lazy(() => import('../components/onboarding/screens/PersonalizationForm'));
+// Importación directa para evitar problemas de carga diferida
+import TrainingScreen from '../components/onboarding/screens/TrainingScreen.jsx';
 const EmailVerificationNotice = lazy(() => import('../components/auth/EmailVerificationNotice.jsx'));
 const PlubotEdit = lazy(() => import('../components/plubot-edit/PlubotEdit.jsx'));
 const PublicChat = lazy(() => import('../pages/public-chat/PublicChat.jsx'));
@@ -292,7 +293,15 @@ function AppWrapper() {
             <Route path="welcome" element={<WelcomeSequence />} />
             <Route path="factory" element={<PrivateRoute><FactoryScreen /></PrivateRoute>} />
             <Route path="personalization" element={<PrivateRoute><PersonalizationForm /></PrivateRoute>} />
+            <Route path="training" element={<PrivateRoute><TrainingScreen /></PrivateRoute>} />
           </Route>
+          <Route path="/plubot/edit/training" element={
+            <Suspense fallback={<LoadingFallback />}>
+              <PrivateRoute>
+                <TrainingScreen />
+              </PrivateRoute>
+            </Suspense>
+          } />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Layout>

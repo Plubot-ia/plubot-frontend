@@ -1,0 +1,55 @@
+/* StatusBubble.css */
+.status-bubble {
+  position: fixed; /* Posicionado de forma fija en la pantalla */
+  bottom: 30px; /* Ajustado para estar a la altura del icono de Byte */
+  right: 100px;  /* Posicionado a la izquierda del icono de ByteAssistant */
+  background-color: rgba(0, 224, 255, 0.9); /* Color cian brillante, similar a la UI */
+  color: #0a1423; /* Texto oscuro para contraste */
+  padding: 10px 15px;
+  border-radius: 15px;
+  box-shadow: 0 0 15px rgba(0, 224, 255, 0.5), 0 0 25px rgba(0, 224, 255, 0.3);
+  z-index: 9999; /* Asegurar que esté por encima de todos los elementos */
+  opacity: 0;
+  transform: translateY(20px) scale(0.9);
+  animation: fadeInGrow 0.5s forwards;
+  max-width: 250px;
+  text-align: center;
+  font-size: 0.9rem;
+  pointer-events: none; /* Evita que interfiera con los clics */
+  backdrop-filter: none; /* Eliminado para evitar problemas con el fondo */
+  -webkit-backdrop-filter: none; /* Eliminado para evitar problemas con el fondo */
+  width: auto; /* Asegura que el ancho se ajuste al contenido */
+  height: auto; /* Asegura que la altura se ajuste al contenido */
+  margin: 0; /* Eliminar cualquier margen que pueda afectar el layout */
+  padding: 10px 15px; /* Mantener el padding consistente */
+  border: none; /* Eliminar cualquier borde que pueda afectar el layout */
+  isolation: isolate; /* Evita que afecte a otros elementos */
+}
+
+.status-bubble-content {
+  position: relative;
+  z-index: 1;
+}
+
+.status-bubble-arrow {
+  content: '';
+  position: absolute;
+  top: 50%; /* Centrado verticalmente */
+  right: -8px; /* Sale por la derecha */
+  transform: translateY(-50%) rotate(45deg); /* Apunta a la derecha y ligeramente abajo */
+  width: 16px;
+  height: 16px;
+  background-color: rgba(0, 224, 255, 0.9);
+  z-index: 0;
+  border-radius: 2px;
+  box-shadow: 3px 3px 8px rgba(0, 224, 255, 0.3);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+}
+
+@keyframes fadeInGrow {
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}

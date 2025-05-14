@@ -1,0 +1,177 @@
+/* Estilos globales para eliminar cualquier overlay oscuro y mensajes duplicados */
+
+/* Forzar que cualquier elemento de carga sea transparente */
+.loading-overlay,
+.loading-indicator,
+.loading,
+[class*="loading"],
+[class*="overlay"] {
+  background: transparent !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  box-shadow: none !important;
+  color: #00e0ff !important;
+}
+
+/* Asegurarse de que los mensajes de guardado no causen problemas visuales */
+.byte-notification {
+  display: none !important; /* Eliminar completamente las notificaciones duplicadas */
+}
+
+/* Forzar que cualquier elemento con fondo oscuro sea transparente */
+[style*="background: rgba(0, 0, 0"],
+[style*="background:rgba(0, 0, 0"],
+[style*="background-color: rgba(0, 0, 0"],
+[style*="background-color:rgba(0, 0, 0"] {
+  background: transparent !important;
+  background-color: transparent !important;
+}
+
+/* Asegurarse de que los elementos de carga no interfieran con la UI */
+.ts-loading,
+.loading,
+.loading-container {
+  background: transparent !important;
+  color: #00e0ff !important;
+}
+
+/* Estilos específicos para el modo Ultra Rendimiento */
+
+/* 1. Desactivar animaciones y efectos visuales en el fondo */
+.performance-mode-active .particle-container,
+.performance-mode-active .particles-js-canvas-el,
+.performance-mode-active .background-animation {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+}
+
+/* 2. Asegurar que el fondo degradado simple sea visible en modo ultra rendimiento */
+.performance-mode-active .simple-background,
+.performance-mode-active .simple-gradient-overlay {
+  display: block !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* Asegurar que el fondo de partículas esté visible en modo normal */
+.ts-background-scene-container,
+.ts-background-scene {
+  display: block !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* 3. Optimizar ByteAssistant */
+/* Desactivar todas las animaciones de ByteAssistant en modo ultra rendimiento */
+.performance-mode-active .ts-byte-assistant {
+  transition: none !important;
+  animation: none !important;
+  transform: none !important;
+}
+
+/* Desactivar animaciones para todos los elementos dentro de ByteAssistant */
+.performance-mode-active .ts-byte-assistant * {
+  transition: none !important;
+  animation: none !important;
+  filter: none !important;
+  text-shadow: none !important;
+  box-shadow: none !important;
+}
+
+/* Desactivar animaciones específicas por nombre */
+.performance-mode-active .ts-byte-image {
+  animation: none !important;
+  transform: none !important;
+}
+
+.performance-mode-active .ts-byte-thinking {
+  animation: none !important;
+}
+
+.performance-mode-active .ts-byte-glow {
+  animation: none !important;
+  opacity: 0.2 !important;
+}
+
+.performance-mode-active .ts-byte-minimized {
+  animation: none !important;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.5) !important;
+}
+
+.performance-mode-active .ts-byte-icon-minimized {
+  animation: none !important;
+}
+
+.performance-mode-active .ts-message-bubble {
+  animation: none !important;
+  transition: none !important;
+}
+
+/* Desactivar animaciones de hover */
+.performance-mode-active .ts-byte-control-btn:hover,
+.performance-mode-active .ts-byte-send-btn:hover {
+  transform: none !important;
+  box-shadow: none !important;
+  background: inherit !important;
+}
+
+/* 4. Optimizar CustomMiniMap */
+.performance-mode-active .ts-custom-minimap-container {
+  transition: none !important;
+  animation: none !important;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.5) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  transform: none !important;
+}
+
+.performance-mode-active .ts-custom-minimap-container.collapsed {
+  animation: none !important;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.5) !important;
+}
+
+.performance-mode-active .ts-custom-minimap-container:hover {
+  transform: none !important;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.5) !important;
+}
+
+/* 5. Optimizar NodePalette */
+.performance-mode-active .node-palette {
+  transition: none !important;
+  animation: none !important;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.5) !important;
+}
+
+.performance-mode-active .node-palette * {
+  transition: none !important;
+  animation: none !important;
+  filter: none !important;
+}
+
+/* 6. Optimizar todos los botones y controles */
+.performance-mode-active button,
+.performance-mode-active .button,
+.performance-mode-active [class*="btn"],
+.performance-mode-active [class*="control"] {
+  transition: none !important;
+  animation: none !important;
+  transform: none !important;
+  box-shadow: none !important;
+  text-shadow: none !important;
+}
+
+/* 7. Desactivar efectos hover en modo ultra rendimiento */
+.performance-mode-active *:hover {
+  transform: none !important;
+  filter: none !important;
+  animation: none !important;
+}
+
+/* Hacer que StatusBubble sea la única notificación visible */
+.status-bubble {
+  z-index: 9999 !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: none !important;
+}
