@@ -7,9 +7,10 @@ import ReactFlow, {
   useEdgesState,
   useReactFlow,
 } from 'reactflow';
+import { ensureEdgesAreVisible } from '../utils/edgeFixUtil';
 import { REACT_FLOW_STYLE, SNAP_GRID } from '../utils/flowEditorConstants';
-import { CustomEdge } from '../../nodes/customedge';
-import { BezierEdge, EdgeMarker } from '../ui/EdgeComponents';
+import CustomEdge from '../../nodes/customedge/CustomEdge';
+import EdgeMarker from '../ui/EdgeMarker';
 import ContextMenuComponent from '../ui/ContextMenuComponent';
 import ZoomControls from '../ui/ZoomControls';
 import PerformanceModeButton from '../ui/PerformanceModeButton';
@@ -20,6 +21,7 @@ import './FlowMain.css';
 import '../ui/FlowControls.css';
 import '../ui/ZoomControls.css';
 import '../ui/PerformanceModeButton.css';
+// La importación de ReactFlowEdgeFix.css ha sido eliminada para evitar conflictos con EliteEdge.css
 
 /**
  * Componente principal que renderiza ReactFlow
@@ -56,6 +58,15 @@ const FlowMain = ({
   const toggleMiniMap = useCallback(() => {
     setMiniMapExpanded(prev => !prev);
   }, []);
+  
+  // Efecto para asegurar que las aristas sean visibles después de cargar
+  useEffect(() => {
+    if (edges.length > 0) {
+      // Programar múltiples intentos para asegurar que las aristas se muestren
+      setTimeout(() => ensureEdgesAreVisible(false), 500);
+      setTimeout(() => ensureEdgesAreVisible(false), 1500);
+    }
+  }, [edges]);
   
   // Eliminar el ajuste automático de la vista al montar el componente
   // Si el usuario quiere centrar la vista, debe hacerlo manualmente desde un botón de UI
@@ -147,6 +158,16 @@ const FlowMain = ({
         snapToGrid={true}
         snapGrid={SNAP_GRID}
         proOptions={{ hideAttribution: true }}
+        onInit={() => {
+          // Forzar la visibilidad de las aristas después de la inicialización
+          setTimeout(() => ensureEdgesAreVisible(false), 500);
+        }}
+        onMoveEnd={() => {
+          // Forzar la visibilidad de las aristas después de mover el viewport
+          if (edges.length > 0) {
+            setTimeout(() => ensureEdgesAreVisible(false), 100);
+          }
+        }}
       >
         {/* Marcadores para las aristas */}
         <EdgeMarker />
@@ -155,24 +176,20 @@ const FlowMain = ({
         <BackgroundScene isUltraPerformanceMode={isUltraPerformanceMode} />
         
         {/* Botón de modo Ultra Rendimiento */}
-        <PerformanceModeButton 
-          isActive={isUltraPerformanceMode} 
-          onClick={onTogglePerformanceMode} 
-        />
+        <Panel position="top-right" className="performance-mode-panel">
+          <PerformanceModeButton 
+            isActive={isUltraPerformanceMode} 
+            onClick={onTogglePerformanceMode} 
+          />
+        </Panel>
         {/* Quitamos las grillas para mostrar solo el fondo personalizado */}
         
         {/* Menú contextual */}
         {contextMenu && (
           <ContextMenuComponent
-            position={contextMenu}
-            onClose={() => onPaneClick()}
+            contextMenu={contextMenu}
+            onClose={() => onContextMenu(null)}
             onAddNode={onAddNode}
-            nodeTypes={Object.entries(NODE_TYPES).map(([type, config]) => ({
-              type,
-              label: config.label,
-              icon: config.icon,
-              color: config.color,
-            }))}
           />
         )}
         
@@ -180,16 +197,18 @@ const FlowMain = ({
         <Controls style={{ display: 'none' }} />
         
         {/* Controles unificados: zoom, historial y versiones */}
-        {historyProps && (
-          <ZoomControls 
-            onUndo={historyProps.undo} 
-            onRedo={historyProps.redo}
-            canUndo={historyProps.canUndo}
-            canRedo={historyProps.canRedo}
-            onToggleHistory={() => onVersionHistoryClick && onVersionHistoryClick()}
-            historyActive={showVersionHistoryPanel}
-          />
-        )}
+        <Panel position="right" className="flow-controls-panel">
+          {historyProps && (
+            <ZoomControls 
+              onUndo={historyProps.undo} 
+              onRedo={historyProps.redo}
+              canUndo={historyProps.canUndo}
+              canRedo={historyProps.canRedo}
+              onToggleHistory={() => onVersionHistoryClick && onVersionHistoryClick()}
+              historyActive={showVersionHistoryPanel}
+            />
+          )}
+        </Panel>
         
         {/* Mini mapa - Directamente en el flujo sin Panel */}
         <CustomMiniMap

@@ -1,5 +1,12 @@
-import React, { useState, useEffect, useRef, useCallback, memo } from 'react';
-import { Handle, Position } from 'reactflow';
+/**
+ * @file EndNode.jsx
+ * @description Componente para representar el nodo final en el editor de flujos PLUBOT.
+ * Implementa diseño optimizado, accesibilidad y características avanzadas.
+ * @version 2.0.0
+ */
+
+import React, { useState, useEffect, useRef, useCallback, memo, useMemo } from 'react';
+import { Handle, Position, useReactFlow } from 'reactflow';
 import { 
   MoreHorizontal, 
   Edit2, 
@@ -20,6 +27,22 @@ import useNode from '@/hooks/useNode';
 import ReactMarkdown from '@/lib/simplified-markdown';
 import { v4 as uuidv4 } from 'uuid';
 import './EndNode.css';
+
+// Configuración del nodo
+const NODE_CONFIG = {
+  DEFAULT_WIDTH: 200,
+  DEFAULT_HEIGHT: 120,
+  MIN_WIDTH: 150,
+  MIN_HEIGHT: 80,
+  COLORS: {
+    BACKGROUND: '#ff6b6b',
+    BACKGROUND_GRADIENT: 'linear-gradient(135deg, #ff6b6b 0%, #ff8e8e 100%)',
+    BORDER: '#ff5252',
+    TEXT: '#ffffff',
+    HANDLE: '#ff6b6b',
+    HANDLE_HOVER: '#ff8e8e',
+  }
+};
 
 const EndNode = memo(({
   data = {
@@ -144,32 +167,27 @@ const EndNode = memo(({
       const updateData = {
         label,
         variables,
-        lastModified: new Date().toISOString(),
-        modifiedBy: data.currentUser || 'unknown',
       };
-
-      // Notificar cambios si existe el callback
-      data.onChange?.(updateData);
-
-      // Registrar cambios en el historial
-      trackChanges('end', updateData, { label: data.label, variables: data.variables }, { label, variables });
-
-      // Actualizar el nodo en el estado global
-      setNodes((nds) =>
-        nds.map((node) =>
-          node.id === id
-            ? { ...node, data: { ...node.data, label, variables, lastModified: updateData.lastModified } }
-            : node
-        )
-      );
+      
+      // Registrar cambios y actualizar el nodo
+      trackChanges('Nodo de fin actualizado', updateData);
+      
+      // Notificar al componente padre sobre el cambio
+      if (data.onChange) {
+        data.onChange(id, updateData);
+      }
     }
-  }, [label, variables, id, data, setNodes, trackChanges]);
+  }, [data, id, label, variables, trackChanges]);
 
-  // Alternar la visualización del editor de variables
-  const toggleVariableEditor = useCallback((e) => {
-    e?.stopPropagation();
-    setShowVariableEditor(!showVariableEditor);
-  }, [showVariableEditor]);
+  // Alternar la visibilidad del editor de variables
+  const toggleVariableEditor = useCallback(() => {
+    setShowVariableEditor(prev => !prev);
+  }, []);
+
+  // Cerrar el menú contextual
+  const closeContextMenu = useCallback(() => {
+    setShowContextMenu(false);
+  }, [setShowContextMenu]);
 
   // Añadir una nueva variable
   const addVariable = useCallback(() => {
@@ -190,7 +208,7 @@ const EndNode = memo(({
   }, [variables]);
 
   // Formatear la etiqueta con variables destacadas y/o markdown
-  const formatLabel = useCallback(() => {
+  const formatLabel = useMemo(() => {
     if (!label) return null;
 
     let formattedLabel = label;
@@ -211,6 +229,45 @@ const EndNode = memo(({
       <ReactMarkdown>{formattedLabel}</ReactMarkdown> : 
       <span dangerouslySetInnerHTML={{ __html: formattedLabel }} />;
   }, [label, variables, data.enableMarkdown]);
+
+  // Optimizar renderizado de elementos que no cambian frecuentemente
+  const renderNodeHeader = useMemo(() => (
+    <div className="end-node-header">
+      <div className="end-node-icon" title="Nodo de fin">
+        {data.customIcon || <Flag size={16} />}
+      </div>
+      <div className="end-node-title" title="Nodo final del flujo">
+        Fin
+        {data.badge && (
+          <span className={`end-node-badge badge-${data.badge.type || 'default'}`}>
+            {data.badge.text}
+          </span>
+        )}
+      </div>
+      <div className="end-node-controls">
+        {!isCollapsed && !isEditing && (
+          <button
+            className="end-node-menu-btn"
+            onClick={(e) => {
+              e.stopPropagation();
+              setContextMenuPosition({ x: e.clientX, y: e.clientY });
+              setShowContextMenu(true);
+            }}
+            aria-label="Menú"
+          >
+            <MoreHorizontal size={16} />
+          </button>
+        )}
+        <button
+          className="end-node-collapse-btn"
+          onClick={toggleCollapse}
+          aria-label={isCollapsed ? 'Expandir' : 'Colapsar'}
+        >
+          {isCollapsed ? <ChevronDown size={16} /> : <ChevronUp size={16} />}
+        </button>
+      </div>
+    </div>
+  ), [data.customIcon, data.badge, isCollapsed, isEditing, toggleCollapse, setShowContextMenu]);
 
   // Opciones del menú contextual
   const contextMenuItems = [
@@ -318,14 +375,21 @@ const EndNode = memo(({
       ref={nodeRef}
       className={`end-node${selected ? ' selected' : ''}${isCollapsed ? ' collapsed' : ''}${isUltraPerformanceMode ? ' ultra-performance' : ''}`}
       style={{
-        width: isCollapsed ? 120 : (data.width || initialWidth),
-        height: isCollapsed ? 40 : (data.height || initialHeight),
-        opacity: isUltraPerformanceMode ? '1' : '0', // Comienza invisible
-        transform: isUltraPerformanceMode ? 'translateY(0) scale(1) translateZ(0)' : 'translateY(10px) scale(0.98) translateZ(0)', // Comienza ligeramente abajo y más pequeño
-        transition: isUltraPerformanceMode ? 'none' : 'all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)' // Transición suave con rebote
+        width: `${initialWidth}px`,
+        minWidth: `${minWidth}px`,
+        minHeight: `${minHeight}px`,
+        height: `${initialHeight}px`,
+        opacity: isResizing ? 0.7 : 1,
+        cursor: isResizing ? 'grabbing' : 'default',
+        background: isUltraPerformanceMode ? '#ff6b6b' : 'linear-gradient(135deg, #ff6b6b 0%, #ff8e8e 100%)',
+        boxShadow: isUltraPerformanceMode ? '0 2px 4px rgba(0, 0, 0, 0.1)' : '0 4px 12px rgba(255, 107, 107, 0.2), 0 1px 3px rgba(0, 0, 0, 0.1)',
+        border: `1px solid ${selected ? '#ff5252' : 'rgba(255, 107, 107, 0.3)'}`,
+        backdropFilter: isUltraPerformanceMode ? 'none' : 'blur(8px)',
+        transition: isUltraPerformanceMode ? 'none' : 'all 0.2s cubic-bezier(0.25, 1, 0.5, 1)',
       }}
-      role="button"
-      aria-label={`Nodo de fin: ${label}`}
+      onClick={handleClick}
+      onDoubleClick={handleDoubleClick}
+      onContextMenu={handleContextMenu}
       tabIndex={0}
       data-testid="end-node"
       data-node-id={id}
@@ -336,79 +400,44 @@ const EndNode = memo(({
         }
       }}
     >
+      {/* Handle de entrada en la parte superior - mejorado para mayor visibilidad y mejor conexión */}
       <Handle
         type="target"
         position={Position.Top}
+        id="default" // ID estandarizado para el handle de entrada
         isConnectable={isConnectable && !isEditing}
         className={`end-node-input ${data.hasActiveInput ? 'active' : ''}`}
         aria-label="Conexión de entrada"
-        onMouseDown={(e) => {
-          e.stopPropagation();
-          e.preventDefault();
-          // Efecto visual al hacer clic en el conector
-          if (e.target) {
-            // Aplicar efecto de pulso
-            e.target.style.transform = 'scale(1.3) translateZ(0)';
-            e.target.style.boxShadow = '0 0 15px rgba(255, 112, 112, 0.7)';
-            e.target.style.transition = 'all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1)';
-            
-            // Restaurar después de la animación
-            setTimeout(() => {
-              e.target.style.transform = '';
-              e.target.style.boxShadow = '';
-              e.target.style.transition = '';
-            }, 300);
-          }
+        data-testid="end-node-input-handle"
+        style={{
+          background: '#ff6b6b',
+          border: '3px solid white',
+          boxShadow: '0 0 0 2px rgba(0, 0, 0, 0.15), 0 4px 6px rgba(0, 0, 0, 0.1)',
+          width: '18px',
+          height: '18px',
+          top: '-10px',
+          zIndex: 110,
+          transition: isUltraPerformanceMode ? 'none' : 'all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
         }}
         onMouseEnter={(e) => {
-          // Efecto al pasar el mouse
-          if (e.target) {
+          // Efecto al pasar el mouse (solo si no está en modo ultra rendimiento)
+          if (e.target && !isUltraPerformanceMode) {
+            e.target.style.transform = 'scale(1.15) translateZ(0)';
+            e.target.style.boxShadow = '0 0 8px rgba(255, 107, 107, 0.8)';
             e.target.style.filter = 'brightness(1.2)';
           }
         }}
         onMouseLeave={(e) => {
           // Restaurar al salir
           if (e.target) {
+            e.target.style.transform = '';
             e.target.style.filter = '';
+            e.target.style.boxShadow = '0 0 0 2px rgba(0, 0, 0, 0.15), 0 4px 6px rgba(0, 0, 0, 0.1)';
           }
         }}
       />
       
-      <div className="end-node-header">
-        <div className="end-node-icon" title="Nodo de fin">
-          {data.customIcon || <Flag size={16} />}
-        </div>
-        <div className="end-node-title" title="Nodo final del flujo">
-          Fin
-          {data.badge && (
-            <span className={`end-node-badge badge-${data.badge.type || 'default'}`}>
-              {data.badge.text}
-            </span>
-          )}
-        </div>
-        <div className="end-node-controls">
-          {!isCollapsed && !isEditing && (
-            <button
-              className="end-node-menu-btn"
-              onClick={(e) => {
-                e.stopPropagation();
-                setContextMenuPosition({ x: e.clientX, y: e.clientY });
-                setShowContextMenu(true);
-              }}
-              aria-label="Menú"
-            >
-              <MoreHorizontal size={16} />
-            </button>
-          )}
-          <button
-            className="end-node-collapse-btn"
-            onClick={toggleCollapse}
-            aria-label={isCollapsed ? 'Expandir' : 'Colapsar'}
-          >
-            {isCollapsed ? <ChevronDown size={16} /> : <ChevronUp size={16} />}
-          </button>
-        </div>
-      </div>
+      {renderNodeHeader}
       
       {!isCollapsed && (
         <>
@@ -453,7 +482,7 @@ const EndNode = memo(({
               </div>
             ) : (
               <div className="end-node-label" title={label}>
-                {label ? formatLabel() : <em className="end-node-placeholder">Sin etiqueta</em>}
+                {label ? formatLabel : <em className="end-node-placeholder">Sin etiqueta</em>}
               </div>
             )}
             {data.context && !isEditing && (

@@ -63,7 +63,7 @@ const MESSAGE_TYPES = {
  * @param {boolean} props.isUltraPerformanceMode - Indica si está en modo ultra rendimiento
  * @returns {JSX.Element} - Ícono del nodo de mensaje
  */
-const MessageNodeIcon = ({ type, isUltraPerformanceMode }) => {
+const MessageNodeIcon = ({ type, isUltraPerformanceMode = false }) => {
   // Tamaño y grosor optimizados para legibilidad
   const iconProps = { 
     size: 16, 
@@ -112,9 +112,7 @@ MessageNodeIcon.propTypes = {
   isUltraPerformanceMode: PropTypes.bool
 };
 
-MessageNodeIcon.defaultProps = {
-  isUltraPerformanceMode: false
-};
+// Valores predeterminados ahora definidos directamente en los parámetros de la función
 
 /**
  * Componente para la vista previa del mensaje con soporte para Markdown y truncado inteligente
@@ -124,7 +122,7 @@ MessageNodeIcon.defaultProps = {
  * @param {boolean} props.isUltraPerformanceMode - Indica si está en modo ultra rendimiento
  * @returns {JSX.Element} - Vista previa del mensaje formateada
  */
-const MessagePreview = ({ message, variables, isUltraPerformanceMode }) => {
+const MessagePreview = ({ message = '', variables = [], isUltraPerformanceMode = false }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const messageRef = useRef(null);
   const [isTruncated, setIsTruncated] = useState(false);
@@ -235,11 +233,7 @@ MessagePreview.propTypes = {
   isUltraPerformanceMode: PropTypes.bool
 };
 
-MessagePreview.defaultProps = {
-  message: '',
-  variables: [],
-  isUltraPerformanceMode: false
-};
+// Valores predeterminados ahora definidos directamente en los parámetros de la función
 
 /**
  * Componente para editar variables del mensaje
@@ -461,7 +455,22 @@ VariableEditor.defaultProps = {
  * @param {boolean} props.isUltraPerformanceMode - Indica si está en modo ultra rendimiento
  * @returns {JSX.Element} - Componente MessageNode
  */
-const MessageNode = memo(({ data = {}, isConnectable, selected, id, setNodes, isUltraPerformanceMode, performanceMode }) => {
+const MessageNode = memo(({ 
+  data = {
+    message: DEFAULT_MESSAGE,
+    type: MESSAGE_TYPES.SYSTEM,
+    variables: []
+  }, 
+  isConnectable = true, 
+  selected = false, 
+  id, 
+  setNodes, 
+  isUltraPerformanceMode = false, 
+  performanceMode = false,
+  onEdit = () => {},
+  onDuplicate = () => {},
+  onDelete = () => {}
+}) => {
   // Asegurarnos de que data siempre sea un objeto para evitar errores de desestructuración
   const safeData = data || {};
   
@@ -848,6 +857,7 @@ const MessageNode = memo(({ data = {}, isConnectable, selected, id, setNodes, is
         <Handle
           type="target"
           position={Position.Top}
+          id="default" // ID estandarizado para el handle de entrada
           isConnectable={isConnectable && !isUltraMode}
           className={`message-node__handle message-node__handle--target ${isUltraMode ? 'message-node__handle--ultra' : ''}`}
           aria-label="Conector de entrada"
@@ -855,10 +865,20 @@ const MessageNode = memo(({ data = {}, isConnectable, selected, id, setNodes, is
           tabIndex={isConnectable && !isUltraMode ? 0 : -1}
           role="button"
           data-testid="message-node-target-handle"
+          style={{
+            top: '-10px', // Alejado del borde para mejor visibilidad
+            width: '18px',
+            height: '18px',
+            backgroundColor: '#3b82f6',
+            border: isUltraMode ? '2px solid white' : '3px solid white',
+            boxShadow: '0 0 0 2px rgba(0, 0, 0, 0.15), 0 4px 6px rgba(0, 0, 0, 0.1)',
+            zIndex: 110
+          }}
         />
         <Handle
           type="source"
           position={Position.Bottom}
+          id="default" // ID estandarizado para el handle de salida
           isConnectable={isConnectable && !isUltraMode}
           className={`message-node__handle message-node__handle--source ${isUltraMode ? 'message-node__handle--ultra' : ''}`}
           aria-label="Conector de salida"
@@ -866,6 +886,15 @@ const MessageNode = memo(({ data = {}, isConnectable, selected, id, setNodes, is
           tabIndex={isConnectable && !isUltraMode ? 0 : -1}
           role="button"
           data-testid="message-node-source-handle"
+          style={{
+            bottom: '-10px', // Alejado del borde para mejor visibilidad
+            width: '18px',
+            height: '18px',
+            backgroundColor: '#3b82f6',
+            border: isUltraMode ? '2px solid white' : '3px solid white',
+            boxShadow: '0 0 0 2px rgba(0, 0, 0, 0.15), 0 4px 6px rgba(0, 0, 0, 0.1)',
+            zIndex: 110
+          }}
         />
       </ContextMenu>
       
@@ -915,24 +944,7 @@ MessageNode.propTypes = {
   performanceMode: PropTypes.bool // Alias para isUltraPerformanceMode (compatibilidad)
 };
 
-/**
- * Valores predeterminados
- * @type {Object}
- */
-MessageNode.defaultProps = {
-  data: {
-    message: DEFAULT_MESSAGE,
-    type: MESSAGE_TYPES.SYSTEM,
-    variables: []
-  },
-  isConnectable: true,
-  selected: false,
-  isUltraPerformanceMode: false,
-  performanceMode: false,
-  onEdit: () => {},
-  onDuplicate: () => {},
-  onDelete: () => {}
-};
+// Los valores predeterminados ahora están definidos directamente en los parámetros de la función
 
 /**
  * Exportar el componente MessageNode

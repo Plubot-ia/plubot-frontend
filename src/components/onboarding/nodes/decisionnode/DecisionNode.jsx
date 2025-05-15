@@ -427,6 +427,8 @@ const DecisionNode = ({
         className={`decision-node__handle decision-node__handle--target ${isUltraPerformanceMode ? 'ultra-performance' : ''}`}
         style={{
           top: '-12px',
+          left: '50%',
+          transform: 'translateX(-50%)',
           zIndex: 50,
           width: '16px',
           height: '16px',
@@ -497,8 +499,10 @@ const DecisionNode = ({
         )}
       </div>
       
-      {/* Handles con mejor espaciado y texto más pequeño */}
+      {/* Handles de entrada y salida */}
       <div className="decision-node__handles">
+        {/* El handle de entrada ya está definido en la parte superior del nodo, no es necesario duplicarlo aquí */}
+        
         <div className="decision-node__handle-wrapper">
           {/* Handles de salida con mayor separación */}
           {conditions.map((output, index) => {
@@ -535,18 +539,32 @@ const DecisionNode = ({
                   style={{
                     left: `${position}%`,
                     backgroundColor: handleColor,
-                    bottom: '-2px', // Extremadamente cerca del margen inferior
+                    bottom: '-10px', // Alejado del margen inferior para mejor visibilidad
                     zIndex: 100,
                     width: '16px',
                     height: '16px',
-                    border: isUltraPerformanceMode ? '1px solid white' : '2px solid white',
-                    boxShadow: isUltraPerformanceMode 
-                      ? '0 1px 2px rgba(0, 0, 0, 0.1)' 
-                      : '0 0 0 2px rgba(0, 0, 0, 0.15), 0 4px 6px rgba(0, 0, 0, 0.1)',
+                    border: isUltraPerformanceMode ? '2px solid white' : '3px solid white',
+                    boxShadow: '0 0 0 2px rgba(0, 0, 0, 0.15), 0 4px 6px rgba(0, 0, 0, 0.1)',
                     transition: isUltraPerformanceMode ? 'none' : 'all 0.2s cubic-bezier(0.25, 1, 0.5, 1)'
                   }}
+                  onMouseEnter={(e) => {
+                    // Efecto al pasar el mouse (solo si no está en modo ultra rendimiento)
+                    if (e.target && !isUltraPerformanceMode) {
+                      e.target.style.transform = 'scale(1.15) translateZ(0)';
+                      e.target.style.boxShadow = `0 0 8px ${handleColor}`;
+                      e.target.style.filter = 'brightness(1.2)';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    // Restaurar al salir
+                    if (e.target) {
+                      e.target.style.transform = '';
+                      e.target.style.filter = '';
+                      e.target.style.boxShadow = '0 0 0 2px rgba(0, 0, 0, 0.15), 0 4px 6px rgba(0, 0, 0, 0.1)';
+                    }
+                  }}
                 />
-                {/* Eliminado el texto debajo de los handles */}
+                {/* Se ha eliminado la etiqueta de texto debajo del handle */}
               </div>
             );
           })}

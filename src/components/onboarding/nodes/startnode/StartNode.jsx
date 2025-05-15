@@ -381,15 +381,23 @@ const StartNode = memo(({ data = {}, isConnectable = true, selected = false, id,
       tabIndex={NODE_CONFIG.ACCESSIBILITY.TABINDEX}
       data-testid="start-node"
     >
-      {/* Handle de salida en la posición configurada */}
+      {/* Handle para conexiones - mejorado para mayor visibilidad y mejor conexión */}
       <Handle
         type="source"
         position={handlePosition}
-        id="a"
-        isConnectable={isConnectable}
+        id="default" // ID estandarizado para el handle de salida
+        isConnectable={isConnectable && !isEditing}
+        className={`start-node__handle ${isUltraPerformanceMode ? 'start-node__handle--ultra' : ''}`}
         style={{
-          background: isHovered && !isUltraPerformanceMode ? NODE_CONFIG.COLORS.HANDLE_HOVER : NODE_CONFIG.COLORS.HANDLE,
-          border: `1px solid ${NODE_CONFIG.COLORS.BORDER}`,
+          background: NODE_CONFIG.COLORS.HANDLE,
+          border: isUltraPerformanceMode ? '2px solid white' : '3px solid white',
+          boxShadow: '0 0 0 2px rgba(0, 0, 0, 0.15), 0 4px 6px rgba(0, 0, 0, 0.1)',
+          width: '18px',
+          height: '18px',
+          zIndex: 110,
+          [handlePosition === Position.Bottom ? 'bottom' : 
+           handlePosition === Position.Top ? 'top' : 
+           handlePosition === Position.Left ? 'left' : 'right']: '-10px',
           transition: isUltraPerformanceMode ? 'none' : 'all 0.2s ease',
         }}
       />

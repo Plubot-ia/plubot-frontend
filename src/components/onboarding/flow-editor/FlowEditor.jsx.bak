@@ -13,8 +13,6 @@ import VersionHistory from '../common/VersionHistory';
 import TransparentOverlay from '../common/TransparentOverlay'; // Nuevo overlay transparente
 import './FlowEditor.css'; // Archivo CSS fusionado
 import './fix-overlay.css'; // CSS para eliminar cualquier overlay oscuro
-// Importar el parche JavaScript para el modo ultra rendimiento
-import './ui/PerformancePatch.js';
 import useAPI from '@/hooks/useAPI';
 import { v4 as uuidv4 } from 'uuid';
 import logo from '@/assets/img/plubot.svg';
@@ -583,8 +581,8 @@ const FlowEditorInner = ({
         console.log('Aristas procesadas para cargar:', processedEdges);
         setEdges(processedEdges);
       }
-    }
-  } catch (error) {
+      
+    } catch (error) {
       console.error('Error al cargar el flujo:', error);
       
       // Para cualquier error, usar el manejador normal

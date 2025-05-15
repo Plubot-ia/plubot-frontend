@@ -30,19 +30,74 @@ export const generateNodeId = (nodeType) => {
 };
 
 /**
+ * Función para throttle - limita la frecuencia de ejecución de una función usando requestAnimationFrame
+ * @param {Function} func - Función a ejecutar
+ * @returns {Function} - Función con throttle
+ */
+export const throttle = (func) => {
+  let rafId = null;
+  let lastArgs = null;
+  
+  return function throttled(...args) {
+    lastArgs = args;
+    
+    if (rafId === null) {
+      rafId = requestAnimationFrame(() => {
+        func(...lastArgs);
+        rafId = null;
+      });
+    }
+  };
+};
+
+/**
+ * Optimiza una función para eventos de arrastre usando throttle
+ * @param {Function} func - Función a optimizar
+ * @param {Object} options - Opciones de optimización
+ * @returns {Function} - Función optimizada
+ */
+export const optimizeDragFunction = (func, options = {}) => {
+  const { useThrottle = true } = options;
+  
+  // Usar throttle para limitar a 60fps (usando requestAnimationFrame)
+  if (useThrottle) {
+    return throttle(func);
+  }
+  
+  return func;
+};
+
+
+/**
  * Valida si una conexión ya existe
  * @param {Array} edges - Aristas existentes
  * @param {Object} params - Parámetros de la nueva conexión
  * @returns {boolean} - true si la conexión ya existe
  */
 export const connectionExists = (edges, params) => {
-  const connectionKey = `${params.source}-${params.target}-${params.sourceHandle || 'default'}-${params.targetHandle || 'default'}`;
-  const existingEdges = new Map();
+  if (!edges || !Array.isArray(edges) || !params) return false;
   
-  edges.forEach(edge => {
-    const key = `${edge.source}-${edge.target}-${edge.sourceHandle || 'default'}-${edge.targetHandle || 'default'}`;
-    existingEdges.set(key, true);
+  // Extraer propiedades de la conexión
+  const { source, target, sourceHandle, targetHandle } = params;
+  
+  // Si falta alguna propiedad esencial, no podemos validar
+  if (!source || !target) return false;
+  
+  // Verificar si existe una conexión con los mismos source y target
+  return edges.some(edge => {
+    // Comparar source y target (propiedades obligatorias)
+    const sourceMatch = edge.source === source;
+    const targetMatch = edge.target === target;
+    
+    // Si no coinciden source y target, no es la misma conexión
+    if (!sourceMatch || !targetMatch) return false;
+    
+    // Comparar sourceHandle y targetHandle (con valores por defecto)
+    const edgeSourceHandle = edge.sourceHandle || 'default';
+    const edgeTargetHandle = edge.targetHandle || 'default';
+    const paramSourceHandle = sourceHandle || 'default';
+    const paramTargetHandle = targetHandle || 'default';
+    
+    return edgeSourceHandle === paramSourceHandle && edgeTargetHandle === paramTargetHandle;
   });
-  
-  return existingEdges.has(connectionKey);
 };

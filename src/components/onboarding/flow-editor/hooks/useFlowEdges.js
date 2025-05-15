@@ -69,35 +69,82 @@ const useFlowEdges = (initialEdges, setEdges, addToHistory) => {
   const onConnect = useCallback((params) => {
     // Verificar si la conexión ya existe
     if (connectionExists(internalEdges, params)) {
+      console.log('Conexión ya existe, ignorando:', params);
       return;
     }
     
+    // Validar que los parámetros de conexión sean válidos
+    if (!params.source || !params.target) {
+      console.error('Intento de conexión con source o target inválidos:', params);
+      return;
+    }
+    
+    // Normalizar sourceHandle y targetHandle
+    // Importante: usar 'default' como valor por defecto para sourceHandle, no null
+    const sourceHandle = params.sourceHandle || 'default';
+    const targetHandle = params.targetHandle || null;
+    
+    // Verificar que los handles existan en los nodos
+    try {
+      // Buscar el nodo source
+      const sourceNode = document.querySelector(`[data-id="${params.source}"]`);
+      if (sourceNode) {
+        // Verificar si el sourceHandle existe en el nodo
+        const sourceHandleElement = sourceNode.querySelector(`[data-handleid="${sourceHandle}"]`);
+        if (!sourceHandleElement) {
+          console.warn(`useFlowEdges: No se encontró el sourceHandle '${sourceHandle}' en el nodo ${params.source}`);
+        }
+      } else {
+        console.warn(`useFlowEdges: No se encontró el nodo source: ${params.source}`);
+      }
+    } catch (error) {
+      console.error('Error al verificar handles:', error);
+    }
+    
+    console.log(`Creando nueva arista: ${params.source} -> ${params.target}, sourceHandle: ${sourceHandle}`);
+    
     // Crear nueva arista con estilo por defecto
-    // Importante: Preservar los IDs completos de los nodos source y target
     const newEdge = {
       ...params,
       id: `edge-${params.source}-${params.target}-${Date.now()}`,
-      style: {
-        ...DEFAULT_EDGE_STYLE,
-        stroke: EDGE_COLORS[params.sourceHandle] || EDGE_COLORS.default,
+      sourceHandle,
+      targetHandle,
+      type: 'default', // Usar siempre 'default' para compatibilidad con EliteEdge
+      animated: false,
+      style: { stroke: '#00e0ff', strokeWidth: 2 },
+      // Agregar datos adicionales para asegurar que la arista se muestre correctamente
+      data: {
+        ...params.data,
+        isEnergyHose: true, // Marcar como manguera energética
+        flowSpeed: 0.5, // Velocidad del flujo
+        flowColor: '#00e0ff', // Color del flujo
       },
-      animated: true,
-      type: 'smoothstep',
       // Guardar los IDs originales para evitar problemas al guardar/cargar
       sourceOriginal: params.source,
-      targetOriginal: params.target
+      targetOriginal: params.target,
     };
+    
+    // Normalizar handles
+    newEdge.sourceHandle = sourceHandle;
+    newEdge.targetHandle = targetHandle;
     
     setInternalEdges(edges => {
       const newEdges = addEdge(newEdge, edges);
       edgesMapRef.current.set(newEdge.id, newEdge);
-      setTimeout(() => setEdges(newEdges), 0);
+      addToHistory({ edges: newEdges });
       
-      // Registrar adición en el historial
-      addToHistory({
-        type: 'addEdge',
-        edges: [newEdge],
-      });
+      // Actualizar el estado de forma asíncrona para evitar problemas de renderizado
+      setTimeout(() => {
+        setEdges(newEdges);
+        
+        // Forzar que se use EliteEdge para renderizar esta arista
+        // Esto garantiza que se vea como una manguera energética desde el principio
+        setTimeout(() => {
+          document.dispatchEvent(new CustomEvent('elite-edge-update-required', { 
+            detail: { id: newEdge.id } 
+          }));
+        }, 50);
+      }, 0);
       
       return newEdges;
     });

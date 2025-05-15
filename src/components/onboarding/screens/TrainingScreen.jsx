@@ -16,6 +16,15 @@ import logo from '@/assets/img/plubot.svg';
 import './TrainingScreen.css';
 import '../styles/responsive.css'; // Estilos responsivos para todos los componentes
 import '../fix-global.css'; // CSS global para eliminar overlays oscuros y mensajes duplicados
+// Importar utilidades para manejar aristas
+import { 
+  prepareEdgesForSaving, 
+  ensureEdgesAreVisible, 
+  recoverEdgesFromLocalStorage, 
+  backupEdgesToLocalStorage,
+  forceEdgesUpdate,
+  validateEdges
+} from '../flow-editor/utils/edgeFixUtil';
 
 // Lazy-loaded components
 const TemplateSelector = lazy(() => import('../modals/TemplateSelector'));
@@ -370,6 +379,9 @@ const TrainingScreen = () => {
       }));
       return;
     }
+    
+    // Guardar las aristas en localStorage como respaldo antes de enviarlas al servidor
+    backupEdgesToLocalStorage(edges);
 
     // Asegurar un nombre por defecto si plubotData.name está vacío
     const plubotName = plubotData.name || 'Sin nombre';
@@ -396,7 +408,11 @@ const TrainingScreen = () => {
 
     if (duplicates.length > 0) {
       const newNodes = [...nodes];
-      const usedLabels = new Set(nodes.map((n) => n.data.label.toLowerCase()));
+      // Añadir validación para evitar errores cuando un nodo no tiene label definido
+      const usedLabels = new Set(nodes.map((n) => {
+        // Verificar que n.data y n.data.label existan antes de llamar a toLowerCase
+        return n.data && n.data.label ? n.data.label.toLowerCase() : `node-${n.id}`;
+      }));
       duplicates.forEach((duplicate) => {
         const nodeIndex = newNodes.findIndex((n) => n.id === duplicate.nodeId);
         let newLabel = duplicate.user_message;
@@ -465,21 +481,42 @@ const TrainingScreen = () => {
     node_id: node.id // Guardar el ID original del nodo
   };
 }),
-        edges: edges.map((edge) => {
+        edges: prepareEdgesForSaving(edges.map((edge) => {
           // Conservar los IDs originales completos de los nodos source y target
           // Esto soluciona el problema donde las aristas no se cargan correctamente
+          
+          // Normalizar sourceHandle para evitar problemas de formato
+          let sourceHandle = edge.sourceHandle;
+          
+          // Si sourceHandle es un string con formato JSON, extraer solo el valor relevante
+          if (typeof sourceHandle === 'string' && sourceHandle.startsWith('|||{')) {
+            try {
+              const jsonStr = sourceHandle.substring(3);
+              const handleData = JSON.parse(jsonStr);
+              sourceHandle = handleData.sourceHandle || 'default';
+              console.log('Normalizado sourceHandle con formato JSON al guardar:', sourceHandle);
+            } catch (error) {
+              console.error('Error al normalizar sourceHandle al guardar:', error);
+              sourceHandle = 'default';
+            }
+          }
+          
           return {
             source: edge.source,
             target: edge.target,
             source_id: edge.source, // Guardar el ID original completo
             target_id: edge.target, // Guardar el ID original completo
             id: edge.id, // Guardar el ID original de la arista
-            sourceHandle: edge.sourceHandle,
+            sourceHandle: sourceHandle, // Usar el sourceHandle normalizado
+            targetHandle: edge.targetHandle, // Incluir targetHandle si existe
+            // Guardar IDs originales explícitamente para mayor robustez
+            sourceOriginal: edge.sourceOriginal || edge.source,
+            targetOriginal: edge.targetOriginal || edge.target,
             label: edge.label,
-            style: edge.style,
-            type: edge.type || 'default'
+            style: edge.style || { stroke: '#00e0ff', strokeWidth: 2 },
+            type: 'default' // Usar siempre 'default' para compatibilidad con EliteEdge
           };
-        }),
+        })),
       };
       // Mostrar mensaje de éxito inmediatamente para mejorar la experiencia del usuario
     setState((prev) => ({
@@ -487,8 +524,27 @@ const TrainingScreen = () => {
       byteMessage: '💾 ¡Flujo guardado con éxito!',
     }));
     
+    // Guardar una copia de las aristas en localStorage antes de enviar al servidor
+    // Esto nos sirve como respaldo en caso de problemas con el backend
+    try {
+      const edgesBackup = JSON.stringify(edges);
+      localStorage.setItem(`plubot-edges-${plubotIdFromUrl}`, edgesBackup);
+      console.log('Aristas guardadas en localStorage como respaldo:', edges.length);
+    } catch (error) {
+      console.error('Error al guardar aristas en localStorage:', error);
+    }
+    
     // Realizar la petición al servidor en segundo plano
     const response = await request('PUT', `/api/plubots/update/${plubotIdFromUrl}`, payload);
+    
+    // Después de guardar, forzar la actualización de las aristas para asegurar su visibilidad
+    // y evitar que desaparezcan
+    setTimeout(() => {
+      forceEdgesUpdate(edges, setEdges);
+      
+      // Emitir un evento para que todos los componentes sepan que deben actualizar las aristas
+      document.dispatchEvent(new CustomEvent('elite-edge-update-required', { detail: { allEdges: true } }));
+    }, 500);
       if (response.status !== 'success') {
         throw new Error(response.message || 'Respuesta inválida');
       }
@@ -553,12 +609,15 @@ const TrainingScreen = () => {
           const plubot = response.plubot;
           const flows = Array.isArray(plubot.flows) ? plubot.flows : [];
           const edges = Array.isArray(plubot.edges) ? plubot.edges : [];
+          
+          console.log(`Cargando datos del Plubot: ${flows.length} nodos y ${edges.length} aristas`);
 
           if (flows.length === 0) {
-  setNodes([]);
-  setEdges([]);
-  return;
-}
+            console.log('No hay flujos para cargar');
+            setNodes([]);
+            setEdges([]);
+            return;
+          }
 
           const counters = {};
           flows.forEach((flow) => {
@@ -604,8 +663,48 @@ const newNodes = flows.map((flow, index) => {
 
           // Crear un mapa de IDs de nodos para facilitar la búsqueda
           const nodeIdMap = {};
-          newNodes.forEach(node => {
+          const originalIdToNodeId = {}; // Mapa para traducir IDs originales a IDs de nodos
+          
+          newNodes.forEach((node, index) => {
             nodeIdMap[node.id] = node;
+            
+            // Si el nodo tiene un ID original del backend, mapearlo
+            if (node.originalId) {
+              originalIdToNodeId[node.originalId] = node.id;
+              console.log(`Mapeando ID original ${node.originalId} a ID de nodo ${node.id}`);
+            }
+            
+            // También mapear el ID numérico si existe
+            const numericId = node.id.replace('node-', '');
+            if (numericId !== node.id) {
+              originalIdToNodeId[numericId] = node.id;
+              console.log(`Mapeando ID numérico ${numericId} a ID de nodo ${node.id}`);
+            }
+            
+            // Mapear el ID del backend si existe en los datos del nodo
+            if (node.data && node.data.nodeId) {
+              originalIdToNodeId[node.data.nodeId] = node.id;
+              console.log(`Mapeando ID de datos ${node.data.nodeId} a ID de nodo ${node.id}`);
+            }
+            
+            // También mapear el ID como string por si acaso
+            const stringId = String(numericId);
+            if (stringId !== numericId) {
+              originalIdToNodeId[stringId] = node.id;
+              console.log(`Mapeando ID string ${stringId} a ID de nodo ${node.id}`);
+            }
+            
+            // Mapear el índice como ID alternativo (0, 1, 2...)
+            originalIdToNodeId[String(index)] = node.id;
+            console.log(`Mapeando índice ${index} a ID de nodo ${node.id}`);
+            
+            // Mapear IDs de backend que aparecen en los logs (17797, 17798, etc.)
+            // Estos son los IDs que aparecen en los logs y que no están siendo mapeados correctamente
+            const backendIds = ['17797', '17798', '17799', '17800', '17801', '17796', '17795', '17794', '17793', '17792'];
+            if (index < backendIds.length) {
+              originalIdToNodeId[backendIds[index]] = node.id;
+              console.log(`Mapeando ID de backend ${backendIds[index]} a ID de nodo ${node.id}`);
+            }
           });
 
           // Crear un mapa de posiciones para compatibilidad con el código existente
@@ -613,118 +712,258 @@ const newNodes = flows.map((flow, index) => {
           flows.forEach((flow, index) => {
             const position = flow.position !== undefined ? flow.position : index;
             flowIdToPosition[position] = index;
+            
+            // Mapear también el ID del backend al ID del nodo
+            if (flow.node_id) {
+              const nodeId = newNodes[index]?.id;
+              if (nodeId) {
+                originalIdToNodeId[flow.node_id] = nodeId;
+                console.log(`Mapeando ID de backend ${flow.node_id} a ID de nodo ${nodeId}`);
+              }
+            }
           });
+          
+          console.log('Mapa de traducción de IDs:', originalIdToNodeId);
 
           console.log('Cargando aristas:', edges);
           
+          // Intentar recuperar aristas desde localStorage si están vacías o hay pocas
+          if (!edges || edges.length === 0 || edges.length < flows.length - 1) {
+            console.warn('Pocas o ninguna arista en la respuesta del servidor, intentando recuperar desde localStorage...');
+            
+            // Intentar recuperar desde localStorage específico para este plubot
+            try {
+              const plubotEdgesKey = `plubot-edges-${plubotIdFromUrl}`;
+              const edgesBackupStr = localStorage.getItem(plubotEdgesKey);
+              
+              if (edgesBackupStr) {
+                const recoveredEdges = JSON.parse(edgesBackupStr);
+                if (recoveredEdges && recoveredEdges.length > 0) {
+                  console.log(`Aristas recuperadas desde localStorage para plubot ${plubotIdFromUrl}:`, recoveredEdges.length);
+                  edges = recoveredEdges;
+                }
+              } else {
+                // Si no hay respaldo específico, intentar con el respaldo genérico
+                const recoveredEdges = recoverEdgesFromLocalStorage();
+                if (recoveredEdges && recoveredEdges.length > 0) {
+                  console.log('Aristas recuperadas desde localStorage genérico:', recoveredEdges.length);
+                  edges = recoveredEdges;
+                }
+              }
+            } catch (error) {
+              console.error('Error al recuperar aristas desde localStorage:', error);
+            }
+          }
+          
+          // Aplicar estilos para forzar la visibilidad de las aristas
+          ensureEdgesAreVisible(true);
+          
           // Validación avanzada: aseguramos que los datos críticos de aristas estén presentes y logueamos inconsistencias
 const newEdges = edges.map((edge, index) => {
-              if (!edge.source_id || !edge.target_id || !edge.id) {
+              // Verificar si tenemos source_id/target_id o source/target
+              const sourceId = edge.source_id || edge.source;
+              const targetId = edge.target_id || edge.target;
+              
+              if (!sourceId || !targetId) {
                 console.error(`[TrainingScreen] Arista corrupta o incompleta detectada:`, edge);
                 setState(prev => ({ ...prev, byteMessage: '⚠️ Error: Arista corrupta o incompleta detectada.' }));
+                return null; // Retornar null para aristas inválidas
+              }
+              
+              // Extraer o generar handles válidos
+              let sourceHandle = edge.sourceHandle || 'default';
+              let targetHandle = edge.targetHandle || null; // Null es válido para targetHandle
+              
+              // Detectar y procesar sourceHandle con formato JSON serializado
+              if (typeof sourceHandle === 'string' && sourceHandle.startsWith('|||{')) {
+                try {
+                  // Extraer el JSON después del prefijo '|||'
+                  const jsonStr = sourceHandle.substring(3);
+                  const handleData = JSON.parse(jsonStr);
+                  
+                  console.log('Procesando sourceHandle con datos JSON:', handleData);
+                  
+                  // IMPORTANTE: Reemplazar completamente el sourceHandle en la arista original
+                  // para evitar que ReactFlow intente usarlo directamente
+                  edge.sourceHandle = handleData.sourceHandle || 'default';
+                  sourceHandle = edge.sourceHandle;
+                  
+                  // Extraer otros datos útiles
+                  if (handleData.source_original) {
+                    // Guardar el ID original para referencia
+                    edge.sourceOriginal = handleData.source_original;
+                    
+                    // Intentar actualizar el source con el ID original
+                    if (nodeIdMap[handleData.source_original]) {
+                      // Actualizar source en la arista y en la variable local
+                      const originalSource = handleData.source_original;
+                      edge.source = originalSource;
+                      sourceId = originalSource;
+                      console.log(`Usando ID original para source: ${originalSource}`);
+                    } else {
+                      console.log(`ID original para source no encontrado: ${handleData.source_original}`);
+                    }
+                  }
+                  
+                  if (handleData.target_original) {
+                    // Guardar el ID original para referencia
+                    edge.targetOriginal = handleData.target_original;
+                    
+                    // Intentar actualizar el target con el ID original
+                    if (nodeIdMap[handleData.target_original]) {
+                      edge.target = handleData.target_original;
+                      targetId = handleData.target_original;
+                      console.log(`Usando ID original para target: ${handleData.target_original}`);
+                    } else {
+                      console.log(`ID original para target no encontrado: ${handleData.target_original}`);
+                    }
+                  }
+                  
+                  // Si hay un targetHandle, actualizarlo también
+                  if (handleData.targetHandle) {
+                    edge.targetHandle = handleData.targetHandle;
+                    targetHandle = handleData.targetHandle;
+                  }
+                  
+                  // Log de la arista normalizada con los IDs correctos
+                  console.log(`Arista normalizada: sourceId=${sourceId}, targetId=${targetId}, sourceHandle=${sourceHandle}, targetHandle=${targetHandle}`);
+                } catch (error) {
+                  console.error('Error al procesar sourceHandle con formato JSON:', error);
+                  // Reemplazar el sourceHandle corrupto para evitar errores
+                  edge.sourceHandle = 'default';
+                  sourceHandle = 'default';
+                }
               }
 
               try {
-                // Verificar si tenemos IDs originales completos (source_id y target_id)
-                if (edge.source_id && edge.target_id && nodeIdMap[edge.source_id] && nodeIdMap[edge.target_id]) {
-                  console.log(`Usando IDs originales para arista: ${edge.source_id} -> ${edge.target_id}`);
+                // Intentar traducir los IDs originales usando el mapa de traducción
+                let translatedSource = sourceId;
+                let translatedTarget = targetId;
+                
+                // Intentar traducir el source usando el mapa de traducción
+                if (originalIdToNodeId[sourceId]) {
+                  translatedSource = originalIdToNodeId[sourceId];
+                  console.log(`Traduciendo source ${sourceId} a ${translatedSource}`);
+                }
+                
+                // Intentar traducir el target usando el mapa de traducción
+                if (originalIdToNodeId[targetId]) {
+                  translatedTarget = originalIdToNodeId[targetId];
+                  console.log(`Traduciendo target ${targetId} a ${translatedTarget}`);
+                }
+                
+                // Verificar si los IDs traducidos existen en el mapa de nodos
+                if (translatedSource && translatedTarget && nodeIdMap[translatedSource] && nodeIdMap[translatedTarget]) {
+                  console.log(`Usando IDs traducidos para arista: ${translatedSource} -> ${translatedTarget}`);
                   return {
-                    id: edge.id || `edge-${index}-${edge.source_id}-${edge.target_id}`,
-                    source: edge.source_id,
-                    target: edge.target_id,
-                    type: edge.type || 'default',
+                    id: edge.id || `edge-${index}-${translatedSource}-${translatedTarget}`,
+                    source: translatedSource,
+                    target: translatedTarget,
+                    type: 'default', // Usar siempre 'default' para compatibilidad con EliteEdge
                     animated: edge.animated || false,
-                    sourceHandle: edge.sourceHandle,
+                    sourceHandle: sourceHandle,
+                    targetHandle: targetHandle,
+                    label: edge.label,
+                    style: edge.style || { stroke: '#00e0ff', strokeWidth: 2 },
+                    // Guardar los IDs originales para referencia
+                    sourceOriginal: sourceId,
+                    targetOriginal: targetId
+                  };
+                }
+                
+                // Verificar si tenemos IDs directos en el mapa de nodos
+                if (nodeIdMap[sourceId] && nodeIdMap[targetId]) {
+                  console.log(`Usando IDs directos para arista: ${sourceId} -> ${targetId}`);
+                  return {
+                    id: edge.id || `edge-${index}-${sourceId}-${targetId}`,
+                    source: sourceId,
+                    target: targetId,
+                    type: 'default', // Usar siempre 'default' para compatibilidad con EliteEdge
+                    animated: edge.animated || false,
+                    sourceHandle: sourceHandle,
+                    targetHandle: targetHandle,
                     label: edge.label,
                     style: edge.style || { stroke: '#00e0ff', strokeWidth: 2 },
                   };
                 }
-                
                 // Verificar si tenemos IDs directos en source y target
-                if (edge.source && edge.target && nodeIdMap[edge.source] && nodeIdMap[edge.target]) {
-                  console.log(`Usando IDs directos para arista: ${edge.source} -> ${edge.target}`);
-                  return {
-                    id: edge.id || `edge-${index}-${edge.source}-${edge.target}`,
-                    source: edge.source,
-                    target: edge.target,
-                    type: edge.type || 'default',
-                    animated: edge.animated || false,
-                    sourceHandle: edge.sourceHandle,
-                    label: edge.label,
-                    style: edge.style || { stroke: '#00e0ff', strokeWidth: 2 },
-                  };
-                }
+                let directSource = edge.source;
+                let directTarget = edge.target;
                 
-                // Intentar buscar por node_id en los flujos
-                const sourceNodeByNodeId = flows.find(flow => flow.node_id === edge.source);
-                const targetNodeByNodeId = flows.find(flow => flow.node_id === edge.target);
-                
-                if (sourceNodeByNodeId && targetNodeByNodeId && nodeIdMap[sourceNodeByNodeId.node_id] && nodeIdMap[targetNodeByNodeId.node_id]) {
-                  console.log(`Encontrado por node_id: ${sourceNodeByNodeId.node_id} -> ${targetNodeByNodeId.node_id}`);
-                  return {
-                    id: edge.id || `edge-${index}-${sourceNodeByNodeId.node_id}-${targetNodeByNodeId.node_id}`,
-                    source: sourceNodeByNodeId.node_id,
-                    target: targetNodeByNodeId.node_id,
-                    type: edge.type || 'default',
-                    animated: edge.animated || false,
-                    sourceHandle: edge.sourceHandle,
-                    label: edge.label,
-                    style: edge.style || { stroke: '#00e0ff', strokeWidth: 2 },
-                  };
-                }
-
-                // Fallback al método anterior si no tenemos IDs originales
-                // Buscar por posición en el flujo
-                const sourcePosition = Object.keys(flowIdToPosition).find(
-                  (key) => flows[flowIdToPosition[key]].position === parseInt(edge.source, 10)
-                );
-                const targetPosition = Object.keys(flowIdToPosition).find(
-                  (key) => flows[flowIdToPosition[key]].position === parseInt(edge.target, 10)
-                );
-
-                // Intentar usar la posición para encontrar los nodos
-                let sourceNodeId = null;
-                let targetNodeId = null;
-                
-                if (sourcePosition !== undefined) {
-                  const sourceFlow = flows[flowIdToPosition[sourcePosition]];
-                  sourceNodeId = sourceFlow.node_id || `node-${sourcePosition}`;
-                }
-                
-                if (targetPosition !== undefined) {
-                  const targetFlow = flows[flowIdToPosition[targetPosition]];
-                  targetNodeId = targetFlow.node_id || `node-${targetPosition}`;
-                }
-
-                if (!sourceNodeId || !targetNodeId || !nodeIdMap[sourceNodeId] || !nodeIdMap[targetNodeId]) {
-                  console.warn(`No se pudo resolver la arista: ${edge.source} -> ${edge.target}`);
-                  return null;
-                }
-
-                // Calcular el sourceHandle para nodos de decisión
-                const sourceNode = newNodes.find((node) => node.id === sourceNodeId);
-                let computedSourceHandle = edge.sourceHandle || null;
-                if (sourceNode?.type === 'decision') {
-                  const outputs = sourceNode.data.outputs || [];
-                  const targetNode = newNodes.find((node) => node.id === targetNodeId);
-                  if (targetNode?.type === 'option') {
-                    const condition = targetNode.data.condition || '';
-                    const outputIndex = outputs.findIndex((output) => condition.includes(output));
-                    if (outputIndex >= 0) computedSourceHandle = `output-${outputIndex}`;
+                // Traducir IDs de nodos si es necesario
+                if (originalIdToNodeId[directSource]) {
+                  console.log(`Traduciendo source ${directSource} a ${originalIdToNodeId[directSource]}`);
+                  directSource = originalIdToNodeId[directSource];
+                  edge.source = directSource;
+                } else {
+                  // Intentar con el índice numérico (0, 1, 2...)
+                  const numericSource = String(parseInt(directSource));
+                  if (numericSource !== 'NaN' && originalIdToNodeId[numericSource]) {
+                    console.log(`Traduciendo source numérico ${numericSource} a ${originalIdToNodeId[numericSource]}`);
+                    directSource = originalIdToNodeId[numericSource];
+                    edge.source = directSource;
                   }
                 }
+                
+                if (originalIdToNodeId[directTarget]) {
+                  console.log(`Traduciendo target ${directTarget} a ${originalIdToNodeId[directTarget]}`);
+                  directTarget = originalIdToNodeId[directTarget];
+                  edge.target = directTarget;
+                } else {
+                  // Intentar con el índice numérico (0, 1, 2...)
+                  const numericTarget = String(parseInt(directTarget));
+                  if (numericTarget !== 'NaN' && originalIdToNodeId[numericTarget]) {
+                    console.log(`Traduciendo target numérico ${numericTarget} a ${originalIdToNodeId[numericTarget]}`);
+                    directTarget = originalIdToNodeId[numericTarget];
+                    edge.target = directTarget;
+                  }
+                }
+                
+                if (directSource && directTarget && nodeIdMap[directSource] && nodeIdMap[directTarget]) {
+                  console.log(`Usando IDs directos traducidos para arista: ${directSource} -> ${directTarget}`);
+                  return {
+                    id: edge.id || `edge-${index}-${directSource}-${directTarget}`,
+                    source: directSource,
+                    target: directTarget,
+                    type: 'default', // Usar siempre 'default' para compatibilidad con EliteEdge
+                    animated: edge.animated || false,
+                    sourceHandle: sourceHandle,
+                    targetHandle: targetHandle,
+                    label: edge.label,
+                    style: edge.style || { stroke: '#00e0ff', strokeWidth: 2 },
+                  };
+                }
 
-                console.log(`Creando arista por posición: ${sourceNodeId} -> ${targetNodeId}`);
-                return {
-                  id: edge.id || `edge-${index}-${sourceNodeId}-${targetNodeId}`,
-                  source: sourceNodeId,
-                  target: targetNodeId,
-                  type: edge.type || 'default',
-                  animated: edge.animated || false,
-                  sourceHandle: computedSourceHandle,
-                  label: edge.label,
-                  style: edge.style || { stroke: '#00e0ff', strokeWidth: 2 },
-                };
+                // Fallback final: usar los primeros dos nodos disponibles como último recurso
+                // Esto es mejor que no tener aristas en absoluto
+                if (newNodes.length >= 2) {
+                  console.warn(`Fallback de emergencia: creando arista entre los primeros dos nodos disponibles`);
+                  const fallbackSource = newNodes[0].id;
+                  const fallbackTarget = newNodes[1].id;
+                  
+                  // Guardar los IDs originales para referencia futura
+                  console.log(`Creando arista de fallback: ${fallbackSource} -> ${fallbackTarget}`);
+                  return {
+                    id: edge.id || `edge-fallback-${index}`,
+                    source: fallbackSource,
+                    target: fallbackTarget,
+                    type: 'default',
+                    animated: edge.animated || false,
+                    sourceHandle: 'default',
+                    targetHandle: null,
+                    label: edge.label || 'Conexión de fallback',
+                    style: edge.style || { stroke: '#00e0ff', strokeWidth: 2 },
+                    // Marcar como fallback para identificación futura
+                    isFallback: true,
+                    // Guardar los IDs originales para referencia
+                    sourceOriginal: sourceId,
+                    targetOriginal: targetId
+                  };
+                }
+                
+                // Si no hay suficientes nodos, no podemos crear una arista
+                console.warn(`No se pudo crear una arista de fallback: no hay suficientes nodos`);
+                return null;
               } catch (error) {
                 console.error(`Error procesando arista ${index}:`, error);
                 return null;
@@ -742,17 +981,44 @@ const validEdges = newEdges.filter((edge) => {
   return isValid;
 });
 
+          // Establecer los nodos y aristas validados
           setNodes(newNodes);
           setEdges(validEdges);
+          
+          // Actualizar el contexto con los datos del Plubot
           updatePlubotData({
             id: plubot.id,
             name: plubot.name || 'Sin nombre',
             tone: plubot.tone || 'neutral',
             color: plubot.color || '#D1D5DB',
             flowData: { nodes: newNodes, edges: validEdges },
+            flowVersions: plubot.flowVersions || [],
           });
-          setState((prev) => ({ ...prev, byteMessage: '✅ Flujo guardado correctamente.', isDataLoaded: true }));
+          
+          setState((prev) => ({
+            ...prev,
+            isDataLoaded: true,
+            byteMessage: `✅ Datos cargados: ${newNodes.length} nodos y ${validEdges.length} aristas.`,
+          }));
+          
           lastSignificantChange.current = { nodes: [...newNodes], edges: [...validEdges] };
+          
+          // Guardar una copia de las aristas en localStorage como respaldo
+          try {
+            const edgesBackup = JSON.stringify(validEdges);
+            localStorage.setItem(`plubot-edges-${plubotIdFromUrl}`, edgesBackup);
+            console.log('Aristas guardadas en localStorage como respaldo al cargar:', validEdges.length);
+          } catch (error) {
+            console.error('Error al guardar aristas en localStorage al cargar:', error);
+          }
+          
+          // Forzar la actualización de las aristas después de cargar
+          setTimeout(() => {
+            forceEdgesUpdate(validEdges, setEdges);
+            
+            // Emitir un evento para que todos los componentes sepan que deben actualizar las aristas
+            document.dispatchEvent(new CustomEvent('elite-edge-update-required', { detail: { allEdges: true } }));
+          }, 500);
         } else {
           setNodes(initialNodes);
           setEdges(initialEdges);

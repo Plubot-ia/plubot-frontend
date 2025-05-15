@@ -58,13 +58,20 @@ const useFlowNodes = (initialNodes, setNodes, addToHistory) => {
       if (positionChanges.length > 0) {
         const movedNodes = positionChanges.map(change => {
           const node = nodesMap.get(change.id);
-          return { id: change.id, position: { ...node.position } };
-        });
+          // Verificar que el nodo y su posición existan
+          if (node && node.position) {
+            return { id: change.id, position: { ...node.position } };
+          }
+          return null;
+        }).filter(Boolean); // Filtrar nodos nulos
         
-        addToHistory({
-          type: 'move',
-          nodes: movedNodes,
-        });
+        // Solo agregar al historial si hay nodos válidos
+        if (movedNodes.length > 0) {
+          addToHistory({
+            type: 'move',
+            nodes: movedNodes,
+          });
+        }
       }
       
       return newNodes;

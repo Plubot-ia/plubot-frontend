@@ -64,10 +64,18 @@ export const NODE_DEFAULT_SIZES = {
 };
 
 export const EDGE_COLORS = {
-    default: '#00e0ff',
-    success: '#00ff9d',
-    warning: '#ffb700',
-    danger: '#ff2e5b',
+    default: '#ff00ff', // Magenta neón intenso para las aristas
+    success: '#28a745',
+    warning: '#ffc107',
+    danger: '#dc3545',
+    info: '#17a2b8',
+    // Colores optimizados para modo ultra rendimiento
+    ultra: {
+        default: '#8a2be2', // Versión más suave del magenta para rendimiento
+        success: '#00cc7a',
+        warning: '#cc9400',
+        danger: '#cc2449'
+    }
 };
 
 export const NODE_LABELS = {
