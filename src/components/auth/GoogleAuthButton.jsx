@@ -21,21 +21,33 @@ const GoogleAuthButton = ({ text = 'Continuar con Google', className = '', onSuc
       const isDevelopment = import.meta.env.DEV || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
       console.log('Entorno detectado:', isDevelopment ? 'Desarrollo' : 'Producción');
       
-      // Opción para forzar un modo específico (para pruebas)
-      // Cambiar a false para probar la autenticación real en desarrollo
-      // Cambiar a true para probar la simulación en producción
-      const forceSimulation = null; // null = autodetectar, true = forzar simulación, false = forzar real
+      // Configuración para determinar el modo de autenticación
+      // En desarrollo: usar simulación
+      // En producción: usar autenticación real con Google
+      const forceSimulation = null; // null = autodetectar (simulación en desarrollo, real en producción)
       
       // Determinar si usamos autenticación simulada o real
+      // En desarrollo: simulación
+      // En producción: autenticación real con Google
       const useSimulatedAuth = forceSimulation !== null ? forceSimulation : isDevelopment;
+      
+      console.log('Modo de autenticación:', useSimulatedAuth ? 'Simulación' : 'Real con Google');
       
       // Modo de desarrollo: simular autenticación con Google
       if (useSimulatedAuth) {
-        console.log('Simulando autenticación con Google en modo desarrollo');
+        // Mensaje diferente según el entorno
+        const entorno = isDevelopment ? 'desarrollo' : 'producción';
+        console.log(`Simulando autenticación con Google en modo ${entorno}`);
         
         // Mostrar un indicador de carga para simular el proceso
         setStatus && setStatus('loading');
-        setMessage && setMessage('Simulando autenticación con Google...');
+        
+        // Mensaje más informativo en producción
+        if (!isDevelopment) {
+          setMessage && setMessage('Simulando autenticación con Google (modo temporal)...');
+        } else {
+          setMessage && setMessage('Simulando autenticación con Google...');
+        }
         
         // Crear un usuario de prueba
         const mockUser = {
@@ -67,9 +79,15 @@ const GoogleAuthButton = ({ text = 'Continuar con Google', className = '', onSuc
           
           // Mostrar mensaje de éxito
           setStatus && setStatus('success');
-          setMessage && setMessage(`¡Bienvenido/a, ${mockUser.name}! Redirigiendo...`);
           
-          // Redirigir a la página principal
+          // Mensaje diferente según el entorno
+          if (!isDevelopment) {
+            setMessage && setMessage(`¡Hola ${mockUser.name}! Autenticación simulada exitosa (modo temporal).`);
+          } else {
+            setMessage && setMessage(`¡Hola ${mockUser.name}! Autenticación exitosa.`);
+          }
+          
+          // Redirigir a la página principal después de un tiempo
           setTimeout(() => navigate('/pluniverse'), 1500);
         }, 1000);
         

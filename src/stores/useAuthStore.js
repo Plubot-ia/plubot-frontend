@@ -498,6 +498,7 @@ const useAuthStore = create(
         try {
           // Hacer la solicitud real al backend para obtener la URL de autenticación
           console.log('Solicitando URL de autenticación de Google al backend');
+          // La ruta correcta es /api/auth/google/login (el blueprint google_auth_bp está registrado con prefijo /auth)
           const response = await instance.get('/api/auth/google/login');
           console.log('Respuesta del backend:', response.data);
           
