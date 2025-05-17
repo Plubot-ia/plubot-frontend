@@ -97,7 +97,7 @@ const AboutPlubot = () => {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
-            <Link to="/plubot/about-chat-byte" className="chat-byte-btn">
+            <Link to="/byte-embajador" className="chat-byte-btn">
               <span className="btn-text">Chatea con Byte</span>
               <span className="btn-icon">→</span>
             </Link>

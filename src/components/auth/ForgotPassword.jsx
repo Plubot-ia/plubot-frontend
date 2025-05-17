@@ -66,7 +66,7 @@ const ForgotPassword = () => {
   };
 
   const handleNavigateToLogin = () => {
-    navigate('/auth/login');
+    navigate('/login');
     window.scrollTo(0, 0);
   };
 

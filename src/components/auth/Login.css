@@ -650,4 +650,44 @@
   animation: login-scanlines 8s linear infinite;
 }
 
-/* Resto del CSS sin cambios */
+/* Estilos para el separador */
+.login-separator {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin: 1.5rem 0;
+}
+
+.login-separator::before,
+.login-separator::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid rgba(0, 224, 255, 0.3);
+}
+
+.login-separator::before {
+  margin-right: 0.5rem;
+}
+
+.login-separator::after {
+  margin-left: 0.5rem;
+}
+
+.login-separator-text {
+  color: rgba(0, 224, 255, 0.8);
+  padding: 0 0.5rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+/* Ajustes para el botón de Google */
+.login-login-container .google-auth-button {
+  margin-bottom: 1rem;
+  transition: all 0.3s ease;
+  width: 100%;
+}
+
+.login-login-container .google-auth-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 25px rgba(0, 224, 255, 0.5);
+}

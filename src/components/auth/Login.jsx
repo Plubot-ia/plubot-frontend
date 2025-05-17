@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import './Login.css';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import useAuthStore from '@/stores/useAuthStore';
+import GoogleAuthButton from './GoogleAuthButton';
 
 const Login = () => {
   const [formData, setFormData] = useState({ email: '', password: '' });
@@ -90,7 +91,13 @@ const Login = () => {
     }
 
     try {
-      await login(formData.email, formData.password);
+      // Asegurarse de que los datos se envían correctamente estructurados
+      const email = formData.email.trim();
+      const password = formData.password;
+      
+      console.log('Intentando login con:', { email });
+      
+      await login(email, password);
       
       // Si llegamos aquí, el login fue exitoso
       showMessage('¡Inicio de sesión exitoso! Redirigiendo...', 'success');
@@ -118,12 +125,12 @@ const Login = () => {
   };
 
   const handleNavigateToRegister = () => {
-    navigate('/auth/register');
+    navigate('/register');
     window.scrollTo(0, 0);
   };
 
   const handleNavigateToForgotPassword = () => {
-    navigate('/auth/forgot');
+    navigate('/forgot-password');
     window.scrollTo(0, 0);
   };
 
@@ -246,6 +253,13 @@ const Login = () => {
             Entrar
           </motion.button>
         </form>
+        
+        <div className="login-separator">
+          <span className="login-separator-text">o</span>
+        </div>
+        
+        <GoogleAuthButton text="Iniciar sesión con Google" className="futuristic" />
+        
         <div className="login-form-footer">
           <p>
             ¿No tenés cuenta?{' '}

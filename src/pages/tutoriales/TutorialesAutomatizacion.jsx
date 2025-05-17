@@ -297,7 +297,7 @@ const TutorialesAutomatizacion = () => {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.9 }}
                 >
-                  <Link to="/plubot/create">
+                  <Link to="/welcome">
                     <motion.button
                       className="cyberpunk-button cta-button"
                       variants={buttonVariants}

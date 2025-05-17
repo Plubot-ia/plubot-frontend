@@ -213,12 +213,8 @@ const WelcomeSequence = () => {
       contentRef.current.style.opacity = '0';
       
       setTimeout(() => {
-        if (isAuthenticated) {
-          nextStep();
-          navigate('/plubot/create/factory');
-        } else {
-          navigate('/auth/login', { state: { from: '/plubot/create/factory' } });
-        }
+        nextStep();
+        navigate('/factory');
       }, 500);
     }
   };

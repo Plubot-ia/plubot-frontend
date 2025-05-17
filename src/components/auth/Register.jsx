@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import './Register.css';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import useAuthStore from '@/stores/useAuthStore';
+import GoogleAuthButton from './GoogleAuthButton';
 
 const Register = () => {
   const [name, setName] = useState('');
@@ -135,8 +136,8 @@ const Register = () => {
   }, []);
 
   const handleNavigateToLogin = () => {
-    console.log('Navigating to /auth/login');
-    navigate('/auth/login');
+    console.log('Navigating to /login');
+    navigate('/login');
     window.scrollTo(0, 0);
   };
 
@@ -274,6 +275,13 @@ const Register = () => {
             <span className="register-btn-glow"></span>
           </button>
         </form>
+        
+        <div className="register-separator">
+          <span className="register-separator-text">o</span>
+        </div>
+        
+        <GoogleAuthButton text="Registrarse con Google" className="futuristic" />
+        
         <div className="register-form-footer">
           <p>
             ¿Ya tienes una cuenta?{' '}

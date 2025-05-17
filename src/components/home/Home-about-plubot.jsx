@@ -17,7 +17,7 @@ const HomeAboutPlubot = () => {
           <p>
             Se conecta con WhatsApp, aprende lo que necesitás, y te libera de lo repetitivo. Porque el tiempo es tu recurso más valioso.
           </p>
-          <Link to="/plubot/about" className="plubot-hero-button secondary">
+          <Link to="/about-plubot" className="plubot-hero-button secondary">
             Descubrir más
           </Link>
         </div>

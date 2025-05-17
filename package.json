@@ -10,6 +10,7 @@
     "@fontsource/orbitron": "^5.2.5",
     "@fortawesome/fontawesome-free": "^6.7.2",
     "@mui/material": "^7.1.0",
+    "@react-oauth/google": "^0.12.2",
     "@tsparticles/react": "^3.0.0",
     "@tsparticles/slim": "^3.8.1",
     "@types/react-beautiful-dnd": "^13.1.8",

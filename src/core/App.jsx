@@ -56,6 +56,7 @@ import TrainingScreen from '../components/onboarding/screens/TrainingScreen.jsx'
 const EmailVerificationNotice = lazy(() => import('../components/auth/EmailVerificationNotice.jsx'));
 const PlubotEdit = lazy(() => import('../components/plubot-edit/PlubotEdit.jsx'));
 const PublicChat = lazy(() => import('../pages/public-chat/PublicChat.jsx'));
+const GoogleAuthCallback = lazy(() => import('../pages/auth/GoogleAuthCallback.jsx'));
 
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import React from 'react';
@@ -253,7 +254,7 @@ const AppWrapper = () => {
   const { pathname } = location;
   
   // Páginas de autenticación que no usan el Layout
-  const isAuthPage = ['/login', '/register', '/forgot-password', '/reset-password', '/change-password'].includes(pathname);
+  const isAuthPage = ['/login', '/register', '/forgot-password', '/reset-password', '/change-password', '/email-verification-notice'].includes(pathname);
   
   // Rutas donde queremos ocultar el encabezado y pie de página
   const hideHeaderFooter = pathname.includes('/plubot/edit/training/') || pathname.includes('/plubot/edit/training');
@@ -272,6 +273,14 @@ const AppWrapper = () => {
                   <Route path="/reset-password" element={<ResetPassword />} />
                   <Route path="/change-password" element={<ChangePassword />} />
                   <Route path="/email-verification-notice" element={<EmailVerificationNotice />} />
+                  <Route path="/auth/google/success" element={<GoogleAuthCallback />} />
+                  <Route path="/auth/google/callback" element={<GoogleAuthCallback />} />
+                  {/* Rutas alternativas para compatibilidad */}
+                  <Route path="/auth/login" element={<Navigate to="/login" replace />} />
+                  <Route path="/auth/register" element={<Navigate to="/register" replace />} />
+                  <Route path="/auth/forgot" element={<Navigate to="/forgot-password" replace />} />
+                  <Route path="/auth/reset" element={<Navigate to="/reset-password" replace />} />
+                  <Route path="/auth/verify-email" element={<Navigate to="/email-verification-notice" replace />} />
                   <Route path="*" element={<Navigate to="/login" replace />} />
                 </Routes>
               ) : (
@@ -303,13 +312,12 @@ const AppWrapper = () => {
                     <Route path="/faq" element={<FAQ />} />
                     <Route path="/tu-opinion" element={<TuOpinion />} />
                     <Route path="/public-chat" element={<PublicChat />} />
+                    <Route path="/plubot/about" element={<Navigate to="/about-plubot" replace />} />
+                    <Route path="/plubot/about-chat-byte" element={<Navigate to="/byte-embajador" replace />} />
+                    <Route path="/plubot/create" element={<Navigate to="/welcome" replace />} />
                     
                     {/* Rutas protegidas */}
-                    <Route path="/pluniverse" element={
-                      <PrivateRoute>
-                        <PluniverseDashboard />
-                      </PrivateRoute>
-                    } />
+                    <Route path="/pluniverse" element={<PluniverseDashboard />} />
                     <Route path="/plubot-studio" element={
                       <PrivateRoute>
                         <PlubotStudio />
@@ -320,16 +328,14 @@ const AppWrapper = () => {
                         <Academy />
                       </PrivateRoute>
                     } />
-                    <Route path="/marketplace" element={
-                      <PrivateRoute>
-                        <Marketplace />
-                      </PrivateRoute>
-                    } />
+                    <Route path="/marketplace" element={<Marketplace />} />
+                    <Route path="/pluniverse/marketplace" element={<Navigate to="/marketplace" replace />} />
                     <Route path="/coliseum" element={
                       <PrivateRoute>
                         <Coliseum />
                       </PrivateRoute>
                     } />
+                    <Route path="/pluniverse/coliseum" element={<Navigate to="/coliseum" replace />} />
                     <Route path="/tower" element={
                       <PrivateRoute>
                         <Tower />
@@ -340,6 +346,7 @@ const AppWrapper = () => {
                         <Sanctuary />
                       </PrivateRoute>
                     } />
+                    <Route path="/pluniverse/sanctuary" element={<Navigate to="/sanctuary" replace />} />
                     <Route path="/plubot/create" element={
                       <PrivateRoute>
                         <CreatePlubot />
@@ -360,26 +367,22 @@ const AppWrapper = () => {
                         <TrainingScreen />
                       </PrivateRoute>
                     } />
-                    <Route path="/welcome" element={
-                      <PrivateRoute>
-                        <WelcomeSequence />
-                      </PrivateRoute>
-                    } />
-                    <Route path="/factory" element={
-                      <PrivateRoute>
-                        <FactoryScreen />
-                      </PrivateRoute>
-                    } />
+                    <Route path="/welcome" element={<WelcomeSequence />} />
+                    <Route path="/factory" element={<FactoryScreen />} />
+                    <Route path="/plubot/create/welcome" element={<Navigate to="/welcome" replace />} />
+                    <Route path="/plubot/create/factory" element={<Navigate to="/factory" replace />} />
                     <Route path="/personalization" element={
                       <PrivateRoute>
                         <PersonalizationForm />
                       </PrivateRoute>
                     } />
+                    <Route path="/plubot/create/personalization" element={<Navigate to="/personalization" replace />} />
                     <Route path="/training" element={
                       <PrivateRoute>
                         <TrainingScreen />
                       </PrivateRoute>
                     } />
+                    <Route path="/plubot/edit/training" element={<Navigate to="/training" replace />} />
                     <Route path="/profile" element={
                       <PrivateRoute>
                         <Profile />

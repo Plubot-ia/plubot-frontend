@@ -505,7 +505,7 @@ const Seguridad = () => {
                   {renderDetailItems}
                   <SecurityRadar />
                   <div className="pt-6 pb-2 text-center">
-                    <Link to="/plubot/create">
+                    <Link to="/welcome">
                       <motion.button
                         className="cta-button"
                         variants={buttonVariants}

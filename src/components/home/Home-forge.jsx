@@ -19,7 +19,7 @@ const HomeForge = () => {
           <p>Enlaza con WhatsApp al instante.</p>
         </div>
       </div>
-      <Link to="/plubot/create" className="forge-cta">Forjar Ahora</Link>
+      <Link to="/welcome" className="forge-cta">Forjar Ahora</Link>
     </section>
   );
 };

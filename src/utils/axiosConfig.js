@@ -19,7 +19,7 @@ const instance = axios.create({
     'Content-Type': 'application/json',
     'Accept': 'application/json'
   },
-  timeout: 10000, // 10 segundos de timeout
+  timeout: 20000, // 20 segundos de timeout (aumentado para evitar timeouts frecuentes)
   validateStatus: function (status) {
     return status >= 200 && status < 500; // Aceptar códigos de estado 2xx y 4xx
   }

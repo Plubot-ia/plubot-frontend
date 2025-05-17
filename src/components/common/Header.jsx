@@ -158,11 +158,11 @@ const Header = () => {
           </li>
           <li>
             <NavLink
-              to="/plubot/create"
+              to="/welcome"
               className="tight-text"
               role="link"
               tabIndex={0}
-              onClick={(e) => handleLinkInteraction(e, '/plubot/create')}
+              onClick={(e) => handleLinkInteraction(e, '/welcome')}
             >
               <Bot size={18} className="nav-icon" /> Crea tu Plubot
             </NavLink>
@@ -199,10 +199,10 @@ const Header = () => {
           </li>
           <li>
             <NavLink
-              to="/pluniverse/coliseum"
+              to="/coliseum"
               role="link"
               tabIndex={0}
-              onClick={(e) => handleLinkInteraction(e, '/pluniverse/coliseum')}
+              onClick={(e) => handleLinkInteraction(e, '/coliseum')}
             >
               <Users size={18} className="nav-icon" /> Comunidad
             </NavLink>

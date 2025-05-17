@@ -32,8 +32,21 @@ const useAuthStore = create(
         set({ loading: true, error: null });
         
         try {
-          const loginData = { email, password };
-          const loginResponse = await instance.post('/api/auth/login', loginData);
+          // Crear FormData para enviar los datos como el backend espera
+          const formData = new FormData();
+          formData.append('email', email.trim());
+          formData.append('password', password);
+          
+          console.log('Enviando datos de login:', { email: email.trim() });
+          
+          // Aumentar el timeout para esta solicitud específica y configurar para FormData
+          const loginResponse = await instance.post('/api/auth/login', formData, {
+            timeout: 30000, // 30 segundos para dar más tiempo en producción
+            headers: {
+              'Content-Type': 'multipart/form-data'
+            }
+          });
+          
           const data = loginResponse.data;
           
           if (data?.status === 'success') {
@@ -44,8 +57,10 @@ const useAuthStore = create(
             const profileResponse = await instance.get('/api/auth/profile', {
               headers: {
                 'Authorization': `Bearer ${data.access_token}`
-              }
+              },
+              timeout: 20000 // 20 segundos para esta solicitud
             });
+            
             const profile = profileResponse.data;
             
             if (profile?.user) {
@@ -66,13 +81,24 @@ const useAuthStore = create(
           throw new Error(data?.message || 'Error al iniciar sesión');
           
         } catch (error) {
-          const errorMessage = error.response?.data?.message || error.message || 'Error de conexión';
+          console.error('Error detallado en login:', error);
+          let errorMessage = 'Error de conexión';
+          
+          if (error.response?.data?.message) {
+            errorMessage = error.response.data.message;
+          } else if (error.message) {
+            errorMessage = error.message;
+          } else if (error.code === 'ECONNABORTED') {
+            errorMessage = 'La conexión ha tardado demasiado. Por favor, inténtalo de nuevo.';
+          }
+          
           set({ 
             user: null, 
             isAuthenticated: false, 
             loading: false, 
             error: errorMessage 
           });
+          
           throw new Error(errorMessage);
         }
       },
@@ -82,8 +108,19 @@ const useAuthStore = create(
         set({ loading: true, error: null });
         
         try {
-          const registerData = { name, email, password };
-          const response = await instance.post('/api/auth/register', registerData);
+          // Crear FormData para enviar los datos como el backend espera
+          const formData = new FormData();
+          formData.append('name', name);
+          formData.append('email', email);
+          formData.append('password', password);
+          
+          // Configuración especial para enviar FormData
+          const response = await instance.post('/api/auth/register', formData, {
+            headers: {
+              'Content-Type': 'multipart/form-data'
+            }
+          });
+          
           const data = response.data;
           
           if (data?.status === 'success') {
@@ -336,15 +373,50 @@ const useAuthStore = create(
         }
       },
       
+      // Solicitar restablecimiento de contraseña
+      forgotPassword: async (email) => {
+        set({ loading: true, error: null });
+        
+        try {
+          // Crear FormData para enviar los datos como el backend espera
+          const formData = new FormData();
+          formData.append('email', email.trim());
+          
+          const response = await instance.post('/api/auth/forgot_password', formData, {
+            headers: {
+              'Content-Type': 'multipart/form-data'
+            }
+          });
+          
+          if (response.data?.status === 'success') {
+            set({ loading: false });
+            return { success: true };
+          }
+          
+          throw new Error(response.data?.message || 'Error al enviar el correo de recuperación');
+          
+        } catch (error) {
+          const errorMessage = error.response?.data?.message || error.message || 'Error de conexión';
+          set({ loading: false, error: errorMessage });
+          throw new Error(errorMessage);
+        }
+      },
+      
       // Restablecer contraseña
       resetPassword: async (token, newPassword) => {
         set({ loading: true, error: null });
         
         try {
-          const response = await instance.post('/api/auth/reset-password', {
-            token,
-            password: newPassword,
-            password_confirmation: newPassword
+          // Crear FormData para enviar los datos como el backend espera
+          const formData = new FormData();
+          formData.append('token', token);
+          formData.append('password', newPassword);
+          formData.append('password_confirmation', newPassword);
+          
+          const response = await instance.post('/api/auth/reset_password', formData, {
+            headers: {
+              'Content-Type': 'multipart/form-data'
+            }
           });
           
           if (response.data?.status === 'success') {
@@ -361,8 +433,138 @@ const useAuthStore = create(
         }
       },
       
+      // Verificar email con token
+      verifyEmail: async (token) => {
+        set({ loading: true, error: null });
+        
+        try {
+          // Crear FormData para enviar los datos como el backend espera
+          const formData = new FormData();
+          formData.append('token', token);
+          
+          const response = await instance.post('/api/auth/verify_email', formData, {
+            headers: {
+              'Content-Type': 'multipart/form-data'
+            }
+          });
+          
+          if (response.data?.status === 'success') {
+            set({ loading: false });
+            return { success: true };
+          }
+          
+          throw new Error(response.data?.message || 'Error al verificar el correo electrónico');
+          
+        } catch (error) {
+          const errorMessage = error.response?.data?.message || error.message || 'Error de conexión';
+          set({ loading: false, error: errorMessage });
+          throw new Error(errorMessage);
+        }
+      },
+      
+      // Reenviar email de verificación
+      resendVerificationEmail: async (email) => {
+        set({ loading: true, error: null });
+        
+        try {
+          // Crear FormData para enviar los datos como el backend espera
+          const formData = new FormData();
+          formData.append('email', email.trim());
+          
+          const response = await instance.post('/api/auth/resend_verification', formData, {
+            headers: {
+              'Content-Type': 'multipart/form-data'
+            }
+          });
+          
+          if (response.data?.status === 'success') {
+            set({ loading: false });
+            return { success: true };
+          }
+          
+          throw new Error(response.data?.message || 'Error al reenviar el correo de verificación');
+          
+        } catch (error) {
+          const errorMessage = error.response?.data?.message || error.message || 'Error de conexión';
+          set({ loading: false, error: errorMessage });
+          throw new Error(errorMessage);
+        }
+      },
+      
+      // Autenticación con Google
+      getGoogleAuthUrl: async () => {
+        set({ loading: true, error: null });
+        
+        try {
+          // Hacer la solicitud real al backend para obtener la URL de autenticación
+          console.log('Solicitando URL de autenticación de Google al backend');
+          const response = await instance.get('/api/auth/google/login');
+          console.log('Respuesta del backend:', response.data);
+          
+          if (response.data?.status === 'success' && response.data?.authUrl) {
+            set({ loading: false });
+            return { success: true, authUrl: response.data.authUrl };
+          }
+          
+          throw new Error(response.data?.message || 'Error al obtener URL de autenticación de Google');
+        } catch (error) {
+          set({
+            loading: false,
+            error: error.response?.data?.message || error.message || 'Error al obtener URL de autenticación de Google'
+          });
+          return { success: false, error: error.message };
+        }
+      },
+      
+      // Procesar token de autenticación de Google
+      processGoogleAuth: async (token) => {
+        set({ loading: true, error: null });
+        
+        try {
+          console.log('Procesando token de autenticación de Google:', token);
+          
+          // Enviar el token al backend para verificarlo
+          const response = await instance.post('/api/auth/google/success', { token });
+          console.log('Respuesta del backend al procesar token:', response.data);
+          
+          if (response.data?.status === 'success') {
+            // Guardar el token
+            localStorage.setItem('access_token', response.data.access_token);
+            
+            // Obtener el perfil del usuario
+            const profileResponse = await instance.get('/api/auth/profile', {
+              headers: {
+                'Authorization': `Bearer ${response.data.access_token}`
+              }
+            });
+            
+            if (profileResponse.data?.user) {
+              set({
+                user: profileResponse.data.user,
+                isAuthenticated: true,
+                loading: false,
+                error: null
+              });
+              
+              return { success: true, user: profileResponse.data.user };
+            }
+          }
+          
+          throw new Error(response.data?.message || 'Error al procesar autenticación con Google');
+          
+        } catch (error) {
+          const errorMessage = error.response?.data?.message || error.message || 'Error de conexión';
+          set({ loading: false, error: errorMessage });
+          throw new Error(errorMessage);
+        }
+      },
+      
       // Limpiar errores
       clearError: () => set({ error: null }),
+      
+      // Funciones para establecer el estado directamente (útil para pruebas y desarrollo)
+      setUser: (user) => set({ user }),
+      setIsAuthenticated: (isAuthenticated) => set({ isAuthenticated }),
       
       // Cache para perfiles
       _profileCache: {

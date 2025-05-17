@@ -206,7 +206,7 @@ const HomeHero = () => {
             </span>
           </p>
         </div>
-        <Link to="/plubot/create" className="hero-button">
+        <Link to="/welcome" className="hero-button">
           Empieza gratis
         </Link>
       </div>

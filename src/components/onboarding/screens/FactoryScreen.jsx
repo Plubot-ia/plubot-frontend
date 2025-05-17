@@ -42,7 +42,7 @@ const FactoryScreen = () => {
 
   const handleNext = () => {
     nextStep();
-    navigate('/plubot/create/personalization');
+    navigate('/personalization');
   };
 
   const particlesInit = async (engine) => {

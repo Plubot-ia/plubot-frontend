@@ -390,9 +390,8 @@ const PersonalizationForm = () => {
                 plubotId,
                 contextData: plubotData
               });
-              // Usar la misma ruta que se usa al editar un plubot existente para asegurar
-              // que la interfaz se renderice correctamente en ambos casos
-              navigate(`/plubot/edit/training?plubotId=${plubotId}`);
+              // Usar una ruta consistente para el flujo de creación
+              navigate(`/training?plubotId=${plubotId}`);
             }, 300);
           } else {
             console.error('Error en la respuesta del backend:', response);
