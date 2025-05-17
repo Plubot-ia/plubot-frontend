@@ -13,6 +13,9 @@ import {
   getNodeInitialData
 } from '@/utils/nodeConfig';
 import { powers as powerNodesDataList } from '@/data/powers.js';
+// Importar los stores de Zustand
+import useFlowStore from '@/stores/useFlowStore';
+import useTrainingStore from '@/stores/useTrainingStore';
 
 const getNodeIcon = (iconIdentifier) => {
   if (typeof iconIdentifier === 'object' && iconIdentifier !== null && typeof iconIdentifier.type === 'function') { 
@@ -70,7 +73,12 @@ advancedCategories.forEach(category => {
   });
 });
 
-const NodePalette = ({ setNodes, setByteMessage }) => {
+const NodePalette = () => {
+  // Obtener funciones del store de Flow
+  const addNode = useFlowStore(state => state.addNode);
+  
+  // Obtener funciones del store de Training
+  const setByteMessage = useTrainingStore(state => state.setByteMessage);
   const [isPaletteExpanded, setIsPaletteExpanded] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [favoriteNodes, setFavoriteNodes] = useState(() => {
@@ -89,6 +97,13 @@ const NodePalette = ({ setNodes, setByteMessage }) => {
   }, [favoriteNodes]);
 
   const onDragStart = (event, nodeType, nodeLabel, category, powerItemData = null) => {
+    // Prevenir comportamiento por defecto y asegurar que el evento se propague correctamente
+    event.preventDefault();
+    event.stopPropagation();
+    
+    console.log(`[NodePalette] Iniciando drag para nodo: ${nodeLabel} (${nodeType})`);
+    
+    // Crear objeto con la información del nodo
     const nodeInfo = {
       nodeType,
       label: nodeLabel,
@@ -101,8 +116,55 @@ const NodePalette = ({ setNodes, setByteMessage }) => {
       nodeInfo,
     };
 
-    event.dataTransfer.setData('application/reactflow', JSON.stringify(dragData));
-    event.dataTransfer.effectAllowed = 'move';
+    try {
+      // Serializar los datos a JSON
+      const jsonData = JSON.stringify(dragData);
+      console.log('[NodePalette] Datos para transferencia:', jsonData);
+      
+      // Establecer los datos en el dataTransfer en múltiples formatos para mayor compatibilidad
+      // Primero como application/json para mayor compatibilidad
+      event.dataTransfer.setData('application/json', jsonData);
+      // Luego como application/reactflow para compatibilidad con ReactFlow
+      event.dataTransfer.setData('application/reactflow', jsonData);
+      // Finalmente como texto plano para máxima compatibilidad
+      event.dataTransfer.setData('text/plain', jsonData);
+      
+      // Configurar el efecto de arrastre
+      event.dataTransfer.effectAllowed = 'copy';
+      
+      // Crear una imagen de arrastre personalizada para mejor feedback visual
+      const dragPreview = document.createElement('div');
+      dragPreview.className = 'node-drag-preview';
+      dragPreview.textContent = nodeLabel;
+      dragPreview.style.position = 'absolute';
+      dragPreview.style.top = '-1000px';
+      dragPreview.style.backgroundColor = 'rgba(0, 224, 255, 0.2)';
+      dragPreview.style.border = '1px solid rgba(0, 224, 255, 0.6)';
+      dragPreview.style.borderRadius = '8px';
+      dragPreview.style.padding = '8px 12px';
+      dragPreview.style.color = '#e0f7ff';
+      dragPreview.style.zIndex = '9999';
+      document.body.appendChild(dragPreview);
+      
+      // Configurar la imagen de arrastre
+      try {
+        event.dataTransfer.setDragImage(dragPreview, 25, 25);
+      } catch (e) {
+        console.warn('[NodePalette] Error al configurar imagen de arrastre:', e);
+      }
+      
+      // Eliminar el elemento temporal después de un breve retraso
+      setTimeout(() => {
+        if (dragPreview.parentNode) {
+          document.body.removeChild(dragPreview);
+        }
+      }, 100);
+      
+      // Mostrar mensaje de ayuda
+      setByteMessage('Arrastra el nodo al editor');
+    } catch (error) {
+      console.error('[NodePalette] Error al iniciar drag:', error);
+    }
 
     // --- Lógica de setDragImage (restaurada y mejorada) ---
     if (event.currentTarget instanceof HTMLElement) {

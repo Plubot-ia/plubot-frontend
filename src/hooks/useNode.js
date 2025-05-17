@@ -5,7 +5,7 @@ import { useNodeHistory } from '@/hooks/useNodeHistory';
 import { usePermissions } from '@/hooks/usePermissions';
 import PropTypes from 'prop-types';
 
-const useNode = ({ id, data = {}, setNodes, isConnectable = true, minWidth = 120, minHeight = 80 }) => {
+const useNode = ({ id, data = {}, onNodesChange, isConnectable = true, minWidth = 120, minHeight = 80 }) => {
   const [isResizing, setIsResizing] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(data.isCollapsed || false);
   const [isEditing, setIsEditing] = useState(false);
@@ -42,13 +42,15 @@ const useNode = ({ id, data = {}, setNodes, isConnectable = true, minWidth = 120
         const { width, height } = entries[0].contentRect;
         if (width < minWidth || height < minHeight) {
           setTimeout(() => {
-            setFlowNodes((nds) =>
-              nds.map((node) =>
-                node.id === id
-                  ? { ...node, width: Math.max(width, minWidth), height: Math.max(height, minHeight) }
-                  : node
-              )
-            );
+            // Usar onNodesChange para actualizar el nodo
+            onNodesChange([{
+              type: 'change',
+              item: {
+                id: id,
+                width: Math.max(width, minWidth),
+                height: Math.max(height, minHeight)
+              }
+            }]);
           }, 0);
         }
       });
@@ -57,21 +59,20 @@ const useNode = ({ id, data = {}, setNodes, isConnectable = true, minWidth = 120
     return () => {
       resizeObserver.current?.disconnect();
     };
-  }, [id, minWidth, minHeight, setFlowNodes]);
+  }, [id, minWidth, minHeight, onNodesChange]);
 
   useEffect(() => {
     const handleMouseMove = (e) => {
       if (!isResizing || !nodeRef.current) return;
-      setNodes((nds) =>
-        nds.map((node) => {
-          if (node.id === id) {
-            const newWidth = Math.max(minWidth, (node.width || initialWidth) + e.movementX);
-            const newHeight = Math.max(minHeight, (node.height || initialHeight) + e.movementY);
-            return { ...node, width: newWidth, height: newHeight };
-          }
-          return node;
-        })
-      );
+      // Usar onNodesChange para actualizar el nodo
+      onNodesChange([{
+        type: 'change',
+        item: {
+          id: id,
+          width: Math.max(minWidth, (getNode(id)?.width || initialWidth) + e.movementX),
+          height: Math.max(minHeight, (getNode(id)?.height || initialHeight) + e.movementY)
+        }
+      }]);
     };
 
     const handleMouseUp = () => {
@@ -93,20 +94,23 @@ const useNode = ({ id, data = {}, setNodes, isConnectable = true, minWidth = 120
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('mouseup', handleMouseUp);
     };
-  }, [isResizing, id, setNodes, getNode, trackNodeEdit, minWidth, minHeight, initialWidth, initialHeight]);
+  }, [id, isResizing, minWidth, minHeight, onNodesChange, initialWidth, initialHeight, getNode, trackNodeEdit]);
 
   const toggleCollapse = useCallback(
     (e) => {
       e.stopPropagation();
       const newCollapsed = !isCollapsed;
       setIsCollapsed(newCollapsed);
-      setNodes((nds) =>
-        nds.map((node) =>
-          node.id === id ? { ...node, data: { ...node.data, isCollapsed: newCollapsed } } : node
-        )
-      );
+      // Usar onNodesChange para actualizar el nodo
+      onNodesChange([{
+        type: 'change',
+        item: {
+          id: id,
+          data: { ...getNode(id)?.data, isCollapsed: newCollapsed }
+        }
+      }]);
     },
-    [isCollapsed, id, setNodes]
+    [isCollapsed, id, onNodesChange, getNode]
   );
 
   const handleContextMenu = useCallback((e) => {
@@ -147,16 +151,14 @@ const useNode = ({ id, data = {}, setNodes, isConnectable = true, minWidth = 120
 
   const saveChanges = useCallback(
     (updateData, previousData, nodeType) => {
-      setNodes((nds) =>
-        nds.map((node) =>
-          node.id === id
-            ? {
-                ...node,
-                data: { ...node.data, ...updateData },
-              }
-            : node
-        )
-      );
+      // Usar onNodesChange para actualizar el nodo
+      onNodesChange([{
+        type: 'change',
+        item: {
+          id: id,
+          data: { ...getNode(id)?.data, ...updateData }
+        }
+      }]);
       // Llamar a trackNodeEdit y addToHistory directamente
       trackNodeEdit(id, nodeType, updateData);
       addToHistory(id, {
@@ -168,7 +170,7 @@ const useNode = ({ id, data = {}, setNodes, isConnectable = true, minWidth = 120
       });
       setIsEditing(false);
     },
-    [id, setNodes, trackNodeEdit, addToHistory, data.currentUser]
+    [id, onNodesChange, getNode, trackNodeEdit, addToHistory, data.currentUser]
   );
 
   const trackChanges = useCallback(

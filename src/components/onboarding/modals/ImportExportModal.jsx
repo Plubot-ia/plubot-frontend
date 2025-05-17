@@ -14,6 +14,7 @@ const ImportExportModal = ({
   setImportData,
   setExportMode,
   setByteMessage,
+  onClose, // Añadimos la prop onClose
 }) => {
   const exportFlow = () => {
     try {
@@ -127,7 +128,7 @@ const ImportExportModal = ({
       <div className="ts-modal-content">
         <div className="ts-modal-header">
           <h3>{importData ? 'Importar Flujo' : 'Exportar Flujo'}</h3>
-          <button onClick={() => setExportMode(false)} className="ts-close-button">
+          <button onClick={onClose} className="ts-close-button">
             ✕
           </button>
         </div>

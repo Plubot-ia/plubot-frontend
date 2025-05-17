@@ -46,44 +46,53 @@ const EliteEdge = ({
   targetPosition,
   style = {},
   markerEnd,
-  data,
-  selected,
+  data = {},
+  selected = false,
   label,
-  sourceHandle,
-  targetHandle
+  sourceHandle: propSourceHandle,
+  targetHandle: propTargetHandle,
+  className = '',
+  isUltraMode: propIsUltraMode = false,
+  ...props
 }) => {
-  // Asegurarse de que sourceHandle siempre tenga un valor válido
-  if (!sourceHandle) {
-    sourceHandle = 'default';
-    console.log(`EliteEdge: sourceHandle no definido para arista ${id}, usando 'default'`);
-  }
+  // Usar variables locales en lugar de modificar los parámetros readonly
+  const [effectiveSourceHandle, setEffectiveSourceHandle] = useState(propSourceHandle || 'default');
+  const [effectiveTargetHandle, setEffectiveTargetHandle] = useState(propTargetHandle || null);
   
-  // Verificar que source y target estén definidos
-  if (!source || !target) {
-    console.warn(`EliteEdge: Arista ${id} con source o target no definidos: source=${source}, target=${target}`);
-  }
-  
-  // Procesar sourceHandle si tiene formato JSON serializado
-  if (typeof sourceHandle === 'string' && sourceHandle.startsWith('|||{')) {
-    try {
-      // Extraer el JSON después del prefijo '|||'
-      const jsonStr = sourceHandle.substring(3);
-      const handleData = JSON.parse(jsonStr);
-      
-      console.log('EliteEdge: Procesando sourceHandle con formato JSON:', handleData);
-      
-      // Usar el sourceHandle interno
-      sourceHandle = handleData.sourceHandle || 'default';
-    } catch (error) {
-      console.error('EliteEdge: Error al procesar sourceHandle con formato JSON:', error);
-      sourceHandle = 'default';
+  // Procesar sourceHandle al montar el componente o cuando cambie
+  useEffect(() => {
+    let newSourceHandle = propSourceHandle || 'default';
+    
+    // Verificar que source y target estén definidos
+    if (!source || !target) {
+      // Evitar logs excesivos en producción
+      if (process.env.NODE_ENV === 'development') {
+        console.warn(`EliteEdge: Arista ${id} con source o target no definidos: source=${source}, target=${target}`);
+      }
+      return; // No continuar si faltan source o target
     }
-  }
-  
-  // Asegurarse de que targetHandle tenga un valor válido
-  if (!targetHandle) {
-    targetHandle = null; // null es válido para targetHandle
-  }
+    
+    // Procesar sourceHandle si tiene formato JSON serializado
+    if (typeof propSourceHandle === 'string' && propSourceHandle.startsWith('|||{')) {
+      try {
+        // Extraer el JSON después del prefijo '|||'
+        const jsonStr = propSourceHandle.substring(3);
+        const handleData = JSON.parse(jsonStr);
+        
+        // Usar el sourceHandle interno (sin log en producción)
+        newSourceHandle = handleData.sourceHandle || 'default';
+      } catch (error) {
+        // Solo mostrar errores en desarrollo
+        if (process.env.NODE_ENV === 'development') {
+          console.error('EliteEdge: Error al procesar sourceHandle con formato JSON');
+        }
+        newSourceHandle = 'default';
+      }
+    }
+    
+    setEffectiveSourceHandle(newSourceHandle);
+    setEffectiveTargetHandle(propTargetHandle || null);
+  }, [propSourceHandle, propTargetHandle, id, source, target]);
   // Estados para efectos interactivos y animaciones
   const [isHovered, setIsHovered] = useState(false);
   const [isClicked, setIsClicked] = useState(false);
@@ -105,7 +114,10 @@ const EliteEdge = ({
   
   // Detectar modo de rendimiento y contexto del dispositivo usando la variable global
   const isUltraPerformanceMode = useMemo(() => {
-    // Verificar en props.data (prioridad más alta)
+    // Verificar en propIsUltraMode (prioridad más alta)
+    if (propIsUltraMode) return true;
+    
+    // Verificar en props.data
     if (data?.isUltraPerformanceMode) return true;
     
     // Verificar la variable global (método principal)
@@ -162,6 +174,8 @@ const EliteEdge = ({
     targetX,
     targetY,
     targetPosition,
+    sourceHandle: effectiveSourceHandle,
+    targetHandle: effectiveTargetHandle,
     curvature: 0.25 + (distance / 1000), // Curvatura adaptativa según distancia
   });
   
@@ -226,7 +240,10 @@ const EliteEdge = ({
   // Animación de flujo de energía (solo en modo normal)
   useEffect(() => {
     // Verificar el modo de rendimiento al inicio y en cada cambio
-    console.log('[EliteEdge] Modo Ultra Rendimiento:', isUltraPerformanceMode ? 'Activado' : 'Desactivado');
+    if (process.env.NODE_ENV === 'development' && !window._loggedUltraMode) {
+      window._loggedUltraMode = true;
+      console.log('[EliteEdge] Modo Ultra Rendimiento:', isUltraPerformanceMode ? 'Activado' : 'Desactivado');
+    }
     
     // Detener completamente la animación en modo ultra rendimiento
     if (isUltraPerformanceMode) {
@@ -485,6 +502,15 @@ const EliteEdge = ({
     ...data
   };
   
+  // Combinar las clases CSS
+  const edgeClasses = [
+    'elite-edge',
+    selected ? 'selected' : '',
+    isHovered ? 'hovered' : '',
+    isUltraPerformanceMode ? 'ultra-mode' : 'normal-mode',
+    props.className || ''
+  ].filter(Boolean).join(' ');
+
   return (
     <>
       <defs>
@@ -508,7 +534,7 @@ const EliteEdge = ({
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
         onClick={handleClick}
-        className={`elite-edge ${selected ? 'selected' : ''} ${isHovered ? 'hovered' : ''} ${isUltraPerformanceMode ? 'ultra-mode' : 'normal-mode'}`}
+        className={edgeClasses}
         data-testid={`edge-${id}`}
         data-performance-mode={isUltraPerformanceMode ? 'ultra' : 'normal'}
       >

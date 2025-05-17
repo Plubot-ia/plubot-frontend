@@ -157,7 +157,8 @@ const Profile = () => {
       return;
     }
     console.log('[Profile] Navegando a editar flujos para plubotId:', plubotId);
-    navigate(`/plubot/edit/training?plubotId=${plubotId}`);
+    // Usar parámetro de ruta en lugar de parámetro de búsqueda
+    navigate(`/plubot/edit/training/${plubotId}`);
     setEditModalPlubot(null);
   };
 

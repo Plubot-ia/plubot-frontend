@@ -1,13 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { Zap, AlertTriangle } from 'lucide-react';
 import './PerformanceModeButton.css';
+import useFlowStore from '@/stores/useFlowStore';
 
 /**
  * Botón para activar/desactivar el modo Ultra Rendimiento
  * Este modo optimiza la visualización y el rendimiento para trabajar con cientos de nodos
  * eliminando efectos visuales, animaciones y simplificando estilos
  */
-const PerformanceModeButton = ({ isActive, onClick }) => {
+const PerformanceModeButton = () => {
+  // Obtener estado y funciones del store de Flow
+  const { isUltraMode, toggleUltraMode } = useFlowStore(state => ({
+    isUltraMode: state.isUltraMode,
+    toggleUltraMode: state.toggleUltraMode
+  }));
   const [showFeedback, setShowFeedback] = useState(false);
   const [hasError, setHasError] = useState(false);
   const [showTooltip, setShowTooltip] = useState(false);
@@ -19,10 +25,8 @@ const PerformanceModeButton = ({ isActive, onClick }) => {
       setShowFeedback(true);
       setHasError(false);
       
-      // Llamar a la función onClick proporcionada (que ya maneja la clase global)
-      if (typeof onClick === 'function') {
-        onClick();
-      }
+      // Llamar a la función toggleUltraMode del store
+      toggleUltraMode();
       
       // Ocultar el feedback después de un tiempo
       setTimeout(() => {
@@ -50,9 +54,9 @@ const PerformanceModeButton = ({ isActive, onClick }) => {
 
   return (
     <button
-      className={`performance-mode-button ${isActive ? 'active' : ''} ${showFeedback ? 'show-feedback' : ''} ${hasError ? 'has-error' : ''}`}
+      className={`performance-mode-button ${isUltraMode ? 'active' : ''} ${showFeedback ? 'show-feedback' : ''} ${hasError ? 'has-error' : ''}`}
       onClick={handleClick}
-      title={isActive ? 'Desactivar modo Ultra Rendimiento' : 'Activar modo Ultra Rendimiento'}
+      title={isUltraMode ? 'Desactivar modo Ultra Rendimiento' : 'Activar modo Ultra Rendimiento'}
     >
       <div className="button-icon">
         <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -61,7 +65,7 @@ const PerformanceModeButton = ({ isActive, onClick }) => {
       </div>
       <div className="feedback-indicator"></div>
       <div className="button-tooltip">
-        {isActive ? 'Desactivar modo Ultra Rendimiento' : 'Activar modo Ultra Rendimiento'}
+        {isUltraMode ? 'Desactivar modo Ultra Rendimiento' : 'Activar modo Ultra Rendimiento'}
       </div>
       {hasError && (
         <div className="performance-error-tooltip">

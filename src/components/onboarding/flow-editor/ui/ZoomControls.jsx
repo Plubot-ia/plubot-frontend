@@ -3,18 +3,31 @@ import { useReactFlow } from 'reactflow';
 import { FiZoomIn, FiZoomOut, FiMaximize, FiRotateCcw, FiRotateCw } from 'react-icons/fi';
 import { History } from 'lucide-react';
 import './ZoomControls.css';
+import useFlowStore from '@/stores/useFlowStore';
+import useTrainingStore from '@/stores/useTrainingStore';
 
 /**
  * Componente para controles de zoom, historial y versiones en el editor de flujos
- * @param {Object} props - Propiedades del componente
- * @param {Function} props.onUndo - Función para deshacer
- * @param {Function} props.onRedo - Función para rehacer
- * @param {boolean} props.canUndo - Si se puede deshacer
- * @param {boolean} props.canRedo - Si se puede rehacer
- * @param {Function} props.onToggleHistory - Función para mostrar/ocultar el historial de versiones
- * @param {boolean} props.historyActive - Si el panel de historial está activo
  */
-const ZoomControls = ({ onUndo, onRedo, canUndo, canRedo, onToggleHistory, historyActive }) => {
+const ZoomControls = () => {
+  // Obtener funciones y estados del store de Flow
+  const { 
+    undo, 
+    redo, 
+    canUndo, 
+    canRedo,
+    toggleHistoryPanel,
+    historyPanelActive
+  } = useFlowStore(state => ({
+    undo: state.undo,
+    redo: state.redo,
+    canUndo: state.canUndo,
+    canRedo: state.canRedo,
+    toggleHistoryPanel: state.toggleHistoryPanel,
+    historyPanelActive: state.historyPanelActive
+  }));
+
+  // Usar ReactFlow hooks para zoom
   const { zoomIn, zoomOut, fitView } = useReactFlow();
 
   return (
@@ -45,7 +58,7 @@ const ZoomControls = ({ onUndo, onRedo, canUndo, canRedo, onToggleHistory, histo
       {/* Controles de historial */}
       <button
         className={`zoom-control-button ${!canUndo ? 'disabled' : ''}`}
-        onClick={onUndo}
+        onClick={undo}
         disabled={!canUndo}
       >
         <FiRotateCcw />
@@ -53,7 +66,7 @@ const ZoomControls = ({ onUndo, onRedo, canUndo, canRedo, onToggleHistory, histo
       </button>
       <button
         className={`zoom-control-button ${!canRedo ? 'disabled' : ''}`}
-        onClick={onRedo}
+        onClick={redo}
         disabled={!canRedo}
       >
         <FiRotateCw />
@@ -62,8 +75,8 @@ const ZoomControls = ({ onUndo, onRedo, canUndo, canRedo, onToggleHistory, histo
       
       {/* Botón de historial de versiones */}
       <button
-        className={`zoom-control-button ${historyActive ? 'active' : ''}`}
-        onClick={onToggleHistory}
+        className={`zoom-control-button ${historyPanelActive ? 'active' : ''}`}
+        onClick={toggleHistoryPanel}
       >
         <History size={18} />
         <div className="button-tooltip">Historial</div>

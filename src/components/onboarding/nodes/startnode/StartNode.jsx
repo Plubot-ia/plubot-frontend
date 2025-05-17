@@ -89,7 +89,7 @@ const NODE_CONFIG = {
  * @param {Object} props.position - Posición del nodo en el canvas
  * @returns {React.ReactElement} Componente StartNode
  */
-const StartNode = memo(({ data = {}, isConnectable = true, selected = false, id, setNodes, setEdges, isUltraPerformanceMode = false, position = { x: 0, y: 0 } }) => {
+const StartNode = memo(({ data = {}, isConnectable = true, selected = false, id, onNodesChange, setEdges, isUltraPerformanceMode = false, position = { x: 0, y: 0 } }) => {
   // Referencias
   const inputRef = useRef(null);
   const nodeRef = useRef(null);
@@ -203,13 +203,14 @@ const StartNode = memo(({ data = {}, isConnectable = true, selected = false, id,
   const saveChanges = useCallback((updateData, prevData = {}, nodeType = NODE_CONFIG.TYPE) => {
     setIsSaving(true);
     try {
-      // Actualización inmutable con immer
-      setNodes((nds) => produce(nds, (draft) => {
-        const node = draft.find((n) => n.id === id);
-        if (node) {
-          node.data = { ...node.data, ...updateData };
+      // Usar onNodesChange para actualizar el nodo
+      onNodesChange([{
+        type: 'change',
+        item: {
+          id: id,
+          data: { ...data, ...updateData }
         }
-      }));
+      }]);
       
       setErrorMessage('');
       return true;
@@ -220,7 +221,7 @@ const StartNode = memo(({ data = {}, isConnectable = true, selected = false, id,
     } finally {
       setIsSaving(false);
     }
-  }, [id, setNodes]);
+  }, [id, onNodesChange, data]);
   
   // Manejar pérdida de foco
   const handleBlur = useCallback(async () => {
@@ -505,7 +506,7 @@ StartNode.propTypes = {
   isConnectable: PropTypes.bool,
   selected: PropTypes.bool,
   id: PropTypes.string.isRequired,
-  setNodes: PropTypes.func.isRequired,
+  onNodesChange: PropTypes.func.isRequired,
   setEdges: PropTypes.func,
   isUltraPerformanceMode: PropTypes.bool,
   position: PropTypes.object

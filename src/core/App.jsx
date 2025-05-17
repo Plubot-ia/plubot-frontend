@@ -217,6 +217,11 @@ function AppWrapper() {
                 <TrainingScreen />
               </PrivateRoute>
             } />
+            <Route path="/plubot/edit/training/:plubotId" element={
+              <PrivateRoute>
+                <TrainingScreen />
+              </PrivateRoute>
+            } />
             <Route path="/plubot/edit/:plubotId" element={
               <PrivateRoute>
                 <PlubotEdit />

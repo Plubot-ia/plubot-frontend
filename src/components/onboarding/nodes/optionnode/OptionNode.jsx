@@ -43,15 +43,15 @@ const NODE_CONFIG = {
  * Componente para el ícono del nodo de opción
  * @param {Object} props - Propiedades del componente
  * @param {string} props.optionLabel - Etiqueta de la opción (Sí, No, etc.)
- * @param {boolean} props.isUltraPerformanceMode - Indica si está en modo ultra rendimiento
+ * @param {boolean} props.isUltraMode - Indica si está en modo ultra rendimiento
  * @returns {JSX.Element} - Ícono del nodo de opción
  */
-const OptionNodeIcon = memo(({ optionLabel, isUltraPerformanceMode }) => {
+const OptionNodeIcon = memo(({ optionLabel, isUltraMode = false }) => {
   // Tamaño y grosor optimizados para legibilidad y rendimiento
   const iconProps = { 
-    size: isUltraPerformanceMode ? 14 : 16, 
-    strokeWidth: isUltraPerformanceMode ? 2 : 1.75,
-    className: isUltraPerformanceMode ? '' : 'option-node__icon-svg'
+    size: isUltraMode ? 14 : 16, 
+    strokeWidth: isUltraMode ? 2 : 1.75,
+    className: isUltraMode ? '' : 'option-node__icon-svg'
   };
   
   // Seleccionar el ícono adecuado según la etiqueta
@@ -71,7 +71,7 @@ const OptionNodeIcon = memo(({ optionLabel, isUltraPerformanceMode }) => {
   
   return (
     <div 
-      className={`option-node__icon ${isUltraPerformanceMode ? 'option-node__icon--ultra' : ''}`}
+      className={`option-node__icon ${isUltraMode ? 'option-node__icon--ultra' : ''}`}
       role="img"
       aria-label={`Opción: ${optionLabel}`}
     >
@@ -84,11 +84,7 @@ OptionNodeIcon.displayName = 'OptionNodeIcon';
 
 OptionNodeIcon.propTypes = {
   optionLabel: PropTypes.string.isRequired,
-  isUltraPerformanceMode: PropTypes.bool
-};
-
-OptionNodeIcon.defaultProps = {
-  isUltraPerformanceMode: false
+  isUltraMode: PropTypes.bool
 };
 
 /**
@@ -103,7 +99,7 @@ OptionNodeIcon.defaultProps = {
  * @param {boolean} props.selected - Si el nodo está seleccionado
  * @param {string} props.id - ID del nodo
  * @param {Function} props.setNodes - Función para actualizar los nodos
- * @param {boolean} props.isUltraPerformanceMode - Si está en modo ultra rendimiento
+ * @param {boolean} props.isUltraMode - Si está en modo ultra rendimiento
  * @returns {JSX.Element} - Componente OptionNode
  */
 const OptionNode = memo(({ 
@@ -118,7 +114,7 @@ const OptionNode = memo(({
   selected = false,
   id,
   setNodes,
-  isUltraPerformanceMode = false,
+  isUltraMode = false,
 }) => {
   // Estados locales
   const [instruction, setInstruction] = useState(data.instruction || NODE_CONFIG.DEFAULT_INSTRUCTION);
@@ -129,7 +125,7 @@ const OptionNode = memo(({
   
   // Alias para mejorar legibilidad
   // Alias para modo ultra rendimiento (más corto)
-  const isUltraMode = isUltraPerformanceMode;
+  // Usar directamente isUltraMode
 
   // Referencias
   const textareaRef = useRef(null);
@@ -409,7 +405,7 @@ const OptionNode = memo(({
           <div className="option-node__title">
             <OptionNodeIcon 
               optionLabel={optionLabel} 
-              isUltraPerformanceMode={isUltraMode} 
+              isUltraMode={isUltraMode} 
             />
             <span className="option-node__label">{optionLabel}</span>
           </div>
@@ -550,7 +546,7 @@ OptionNode.propTypes = {
   selected: PropTypes.bool,
   id: PropTypes.string.isRequired,
   setNodes: PropTypes.func.isRequired,
-  isUltraPerformanceMode: PropTypes.bool
+  isUltraMode: PropTypes.bool
 };
 
 export default OptionNode;

@@ -59,11 +59,14 @@ export const AuthProvider = ({ children }) => {
     try {
       console.log('Iniciando login con:', email);
       setLoading(true);
-      const formData = new FormData();
-      formData.append('email', email);
-      formData.append('password', password);
+      
+      // Enviar los datos como JSON en lugar de FormData
+      const loginData = {
+        email,
+        password
+      };
   
-      const data = await request('post', '/api/auth/login', formData);
+      const data = await request('post', '/api/auth/login', loginData);
       if (data && data.status === 'success') {
         console.log('Login exitoso, guardando token');
         storeToken(data.access_token);
@@ -96,12 +99,15 @@ export const AuthProvider = ({ children }) => {
     try {
       console.log('Iniciando registro con:', email);
       setLoading(true);
-      const formData = new FormData();
-      formData.append('name', name);
-      formData.append('email', email);
-      formData.append('password', password);
+      
+      // Enviar los datos como JSON en lugar de FormData
+      const registerData = {
+        name,
+        email,
+        password
+      };
 
-      const data = await request('post', '/api/auth/register', formData);
+      const data = await request('post', '/api/auth/register', registerData);
       if (data && data.status === 'success') {
         console.log('Registro exitoso, seteando usuario');
         setUser({ name, email });

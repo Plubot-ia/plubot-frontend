@@ -45,24 +45,25 @@
 
 /* Botón de cierre similar al simulador */
 .ts-btn-close {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  background: #ff3366;
-  border: 2px solid white;
+  position: fixed; /* Cambiado de absolute a fixed para asegurar que esté siempre visible */
+  top: 80px; /* Ajustado para que esté debajo del EpicHeader */
+  right: 50px; /* Ajustado para que esté más visible */
+  background: #ff0044; /* Color más intenso para mayor visibilidad */
+  border: 3px solid white;
   color: white;
   cursor: pointer;
-  width: 36px;
-  height: 36px;
+  width: 50px; /* Aumentado el tamaño */
+  height: 50px; /* Aumentado el tamaño */
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 50%;
   transition: all 0.2s ease;
-  font-size: 20px;
+  font-size: 26px; /* Aumentado el tamaño de la fuente */
   font-weight: bold;
-  box-shadow: 0 0 10px rgba(255, 51, 102, 0.6), 0 0 20px rgba(255, 51, 102, 0.4);
-  z-index: 9999;
+  box-shadow: 0 0 20px rgba(255, 0, 68, 0.9), 0 0 30px rgba(255, 0, 68, 0.7);
+  z-index: 10000; /* Asegurar que esté por encima de todo */
+  opacity: 1;
 }
 
 .ts-btn-close:hover {

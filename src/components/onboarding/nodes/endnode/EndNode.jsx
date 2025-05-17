@@ -7,6 +7,7 @@
 
 import React, { useState, useEffect, useRef, useCallback, memo, useMemo } from 'react';
 import { Handle, Position, useReactFlow } from 'reactflow';
+import useFlowStore from '@/stores/useFlowStore';
 import { 
   MoreHorizontal, 
   Edit2, 
@@ -55,7 +56,7 @@ const EndNode = memo(({
   isConnectable = true,
   selected = false,
   id,
-  setNodes,
+  onNodesChange,
   isUltraPerformanceMode = false,
 }) => {
   // Estados locales del componente
@@ -98,7 +99,7 @@ const EndNode = memo(({
   } = useNode({ 
     id, 
     data, 
-    setNodes, 
+    onNodesChange, 
     isConnectable, 
     minWidth: 150,
     minHeight: 100 
@@ -575,23 +576,24 @@ const EndNode = memo(({
           onKeyDown={(e) => {
             if (['ArrowRight', 'ArrowLeft', 'ArrowUp', 'ArrowDown'].includes(e.key)) {
               e.preventDefault();
-              setNodes((nds) =>
-                nds.map((node) => {
-                  if (node.id === id) {
-                    let newWidth = node.width || initialWidth;
-                    let newHeight = node.height || initialHeight;
-                    
-                    // Cambiar dimensiones con teclado
-                    if (e.key === 'ArrowRight') newWidth += 10;
-                    if (e.key === 'ArrowLeft') newWidth = Math.max(minWidth, newWidth - 10);
-                    if (e.key === 'ArrowDown') newHeight += 10;
-                    if (e.key === 'ArrowUp') newHeight = Math.max(minHeight, newHeight - 10);
-                    
-                    return { ...node, width: newWidth, height: newHeight };
-                  }
-                  return node;
-                })
-              );
+              // Usar onNodesChange para actualizar el nodo
+              let newWidth = initialWidth;
+              let newHeight = initialHeight;
+              
+              // Cambiar dimensiones con teclado
+              if (e.key === 'ArrowRight') newWidth += 10;
+              if (e.key === 'ArrowLeft') newWidth = Math.max(minWidth, newWidth - 10);
+              if (e.key === 'ArrowDown') newHeight += 10;
+              if (e.key === 'ArrowUp') newHeight = Math.max(minHeight, newHeight - 10);
+              
+              onNodesChange([{
+                type: 'change',
+                item: {
+                  id: id,
+                  width: newWidth,
+                  height: newHeight
+                }
+              }]);
             }
           }}
           style={{ cursor: isResizing ? 'grabbing' : 'nwse-resize' }}
@@ -645,7 +647,7 @@ EndNode.propTypes = {
   isConnectable: PropTypes.bool,
   selected: PropTypes.bool,
   id: PropTypes.string.isRequired,
-  setNodes: PropTypes.func.isRequired,
+  onNodesChange: PropTypes.func.isRequired,
 };
 
 export default EndNode;

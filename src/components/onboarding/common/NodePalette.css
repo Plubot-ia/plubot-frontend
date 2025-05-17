@@ -21,6 +21,24 @@
   -ms-user-select: none;
 }
 
+/* Estilo para la vista previa de arrastre */
+.node-drag-preview {
+  position: absolute;
+  background: rgba(0, 224, 255, 0.2);
+  border: 1px solid rgba(0, 224, 255, 0.6);
+  border-radius: 8px;
+  padding: 8px 12px;
+  color: #e0f7ff;
+  font-size: 14px;
+  pointer-events: none;
+  z-index: 9999;
+  box-shadow: 0 0 10px rgba(0, 224, 255, 0.4);
+  backdrop-filter: blur(4px);
+  opacity: 0.9;
+  transform: translate(-50%, -50%);
+  white-space: nowrap;
+}
+
 .ts-palette-header {
   display: flex;
   justify-content: space-between;

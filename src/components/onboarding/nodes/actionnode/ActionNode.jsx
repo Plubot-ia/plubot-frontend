@@ -215,7 +215,7 @@ const ActionNodeComponent = ({
   isConnectable = true,
   selected = false,
   id,
-  setNodes,
+  onNodesChange,
 }) => {
     const [actionType, setActionType] = useState(data.actionType || 'sendEmail');
     const [description, setDescription] = useState(data.description || '');
@@ -235,7 +235,7 @@ const ActionNodeComponent = ({
       saveChanges,
       initialWidth,
       initialHeight,
-    } = useNode({ id, data, setNodes, minWidth: 180, minHeight: 100 });
+    } = useNode({ id, data, onNodesChange, minWidth: 180, minHeight: 100 });
     const { canEdit, canDelete } = usePermissions();
 
     const previousData = useRef({ description: '', actionType: 'sendEmail', parameters: {} });
@@ -569,7 +569,7 @@ ActionNode.propTypes = {
   isConnectable: PropTypes.bool,
   selected: PropTypes.bool,
   id: PropTypes.string.isRequired,
-  setNodes: PropTypes.func.isRequired,
+  onNodesChange: PropTypes.func.isRequired,
 };
 
 export default ActionNode;

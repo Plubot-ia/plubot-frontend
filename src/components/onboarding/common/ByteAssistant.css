@@ -1,14 +1,17 @@
 .ts-byte-assistant {
-    position: absolute;
-    bottom: 1rem;
+    position: fixed;
+    bottom: 0; /* Eliminar margen inferior completamente */
     right: 1rem;
     width: 300px;
-    height: 500px; /* Fixed height for the entire component */
+    height: 450px;
     z-index: 1002;
     display: flex;
     flex-direction: column;
     transition: width 0.3s ease;
     overflow: hidden;
+    border: 1px solid #00e0ff; /* Añadir borde para cerrar el cuadrado correctamente */
+    border-radius: 8px 8px 0 0; /* Redondear solo las esquinas superiores */
+    background-color: rgba(10, 20, 35, 0.95); /* Fondo oscuro semi-transparente */
 }
 
 .ts-byte-expanded {
@@ -91,7 +94,7 @@
 }
 
 .ts-byte-minimized {
-    position: absolute;
+    position: fixed;
     bottom: 1rem;
     right: 1rem;
     width: 60px;
@@ -199,46 +202,49 @@
     border-left: 3px solid #ffb700;
 }
 
-.ts-message-type-info {
-    border-left: 3px solid #00e0ff;
-}
-
-.ts-byte-input-container {
+.ts-byte-input {
     display: flex;
     gap: 0.5rem;
-    margin-top: auto;
-    flex-shrink: 0;
+    width: 100%;
+    margin-top: auto; /* Push to bottom */
 }
 
-.ts-byte-input {
+.ts-byte-text-input {
     flex: 1;
-    background: #171727;
+    background: rgba(23, 23, 39, 0.8);
     border: 1px solid #00e0ff;
-    border-radius: 4px;
-    padding: 0.5rem;
     color: #e0e0ff;
-    font-family: inherit;
+    padding: 0.5rem;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    resize: none;
+    min-height: 40px;
+    max-height: 100px;
+    transition: all 0.3s ease;
 }
 
-.ts-byte-input:focus {
+.ts-byte-text-input:focus {
     outline: none;
     box-shadow: 0 0 5px #00e0ff;
 }
 
 .ts-byte-send-btn {
     background: #00e0ff;
-    border: none;
     color: #0a0a14;
-    border-radius: 4px;
+    border: none;
     padding: 0.5rem 1rem;
+    border-radius: 4px;
     cursor: pointer;
     font-weight: bold;
-    transition: all 0.2s ease;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .ts-byte-send-btn:hover {
-    background: #ff00ff;
-    box-shadow: 0 0 8px #ff00ff;
+    background: #00c4e0;
+    box-shadow: 0 0 8px #00e0ff;
 }
 
 .ts-byte-send-btn:disabled {
@@ -253,7 +259,7 @@
         transform: translateY(0);
     }
     50% {
-        transform: translateY(-4px);
+        transform: translateY(-10px);
     }
     100% {
         transform: translateY(0);
@@ -262,24 +268,31 @@
 
 @keyframes ts-byteThinking {
     0% {
-        transform: translateY(0) scale(1);
-        opacity: 1;
+        transform: translateY(0) rotate(0deg);
     }
     25% {
-        transform: translateY(-3px) scale(1.03);
-        opacity: 0.9;
+        transform: translateY(-5px) rotate(-5deg);
     }
     50% {
-        transform: translateY(0) scale(1);
-        opacity: 1;
+        transform: translateY(0) rotate(0deg);
     }
     75% {
-        transform: translateY(-2px) scale(1.02);
-        opacity: 0.95;
+        transform: translateY(-5px) rotate(5deg);
     }
     100% {
-        transform: translateY(0) scale(1);
-        opacity: 1;
+        transform: translateY(0) rotate(0deg);
+    }
+}
+
+@keyframes ts-neonPulse {
+    0% {
+        box-shadow: 0 0 5px #00e0ff, 0 0 10px #00e0ff;
+    }
+    50% {
+        box-shadow: 0 0 15px #00e0ff, 0 0 20px #00e0ff;
+    }
+    100% {
+        box-shadow: 0 0 5px #00e0ff, 0 0 10px #00e0ff;
     }
 }
 
@@ -294,33 +307,37 @@
     }
 }
 
-@keyframes ts-neonPulse {
-    0% {
-        box-shadow: 0 0 5px #00e0ff, 0 0 10px #00e0ff;
-    }
-    50% {
-        box-shadow: 0 0 10px #00e0ff, 0 0 15px #ff00ff;
-    }
-    100% {
-        box-shadow: 0 0 5px #00e0ff, 0 0 10px #00e0ff;
-    }
+/* Loading animation */
+.ts-byte-loading {
+    display: flex;
+    gap: 0.3rem;
+    padding: 0.5rem;
+    align-self: flex-start;
 }
 
-/* Notificacion Guardar*/
+.ts-byte-loading-dot {
+    width: 8px;
+    height: 8px;
+    background: #00e0ff;
+    border-radius: 50%;
+    animation: ts-loadingPulse 1.5s infinite ease-in-out;
+}
 
-.byte-notification {
-    position: absolute;
-    background: rgba(0, 224, 255, 0.8);
-    color: #000;
-    padding: 0.5rem 1rem;
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0, 224, 255, 0.5);
-    z-index: 1000;
-    pointer-events: none;
-    transition: all 0.3s ease-out;
-  }
-  
-  .byte-notification.removing {
-    opacity: 0;
-    transform: translateY(-20px);
-  }
+.ts-byte-loading-dot:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.ts-byte-loading-dot:nth-child(3) {
+    animation-delay: 0.4s;
+}
+
+@keyframes ts-loadingPulse {
+    0%, 100% {
+        transform: scale(0.5);
+        opacity: 0.5;
+    }
+    50% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}

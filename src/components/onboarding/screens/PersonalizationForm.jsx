@@ -342,9 +342,12 @@ const PersonalizationForm = () => {
           const response = await createBot(payload);
           console.log('Respuesta de POST /api/plubots/create:', response);
           if (response.status === 'success' && response.plubot?.id) {
-            updatePlubotData({ id: response.plubot.id });
+            // Actualizar el contexto con todos los datos necesarios
+            const plubotId = response.plubot.id;
+            
+            // Crear un objeto completo con todos los datos necesarios
             const newPlubot = {
-              id: response.plubot.id,
+              id: plubotId,
               name: payload.name,
               tone: payload.tone,
               color: payload.color,
@@ -352,13 +355,46 @@ const PersonalizationForm = () => {
               initial_message: payload.initial_message,
               powers: payload.powers.join(','),
             };
+            
+            // Actualizar el contexto de creación del Plubot con datos completos
+            // incluyendo un flowData vacío pero inicializado
+            updatePlubotData({
+              id: plubotId,
+              name: payload.name,
+              tone: payload.tone,
+              color: payload.color,
+              purpose: payload.purpose,
+              initial_message: payload.initial_message,
+              powers: payload.powers,
+              // Inicializar flowData con arrays vacíos para evitar problemas de inicialización
+              flowData: { nodes: [], edges: [] },
+              // Inicializar flowVersions como array vacío
+              flowVersions: []
+            });
+            
+            // Actualizar el usuario con el nuevo Plubot
             setUser(prev => ({
               ...prev,
               plubots: [...(prev.plubots || []), newPlubot]
             }));
+            
+            // Mostrar mensaje de éxito
             setMessageText(personalityMessages[plubotData.tone]?.confirmation || '¡Plubot creado con éxito!');
+            
+            // Avanzar al siguiente paso en el proceso de creación
             nextStep();
-            navigate(`/plubot/create/training?plubotId=${response.plubot.id}`);
+            
+            // Esperar un momento para asegurar que el contexto se ha actualizado
+            // antes de navegar a TrainingScreen
+            setTimeout(() => {
+              console.log('Navegando a TrainingScreen con contexto inicializado:', {
+                plubotId,
+                contextData: plubotData
+              });
+              // Usar la misma ruta que se usa al editar un plubot existente para asegurar
+              // que la interfaz se renderice correctamente en ambos casos
+              navigate(`/plubot/edit/training?plubotId=${plubotId}`);
+            }, 300);
           } else {
             console.error('Error en la respuesta del backend:', response);
             setMessageText('Error: No se pudo obtener el ID del Plubot.');

@@ -15,24 +15,24 @@ const CONFIG = {
 /**
  * Componente para renderizar un fondo personalizado en el editor de flujos
  * @param {Object} props - Propiedades del componente
- * @param {boolean} props.isUltraPerformanceMode - Indica si el modo de ultra rendimiento está activado
+ * @param {boolean} props.isUltraMode - Indica si el modo de ultra rendimiento está activado
  */
-const BackgroundScene = ({ isUltraPerformanceMode = false }) => {
+const BackgroundScene = ({ isUltraMode = false }) => {
   const canvasRef = useRef(null);
   const staticCanvasRef = useRef(null);
   const mousePosition = useRef({ x: 0, y: 0 });
-  const [mode, setMode] = useState(isUltraPerformanceMode ? 'ultra' : 'normal');
+  const [mode, setMode] = useState(isUltraMode ? 'ultra' : 'normal');
   
   // Estado para forzar la reconstrucción del fondo
   const [forceRebuild, setForceRebuild] = useState(0);
   
-  // Actualizar el modo cuando cambia la prop isUltraPerformanceMode
+  // Actualizar el modo cuando cambia la prop isUltraMode
   useEffect(() => {
-    setMode(isUltraPerformanceMode ? 'ultra' : 'normal');
-    console.log(`Modo cambiado a: ${isUltraPerformanceMode ? 'ultra' : 'normal'}`);
+    setMode(isUltraMode ? 'ultra' : 'normal');
+    console.log(`Modo cambiado a: ${isUltraMode ? 'ultra' : 'normal'}`);
     
     // Forzar la recreación completa del fondo cuando se cambia de modo ultra a normal
-    if (!isUltraPerformanceMode) {
+    if (!isUltraMode) {
       // Incrementar el contador para forzar la reconstrucción
       setForceRebuild(prev => prev + 1);
       
@@ -54,7 +54,7 @@ const BackgroundScene = ({ isUltraPerformanceMode = false }) => {
         }
       }, 50);
     }
-  }, [isUltraPerformanceMode]);
+  }, [isUltraMode]);
 
   // Modo normal con partículas animadas
   useEffect(() => {

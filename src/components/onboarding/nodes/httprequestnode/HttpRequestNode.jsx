@@ -24,7 +24,7 @@ const HttpRequestNode = React.memo(
     isConnectable = true,
     selected = false,
     id,
-    setNodes,
+    onNodesChange,
     isUltraPerformanceMode = false,
   }) => {
     const defaultData = {
@@ -96,7 +96,7 @@ const HttpRequestNode = React.memo(
     } = useNode({
       id,
       data, 
-      setNodes,
+      onNodesChange,
       isConnectable,
       minWidth: 280, 
       minHeight: 150, 
@@ -643,7 +643,7 @@ HttpRequestNode.propTypes = {
   isConnectable: PropTypes.bool,
   selected: PropTypes.bool,
   id: PropTypes.string.isRequired,
-  setNodes: PropTypes.func.isRequired,
+  onNodesChange: PropTypes.func.isRequired,
 };
 
 HttpRequestNode.displayName = 'HttpRequestNode';

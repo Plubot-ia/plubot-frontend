@@ -1,16 +1,24 @@
 import React from 'react';
 import { FiRotateCcw, FiRotateCw } from 'react-icons/fi';
 import './HistoryControls.css';
+import useFlowStore from '@/stores/useFlowStore';
 
 /**
  * Componente para controles de historial (deshacer/rehacer) en el editor de flujos
  */
-const HistoryControls = ({ onUndo, onRedo, canUndo, canRedo }) => {
+const HistoryControls = () => {
+  // Obtener funciones y estados del store de Flow
+  const { undo, redo, canUndo, canRedo } = useFlowStore(state => ({
+    undo: state.undo,
+    redo: state.redo,
+    canUndo: state.canUndo,
+    canRedo: state.canRedo
+  }));
   return (
     <div className="history-controls">
       <button
         className="history-control-button"
-        onClick={onUndo}
+        onClick={undo}
         disabled={!canUndo}
         title="Deshacer"
       >
@@ -18,7 +26,7 @@ const HistoryControls = ({ onUndo, onRedo, canUndo, canRedo }) => {
       </button>
       <button
         className="history-control-button"
-        onClick={onRedo}
+        onClick={redo}
         disabled={!canRedo}
         title="Rehacer"
       >

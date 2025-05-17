@@ -3,13 +3,14 @@ import { useNavigate } from 'react-router-dom';
 import { ReactFlowProvider } from 'reactflow';
 import { emitEvent, onEvent } from '@/utils/eventBus';
 import { NODE_TYPES, EDGE_TYPES } from '@/utils/nodeConfig';
+import useFlowStore from '@/stores/useFlowStore';
 import SimulationInterface from '../simulation/SimulationInterface';
 import EpicHeader from '../common/EpicHeader';
 import EmbedModal from '../modals/EmbedModal';
 import useNodeStyles from './hooks/useNodeStyles';
 import StatusBubble from '../common/StatusBubble';
 import ByteAssistant from '../common/ByteAssistant';
-import VersionHistory from '../common/VersionHistory';
+import VersionHistory from "../modals/VersionHistory";
 import TransparentOverlay from '../common/TransparentOverlay'; // Nuevo overlay transparente
 import './FlowEditor.css'; // Archivo CSS fusionado
 import './fix-overlay.css'; // CSS para eliminar cualquier overlay oscuro
@@ -67,17 +68,32 @@ class NodeErrorBoundary extends React.Component {
 
 // Definir los tipos de nodos para ReactFlow
 // Usamos useMemo para evitar recreaciones constantes de los tipos de nodos
-const useNodeTypes = (setNodes, setEdges, isUltraPerformanceMode = false) => {
+const useNodeTypes = (isUltraPerformanceMode = false) => {
   // Utilizamos el hook useNodeStyles para obtener estilos consistentes y memoizados
   const nodeStyles = useNodeStyles(isUltraPerformanceMode);
+  
+  // Obtener las funciones directamente del store de Zustand
+  const store = useFlowStore.getState();
+  const { onNodesChange, onEdgesChange, onConnect } = store;
+  
+  // Verificar si setNodes y setEdges existen en el store
+  const setNodes = store.setNodes || ((nodes) => {
+    console.error('[FlowEditor] Error: No se pudo acceder a setNodes desde el store');
+  });
+  
+  const setEdges = store.setEdges || ((edges) => {
+    console.error('[FlowEditor] Error: No se pudo acceder a setEdges desde el store');
+  });
   
   return React.useMemo(() => ({
     start: (props) => (
       <NodeErrorBoundary>
         <StartNode 
           {...props} 
-          setNodes={setNodes} 
+          onNodesChange={onNodesChange}
           setEdges={setEdges} 
+          onEdgesChange={onEdgesChange}
+          onConnect={onConnect}
           style={nodeStyles.start}
           selectedStyle={nodeStyles.selected}
           hoveredStyle={nodeStyles.hovered}
@@ -90,8 +106,10 @@ const useNodeTypes = (setNodes, setEdges, isUltraPerformanceMode = false) => {
         <Suspense fallback={<div>Cargando...</div>}>
           <EndNode 
             {...props} 
-            setNodes={setNodes} 
+            onNodesChange={onNodesChange}
             setEdges={setEdges} 
+            onEdgesChange={onEdgesChange}
+            onConnect={onConnect}
             style={nodeStyles.end}
             selectedStyle={nodeStyles.selected}
             hoveredStyle={nodeStyles.hovered}
@@ -107,6 +125,9 @@ const useNodeTypes = (setNodes, setEdges, isUltraPerformanceMode = false) => {
             {...props} 
             setNodes={setNodes} 
             setEdges={setEdges} 
+            onNodesChange={onNodesChange}
+            onEdgesChange={onEdgesChange}
+            onConnect={onConnect}
             style={nodeStyles.message}
             selectedStyle={nodeStyles.selected}
             hoveredStyle={nodeStyles.hovered}
@@ -122,6 +143,9 @@ const useNodeTypes = (setNodes, setEdges, isUltraPerformanceMode = false) => {
             {...props} 
             setNodes={setNodes} 
             setEdges={setEdges} 
+            onNodesChange={onNodesChange}
+            onEdgesChange={onEdgesChange}
+            onConnect={onConnect}
             style={nodeStyles.decision}
             selectedStyle={nodeStyles.selected}
             hoveredStyle={nodeStyles.hovered}
@@ -136,7 +160,10 @@ const useNodeTypes = (setNodes, setEdges, isUltraPerformanceMode = false) => {
           <OptionNode 
             {...props} 
             setNodes={setNodes} 
-            setEdges={setEdges} 
+            setEdges={setEdges}
+            onNodesChange={onNodesChange}
+            onEdgesChange={onEdgesChange}
+            onConnect={onConnect} 
             style={nodeStyles.option}
             selectedStyle={nodeStyles.selected}
             hoveredStyle={nodeStyles.hovered}
@@ -231,7 +258,8 @@ const FlowEditorInner = ({
   notifyByte,
   showVersionHistoryPanel,
   setShowVersionHistoryPanel,
-  saveFlowData
+  saveFlowData,
+  hideHeader = false // Añadir la prop hideHeader con valor por defecto false
 }) => {
   // Estado local
   const navigate = useNavigate();
@@ -377,7 +405,15 @@ const FlowEditorInner = ({
           // Asegurar que los nodos tengan la propiedad data
           data: node.data || {}
         }));
-        setNodes(processedNodes);
+        
+        // Usar directamente la función setNodes del store
+        const flowStore = useFlowStore.getState();
+        if (flowStore && typeof flowStore.setNodes === 'function') {
+          console.log('[FlowEditor] Actualizando nodos con setNodes');
+          flowStore.setNodes(processedNodes);
+        } else {
+          console.error('[FlowEditor] Error: No se pudo acceder a setNodes desde el store');
+        }
       }
       
       // Mostrar información detallada sobre las aristas recibidas
@@ -581,7 +617,15 @@ const FlowEditorInner = ({
         }
 
         console.log('Aristas procesadas para cargar:', processedEdges);
-        setEdges(processedEdges);
+        
+        // Usar directamente la función setEdges del store
+        const flowStore = useFlowStore.getState();
+        if (flowStore && typeof flowStore.setEdges === 'function') {
+          console.log('[FlowEditor] Actualizando aristas con setEdges');
+          flowStore.setEdges(processedEdges);
+        } else {
+          console.error('[FlowEditor] Error: No se pudo acceder a setEdges desde el store');
+        }
       }
     }
   } catch (error) {
@@ -811,19 +855,22 @@ const FlowEditorInner = ({
   // Renderizar el componente
   return (
     <div className="flow-editor-wrapper">
-      <EpicHeader
-        flowName={flowName}
-        nodeCount={internalNodes.length}
-        edgeCount={internalEdges.length}
-        lastSaved={lastSaved}
-        logoSrc={logo}
-        onSave={handleSaveFlow}
-        onShare={() => setShowEmbedModal(true)}
-        onSimulate={toggleSimulation}
-        onShowTemplates={() => setShowTemplateSelector(true)}
-        onSettings={() => navigate('/dashboard')}
-        onCloseModals={handleCloseAllModals} // Pasar la funciu00f3n para cerrar todos los modales
-      />
+      {/* Solo renderizar el EpicHeader si no estamos en la pantalla de entrenamiento */}
+      {!hideHeader && (
+        <EpicHeader
+          flowName={flowName}
+          nodeCount={internalNodes.length}
+          edgeCount={internalEdges.length}
+          lastSaved={lastSaved}
+          logoSrc={logo}
+          onSave={handleSaveFlow}
+          onShare={() => setShowEmbedModal(true)}
+          onSimulate={toggleSimulation}
+          onShowTemplates={() => setShowTemplateSelector(true)}
+          onSettings={() => navigate('/dashboard')}
+          onCloseModals={handleCloseAllModals} // Pasar la función para cerrar todos los modales
+        />
+      )}
       
       <div className="flow-editor-container">
         
@@ -834,7 +881,7 @@ const FlowEditorInner = ({
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
           onConnect={onConnect}
-          nodeTypes={useNodeTypes(setNodes, setEdges, isUltraPerformanceMode)}
+          nodeTypes={useNodeTypes(isUltraPerformanceMode)}
           edgeTypes={useEdgeTypes()}
           selectedNode={selectedNode}
           contextMenu={contextMenu}
@@ -930,6 +977,7 @@ const FlowEditor = ({
   name,
   notifyByte,
   saveFlowData,
+  hideHeader = false, // Añadir la prop hideHeader con valor por defecto false
 }) => {
   try {
     return (
@@ -953,6 +1001,7 @@ const FlowEditor = ({
           name={name}
           notifyByte={notifyByte}
           saveFlowData={saveFlowData}
+          hideHeader={hideHeader}
         />
       </ReactFlowProvider>
     );

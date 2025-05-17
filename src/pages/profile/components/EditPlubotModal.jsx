@@ -54,7 +54,16 @@ const EditPlubotModal = ({
           </button>
           <button
             className="edit-modal-flows-button"
-            onClick={() => handleEditFlows(plubot.id)}
+            onClick={() => {
+              if (!plubot.id) {
+                console.error('[EditPlubotModal] Error: plubotId no válido en Editar Flujos:', plubot);
+                showNotification('Error: ID del Plubot no válido. Por favor, crea un nuevo plubot.', 'error');
+                setEditModalPlubot(null);
+                return;
+              }
+              console.log('[EditPlubotModal] Navegando a editar flujos para plubotId:', plubot.id);
+              handleEditFlows(plubot.id);
+            }}
           >
             <span className="edit-modal-icon">🔄</span> Editar Flujos
           </button>
