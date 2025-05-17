@@ -1,8 +1,8 @@
-import { useEffect, useState, useRef, useContext } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { motion, useAnimation, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { usePlubotCreation } from '@/context/PlubotCreationContext.jsx';
-import { AuthContext } from '@/context/AuthContext';
+import useAuthStore from '@/stores/useAuthStore';
 import plubotIcon from '@/assets/img/plubot.svg';
 import './WelcomeSequence.css';
 
@@ -31,6 +31,7 @@ const WelcomeSequence = () => {
   const [displayText, setDisplayText] = useState('');
   const [currentPhase, setCurrentPhase] = useState(0);
   const [isButtonEnabled, setIsButtonEnabled] = useState(false);
+  const { isAuthenticated } = useAuthStore();
   const [isAnimationComplete, setIsAnimationComplete] = useState(false);
   const [showSkipHint, setShowSkipHint] = useState(true);
   const [isHovered, setIsHovered] = useState(false);
@@ -48,7 +49,6 @@ const WelcomeSequence = () => {
 
   const navigate = useNavigate();
   const { nextStep } = usePlubotCreation();
-  const { isAuthenticated } = useContext(AuthContext);
   const contentRef = useRef(null);
   const plubotAnimation = useAnimation();
   const backgroundAnimation = useAnimation();

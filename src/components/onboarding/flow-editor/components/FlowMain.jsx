@@ -137,17 +137,31 @@ const FlowMain = ({
       // Obtener los límites del contenedor de ReactFlow
       const reactFlowBounds = reactFlowWrapper.current.getBoundingClientRect();
       
-      // Obtener la posiciu00f3n donde se soltu00f3 el nodo, ajustada al viewport de ReactFlow
+      // Obtener la posición donde se soltó el nodo, ajustada al viewport de ReactFlow
       const position = project({
         x: event.clientX - reactFlowBounds.left,
         y: event.clientY - reactFlowBounds.top,
       });
       
       try {
-        // Obtener los datos del nodo arrastrado desde el dataTransfer
-        const jsonData = event.dataTransfer.getData('application/reactflow');
+        // Intentar obtener los datos del nodo arrastrado desde diferentes formatos
+        let jsonData = event.dataTransfer.getData('application/reactflow');
+        
+        // Si no hay datos en application/reactflow, intentar con otros formatos
+        if (!jsonData) {
+          jsonData = event.dataTransfer.getData('text/reactflow');
+        }
+        
+        if (!jsonData) {
+          jsonData = event.dataTransfer.getData('application/json');
+        }
+        
+        if (!jsonData) {
+          jsonData = event.dataTransfer.getData('text/plain');
+        }
         
         if (jsonData) {
+          console.log('[FlowMain] Datos recibidos en onDrop:', jsonData);
           const data = JSON.parse(jsonData);
           
           // Verificar que los datos son válidos para un nodo personalizado
@@ -155,9 +169,12 @@ const FlowMain = ({
             // Extraer la información del nodo
             const { nodeType } = data.nodeInfo;
             
-            // Au00f1adir el nodo en la posiciu00f3n donde se soltu00f3
+            console.log(`[FlowMain] Añadiendo nodo de tipo ${nodeType} en posición:`, position);
+            // Añadir el nodo en la posición donde se soltó
             onAddNode(nodeType, position, data.nodeInfo);
           }
+        } else {
+          console.warn('[FlowMain] No se encontraron datos válidos en el evento de drop');
         }
       } catch (error) {
         console.error('Error al procesar el nodo arrastrado:', error);

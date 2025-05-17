@@ -1,12 +1,12 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import { v4 as uuidv4 } from 'uuid';
 import { applyNodeChanges, applyEdgeChanges, addEdge } from 'reactflow';
 import { NODE_TYPES, EDGE_TYPES, EDGE_COLORS } from '@/utils/nodeConfig';
 import useTrainingStore from './useTrainingStore';
+import flowService, { generateId } from '@/services/flowService';
 
-// Función para generar IDs únicos
-const generateNodeId = (type = 'node') => `${type}-${uuidv4()}`;
+// Función para generar IDs únicos (ahora usa el servicio de flujo)
+const generateNodeId = (type = 'node') => generateId(type);
 
 // Estado inicial
 const initialState = {
@@ -19,6 +19,8 @@ const initialState = {
   isSaving: false,
   lastSaved: null,
   flowName: 'Flujo sin título',
+  plubotId: null,
+  previousState: null,
   history: {
     past: [],
     future: [],
@@ -245,39 +247,86 @@ const useFlowStore = create(
         isUltraMode: !state.isUltraMode
       })),
       
-      // Función para guardar el flujo (usada por EpicHeader)
-      saveFlow: () => {
-        const { nodes, edges } = get();
-        const plubotData = useTrainingStore.getState().plubotData;
-        const saveFlowData = useTrainingStore.getState().saveFlowData;
+      loadFlow: (plubotId) => {
+        set({ isSaving: true });
         
-        if (plubotData?.id && saveFlowData) {
-          set({ isSaving: true });
-          
-          // Actualizar el nombre del flujo si está disponible
-          if (plubotData.name) {
-            set({ flowName: plubotData.name });
-          }
-          
-          // Usar la función saveFlowData del store de Training
-          saveFlowData(plubotData.id, nodes, edges, plubotData.name)
-            .then(() => {
-              set({ 
-                isSaving: false,
-                lastSaved: new Date().toISOString()
-              });
-              // Mostrar mensaje de éxito en el StatusBubble
-              useTrainingStore.getState().setByteMessage('💾 Flujo guardado exitosamente');
-            })
-            .catch((error) => {
-              console.error('Error al guardar el flujo:', error);
-              set({ isSaving: false });
-              // Mostrar mensaje de error en el StatusBubble
-              useTrainingStore.getState().setByteMessage('❌ Error al guardar el flujo');
+        return flowService.loadFlow(plubotId)
+          .then(flowData => {
+            // Actualizar el estado con los datos cargados
+            set({
+              nodes: flowData.nodes || [],
+              edges: flowData.edges || [],
+              flowName: flowData.name || 'Flujo sin título',
+              plubotId,
+              isSaving: false,
+              lastSaved: new Date().toISOString(),
+              // Guardar el estado actual como estado anterior para comparaciones futuras
+              previousState: { nodes: flowData.nodes || [], edges: flowData.edges || [] }
             });
-        } else {
-          console.warn('No se puede guardar: ID de plubot no disponible o función saveFlowData no encontrada');
+            
+            return {
+              success: true,
+              message: 'Flujo cargado correctamente',
+              timestamp: new Date().toISOString(),
+            };
+          })
+          .catch(error => {
+            set({ isSaving: false });
+            console.error('Error al cargar el flujo:', error);
+            return {
+              success: false,
+              message: 'Error al cargar el flujo: ' + (error.message || 'Error desconocido'),
+              timestamp: new Date().toISOString(),
+            };
+          });
+      },
+      
+      saveFlow: () => {
+        const state = get();
+        const { nodes, edges, flowName, plubotId, previousState } = state;
+        
+        // Si no hay ID de plubot, no podemos guardar
+        if (!plubotId) {
+          console.error('No se puede guardar el flujo: ID de plubot no definido');
+          return Promise.resolve({
+            success: false,
+            message: 'No se puede guardar el flujo: ID de plubot no definido',
+            timestamp: new Date().toISOString(),
+          });
         }
+        
+        // Marcar como guardando
+        set({ isSaving: true });
+        
+        // Estado actual para enviar
+        const currentState = { nodes, edges, name: flowName };
+        
+        // Usar el servicio de flujo para guardar con actualizaciones incrementales
+        return flowService.saveFlow(plubotId, currentState, previousState)
+          .then(response => {
+            // Actualizar estado
+            set({
+              isSaving: false,
+              lastSaved: new Date().toISOString(),
+              // Actualizar el estado anterior para la próxima comparación
+              previousState: { ...currentState }
+            });
+            
+            return {
+              success: true,
+              message: 'Flujo guardado correctamente',
+              timestamp: new Date().toISOString(),
+            };
+          })
+          .catch(error => {
+            set({ isSaving: false });
+            console.error('Error al guardar el flujo:', error);
+            return {
+              success: false,
+              message: 'Error al guardar el flujo: ' + (error.message || 'Error desconocido'),
+              timestamp: new Date().toISOString(),
+            };
+          });
       },
       
       // Función para obtener el conteo preciso de aristas visibles (usada por EpicHeader)
@@ -380,11 +429,53 @@ const useFlowStore = create(
       reset: () => set({
         ...initialState,
         history: {
-          ...initialState.history,
           past: [],
           future: [],
-        },
+          maxHistory: initialState.history.maxHistory,
+        }
       }),
+      
+      // Establecer el ID del plubot
+      setPlubotId: (id) => set({ plubotId: id }),
+      
+      // Listar copias de seguridad disponibles
+      listBackups: () => {
+        const { plubotId } = get();
+        
+        if (!plubotId) {
+          return Promise.resolve([]);
+        }
+        
+        return flowService.listBackups(plubotId);
+      },
+      
+      // Restaurar una copia de seguridad
+      restoreBackup: (backupId) => {
+        const { plubotId } = get();
+        set({ isSaving: true });
+        
+        if (!plubotId) {
+          set({ isSaving: false });
+          return Promise.resolve({
+            success: false,
+            message: 'No se puede restaurar: ID de plubot no definido',
+          });
+        }
+        
+        return flowService.restoreBackup(plubotId, backupId)
+          .then(response => {
+            // Recargar el flujo después de restaurar
+            return get().loadFlow(plubotId);
+          })
+          .catch(error => {
+            set({ isSaving: false });
+            console.error('Error al restaurar la copia de seguridad:', error);
+            return {
+              success: false,
+              message: 'Error al restaurar: ' + (error.message || 'Error desconocido'),
+            };
+          });
+      },
     }),
     {
       name: 'flow-editor-store',

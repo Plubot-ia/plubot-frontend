@@ -1,8 +1,7 @@
 import { useContext, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { AuthContext } from '@/context/AuthContext';
 import { GamificationContext } from '@/context/GamificationContext';
-import useAPI from '@/hooks/useAPI';
+import useAuthStore from '@/stores/useAuthStore';
 
 // Componentes modularizados
 import ProfileHeader from './components/ProfileHeader';
@@ -28,9 +27,8 @@ import './styles/Profile.css';
 
 const Profile = () => {
   const navigate = useNavigate();
-  const { user, setUser } = useContext(AuthContext);
+  const { user, updateProfile } = useAuthStore();
   const { pluCoins, level, addPluCoins } = useContext(GamificationContext);
-  const api = useAPI();
   
   // Estados centralizados usando hooks personalizados
   const { 
@@ -61,6 +59,43 @@ const Profile = () => {
   } = useAchievements();
   
   const { mousePosition, containerRef } = useMouseTracker();
+  
+  // Cargar el perfil al montar el componente - solo una vez
+  useEffect(() => {
+    // Evitar cargar el perfil si ya tenemos datos del usuario
+    if (user) {
+      return;
+    }
+    
+    const loadProfile = async () => {
+      try {
+        // Usar el método fetchUserProfile del store de autenticación
+        const { fetchUserProfile } = useAuthStore.getState();
+        // No forzar la actualización si ya tenemos datos en caché
+        const result = await fetchUserProfile(false);
+        
+        if (!result.success) {
+          setNotification({ 
+            message: result.message || 'Error al cargar el perfil. Por favor, inténtalo de nuevo más tarde.', 
+            type: 'error' 
+          });
+          
+          if (result.message?.includes('sesión')) {
+            navigate('/login');
+          }
+        }
+      } catch (error) {
+        console.error('Error al cargar el perfil:', error);
+        setNotification({ 
+          message: 'Error al cargar el perfil. Por favor, inténtalo de nuevo más tarde.', 
+          type: 'error' 
+        });
+      }
+    };
+    
+    loadProfile();
+    // Incluir user en las dependencias para evitar cargar el perfil si ya existe
+  }, [navigate, setNotification, user]);
 
   // Estados de UI
   const [activeTab, setActiveTab] = useState('profile');
@@ -74,8 +109,7 @@ const Profile = () => {
   
   // Inicialización
   useEffect(() => {
-    fetchUserProfile(setUser, navigate, setNotification);
-    
+    // La carga del perfil ya se maneja en el otro useEffect
     const loadingTimeout = setTimeout(() => setIsLoaded(true), 300);
     const achievementTimeout = setTimeout(() => {
       setRecentAchievement({
@@ -157,7 +191,7 @@ const Profile = () => {
       return;
     }
     console.log('[Profile] Navegando a editar flujos para plubotId:', plubotId);
-    // Usar parámetro de ruta en lugar de parámetro de búsqueda
+    // Usar parámetro de ruta en lugar de parámetro de búsqueda para asegurar que el ID del Plubot se capture correctamente
     navigate(`/plubot/edit/training/${plubotId}`);
     setEditModalPlubot(null);
   };
@@ -216,7 +250,7 @@ const Profile = () => {
           {activeTab === 'profile' && (
             <ProfileMain 
               user={user}
-              setUser={setUser}
+              updateProfile={updateProfile}
               level={level}
               pluCoins={pluCoins}
               energyLevel={energyLevel}
@@ -239,7 +273,7 @@ const Profile = () => {
           {activeTab === 'plubots' && (
             <PlubotSection 
               user={user}
-              setUser={setUser}
+              updateProfile={updateProfile}
               animateBadges={animateBadges}
               setModalPlubot={setModalPlubot}
               setEditModalPlubot={setEditModalPlubot}
@@ -251,7 +285,7 @@ const Profile = () => {
           {activeTab === 'powers' && (
             <PowersSection 
               user={user}
-              setUser={setUser}
+              updateProfile={updateProfile}
               showNotification={showNotification}
               navigate={navigate}
             />

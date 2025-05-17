@@ -1,13 +1,12 @@
-import { useState, useEffect, useRef, useContext } from 'react';
-import axiosInstance from '@/utils/axiosConfig';
-import { AuthContext } from '@/context/AuthContext';
+import { useState, useEffect, useRef } from 'react';
+import useAuthStore from '@/stores/useAuthStore';
 
 /**
  * Hook personalizado para gestionar los datos del perfil del usuario
  * @returns {Object} - Objeto con estados y funciones para gestionar el perfil
  */
 const useProfileData = () => {
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
   const [energyLevel, setEnergyLevel] = useState(0);
   const [dailyRewardAvailable, setDailyRewardAvailable] = useState(true);
@@ -21,8 +20,31 @@ const useProfileData = () => {
     (Math.random() + 1).toString(36).substring(2, 7).toUpperCase()
   );
   
-  // Obtener contexto de autenticación
-  const { user } = useContext(AuthContext);
+  // Obtener usuario y estado del store de autenticación
+  const { user, profile } = useAuthStore();
+  
+  // Sincronizar estados con el store de autenticación
+  useEffect(() => {
+    if (profile) {
+      setIsLoading(profile.isLoading || false);
+      setIsLoaded(profile.isLoaded || false);
+      
+      // Si hay un valor de energía en el perfil, usarlo
+      if (profile.energyLevel !== undefined) {
+        setEnergyLevel(profile.energyLevel);
+      }
+      
+      // Si hay información sobre la recompensa diaria, usarla
+      if (profile.dailyRewardAvailable !== undefined) {
+        setDailyRewardAvailable(profile.dailyRewardAvailable);
+      }
+      
+      // Si hay actividades recientes, usarlas
+      if (profile.recentActivities && Array.isArray(profile.recentActivities)) {
+        setRecentActivities(profile.recentActivities);
+      }
+    }
+  }, [profile]);
   
   // Actualizar nivel de energía cuando cambia el usuario
   useEffect(() => {
@@ -33,43 +55,6 @@ const useProfileData = () => {
       setEnergyLevel(0);
     }
   }, [user]);
-
-  /**
-   * Función para cargar el perfil del usuario desde la API
-   * @param {Function} setUser - Función para actualizar el usuario en el contexto
-   * @param {Function} navigate - Función de navegación
-   * @param {Function} setNotification - Función para mostrar notificaciones
-   */
-  const fetchUserProfile = async (setUser, navigate, setNotification) => {
-    try {
-      const token = localStorage.getItem('access_token');
-      if (!token) {
-        setNotification({ message: 'Sesión no encontrada. Por favor, inicia sesión.', type: 'error' });
-        navigate('/login');
-        return;
-      }
-      
-      const response = await axiosInstance.get('/api/auth/profile');
-      
-      if (response.data.status === 'success') {
-        setUser(response.data.user);
-      } else {
-        setNotification({ message: response.data.message || 'Error al cargar el perfil', type: 'error' });
-      }
-    } catch (error) {
-      console.error('[Profile] Error al refrescar perfil:', error);
-      
-      if (error.response?.status === 401) {
-        localStorage.removeItem('access_token');
-        setNotification({ message: 'Sesión expirada. Por favor, inicia sesión nuevamente.', type: 'error' });
-        navigate('/login');
-      } else {
-        setNotification({ message: 'Error al cargar el perfil: ' + error.message, type: 'error' });
-      }
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   return {
     isLoading,
@@ -83,8 +68,7 @@ const useProfileData = () => {
     recentActivities,
     setRecentActivities,
     profileId,
-    terminalId,
-    fetchUserProfile
+    terminalId
   };
 };
 

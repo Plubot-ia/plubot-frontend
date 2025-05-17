@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Register.css';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
-import { AuthContext } from '../../context/AuthContext';
+import useAuthStore from '@/stores/useAuthStore';
 
 const Register = () => {
   const [name, setName] = useState('');
@@ -16,10 +16,16 @@ const Register = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [registrationSuccess, setRegistrationSuccess] = useState(false);
   const navigate = useNavigate();
-  const { register } = useContext(AuthContext);
+  const { register, error: authError } = useAuthStore();
+
+  // Efecto para manejar errores del store
+  useEffect(() => {
+    if (authError) {
+      showMessage(authError, 'error');
+    }
+  }, [authError]);
 
   const showMessage = (text, type) => {
-    console.log(`Showing message: ${text} (type: ${type})`);
     setMessage({ text, type });
     setTimeout(() => setMessage({ text: '', type: '' }), 5000);
   };
@@ -87,18 +93,16 @@ const Register = () => {
     }
 
     try {
-      console.log('Attempting to register with:', { name, email });
       const response = await register(name, email, password);
-      console.log('Register response:', response);
-      if (response.status === 'success') {
-        showMessage('¡Registro exitoso! Revisa tu correo para verificar.', 'success');
-        console.log('Registration successful, setting registrationSuccess to true');
+      if (response?.success) {
+        showMessage('¡Registro exitoso! Revisa tu correo para verificar tu cuenta.', 'success');
         setRegistrationSuccess(true);
-        // Forzar navegación inmediata
-        console.log('Immediately navigating to /auth/verify-email');
-        navigate('/auth/verify-email', { replace: true });
+        navigate('/email-verification-notice', { 
+          state: { email }, 
+          replace: true 
+        });
       } else {
-        showMessage(response.message || 'Error en el registro. Intenta nuevamente.', 'error');
+        showMessage('Error en el registro. Intenta nuevamente.', 'error');
         setIsSubmitting(false);
       }
     } catch (error) {

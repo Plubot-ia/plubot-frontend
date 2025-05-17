@@ -1,0 +1,524 @@
+import { create } from 'zustand';
+import { persist, createJSONStorage } from 'zustand/middleware';
+import axios from 'axios';
+import instance from '@/utils/axiosConfig';
+
+// Estado inicial
+const initialState = {
+  user: null,
+  isAuthenticated: false,
+  loading: false,
+  error: null,
+  // Estado del perfil
+  profile: {
+    energyLevel: 0,
+    dailyRewardAvailable: true,
+    recentActivities: [],
+    isLoading: false,
+    isLoaded: false,
+    profileId: null,
+    terminalId: null
+  }
+};
+
+// Crear el store de autenticación
+const useAuthStore = create(
+  persist(
+    (set, get) => ({
+      ...initialState,
+      
+      // Iniciar sesión
+      login: async (email, password) => {
+        set({ loading: true, error: null });
+        
+        try {
+          const loginData = { email, password };
+          const loginResponse = await instance.post('/api/auth/login', loginData);
+          const data = loginResponse.data;
+          
+          if (data?.status === 'success') {
+            // Guardar el token
+            localStorage.setItem('access_token', data.access_token);
+            
+            // Obtener el perfil del usuario
+            const profileResponse = await instance.get('/api/auth/profile', {
+              headers: {
+                'Authorization': `Bearer ${data.access_token}`
+              }
+            });
+            const profile = profileResponse.data;
+            
+            if (profile?.user) {
+              if (!profile.user.is_verified) {
+                throw new Error('Por favor verifica tu correo antes de iniciar sesión.');
+              }
+              
+              set({
+                user: profile.user,
+                isAuthenticated: true,
+                loading: false,
+              });
+              
+              return { success: true, user: profile.user };
+            }
+          }
+          
+          throw new Error(data?.message || 'Error al iniciar sesión');
+          
+        } catch (error) {
+          const errorMessage = error.response?.data?.message || error.message || 'Error de conexión';
+          set({ 
+            user: null, 
+            isAuthenticated: false, 
+            loading: false, 
+            error: errorMessage 
+          });
+          throw new Error(errorMessage);
+        }
+      },
+      
+      // Registrar nuevo usuario
+      register: async (name, email, password) => {
+        set({ loading: true, error: null });
+        
+        try {
+          const registerData = { name, email, password };
+          const response = await instance.post('/api/auth/register', registerData);
+          const data = response.data;
+          
+          if (data?.status === 'success') {
+            set({ loading: false });
+            return { success: true };
+          }
+          
+          throw new Error(data?.message || 'Error en el registro');
+          
+        } catch (error) {
+          const errorMessage = error.response?.data?.message || error.message || 'Error de conexión';
+          set({ loading: false, error: errorMessage });
+          throw new Error(errorMessage);
+        }
+      },
+      
+      // Cerrar sesión
+      logout: async () => {
+        try {
+          await instance.post('/api/auth/logout');
+        } catch (error) {
+          console.error('Error al cerrar sesión:', error);
+        } finally {
+          // Limpiar el estado y el almacenamiento
+          localStorage.removeItem('access_token');
+          set({
+            user: null,
+            isAuthenticated: false,
+            loading: false,
+            error: null,
+          });
+        }
+      },
+      
+      // Verificar autenticación
+      checkAuth: async () => {
+        const state = get();
+        
+        // Si ya está autenticado, no es necesario verificar de nuevo
+        if (state.isAuthenticated && state.user) {
+          return true;
+        }
+        
+        // Si ya se está verificando, no hacer nada
+        if (state.loading) {
+          return false;
+        }
+        
+        const token = localStorage.getItem('access_token');
+        
+        // Si no hay token, no está autenticado
+        if (!token) {
+          set({ loading: false, isAuthenticated: false, user: null });
+          return false;
+        }
+        
+        // Si hay un usuario en caché y el token es válido, usarlo
+        if (state._profileCache.isValid() && state._profileCache.data) {
+          set({
+            user: state._profileCache.data,
+            isAuthenticated: true,
+            loading: false,
+            error: null
+          });
+          return true;
+        }
+        
+        // Marcar como cargando
+        set({ loading: true });
+        
+        try {
+          // Verificar token con el servidor
+          const response = await instance.get('/api/auth/me', {
+            headers: { 'Authorization': `Bearer ${token}` },
+            // Evitar caché del navegador
+            params: { _: Date.now() }
+          });
+          
+          if (response.data?.user) {
+            // Actualizar caché
+            state._profileCache.set(response.data.user);
+            
+            // Actualizar estado
+            set({
+              user: response.data.user,
+              isAuthenticated: true,
+              loading: false,
+              error: null
+            });
+            return true;
+          }
+          
+          // Si no hay usuario en la respuesta, limpiar todo
+          localStorage.removeItem('access_token');
+          state._profileCache.clear();
+          set({
+            user: null,
+            isAuthenticated: false,
+            loading: false,
+            error: 'Sesión inválida'
+          });
+          return false;
+          
+        } catch (error) {
+          const errorMessage = error.response?.data?.message || error.message || 'Error de conexión';
+          
+          if (process.env.NODE_ENV === 'development') {
+            console.error('[Auth] Error al verificar autenticación:', errorMessage);
+          }
+          
+          // Si hay un error de autenticación, limpiar todo
+          if (error.response?.status === 401) {
+            localStorage.removeItem('access_token');
+            state._profileCache.clear();
+            set({
+              user: null,
+              isAuthenticated: false,
+              loading: false,
+              error: 'Sesión expirada. Por favor, inicia sesión nuevamente.'
+            });
+          } else {
+            // Para otros errores, mantener el estado actual pero marcar el error
+            set(state => ({
+              loading: false,
+              error: errorMessage
+            }));
+          }
+          
+          return false;
+        }
+      },
+      
+      // Variable para controlar si hay una petición en curso
+      _isLoadingProfile: false,
+      
+      // Método para cargar el perfil del usuario
+      fetchUserProfile: async (forceUpdate = false) => {
+        const currentState = get();
+        
+        // Si ya tenemos el perfil y no se fuerza la actualización, devolver el perfil actual
+        if (currentState.user && currentState.isAuthenticated && !forceUpdate) {
+          return { success: true, user: currentState.user };
+        }
+        
+        // Usar una variable estática para evitar peticiones simultáneas
+        if (useAuthStore._isLoadingProfile) {
+          return { success: false, message: 'Ya hay una carga en curso' };
+        }
+        
+        // Marcar como cargando
+        useAuthStore._isLoadingProfile = true;
+        set({ loading: true, error: null });
+        
+        try {
+          const token = localStorage.getItem('access_token');
+          if (!token) {
+            set({ 
+              user: null, 
+              isAuthenticated: false, 
+              loading: false, 
+              error: 'No se encontró token de autenticación' 
+            });
+            return { success: false, message: 'No se encontró token de autenticación' };
+          }
+          
+          // Verificar si hay datos en caché válidos
+          if (!forceUpdate && currentState._profileCache.isValid()) {
+            const cachedUser = currentState._profileCache.data;
+            set({
+              user: cachedUser,
+              isAuthenticated: true,
+              loading: false,
+              error: null,
+              profile: {
+                ...currentState.profile,
+                energyLevel: Math.min(cachedUser.plubots?.length * 20 || 0, 100),
+                isLoaded: true
+              }
+            });
+            return { success: true, user: cachedUser };
+          }
+          
+          if (process.env.NODE_ENV === 'development') {
+            console.log('[Auth] Cargando perfil de usuario...');
+          }
+          
+          const response = await instance.get('/api/auth/profile', {
+            headers: { 'Authorization': `Bearer ${token}` },
+            params: { _t: Date.now() } // Evitar caché del navegador
+          });
+          
+          if (response.data?.status === 'success' && response.data.user) {
+            // Actualizar caché
+            currentState._profileCache.set(response.data.user);
+            
+            // Actualizar estado
+            set({
+              user: response.data.user,
+              isAuthenticated: true,
+              loading: false,
+              error: null,
+              profile: {
+                ...currentState.profile,
+                energyLevel: Math.min(response.data.user.plubots?.length * 20 || 0, 100),
+                isLoaded: true
+              }
+            });
+            
+            if (process.env.NODE_ENV === 'development') {
+              console.log('[Auth] Perfil cargado correctamente');
+            }
+            
+            // Liberar la variable de carga
+            useAuthStore._isLoadingProfile = false;
+            return { success: true, user: response.data.user };
+          }
+          
+          throw new Error(response.data?.message || 'Error al cargar el perfil');
+          
+        } catch (error) {
+          const errorMessage = error.response?.data?.message || error.message || 'Error de conexión';
+          
+          if (process.env.NODE_ENV === 'development') {
+            console.error('[Auth] Error al cargar perfil:', errorMessage);
+          }
+          
+          // Si hay un error de autenticación, limpiar todo
+          if (error.response?.status === 401) {
+            localStorage.removeItem('access_token');
+            currentState._profileCache.clear();
+            set({
+              user: null,
+              isAuthenticated: false,
+              loading: false,
+              error: 'Sesión expirada. Por favor, inicia sesión nuevamente.'
+            });
+          } else {
+            set({
+              loading: false,
+              error: errorMessage
+            });
+          }
+          
+          // Liberar la variable de carga en caso de error
+          useAuthStore._isLoadingProfile = false;
+          return { success: false, message: errorMessage };
+        } finally {
+          // Asegurarse de que siempre se libere la variable de carga
+          useAuthStore._isLoadingProfile = false;
+        }
+      },
+      
+      // Restablecer contraseña
+      resetPassword: async (token, newPassword) => {
+        set({ loading: true, error: null });
+        
+        try {
+          const response = await instance.post('/api/auth/reset-password', {
+            token,
+            password: newPassword,
+            password_confirmation: newPassword
+          });
+          
+          if (response.data?.status === 'success') {
+            set({ loading: false });
+            return { success: true };
+          }
+          
+          throw new Error(response.data?.message || 'Error al restablecer la contraseña');
+          
+        } catch (error) {
+          const errorMessage = error.response?.data?.message || error.message || 'Error de conexión';
+          set({ loading: false, error: errorMessage });
+          throw new Error(errorMessage);
+        }
+      },
+      
+      // Limpiar errores
+      clearError: () => set({ error: null }),
+      
+      // Cache para perfiles
+      _profileCache: {
+        data: null,
+        timestamp: 0,
+        isValid() {
+          return this.data && (Date.now() - this.timestamp) < 30000;
+        },
+        set(data) {
+          this.data = data;
+          this.timestamp = Date.now();
+        },
+        clear() {
+          this.data = null;
+          this.timestamp = 0;
+        }
+      },
+      
+      // Actualizar perfil
+      updateProfile: async (updates) => {
+        // Evitar actualizaciones duplicadas
+        const currentState = get();
+        if (currentState.profile.isLoading) {
+          return { success: false, message: 'Ya hay una actualización en curso' };
+        }
+        
+        set(state => ({ 
+          profile: { 
+            ...state.profile, 
+            isLoading: true, 
+            error: null 
+          } 
+        }));
+        
+        try {
+          // Crear FormData solo si hay actualizaciones
+          const formData = new FormData();
+          let hasUpdates = false;
+          
+          Object.entries(updates).forEach(([key, value]) => {
+            if (value !== undefined && value !== null) {
+              formData.append(key, value);
+              hasUpdates = true;
+            }
+          });
+          
+          if (!hasUpdates) {
+            set(state => ({ 
+              profile: { 
+                ...state.profile, 
+                isLoading: false 
+              } 
+            }));
+            return { success: true, user: currentState.user };
+          }
+          
+          if (process.env.NODE_ENV === 'development') {
+            console.log('[Auth] Actualizando perfil...', updates);
+          }
+          
+          const response = await instance.put('/api/auth/profile', formData, {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+            },
+          });
+          
+          if (response.data?.status === 'success' && response.data.user) {
+            const updatedUser = { ...currentState.user, ...response.data.user };
+            
+            // Actualizar la caché
+            currentState._profileCache.set(updatedUser);
+            
+            // Actualizar el estado
+            set({
+              user: updatedUser,
+              isAuthenticated: true,
+              profile: { 
+                ...currentState.profile, 
+                isLoading: false, 
+                error: null,
+                energyLevel: Math.min(updatedUser.plubots?.length * 20 || 0, 100)
+              }
+            });
+            
+            if (process.env.NODE_ENV === 'development') {
+              console.log('[Auth] Perfil actualizado correctamente');
+            }
+            
+            return { success: true, user: updatedUser };
+          }
+          
+          throw new Error(response.data?.message || 'Error al actualizar el perfil');
+          
+        } catch (error) {
+          const errorMessage = error.response?.data?.message || error.message || 'Error de conexión';
+          
+          if (process.env.NODE_ENV === 'development') {
+            console.error('[Auth] Error al actualizar perfil:', errorMessage);
+          }
+          
+          set(state => ({
+            profile: { 
+              ...state.profile, 
+              isLoading: false,
+              error: errorMessage 
+            }
+          }));
+          
+          // Si hay un error de autenticación, limpiar la caché
+          if (error.response?.status === 401) {
+            currentState._profileCache.clear();
+            localStorage.removeItem('access_token');
+            set({
+              isAuthenticated: false,
+              user: null,
+              loading: false
+            });
+          }
+          
+          throw new Error(errorMessage);
+        }
+      },
+      
+      // Gamificación
+      claimDailyReward: () => {
+        set(state => ({
+          profile: {
+            ...state.profile,
+            dailyRewardAvailable: false,
+            energyLevel: Math.min(100, (state.profile.energyLevel || 0) + 20)
+          }
+        }));
+        // Aquí iría la llamada a la API para reclamar la recompensa
+        return { success: true };
+      },
+      
+      // Utilidades
+      clearProfileError: () => set(state => ({ 
+        profile: { ...state.profile, error: null } 
+      })),
+    }),
+    {
+      name: 'auth-storage',
+      storage: createJSONStorage(() => sessionStorage),
+      partialize: (state) => ({
+        user: state.user,
+        isAuthenticated: state.isAuthenticated,
+      }),
+    }
+  )
+);
+
+// Selectores personalizados
+export const useUser = () => useAuthStore((state) => state.user);
+export const useIsAuthenticated = () => useAuthStore((state) => state.isAuthenticated);
+export const useAuthLoading = () => useAuthStore((state) => state.loading);
+export const useAuthError = () => useAuthStore((state) => state.error);
+
+export default useAuthStore;

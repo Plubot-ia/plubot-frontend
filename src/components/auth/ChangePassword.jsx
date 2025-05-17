@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axiosInstance from '../../utils/axiosConfig';
+import useAuthStore from '@/stores/useAuthStore';
 import './ChangePassword.css';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 
@@ -16,6 +16,14 @@ const ChangePassword = () => {
   const [message, setMessage] = useState({ text: '', type: '' });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
+  const { updateProfile, error: authError } = useAuthStore();
+
+  // Efecto para manejar errores del store
+  useEffect(() => {
+    if (authError) {
+      showMessage(authError, 'error');
+    }
+  }, [authError]);
 
   const showMessage = (text, type) => {
     setMessage({ text, type });
@@ -52,26 +60,30 @@ const ChangePassword = () => {
     }
 
     try {
-      const data = new FormData();
-      data.append('current_password', formData.current_password);
-      data.append('new_password', formData.new_password);
-      data.append('confirm_password', formData.confirm_password);
+      const response = await updateProfile({
+        current_password: formData.current_password,
+        password: formData.new_password,
+        password_confirmation: formData.confirm_password
+      });
 
-      const response = await axiosInstance.post('/api/auth/change_password', data);
-
-      if (response.data.status === 'success') {
-        showMessage('¡Contraseña cambiada exitosamente! Redirigiendo...', 'success');
+      if (response) {
+        showMessage('Contraseña actualizada exitosamente', 'success');
         const card = document.querySelector('.change-password-card');
         if (card) {
           card.style.boxShadow =
             '0 0 50px rgba(0, 255, 150, 0.7), 0 0 120px rgba(0, 0, 0, 0.8), inset 0 0 25px rgba(0, 255, 150, 0.4)';
         }
+        setFormData({
+          current_password: '',
+          new_password: '',
+          confirm_password: '',
+        });
         setTimeout(() => {
-          navigate('/pluniverse');
+          navigate('/profile');
           window.scrollTo(0, 0);
         }, 2000);
       } else {
-        showMessage(response.data.message || 'Error al cambiar la contraseña. Intenta nuevamente.', 'error');
+        showMessage('Error al actualizar la contraseña', 'error');
         setIsSubmitting(false);
       }
     } catch (error) {

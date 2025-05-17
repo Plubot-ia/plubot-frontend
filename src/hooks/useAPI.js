@@ -64,14 +64,24 @@ const useAPI = () => {
         }
       }
       
-      const headers = token ? { Authorization: `Bearer ${token}` } : {};
+      // Configurar cabeceras
+      const headers = {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        ...(token && { 'Authorization': `Bearer ${token}` }),
+        ...(config.headers || {})
+      };
+
+      // Para depuración
+      console.log(`Enviando petición a ${url} con datos:`, data);
+      console.log('Cabeceras de la petición:', headers);
 
       const response = await instance({
         method,
         url,
-        data,
+        data: data ? JSON.stringify(data) : null,
         ...config,
-        headers: { ...headers, ...config.headers },
+        headers,
       });
       setLoading(false);
       return response.data;

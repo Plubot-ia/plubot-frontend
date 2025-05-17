@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useContext } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { usePlubotCreation } from '@/context/PlubotCreationContext.jsx';
@@ -8,7 +8,7 @@ import byteImage from '@/assets/img/byte.png';
 import proLogo from '@/assets/img/plubotpro.svg';
 import { powers } from '@/data/powers.js';
 import './PersonalizationForm.css';
-import { AuthContext } from '@/context/AuthContext';
+import useAuthStore from '@/stores/useAuthStore';
 import useAPI from '@/hooks/useAPI';
 
 const PersonalizationForm = () => {
@@ -27,7 +27,7 @@ const PersonalizationForm = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { request, createBot, loading, error } = useAPI();
-  const { user, setUser } = useContext(AuthContext);
+  const { user, updateProfile } = useAuthStore();
   const plubotId = searchParams.get('plubotId');
 
   // Nuevas personalidades (todas elegibles)
@@ -300,15 +300,14 @@ const PersonalizationForm = () => {
               powers: payload.powers.join(','),
             };
             console.log('Actualizando user.plubots con:', updatedPlubot);
-            setUser(prev => {
-              const newPlubots = prev.plubots.map(p =>
-                p.id === plubotId ? updatedPlubot : p
-              );
-              console.log('Nuevo estado de user.plubots:', newPlubots);
-              return {
-                ...prev,
-                plubots: newPlubots,
-              };
+            // Actualizar el perfil del usuario con el Plubot modificado
+            const newPlubots = user?.plubots?.map(p =>
+              p.id === plubotId ? updatedPlubot : p
+            ) || [];
+            console.log('Nuevo estado de user.plubots:', newPlubots);
+            updateProfile({
+              plubots: newPlubots
+            
             });
 
             // Forzar recarga de datos del perfil
@@ -316,11 +315,11 @@ const PersonalizationForm = () => {
             const profileResponse = await request('GET', '/api/auth/profile');
             console.log('Respuesta de GET /api/auth/profile:', profileResponse);
             if (profileResponse.status === 'success') {
-              setUser(prev => ({
-                ...prev,
+              // Actualizar el perfil completo con los datos recibidos del servidor
+              updateProfile({
                 ...profileResponse.user,
-                plubots: profileResponse.user.plubots || prev.plubots,
-              }));
+                plubots: profileResponse.user.plubots || user?.plubots || []
+              });
               console.log('Estado de user actualizado con datos del perfil:', profileResponse.user);
             } else {
               console.error('Error al cargar datos del perfil:', profileResponse);
@@ -373,10 +372,10 @@ const PersonalizationForm = () => {
             });
             
             // Actualizar el usuario con el nuevo Plubot
-            setUser(prev => ({
-              ...prev,
-              plubots: [...(prev.plubots || []), newPlubot]
-            }));
+            // Actualizar el perfil del usuario con el nuevo Plubot
+            updateProfile({
+              plubots: [...(user?.plubots || []), newPlubot]
+            });
             
             // Mostrar mensaje de éxito
             setMessageText(personalityMessages[plubotData.tone]?.confirmation || '¡Plubot creado con éxito!');

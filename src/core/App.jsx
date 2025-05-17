@@ -1,9 +1,9 @@
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
-import { AuthProvider } from '../context/AuthContext';
 import { GamificationProvider } from '../context/GamificationContext';
 import { PlubotCreationProvider } from '../context/PlubotCreationContext';
 import PrivateRoute from '../components/auth/PrivateRoute.jsx';
 import { useEffect, Suspense, lazy } from 'react';
+import useAuthStore from '@/stores/useAuthStore';
 
 // Componentes que se cargan inmediatamente (críticos para la experiencia inicial)
 import Layout from '../pages/layout/Layout.jsx';
@@ -100,233 +100,320 @@ const LoadingFallback = () => (
 
 // Error boundary para errores globales
 class ErrorBoundary extends React.Component {
-  state = { hasError: false };
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
 
-  static getDerivedStateFromError() {
-    return { hasError: true };
+  static getDerivedStateFromError(error) {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error, errorInfo) {
+    console.error("Error capturado en ErrorBoundary:", error, errorInfo);
   }
 
   render() {
     if (this.state.hasError) {
       return (
-        <div style={{ textAlign: 'center', padding: '2rem', color: '#fff', background: '#0a0e2f' }}>
-          <h1>¡Algo salió mal!</h1>
-          <p>Por favor, recarga la página o contacta al soporte.</p>
+        <div style={{ padding: '20px', textAlign: 'center', color: 'white' }}>
+          <h2>¡Ups! Algo salió mal.</h2>
+          <p>Por favor, recarga la página o inténtalo de nuevo más tarde.</p>
+          <button 
+            onClick={() => window.location.reload()}
+            style={{
+              padding: '10px 20px',
+              marginTop: '20px',
+              backgroundColor: '#4CAF50',
+              color: 'white',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              fontSize: '16px'
+            }}
+          >
+            Recargar Página
+          </button>
         </div>
       );
     }
+
     return this.props.children;
   }
 }
+
+// Componente para inicializar la autenticación
+const AuthInitializer = ({ children }) => {
+  const { checkAuth, isAuthenticated, loading } = useAuthStore();
+  const initialized = React.useRef(false);
+
+  useEffect(() => {
+    // Solo verificar autenticación si no estamos ya cargando y no está inicializado
+    if (!loading && !initialized.current) {
+      initialized.current = true;
+      
+      // Verificar el estado de autenticación al cargar la aplicación
+      const verifyAuth = async () => {
+        try {
+          await checkAuth();
+        } catch (error) {
+          console.error('Error al verificar autenticación:', error);
+        }
+      };
+      
+      verifyAuth();
+      
+      // Configurar un intervalo para verificar la autenticación periódicamente
+      // solo si el usuario está autenticado
+      let intervalId;
+      if (isAuthenticated) {
+        intervalId = setInterval(() => {
+          checkAuth().catch(console.error);
+        }, 5 * 60 * 1000); // Cada 5 minutos
+      }
+      
+      return () => {
+        if (intervalId) clearInterval(intervalId);
+      };
+    }
+  }, [checkAuth, isAuthenticated, loading]);
+
+  return children;
+};
 
 // Componente para desplazar al inicio en cada cambio de ruta
 function ScrollToTop() {
   const { pathname } = useLocation();
 
   useEffect(() => {
-    console.log(`ScrollToTop triggered for pathname: ${pathname}`);
+    // Buscar el contenedor principal de scroll
+    const findScrollableContainer = () => {
+      const containers = [
+        document.querySelector('.app-container'),
+        document.querySelector('.main-content'),
+        document.querySelector('main'),
+        document.querySelector('div[style*="overflow-y"]'),
+        document.body,
+        document.documentElement
+      ];
+      
+      return containers.find(container => {
+        if (!container) return false;
+        const style = getComputedStyle(container);
+        const isScrollable = style.overflowY === 'auto' || style.overflowY === 'scroll';
+        const hasScrollableContent = container.scrollHeight > container.clientHeight;
+        return isScrollable && hasScrollableContent;
+      }) || window; // Por defecto usar window si no se encuentra otro contenedor
+    };
     
-    // Buscar contenedor desplazable
-    const possibleContainers = [
-      document.querySelector('.layout'),
-      document.querySelector('main'),
-      document.querySelector('div[style*="overflow-y"]'),
-      document.body,
-      window
-    ].filter(Boolean);
-
-    let scrollTarget = window;
-    for (const container of possibleContainers) {
-      const isScrollable =
-        container !== window &&
-        container.scrollHeight > container.clientHeight &&
-        (getComputedStyle(container).overflowY === 'auto' ||
-         getComputedStyle(container).overflowY === 'scroll');
-      if (isScrollable) {
-        scrollTarget = container;
-        console.log(`Scrollable container found: ${container.className || container.tagName}`);
-        break;
-      }
-    }
-
-    // Primer intento de scroll con retraso
-    const scrollTimeout = setTimeout(() => {
-      scrollTarget.scrollTo({
-        top: 0,
-        left: 0,
-        behavior: 'instant'
-      });
-      const scrollY = scrollTarget === window ? window.scrollY : scrollTarget.scrollTop;
-      console.log(`First scroll executed for ${pathname}, scrollY=${scrollY}`);
-      // Prevenir enfoque automático
-      const focusableElements = document.querySelectorAll('a[href], button, input, select, textarea');
-      focusableElements.forEach((el) => {
-        el.blur();
-      });
-      console.log('Prevented auto-focus for navigable elements');
-      // Segundo intento de scroll
+    const container = findScrollableContainer();
+    if (container) {
+      // Usar setTimeout para asegurar que el DOM esté listo
       setTimeout(() => {
-        const currentScrollY = scrollTarget === window ? window.scrollY : scrollTarget.scrollTop;
-        if (currentScrollY !== 0) {
-          scrollTarget.scrollTo({
-            top: 0,
-            left: 0,
-            behavior: 'instant'
-          });
-          console.log(`Second scroll executed for ${pathname}, scrollY=${currentScrollY}`);
-        }
-      }, 100);
-    }, 200); // Retraso inicial de 200ms
-
+        container.scrollTo({ top: 0, behavior: 'smooth' });
+        
+        // Verificar si el scroll se realizó correctamente
+        const checkScroll = () => {
+          // Prevenir auto-enfoque en elementos navegables después del scroll
+          if (document.activeElement && 
+              (document.activeElement.tagName === 'A' || 
+               document.activeElement.tagName === 'BUTTON' ||
+               document.activeElement.getAttribute('role') === 'button')) {
+            document.activeElement.blur();
+          }
+          
+          // Verificar nuevamente después de un breve retraso para asegurar que el scroll se completó
+          setTimeout(() => {
+            const currentScrollY = container === window ? window.scrollY : container.scrollTop;
+            if (currentScrollY > 0) {
+              container.scrollTo({ top: 0, behavior: 'auto' });
+            }
+          }, 100);
+        };
+        
+        checkScroll();
+      }, 0);
+    }
+    
     // Deshabilitar la restauración automática del desplazamiento
     if ('scrollRestoration' in window.history) {
       window.history.scrollRestoration = 'manual';
     }
-
+    
     // Limpiar el timeout al desmontar
-    return () => clearTimeout(scrollTimeout);
+    return () => {};
   }, [pathname]);
 
   return null;
 }
 
 // Envoltorio que decide si usar Layout o no
-function AppWrapper() {
+const AppWrapper = () => {
   const location = useLocation();
-  const isTrainingRoute = location.pathname === "/plubot/create/training" || location.pathname.startsWith("/plubot/edit/");
-  const isChatRoute = location.pathname.startsWith("/chat/");
-
-  if (isTrainingRoute) {
-    return (
-      <>
-        <ScrollToTop />
-        <Suspense fallback={<LoadingFallback />}>
-          <Routes>
-            <Route path="/plubot/create/training" element={
-              <PrivateRoute>
-                <TrainingScreen />
-              </PrivateRoute>
-            } />
-            <Route path="/plubot/edit/personalization" element={
-              <PrivateRoute>
-                <PersonalizationForm />
-              </PrivateRoute>
-            } />
-            <Route path="/plubot/edit/training" element={
-              <PrivateRoute>
-                <TrainingScreen />
-              </PrivateRoute>
-            } />
-            <Route path="/plubot/edit/training/:plubotId" element={
-              <PrivateRoute>
-                <TrainingScreen />
-              </PrivateRoute>
-            } />
-            <Route path="/plubot/edit/:plubotId" element={
-              <PrivateRoute>
-                <PlubotEdit />
-              </PrivateRoute>
-            } />
-          </Routes>
-        </Suspense>
-      </>
-    );
-  }
-
-  if (isChatRoute) {
-    return (
-      <>
-        <ScrollToTop />
-        <Suspense fallback={<LoadingFallback />}>
-          <Routes>
-            <Route path="/chat/:publicId" element={<PublicChat />} />
-          </Routes>
-        </Suspense>
-      </>
-    );
-  }
+  const { pathname } = location;
+  
+  // Páginas de autenticación que no usan el Layout
+  const isAuthPage = ['/login', '/register', '/forgot-password', '/reset-password', '/change-password'].includes(pathname);
+  
+  // Rutas donde queremos ocultar el encabezado y pie de página
+  const hideHeaderFooter = pathname.includes('/plubot/edit/training/') || pathname.includes('/plubot/edit/training');
 
   return (
-    <Suspense fallback={<LoadingFallback />}>
-      <Layout>
-        <ScrollToTop />
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/faq" element={<FAQ />} />
-          <Route path="/tutoriales" element={<Tutoriales />} />
-          <Route path="/tutoriales/automatizacion" element={<TutorialesAutomatizacion />} />
-          <Route path="/tutoriales/aprendizaje" element={<TutorialesAprendizaje />} />
-          <Route path="/tutoriales/flujos" element={<TutorialesFlujos />} />
-          <Route path="/tutoriales/expansion" element={<TutorialesExpansion />} />
-          <Route path="/services" element={<Services />} />
-          <Route path="/case-studies" element={<CaseStudies />} />
-          <Route path="/chatbot" element={<Chatbot />} />
-          <Route path="/contact" element={<Contact />} />
-          <Route path="/blog" element={<Blog />} />
-          <Route path="/blog/:slug" element={<BlogPost />} />
-          <Route path="/terms" element={<Terms />} />
-          <Route path="/privacy" element={<Privacy />} />
-          <Route path="/seguridad" element={<Seguridad />} />
-          <Route path="/plans" element={<Plans />} />
-          <Route path="/poderes" element={<Poderes />} />
-          <Route path="/poderes-about" element={<PoderesAbout />} />
-          <Route path="/pluniverse" element={<PluniverseDashboard />} />
-          <Route path="/pluniverse/factory" element={<PrivateRoute><PlubotStudio /></PrivateRoute>} />
-          <Route path="/pluniverse/academy" element={<PrivateRoute><Academy /></PrivateRoute>} />
-          <Route path="/pluniverse/marketplace" element={<Marketplace />} />
-          <Route path="/pluniverse/coliseum" element={<PrivateRoute><Coliseum /></PrivateRoute>} />
-          <Route path="/pluniverse/tower" element={<PrivateRoute><Tower /></PrivateRoute>} />
-          <Route path="/pluniverse/sanctuary" element={<PrivateRoute><Sanctuary /></PrivateRoute>} />
-          <Route path="/pluniverse/learn-powers" element={<PrivateRoute><PoderesAbout /></PrivateRoute>} />
-          <Route path="/auth" element={<Navigate to="/auth/login" replace />} />
-          <Route path="/auth/login" element={<Login />} />
-          <Route path="/login" element={<Navigate to="/auth/login" />} />
-          <Route path="/auth/register" element={<Register />} />
-          <Route path="/auth/verify-email" element={<EmailVerificationNotice />} />
-          <Route path="/auth/forgot" element={<ForgotPassword />} />
-          <Route path="/auth/reset" element={<ResetPassword />} />
-          <Route path="/reset-password/:token" element={<ResetPassword />} />
-          <Route path="/auth/change-password" element={<PrivateRoute><ChangePassword /></PrivateRoute>} />
-          <Route path="/profile" element={<PrivateRoute><Profile /></PrivateRoute>} />
-          <Route path="/auth/logout" element={<Logout />} />
-          <Route path="/plubot/about" element={<AboutPlubot />} />
-          <Route path="/plubot/about-chat-byte" element={<ByteEmbajador />} />
-          <Route path="/historyverse" element={<Historyverse />} />
-          <Route path="/tu-opinion" element={<TuOpinion />} /> {/* Nueva ruta */}
-          <Route path="/plubot/create/*" element={<CreatePlubot />}>
-            <Route index element={<WelcomeSequence />} />
-            <Route path="welcome" element={<WelcomeSequence />} />
-            <Route path="factory" element={<PrivateRoute><FactoryScreen /></PrivateRoute>} />
-            <Route path="personalization" element={<PrivateRoute><PersonalizationForm /></PrivateRoute>} />
-            <Route path="training" element={<PrivateRoute><TrainingScreen /></PrivateRoute>} />
-          </Route>
-          <Route path="/plubot/edit/training" element={
+    <ErrorBoundary>
+      <AuthInitializer>
+        <GamificationProvider>
+          <PlubotCreationProvider>
             <Suspense fallback={<LoadingFallback />}>
-              <PrivateRoute>
-                <TrainingScreen />
-              </PrivateRoute>
+              {isAuthPage ? (
+                <Routes>
+                  <Route path="/login" element={<Login />} />
+                  <Route path="/register" element={<Register />} />
+                  <Route path="/forgot-password" element={<ForgotPassword />} />
+                  <Route path="/reset-password" element={<ResetPassword />} />
+                  <Route path="/change-password" element={<ChangePassword />} />
+                  <Route path="/email-verification-notice" element={<EmailVerificationNotice />} />
+                  <Route path="*" element={<Navigate to="/login" replace />} />
+                </Routes>
+              ) : (
+                <Layout hideHeaderFooter={hideHeaderFooter}>
+                  <ScrollToTop />
+                  <Routes>
+                    {/* Rutas públicas */}
+                    <Route path="/" element={<Home />} />
+                    <Route path="/tutoriales" element={<Tutoriales />} />
+                    <Route path="/tutoriales/automatizacion" element={<TutorialesAutomatizacion />} />
+                    <Route path="/tutoriales/aprendizaje" element={<TutorialesAprendizaje />} />
+                    <Route path="/tutoriales/flujos" element={<TutorialesFlujos />} />
+                    <Route path="/tutoriales/expansion" element={<TutorialesExpansion />} />
+                    <Route path="/services" element={<Services />} />
+                    <Route path="/case-studies" element={<CaseStudies />} />
+                    <Route path="/chatbot" element={<Chatbot />} />
+                    <Route path="/contact" element={<Contact />} />
+                    <Route path="/blog" element={<Blog />} />
+                    <Route path="/blog/:slug" element={<BlogPost />} />
+                    <Route path="/terms" element={<Terms />} />
+                    <Route path="/privacy" element={<Privacy />} />
+                    <Route path="/seguridad" element={<Seguridad />} />
+                    <Route path="/plans" element={<Plans />} />
+                    <Route path="/poderes" element={<Poderes />} />
+                    <Route path="/poderes-about" element={<PoderesAbout />} />
+                    <Route path="/about-plubot" element={<AboutPlubot />} />
+                    <Route path="/byte-embajador" element={<ByteEmbajador />} />
+                    <Route path="/historyverse" element={<Historyverse />} />
+                    <Route path="/faq" element={<FAQ />} />
+                    <Route path="/tu-opinion" element={<TuOpinion />} />
+                    <Route path="/public-chat" element={<PublicChat />} />
+                    
+                    {/* Rutas protegidas */}
+                    <Route path="/pluniverse" element={
+                      <PrivateRoute>
+                        <PluniverseDashboard />
+                      </PrivateRoute>
+                    } />
+                    <Route path="/plubot-studio" element={
+                      <PrivateRoute>
+                        <PlubotStudio />
+                      </PrivateRoute>
+                    } />
+                    <Route path="/academy" element={
+                      <PrivateRoute>
+                        <Academy />
+                      </PrivateRoute>
+                    } />
+                    <Route path="/marketplace" element={
+                      <PrivateRoute>
+                        <Marketplace />
+                      </PrivateRoute>
+                    } />
+                    <Route path="/coliseum" element={
+                      <PrivateRoute>
+                        <Coliseum />
+                      </PrivateRoute>
+                    } />
+                    <Route path="/tower" element={
+                      <PrivateRoute>
+                        <Tower />
+                      </PrivateRoute>
+                    } />
+                    <Route path="/sanctuary" element={
+                      <PrivateRoute>
+                        <Sanctuary />
+                      </PrivateRoute>
+                    } />
+                    <Route path="/plubot/create" element={
+                      <PrivateRoute>
+                        <CreatePlubot />
+                      </PrivateRoute>
+                    } />
+                    <Route path="/plubot/edit/:id" element={
+                      <PrivateRoute>
+                        <PlubotEdit />
+                      </PrivateRoute>
+                    } />
+                    <Route path="/plubot/edit/personalization" element={
+                      <PrivateRoute>
+                        <PersonalizationForm />
+                      </PrivateRoute>
+                    } />
+                    <Route path="/plubot/edit/training/:plubotId" element={
+                      <PrivateRoute>
+                        <TrainingScreen />
+                      </PrivateRoute>
+                    } />
+                    <Route path="/welcome" element={
+                      <PrivateRoute>
+                        <WelcomeSequence />
+                      </PrivateRoute>
+                    } />
+                    <Route path="/factory" element={
+                      <PrivateRoute>
+                        <FactoryScreen />
+                      </PrivateRoute>
+                    } />
+                    <Route path="/personalization" element={
+                      <PrivateRoute>
+                        <PersonalizationForm />
+                      </PrivateRoute>
+                    } />
+                    <Route path="/training" element={
+                      <PrivateRoute>
+                        <TrainingScreen />
+                      </PrivateRoute>
+                    } />
+                    <Route path="/profile" element={
+                      <PrivateRoute>
+                        <Profile />
+                      </PrivateRoute>
+                    } />
+                    <Route path="/change-password" element={
+                      <PrivateRoute>
+                        <ChangePassword />
+                      </PrivateRoute>
+                    } />
+                    <Route path="/logout" element={
+                      <PrivateRoute>
+                        <Logout />
+                      </PrivateRoute>
+                    } />
+                    
+                    {/* Redirecciones */}
+                    <Route path="*" element={<NotFound />} />
+                  </Routes>
+                </Layout>
+              )}
             </Suspense>
-          } />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </Layout>
-    </Suspense>
+          </PlubotCreationProvider>
+        </GamificationProvider>
+      </AuthInitializer>
+    </ErrorBoundary>
   );
-}
+};
 
 function App() {
   return (
-    <GamificationProvider>
-      <PlubotCreationProvider>
-        <BrowserRouter>
-          <AuthProvider>
-            <ErrorBoundary>
-              <AppWrapper />
-            </ErrorBoundary>
-          </AuthProvider>
-        </BrowserRouter>
-      </PlubotCreationProvider>
-    </GamificationProvider>
+    <BrowserRouter>
+      <AppWrapper />
+    </BrowserRouter>
   );
 }
 

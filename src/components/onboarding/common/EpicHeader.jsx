@@ -1,6 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './EpicHeader.css';
-import { Save, Share2, Monitor, LayoutTemplate, MoreHorizontal } from 'lucide-react';
+import { Save, Share2, Monitor, LayoutTemplate, MoreHorizontal, History, Settings, Database, BarChart2 } from 'lucide-react';
+import BackupManager from '@/components/flow/BackupManager';
+import PerformanceStats from '@/components/flow/PerformanceStats';
 
 // Importar fuente Orbitron para el estilo cyberpunk
 import '@fontsource/orbitron/400.css';
@@ -21,7 +23,8 @@ const EpicHeader = ({
   openTemplatesModal,
   openSettingsModal,
   saveFlow: propsSaveFlow,
-  getVisibleNodeCount
+  getVisibleNodeCount,
+  plubotId // ID del plubot para el BackupManager
 }) => {
   // Obtener datos del store de Flow
   const { 
@@ -113,8 +116,16 @@ const EpicHeader = ({
   const finalSettingsModal = openSettingsModal || storeSettingsModal;
   
   // Calcular conteos
-  const nodeCount = getVisibleNodeCount ? getVisibleNodeCount() : (nodes?.length || 0);
-  const edgeCount = getVisibleEdgeCount ? getVisibleEdgeCount() : (edges?.length || 0);
+  // Filtrar nodos que no están eliminados
+  const visibleNodes = nodes ? nodes.filter(node => !node.deleted && !node.hidden) : [];
+  const visibleEdges = edges ? edges.filter(edge => !edge.deleted && !edge.hidden) : [];
+  
+  const nodeCount = getVisibleNodeCount ? getVisibleNodeCount() : visibleNodes.length;
+  const edgeCount = getVisibleEdgeCount ? getVisibleEdgeCount() : visibleEdges.length;
+  
+  // Estado para el menú desplegable de opciones
+  const [optionsMenuOpen, setOptionsMenuOpen] = useState(false);
+  const optionsMenuRef = useRef(null);
   
   // Eliminamos las partículas para mejorar el rendimiento
   const [time, setTime] = useState(new Date());
@@ -126,6 +137,20 @@ const EpicHeader = ({
     }, 60000);
     
     return () => clearInterval(timer);
+  }, []);
+  
+  // Cerrar el menú de opciones al hacer clic fuera de él
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (optionsMenuRef.current && !optionsMenuRef.current.contains(event.target)) {
+        setOptionsMenuOpen(false);
+      }
+    };
+    
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
   }, []);
   
   // Formatear la fecha de última guardado
@@ -215,8 +240,15 @@ const EpicHeader = ({
         
         <div className="epic-header-actions">
           <button 
-            className="epic-header-button" 
-            onClick={propsSaveFlow || saveFlow}
+            className="epic-header-button save-button" 
+            onClick={() => {
+              // Usar directamente la función de guardado original para mantener compatibilidad
+              if (propsSaveFlow) {
+                propsSaveFlow();
+              } else if (saveFlow) {
+                saveFlow();
+              }
+            }}
             title="Guardar flujo"
           >
             <Save size={16} className="epic-header-button-icon" />
@@ -225,9 +257,12 @@ const EpicHeader = ({
           
           <button 
             className="epic-header-button"
-            onClick={finalShareModal}
+            onClick={() => {
+              // Solo emitir el evento para abrir el modal de compartir
+              // Esto evita que se abran dos modales al mismo tiempo
+              window.dispatchEvent(new CustomEvent('open-embed-modal'));
+            }}
             title="Compartir flujo"
-            disabled={!finalShareModal}
           >
             <Share2 size={16} className="epic-header-button-icon" />
             <span>Compartir</span>
@@ -245,23 +280,100 @@ const EpicHeader = ({
           
           <button 
             className="epic-header-button"
-            onClick={finalTemplatesModal}
+            onClick={() => {
+              // Solo emitir el evento para abrir el modal de plantillas
+              // Esto evita que se abran dos modales al mismo tiempo
+              window.dispatchEvent(new CustomEvent('open-template-selector'));
+            }}
             title="Mostrar plantillas"
-            disabled={!finalTemplatesModal}
           >
             <LayoutTemplate size={16} className="epic-header-button-icon" />
             <span>Plantillas</span>
           </button>
           
-          <button 
-            className="epic-header-button"
-            onClick={finalSettingsModal}
-            title="Más opciones"
-            disabled={!finalSettingsModal}
-          >
-            <MoreHorizontal size={16} className="epic-header-button-icon" />
-            <span>Opciones</span>
-          </button>
+          <div className="epic-header-dropdown" ref={optionsMenuRef}>
+            <button 
+              className={`epic-header-button ${optionsMenuOpen ? 'active' : ''}`}
+              onClick={() => setOptionsMenuOpen(!optionsMenuOpen)}
+              title="Más opciones"
+            >
+              <MoreHorizontal size={16} className="epic-header-button-icon" />
+              <span>Opciones</span>
+            </button>
+            
+            {/* Menú desplegable dentro del mismo contenedor para mantener la referencia */}
+            {optionsMenuOpen && (
+              <div className="epic-header-dropdown-menu">
+                {plubotId && (
+                  <div className="epic-header-dropdown-item">
+                    <History size={16} className="epic-header-dropdown-icon" />
+                    <span>Copias de seguridad</span>
+                    <div className="epic-header-dropdown-action">
+                      <BackupManager plubotId={plubotId} />
+                    </div>
+                  </div>
+                )}
+                
+                {/* Historial de versiones */}
+                <div 
+                  className="epic-header-dropdown-item clickable"
+                  onClick={() => {
+                    // Cerrar el menú de opciones
+                    setOptionsMenuOpen(false);
+                    // Emitir evento para abrir el historial de versiones
+                    window.dispatchEvent(new CustomEvent('open-version-history'));
+                  }}
+                >
+                  <History size={16} className="epic-header-dropdown-icon" />
+                  <span>Historial de versiones</span>
+                </div>
+                
+                {/* Estadísticas de rendimiento */}
+                <div className="epic-header-dropdown-item">
+                  <BarChart2 size={16} className="epic-header-dropdown-icon" />
+                  <span>Estadísticas de rendimiento</span>
+                  <div className="epic-header-dropdown-content">
+                    <div className="performance-stats-mini">
+                      <div className="performance-stats-row">
+                        <span className="performance-stats-label">Memoria estimada:</span>
+                        <span className="performance-stats-value">{nodes.length * 2 + edges.length * 1.5} KB</span>
+                      </div>
+                      <div className="performance-stats-row">
+                        <span className="performance-stats-label">Tiempo de guardado:</span>
+                        <span className="performance-stats-value">{lastSaved ? `${((new Date() - new Date(lastSaved)) / 1000).toFixed(1)} s` : 'N/A'}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="epic-header-dropdown-item clickable" onClick={() => {
+                  setOptionsMenuOpen(false);
+                  if (finalSettingsModal) finalSettingsModal();
+                }}>
+                  <Settings size={16} className="epic-header-dropdown-icon" />
+                  <span>Configuración</span>
+                </div>
+                
+                <div className="epic-header-dropdown-item">
+                  <BarChart2 size={16} className="epic-header-dropdown-icon" />
+                  <span>Rendimiento</span>
+                  <div className="epic-header-dropdown-action">
+                    <div className="performance-indicator" title="Ver estadísticas de rendimiento">
+                      <div className="performance-dot" />
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="epic-header-dropdown-item">
+                  <Database size={16} className="epic-header-dropdown-icon" />
+                  <span>Base de datos</span>
+                  <div className="epic-header-dropdown-action">
+                    <span className="database-status">Conectado</span>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </header>

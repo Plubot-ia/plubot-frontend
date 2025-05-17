@@ -79,6 +79,14 @@ const NodePalette = () => {
   
   // Obtener funciones del store de Training
   const setByteMessage = useTrainingStore(state => state.setByteMessage);
+  
+  // Asegurarse de que el store esté inicializado correctamente
+  useEffect(() => {
+    // Verificar que addNode esté disponible
+    if (!addNode) {
+      console.error('[NodePalette] Error: No se pudo acceder a addNode desde el store');
+    }
+  }, [addNode]);
   const [isPaletteExpanded, setIsPaletteExpanded] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [favoriteNodes, setFavoriteNodes] = useState(() => {
@@ -126,6 +134,8 @@ const NodePalette = () => {
       event.dataTransfer.setData('application/json', jsonData);
       // Luego como application/reactflow para compatibilidad con ReactFlow
       event.dataTransfer.setData('application/reactflow', jsonData);
+      // También como text/reactflow para compatibilidad con versiones anteriores de ReactFlow
+      event.dataTransfer.setData('text/reactflow', jsonData);
       // Finalmente como texto plano para máxima compatibilidad
       event.dataTransfer.setData('text/plain', jsonData);
       

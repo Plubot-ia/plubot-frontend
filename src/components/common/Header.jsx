@@ -1,7 +1,7 @@
 import { useState, useEffect, useContext } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { AuthContext } from '../../context/AuthContext';
 import { GamificationContext } from '../../context/GamificationContext';
+import useAuthStore from '../../stores/useAuthStore';
 import {
   Home,
   Bot,
@@ -22,22 +22,29 @@ const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isLogoLoaded, setIsLogoLoaded] = useState(false);
-  const { user, isAuthenticated, logout } = useContext(AuthContext);
+  const { user, isAuthenticated, logout } = useAuthStore();
   const { pluCoins, level } = useContext(GamificationContext);
   const navigate = useNavigate();
+  
+  // Cargar el logo
+  useEffect(() => {
+    const img = new Image();
+    img.src = logo;
+    img.onload = () => setIsLogoLoaded(true);
+  }, []);
 
   const toggleMenu = () => {
-    console.log('Toggle menu clicked, isOpen:', !isOpen);
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[Header] Menu toggled:', !isOpen);
+    }
     setIsOpen(!isOpen);
   };
 
   const closeMenu = () => {
-    console.log('Closing menu, isOpen: false');
     setIsOpen(false);
   };
 
   const handleLinkInteraction = (e, to) => {
-    console.log(`Link clicked: type=${e.type}, target=${to}`);
     closeMenu();
   };
 
@@ -49,7 +56,7 @@ const Header = () => {
     try {
       await logout();
       setIsProfileOpen(false);
-      navigate('/auth/login');
+      navigate('/login');
     } catch (error) {
       console.error('Error al cerrar sesión:', error);
     }
@@ -59,14 +66,7 @@ const Header = () => {
     const handleScroll = (event) => {
       const target = event.currentTarget;
       const scrollY = target === window ? window.scrollY : target.scrollTop;
-      console.log('Scroll detected', {
-        scrollY,
-        target: target === window ? 'window' : target.className || target.tagName,
-        scrollHeight: target.scrollHeight,
-        clientHeight: target.clientHeight
-      });
       const scrolled = scrollY > 10;
-      console.log('Setting isScrolled:', scrolled);
       setIsScrolled(scrolled);
     };
 
@@ -76,10 +76,10 @@ const Header = () => {
       document.querySelector('.main-content'),
       document.querySelector('main'),
       document.querySelector('div[style*="overflow-y"]'),
-      document.querySelector('.container'), // Añadido por si usas un contenedor genérico
+      document.querySelector('.container'),
       document.body,
       window
-    ].filter(Boolean); // Filtra nulos
+    ].filter(Boolean);
 
     let scrollTarget = null;
     for (const container of possibleContainers) {
@@ -88,32 +88,30 @@ const Header = () => {
         container.scrollHeight > container.clientHeight &&
         (getComputedStyle(container).overflowY === 'auto' ||
           getComputedStyle(container).overflowY === 'scroll');
-      console.log('Checking container:', {
-        element: container === window ? 'window' : container.className || container.tagName,
-        scrollHeight: container.scrollHeight,
-        clientHeight: container.clientHeight,
-        overflowY: container !== window ? getComputedStyle(container).overflowY : 'N/A',
-        isScrollable
-      });
+      
       if (container === window || isScrollable) {
         scrollTarget = container;
         break;
       }
     }
 
+    // Si no se encontró un contenedor desplazable, usar window por defecto
     if (!scrollTarget) {
-      console.warn('No scrollable container found, defaulting to window');
       scrollTarget = window;
     }
 
-    console.log('Scroll listener added to:', scrollTarget === window ? 'window' : scrollTarget.className || scrollTarget.tagName);
-    scrollTarget.addEventListener('scroll', handleScroll, { passive: true });
+    // Añadir listener de scroll al contenedor encontrado
+    if (scrollTarget) {
+      scrollTarget.addEventListener('scroll', handleScroll, { passive: true });
+    }
 
+    // Limpiar el listener al desmontar
     return () => {
-      console.log('Scroll listener removed from:', scrollTarget === window ? 'window' : scrollTarget.className || scrollTarget.tagName);
-      scrollTarget.removeEventListener('scroll', handleScroll);
+      if (scrollTarget) {
+        scrollTarget.removeEventListener('scroll', handleScroll);
+      }
     };
-  }, []);
+  }, [isScrolled]);
 
   return (
     <header className={`header ${isScrolled ? 'scrolled' : ''}`}>
@@ -222,7 +220,6 @@ const Header = () => {
         </ul>
 
         <div className={`auth-section ${isOpen ? 'active' : ''}`}>
-          {console.log('Header: isAuthenticated=', isAuthenticated, 'user=', user)}
           {isAuthenticated ? (
             <div className="user-profile">
               <div
@@ -245,9 +242,9 @@ const Header = () => {
                     <p>PluCoin: {pluCoins}</p>
                   </div>
                   <NavLink
-                    to="/auth/change-password"
+                    to="/change-password"
                     className="profile-link"
-                    onClick={(e) => handleLinkInteraction(e, '/auth/change-password')}
+                    onClick={(e) => handleLinkInteraction(e, '/change-password')}
                   >
                     Cambiar Contraseña
                   </NavLink>
@@ -266,11 +263,11 @@ const Header = () => {
             </div>
           ) : (
             <NavLink
-              to="/auth/login"
+              to="/login"
               className="auth-button glowing"
               role="link"
               tabIndex={0}
-              onClick={(e) => handleLinkInteraction(e, '/auth/login')}
+              onClick={(e) => handleLinkInteraction(e, '/login')}
             >
               Acceder / Registrarse
             </NavLink>

@@ -8,24 +8,35 @@ import useTrainingStore from '@/stores/useTrainingStore';
 
 /**
  * Componente para controles de zoom, historial y versiones en el editor de flujos
+ * @param {Object} props - Propiedades del componente
+ * @param {Function} props.onUndo - Función para deshacer cambios
+ * @param {Function} props.onRedo - Función para rehacer cambios
+ * @param {boolean} props.canUndo - Indica si se puede deshacer
+ * @param {boolean} props.canRedo - Indica si se puede rehacer
+ * @param {Function} props.onToggleHistory - Función para mostrar/ocultar el panel de historial
+ * @param {boolean} props.historyActive - Indica si el panel de historial está activo
  */
-const ZoomControls = () => {
-  // Obtener funciones y estados del store de Flow
-  const { 
-    undo, 
-    redo, 
-    canUndo, 
-    canRedo,
-    toggleHistoryPanel,
-    historyPanelActive
-  } = useFlowStore(state => ({
+const ZoomControls = ({
+  onUndo,
+  onRedo,
+  canUndo,
+  canRedo,
+  onToggleHistory,
+  historyActive
+}) => {
+  // Usar el store de Flow como fallback si no se proporcionan props
+  const flowStore = useFlowStore(state => ({
     undo: state.undo,
     redo: state.redo,
     canUndo: state.canUndo,
-    canRedo: state.canRedo,
-    toggleHistoryPanel: state.toggleHistoryPanel,
-    historyPanelActive: state.historyPanelActive
+    canRedo: state.canRedo
   }));
+  
+  // Usar las props si están disponibles, de lo contrario usar el store
+  const handleUndo = onUndo || flowStore.undo;
+  const handleRedo = onRedo || flowStore.redo;
+  const isUndoEnabled = canUndo !== undefined ? canUndo : flowStore.canUndo;
+  const isRedoEnabled = canRedo !== undefined ? canRedo : flowStore.canRedo;
 
   // Usar ReactFlow hooks para zoom
   const { zoomIn, zoomOut, fitView } = useReactFlow();
@@ -55,31 +66,40 @@ const ZoomControls = () => {
         <div className="button-tooltip">Ajustar vista</div>
       </button>
       
-      {/* Controles de historial */}
+      {/* Botones de deshacer/rehacer */}
       <button
-        className={`zoom-control-button ${!canUndo ? 'disabled' : ''}`}
-        onClick={undo}
-        disabled={!canUndo}
+        className={`zoom-control-button ${!isUndoEnabled ? 'disabled' : ''}`}
+        onClick={() => isUndoEnabled && handleUndo()}
+        disabled={!isUndoEnabled}
       >
         <FiRotateCcw />
         <div className="button-tooltip">Deshacer</div>
       </button>
       <button
-        className={`zoom-control-button ${!canRedo ? 'disabled' : ''}`}
-        onClick={redo}
-        disabled={!canRedo}
+        className={`zoom-control-button ${!isRedoEnabled ? 'disabled' : ''}`}
+        onClick={() => isRedoEnabled && handleRedo()}
+        disabled={!isRedoEnabled}
       >
         <FiRotateCw />
         <div className="button-tooltip">Rehacer</div>
       </button>
       
-      {/* Botón de historial de versiones */}
+      {/* Botón de historial */}
       <button
-        className={`zoom-control-button ${historyPanelActive ? 'active' : ''}`}
-        onClick={toggleHistoryPanel}
+        className={`zoom-control-button ${historyActive ? 'active' : ''}`}
+        onClick={() => {
+          console.log('[ZoomControls] Botón de historial clickeado');
+          if (onToggleHistory) {
+            onToggleHistory();
+          } else {
+            // Emitir un evento personalizado como fallback
+            const event = new CustomEvent('open-version-history');
+            window.dispatchEvent(event);
+          }
+        }}
       >
-        <History size={18} />
-        <div className="button-tooltip">Historial</div>
+        <History />
+        <div className="button-tooltip">Historial de versiones</div>
       </button>
     </div>
   );

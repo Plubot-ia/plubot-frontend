@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axiosInstance from '../../utils/axiosConfig';
+import useAuthStore from '@/stores/useAuthStore';
 import './ForgotPassword.css';
 
 const ForgotPassword = () => {
@@ -8,6 +8,14 @@ const ForgotPassword = () => {
   const [message, setMessage] = useState({ text: '', type: '' });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
+  const { forgotPassword, error: authError } = useAuthStore();
+
+  // Efecto para manejar errores del store
+  useEffect(() => {
+    if (authError) {
+      showMessage(authError, 'error');
+    }
+  }, [authError]);
 
   const showMessage = (text, type) => {
     setMessage({ text, type });
@@ -32,11 +40,9 @@ const ForgotPassword = () => {
     }
   
     try {
-      const formData = new FormData();
-      formData.append('email', email);
-      const response = await axiosInstance.post('/api/auth/forgot_password', formData);
-  
-      if (response.data.status === 'success') {
+      const response = await forgotPassword(email);
+      
+      if (response?.success) {
         showMessage('Correo de restablecimiento enviado. Revisa tu bandeja de entrada.', 'success');
         const card = document.querySelector('.forgot-password-card');
         if (card) {
@@ -44,11 +50,11 @@ const ForgotPassword = () => {
             '0 0 50px rgba(0, 255, 150, 0.7), 0 0 120px rgba(0, 0, 0, 0.8), inset 0 0 25px rgba(0, 255, 150, 0.4)';
         }
         setTimeout(() => {
-          navigate('/auth/login');
+          navigate('/login');
           window.scrollTo(0, 0);
         }, 3000);
       } else {
-        showMessage(response.data.message || 'Error al enviar el correo. Intenta nuevamente.', 'error');
+        showMessage('Error al enviar el correo. Intenta nuevamente.', 'error');
         setIsSubmitting(false);
       }
     } catch (error) {

@@ -287,39 +287,6 @@ const FlowEditorInner = ({
   // Estado del modo ultra rendimiento
   const [isUltraPerformanceMode, setIsUltraPerformanceMode] = useState(getSavedPerformanceMode);
 
-  // Agregar listeners para los eventos de los botones
-  useEffect(() => {
-    // Listener para historial de versiones
-    const handleVersionHistoryEvent = () => {
-      console.log('Abriendo historial de versiones desde evento');
-      setShowVersionHistoryPanel(true);
-    };
-    
-    // Listener para compartir (EmbedModal)
-    const handleEmbedModalEvent = () => {
-      console.log('Abriendo modal de compartir desde evento');
-      setShowEmbedModal(true);
-    };
-    
-    // Listener para plantillas (TemplateSelector)
-    const handleTemplateSelectorEvent = () => {
-      console.log('Abriendo selector de plantillas desde evento');
-      setShowTemplateSelector(true);
-    };
-    
-    // Registrar todos los listeners
-    window.addEventListener('open-version-history', handleVersionHistoryEvent);
-    window.addEventListener('open-embed-modal', handleEmbedModalEvent);
-    window.addEventListener('open-template-selector', handleTemplateSelectorEvent);
-    
-    // Limpiar todos los listeners al desmontar
-    return () => {
-      window.removeEventListener('open-version-history', handleVersionHistoryEvent);
-      window.removeEventListener('open-embed-modal', handleEmbedModalEvent);
-      window.removeEventListener('open-template-selector', handleTemplateSelectorEvent);
-    };
-  }, [setShowVersionHistoryPanel, setShowEmbedModal, setShowTemplateSelector]);
-  
   // Sincronizar la clase global SIEMPRE que cambie el estado
   useEffect(() => {
     const className = 'performance-mode-active';
@@ -930,12 +897,6 @@ const FlowEditorInner = ({
             canUndo: canUndo,
             canRedo: canRedo
           }}
-          showVersionHistoryPanel={showVersionHistoryPanel}
-          onVersionHistoryClick={() => setShowVersionHistoryPanel(!showVersionHistoryPanel)}
-          isUltraPerformanceMode={isUltraPerformanceMode}
-          onTogglePerformanceMode={handleTogglePerformanceMode}
-        />
-        
         {/* Burbuja de estado para mensajes críticos */}
         <StatusBubble message={byteMessage} />
         

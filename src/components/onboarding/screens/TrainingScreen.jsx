@@ -98,21 +98,27 @@ const ModalManager = ({ modals, modalProps, onClose }) => {
 
 const TrainingScreen = () => {
   const [searchParams] = useSearchParams();
-  // Obtener el ID del plubot de la URL (formato: /plubot/edit/training/130)
+  // Obtener el ID del plubot de la URL (formatos posibles: /plubot/edit/training/130 o con query param ?plubotId=130)
   const { pathname } = window.location;
   const pathParts = pathname.split('/');
-  // Asegurarse de que el ID es un número válido
-  let plubotIdFromUrl = pathParts[pathParts.length - 1] || searchParams.get('plubotId') || null;
   
-  // Validar que el ID es un número y no está vacío
-  if (plubotIdFromUrl && (plubotIdFromUrl === 'training' || isNaN(parseInt(plubotIdFromUrl)))) {
-    // Si el último segmento es 'training', buscar en el penúltimo segmento
-    plubotIdFromUrl = pathParts[pathParts.length - 2] || searchParams.get('plubotId') || null;
+  // Primero intentamos obtener el ID de los parámetros de la URL
+  let plubotIdFromUrl = searchParams.get('plubotId');
+  
+  // Si no hay ID en los parámetros, intentamos obtenerlo de la ruta
+  if (!plubotIdFromUrl) {
+    // Obtener el último segmento de la ruta
+    const lastSegment = pathParts[pathParts.length - 1];
+    
+    // Verificar si el último segmento es un número (ID válido)
+    if (lastSegment && !isNaN(parseInt(lastSegment))) {
+      plubotIdFromUrl = lastSegment;
+    }
   }
   
-  // Verificar si es un ID válido (número)
+  // Verificar si tenemos un ID válido
   if (plubotIdFromUrl && !isNaN(parseInt(plubotIdFromUrl))) {
-    console.log('ID del Plubot encontrado en la URL:', plubotIdFromUrl);
+    console.log('ID del Plubot encontrado:', plubotIdFromUrl);
   } else {
     console.warn('No se encontró un ID válido en la URL. Usando ID por defecto: 130');
     plubotIdFromUrl = '130'; // ID por defecto para desarrollo
