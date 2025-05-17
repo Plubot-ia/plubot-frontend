@@ -498,8 +498,18 @@ const useAuthStore = create(
         try {
           // Hacer la solicitud real al backend para obtener la URL de autenticación
           console.log('Solicitando URL de autenticación de Google al backend');
+          
+          // Determinar la URL base del backend según el entorno
+          const isDevelopment = import.meta.env.DEV || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+          const backendBaseUrl = isDevelopment ? '' : 'https://plubot-backend.onrender.com';
+          
+          console.log('URL base del backend:', backendBaseUrl);
+          
           // La ruta correcta es /api/auth/google/login (el blueprint google_auth_bp está registrado con prefijo /auth)
-          const response = await instance.get('/api/auth/google/login');
+          const url = `${backendBaseUrl}/api/auth/google/login`;
+          console.log('Enviando solicitud a:', url);
+          
+          const response = await instance.get(url);
           console.log('Respuesta del backend:', response.data);
           
           if (response.data?.status === 'success' && response.data?.authUrl) {

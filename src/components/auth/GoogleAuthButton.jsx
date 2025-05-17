@@ -21,10 +21,10 @@ const GoogleAuthButton = ({ text = 'Continuar con Google', className = '', onSuc
       const isDevelopment = import.meta.env.DEV || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
       console.log('Entorno detectado:', isDevelopment ? 'Desarrollo' : 'Producción');
       
-      // Configuración para determinar el modo de autenticación
-      // En desarrollo: usar simulación
-      // En producción: usar autenticación real con Google
-      const forceSimulation = null; // null = autodetectar (simulación en desarrollo, real en producción)
+      // IMPORTANTE: Temporalmente forzamos la simulación en todos los entornos
+      // hasta que las rutas del backend estén correctamente configuradas en producción
+      // TODO: Cambiar a null cuando el backend esté listo
+      const forceSimulation = true; // Forzar simulación en todos los entornos
       
       // Determinar si usamos autenticación simulada o real
       // En desarrollo: simulación

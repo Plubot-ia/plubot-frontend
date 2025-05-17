@@ -43,11 +43,23 @@ const GoogleAuthCallback = () => {
           setStatus('loading');
           setMessage('Procesando autenticación con Google...');
           
+          console.log('Iniciando proceso de autenticación con Google...');
+          
           // Realizar una solicitud directa al backend para procesar el código
           try {
             // Crear una función asíncrona para manejar la solicitud
             const processCode = async () => {
-              const response = await fetch(`/api/auth/google/callback?code=${encodeURIComponent(code)}&state=${encodeURIComponent(state || '')}`);
+              // Determinar la URL base del backend según el entorno
+              const isDevelopment = import.meta.env.DEV || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+              const backendBaseUrl = isDevelopment ? '' : 'https://plubot-backend.onrender.com';
+              
+              console.log('URL base del backend:', backendBaseUrl);
+              
+              // Construir la URL completa
+              const url = `${backendBaseUrl}/api/auth/google/callback?code=${encodeURIComponent(code)}&state=${encodeURIComponent(state || '')}`;
+              console.log('Enviando solicitud a:', url);
+              
+              const response = await fetch(url);
               
               // Si la respuesta no es exitosa, mostrar un error
               if (!response.ok) {
