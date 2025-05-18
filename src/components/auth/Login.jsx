@@ -16,12 +16,32 @@ const Login = () => {
   const location = useLocation();
   const { login, isAuthenticated, loading: authLoading, error: authError } = useAuthStore();
 
-  // Efecto para manejar errores del store
+  // Efecto para manejar errores del store y mensajes de la URL
   useEffect(() => {
     if (authError) {
       setMessage({ text: authError, type: 'error' });
     }
-  }, [authError]);
+    
+    // Procesar parámetros de la URL
+    const searchParams = new URLSearchParams(location.search);
+    const urlMessage = searchParams.get('message');
+    
+    if (urlMessage) {
+      switch (urlMessage) {
+        case 'verified':
+          setMessage({ text: '¡Correo verificado exitosamente! Ya puedes iniciar sesión.', type: 'success' });
+          break;
+        case 'already_verified':
+          setMessage({ text: 'Tu correo ya ha sido verificado anteriormente.', type: 'info' });
+          break;
+        case 'password_reset':
+          setMessage({ text: 'Contraseña restablecida exitosamente. Inicia sesión con tu nueva contraseña.', type: 'success' });
+          break;
+        default:
+          break;
+      }
+    }
+  }, [authError, location.search]);
 
   // Cargar datos guardados del formulario
   useEffect(() => {

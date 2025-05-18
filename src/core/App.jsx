@@ -292,6 +292,11 @@ const AppWrapper = () => {
                     return `/reset-password?token=${location.pathname.split('/').pop()}`;
                   }} replace />} />
                   <Route path="/auth/verify-email" element={<Navigate to="/email-verification-notice" replace />} />
+                  <Route path="/api/auth/verify_email/:token" element={<Navigate to={location => {
+                    // Extraer el token del path y redirigir a login con mensaje de verificación
+                    const token = location.pathname.split('/').pop();
+                    return `/login?message=verified`;
+                  }} replace />} />
                   <Route path="*" element={<Navigate to="/login" replace />} />
                 </Routes>
               ) : (
