@@ -336,13 +336,32 @@ const PersonalizationForm = () => {
             setMessageText('Error al actualizar el Plubot: ' + (response.message || 'Respuesta inválida'));
           }
         } else {
-          // Modo creación: crear nuevo Plubot
+          // Modo creación: crear nuevo Plubot con persistencia robusta
           console.log('Enviando solicitud POST a /api/plubots/create con payload:', payload);
+          
+          // Crear respaldo local antes de enviar al servidor
+          try {
+            // Guardar una copia del plubot en localStorage como respaldo adicional
+            const localBackupKey = `plubot_backup_${Date.now()}`;
+            localStorage.setItem(localBackupKey, JSON.stringify({
+              data: payload,
+              timestamp: new Date().toISOString(),
+              status: 'pending'
+            }));
+            console.log('Respaldo local de plubot creado antes de enviar al servidor');
+          } catch (backupError) {
+            console.warn('No se pudo crear respaldo local adicional:', backupError);
+          }
+          
+          // Intentar crear el plubot con el sistema robusto de persistencia
           const response = await createBot(payload);
-          console.log('Respuesta de POST /api/plubots/create:', response);
+          console.log('Respuesta de createBot:', response);
+          
+          // Manejar respuesta exitosa (tanto online como offline)
           if (response.status === 'success' && response.plubot?.id) {
             // Actualizar el contexto con todos los datos necesarios
             const plubotId = response.plubot.id;
+            const isOfflineMode = response._offlineMode === true;
             
             // Crear un objeto completo con todos los datos necesarios
             const newPlubot = {
@@ -352,11 +371,11 @@ const PersonalizationForm = () => {
               color: payload.color,
               purpose: payload.purpose,
               initial_message: payload.initial_message,
-              powers: payload.powers.join(','),
+              powers: Array.isArray(payload.powers) ? payload.powers.join(',') : payload.powers,
+              _offlineCreated: isOfflineMode
             };
             
             // Actualizar el contexto de creación del Plubot con datos completos
-            // incluyendo un flowData vacío pero inicializado
             updatePlubotData({
               id: plubotId,
               name: payload.name,
@@ -368,17 +387,34 @@ const PersonalizationForm = () => {
               // Inicializar flowData con arrays vacíos para evitar problemas de inicialización
               flowData: { nodes: [], edges: [] },
               // Inicializar flowVersions como array vacío
-              flowVersions: []
+              flowVersions: [],
+              _offlineCreated: isOfflineMode
             });
             
-            // Actualizar el usuario con el nuevo Plubot
             // Actualizar el perfil del usuario con el nuevo Plubot
-            updateProfile({
-              plubots: [...(user?.plubots || []), newPlubot]
+            const { user, updateUser } = useAuthStore.getState();
+            const updatedPlubots = [...(user?.plubots || []), newPlubot];
+            
+            // Actualizar el estado del usuario en el store
+            updateUser({
+              ...user,
+              plubots: updatedPlubots
             });
             
-            // Mostrar mensaje de éxito
-            setMessageText(personalityMessages[plubotData.tone]?.confirmation || '¡Plubot creado con éxito!');
+            // Actualizar también el respaldo local de plubots
+            try {
+              localStorage.setItem('user_plubots_backup', JSON.stringify(updatedPlubots));
+              console.log('Respaldo de plubots de usuario actualizado con el nuevo plubot');
+            } catch (backupError) {
+              console.error('Error al actualizar respaldo de plubots:', backupError);
+            }
+            
+            // Mostrar mensaje de éxito (adaptado si estamos en modo offline)
+            if (isOfflineMode) {
+              setMessageText('¡Plubot creado localmente! Se sincronizará cuando haya conexión.');
+            } else {
+              setMessageText(personalityMessages[plubotData.tone]?.confirmation || '¡Plubot creado con éxito!');
+            }
             
             // Avanzar al siguiente paso en el proceso de creación
             nextStep();
@@ -388,14 +424,67 @@ const PersonalizationForm = () => {
             setTimeout(() => {
               console.log('Navegando a TrainingScreen con contexto inicializado:', {
                 plubotId,
-                contextData: plubotData
+                contextData: plubotData,
+                offlineMode: isOfflineMode
               });
               // Usar una ruta consistente para el flujo de creación
               navigate(`/training?plubotId=${plubotId}`);
-            }, 300);
+            }, 500); // Aumentar ligeramente el tiempo para asegurar que todo se actualice
+          } else if (response._recoverable) {
+            // Caso especial: error pero con datos recuperables
+            console.warn('Error recuperable al crear plubot:', response);
+            
+            // Crear un ID local para el plubot
+            const tempId = `local_${Date.now()}`;
+            
+            // Crear un objeto plubot con los datos disponibles
+            const recoveredPlubot = {
+              id: tempId,
+              name: payload.name,
+              tone: payload.tone,
+              color: payload.color,
+              purpose: payload.purpose,
+              initial_message: payload.initial_message,
+              powers: Array.isArray(payload.powers) ? payload.powers.join(',') : payload.powers,
+              _recoveryPending: true
+            };
+            
+            // Actualizar el contexto con los datos recuperados
+            updatePlubotData({
+              ...recoveredPlubot,
+              powers: payload.powers,
+              flowData: { nodes: [], edges: [] },
+              flowVersions: []
+            });
+            
+            // Mostrar mensaje de recuperación
+            setMessageText('Se ha producido un error, pero tus datos están seguros. Continuando en modo de recuperación.');
+            
+            // Avanzar al siguiente paso
+            nextStep();
+            
+            // Navegar a TrainingScreen con los datos recuperados
+            setTimeout(() => {
+              navigate(`/training?plubotId=${tempId}&recovery=true`);
+            }, 500);
           } else {
-            console.error('Error en la respuesta del backend:', response);
-            setMessageText('Error: No se pudo obtener el ID del Plubot.');
+            // Error sin posibilidad de recuperación inmediata
+            console.error('Error en la respuesta al crear plubot:', response);
+            setMessageText('Error: No se pudo crear el Plubot. ' + (response.message || 'Inténtalo de nuevo más tarde.'));
+            
+            // Intentar guardar los datos para recuperación futura
+            try {
+              const failedPlubots = JSON.parse(localStorage.getItem('failed_plubots') || '[]');
+              failedPlubots.push({
+                data: payload,
+                timestamp: new Date().toISOString(),
+                error: response.message || 'Error desconocido'
+              });
+              localStorage.setItem('failed_plubots', JSON.stringify(failedPlubots));
+              console.log('Datos del plubot guardados para recuperación futura');
+            } catch (recoveryError) {
+              console.error('No se pudieron guardar datos para recuperación:', recoveryError);
+            }
           }
         }
       } catch (error) {

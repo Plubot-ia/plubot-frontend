@@ -10,6 +10,7 @@ import ProfileMain from './components/ProfileMain';
 import PlubotSection from './components/PlubotSection';
 import PowersSection from './components/PowersSection';
 import ActivitySection from './components/ActivitySection';
+import BackupSection from './components/BackupSection';
 import NotificationSystem from './components/NotificationSystem';
 import AchievementPopup from './components/AchievementPopup';
 import VisualEffects from './components/VisualEffects';
@@ -296,6 +297,10 @@ const Profile = () => {
               recentActivities={recentActivities} 
               animateBadges={animateBadges} 
             />
+          )}
+          
+          {activeTab === 'backup' && (
+            <BackupSection />
           )}
         </div>
 

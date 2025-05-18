@@ -257,7 +257,15 @@ const AppWrapper = () => {
   const isAuthPage = ['/login', '/register', '/forgot-password', '/reset-password', '/change-password', '/email-verification-notice'].includes(pathname);
   
   // Rutas donde queremos ocultar el encabezado y pie de página
-  const hideHeaderFooter = pathname.includes('/plubot/edit/training/') || pathname.includes('/plubot/edit/training');
+  const isHideHeaderFooter = [
+    '/training',
+    '/plubot/edit/training',
+    '/plubot/create/training',
+  ].some(route => pathname.startsWith(route));
+  
+  // Verificación adicional para rutas con parámetros de consulta
+  const hasTrainingQueryParam = pathname === '/training' || pathname.includes('/training?');
+  const shouldHideHeaderFooter = isHideHeaderFooter || hasTrainingQueryParam;
 
   return (
     <ErrorBoundary>
@@ -280,11 +288,14 @@ const AppWrapper = () => {
                   <Route path="/auth/register" element={<Navigate to="/register" replace />} />
                   <Route path="/auth/forgot" element={<Navigate to="/forgot-password" replace />} />
                   <Route path="/auth/reset" element={<Navigate to="/reset-password" replace />} />
+                  <Route path="/reset-password/:token" element={<Navigate to={location => {
+                    return `/reset-password?token=${location.pathname.split('/').pop()}`;
+                  }} replace />} />
                   <Route path="/auth/verify-email" element={<Navigate to="/email-verification-notice" replace />} />
                   <Route path="*" element={<Navigate to="/login" replace />} />
                 </Routes>
               ) : (
-                <Layout hideHeaderFooter={hideHeaderFooter}>
+                <Layout hideHeaderFooter={shouldHideHeaderFooter}>
                   <ScrollToTop />
                   <Routes>
                     {/* Rutas públicas */}

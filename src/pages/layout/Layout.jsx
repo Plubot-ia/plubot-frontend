@@ -4,14 +4,23 @@ import AOS from 'aos';
 import { gsap } from 'gsap';
 import 'aos/dist/aos.css';
 import '@fortawesome/fontawesome-free/css/all.min.css';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { ScrollToPlugin } from 'gsap/ScrollToPlugin';
+import { useSyncService } from '../../services/syncService';
+
+gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
 
 import Header from '@components/common/Header';
 import WhatsAppButton from '@components/common/WhatsAppButton.jsx';
 import Footer from '@components/common/Footer.jsx';
+import SyncStatusIndicator from '../../components/sync/SyncStatusIndicator';
 import './Layout.css';
 
 const Layout = ({ children, hideHeaderFooter }) => {
   const location = useLocation();
+  
+  // Inicializar el servicio de sincronizaciu00f3n
+  const { syncState } = useSyncService();
 
   useEffect(() => {
     // Temporalmente deshabilitar AOS para depuración
@@ -103,6 +112,15 @@ const Layout = ({ children, hideHeaderFooter }) => {
       <main>{children}</main>
       {/* <WhatsAppButton /> */}
       {!hideHeaderFooter && <Footer />}
+      
+      {/* Indicador de sincronización flotante - solo en páginas relevantes */}
+      {location.pathname.includes('/training') || 
+       location.pathname.includes('/plubot/edit') || 
+       location.pathname.includes('/profile') ? (
+        <div className="sync-indicator-container">
+          <SyncStatusIndicator expanded={false} />
+        </div>
+      ) : null}
     </div>
   );
 };

@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import useAuthStore from '@/stores/useAuthStore';
 import './ResetPassword.css';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 
 const ResetPassword = () => {
-    const { token } = useParams(); // Obtiene el token de la URL (/reset-password/:token)
+    const location = useLocation();
+    const searchParams = new URLSearchParams(location.search);
+    const token = searchParams.get('token'); // Obtiene el token del query parameter (?token=xyz)
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [showNewPassword, setShowNewPassword] = useState(false);

@@ -11,7 +11,8 @@ const ProfileTabs = ({ activeTab, setActiveTab }) => {
     { id: 'profile', label: 'PERFIL' },
     { id: 'plubots', label: 'PLUBOTS' },
     { id: 'powers', label: 'PODERES' },
-    { id: 'activity', label: 'ACTIVIDAD' }
+    { id: 'activity', label: 'ACTIVIDAD' },
+    { id: 'backup', label: 'RESPALDO' }
   ];
 
   return (

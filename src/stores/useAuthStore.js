@@ -235,7 +235,7 @@ const useAuthStore = create(
         
         try {
           // Verificar token con el servidor
-          const response = await instance.get('/api/auth/me', {
+          const response = await instance.get('/api/auth/profile', {
             headers: { 'Authorization': `Bearer ${token}` },
             // Evitar caché del navegador
             params: { _: Date.now() }
@@ -298,12 +298,35 @@ const useAuthStore = create(
       // Variable para controlar si hay una petición en curso
       _isLoadingProfile: false,
       
-      // Método para cargar el perfil del usuario
+      // Método para cargar el perfil del usuario con persistencia robusta de plubots
       fetchUserProfile: async (forceUpdate = false) => {
         const currentState = get();
         
-        // Si ya tenemos el perfil y no se fuerza la actualización, devolver el perfil actual
+        // Si ya tenemos el perfil y no se fuerza la actualización, verificar si hay respaldo de plubots
         if (currentState.user && currentState.isAuthenticated && !forceUpdate) {
+          try {
+            // Verificar si hay respaldo de plubots en localStorage
+            const cachedPlubots = localStorage.getItem('user_plubots_backup');
+            if (cachedPlubots) {
+              const parsedPlubots = JSON.parse(cachedPlubots);
+              if (Array.isArray(parsedPlubots) && parsedPlubots.length > 0) {
+                // Si el usuario no tiene plubots o tiene menos que el respaldo, usar el respaldo
+                if (!currentState.user.plubots || 
+                    !Array.isArray(currentState.user.plubots) || 
+                    currentState.user.plubots.length < parsedPlubots.length) {
+                  console.log('[Auth] Restaurando plubots desde respaldo local:', parsedPlubots);
+                  const updatedUser = {
+                    ...currentState.user,
+                    plubots: parsedPlubots
+                  };
+                  set({ user: updatedUser });
+                  return { success: true, user: updatedUser, restored: true };
+                }
+              }
+            }
+          } catch (cacheError) {
+            console.warn('[Auth] Error al procesar respaldo de plubots:', cacheError);
+          }
           return { success: true, user: currentState.user };
         }
         
@@ -317,8 +340,42 @@ const useAuthStore = create(
         set({ loading: true, error: null });
         
         try {
-          const token = localStorage.getItem('access_token');
+          // Verificar si hay token en localStorage o sessionStorage
+          const token = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
           if (!token) {
+            // Intentar recuperar datos de respaldo antes de fallar
+            try {
+              const userId = localStorage.getItem('user_id');
+              const userEmail = localStorage.getItem('user_email');
+              const cachedPlubots = localStorage.getItem('user_plubots_backup');
+              
+              if (userId && userEmail && cachedPlubots) {
+                const parsedPlubots = JSON.parse(cachedPlubots);
+                if (Array.isArray(parsedPlubots)) {
+                  console.warn('[Auth] Usando datos de respaldo para mantener sesión sin token');
+                  const backupUser = {
+                    id: userId,
+                    email: userEmail,
+                    name: localStorage.getItem('user_name') || userEmail.split('@')[0],
+                    plubots: parsedPlubots,
+                    is_verified: true
+                  };
+                  
+                  set({
+                    user: backupUser,
+                    isAuthenticated: true,
+                    loading: false,
+                    error: 'Usando datos locales. La conexión con el servidor falló.'
+                  });
+                  
+                  useAuthStore._isLoadingProfile = false;
+                  return { success: true, user: backupUser, offline: true };
+                }
+              }
+            } catch (backupError) {
+              console.error('[Auth] Error al recuperar datos de respaldo:', backupError);
+            }
+            
             set({ 
               user: null, 
               isAuthenticated: false, 
@@ -331,6 +388,26 @@ const useAuthStore = create(
           // Verificar si hay datos en caché válidos
           if (!forceUpdate && currentState._profileCache.isValid()) {
             const cachedUser = currentState._profileCache.data;
+            
+            // Verificar si hay respaldo de plubots en localStorage
+            try {
+              const cachedPlubots = localStorage.getItem('user_plubots_backup');
+              if (cachedPlubots) {
+                const parsedPlubots = JSON.parse(cachedPlubots);
+                if (Array.isArray(parsedPlubots) && parsedPlubots.length > 0) {
+                  // Si el usuario en caché no tiene plubots o tiene menos que el respaldo, usar el respaldo
+                  if (!cachedUser.plubots || 
+                      !Array.isArray(cachedUser.plubots) || 
+                      cachedUser.plubots.length < parsedPlubots.length) {
+                    console.log('[Auth] Restaurando plubots desde respaldo local:', parsedPlubots);
+                    cachedUser.plubots = parsedPlubots;
+                  }
+                }
+              }
+            } catch (cacheError) {
+              console.warn('[Auth] Error al procesar respaldo de plubots:', cacheError);
+            }
+            
             set({
               user: cachedUser,
               isAuthenticated: true,
@@ -342,6 +419,19 @@ const useAuthStore = create(
                 isLoaded: true
               }
             });
+            
+            // Guardar datos de respaldo
+            try {
+              localStorage.setItem('user_id', cachedUser.id);
+              localStorage.setItem('user_email', cachedUser.email);
+              localStorage.setItem('user_name', cachedUser.name);
+              if (cachedUser.plubots && Array.isArray(cachedUser.plubots)) {
+                localStorage.setItem('user_plubots_backup', JSON.stringify(cachedUser.plubots));
+              }
+            } catch (backupError) {
+              console.error('[Auth] Error al guardar datos de respaldo:', backupError);
+            }
+            
             return { success: true, user: cachedUser };
           }
           
@@ -349,12 +439,66 @@ const useAuthStore = create(
             console.log('[Auth] Cargando perfil de usuario...');
           }
           
-          const response = await instance.get('/api/auth/profile', {
-            headers: { 'Authorization': `Bearer ${token}` },
-            params: { _t: Date.now() } // Evitar caché del navegador
-          });
+          // Implementar sistema de reintentos para mayor robustez
+          let response;
+          let retryCount = 0;
+          const maxRetries = 3;
+          
+          while (retryCount < maxRetries) {
+            try {
+              response = await instance.get('/api/auth/profile', {
+                headers: { 'Authorization': `Bearer ${token}` },
+                params: { _t: Date.now() }, // Evitar caché del navegador
+                timeout: 15000 // 15 segundos de timeout
+              });
+              break; // Si la petición es exitosa, salir del bucle
+            } catch (retryError) {
+              retryCount++;
+              if (retryCount >= maxRetries) {
+                throw retryError; // Si ya hemos agotado los reintentos, propagar el error
+              }
+              console.warn(`[Auth] Reintentando cargar perfil (${retryCount}/${maxRetries})...`);
+              await new Promise(resolve => setTimeout(resolve, 1000 * retryCount)); // Espera progresiva
+            }
+          }
           
           if (response.data?.status === 'success' && response.data.user) {
+            // Asegurarse de que el usuario tenga un array de plubots válido
+            if (!response.data.user.plubots) {
+              response.data.user.plubots = [];
+            } else if (!Array.isArray(response.data.user.plubots)) {
+              console.warn('[Auth] Los plubots del usuario no están en formato de array. Corrigiendo...');
+              response.data.user.plubots = Object.values(response.data.user.plubots);
+            }
+            
+            // Verificar si hay respaldo de plubots en localStorage
+            try {
+              const cachedPlubots = localStorage.getItem('user_plubots_backup');
+              if (cachedPlubots) {
+                const parsedPlubots = JSON.parse(cachedPlubots);
+                if (Array.isArray(parsedPlubots) && parsedPlubots.length > 0) {
+                  // Si el usuario no tiene plubots o tiene menos que el respaldo, usar el respaldo
+                  if (response.data.user.plubots.length < parsedPlubots.length) {
+                    console.log('[Auth] Restaurando plubots desde respaldo local:', parsedPlubots);
+                    response.data.user.plubots = parsedPlubots;
+                  }
+                }
+              }
+            } catch (cacheError) {
+              console.warn('[Auth] Error al procesar respaldo de plubots:', cacheError);
+            }
+            
+            // Guardar una copia de respaldo de los plubots en localStorage
+            try {
+              localStorage.setItem('user_id', response.data.user.id);
+              localStorage.setItem('user_email', response.data.user.email);
+              localStorage.setItem('user_name', response.data.user.name);
+              localStorage.setItem('user_plubots_backup', JSON.stringify(response.data.user.plubots));
+              console.log('[Auth] Respaldo de plubots guardado en localStorage:', response.data.user.plubots);
+            } catch (backupError) {
+              console.error('[Auth] Error al guardar respaldo de plubots:', backupError);
+            }
+            
             // Actualizar caché
             currentState._profileCache.set(response.data.user);
             
@@ -371,11 +515,6 @@ const useAuthStore = create(
               }
             });
             
-            if (process.env.NODE_ENV === 'development') {
-              console.log('[Auth] Perfil cargado correctamente');
-            }
-            
-            // Liberar la variable de carga
             useAuthStore._isLoadingProfile = false;
             return { success: true, user: response.data.user };
           }
@@ -389,9 +528,43 @@ const useAuthStore = create(
             console.error('[Auth] Error al cargar perfil:', errorMessage);
           }
           
-          // Si hay un error de autenticación, limpiar todo
+          // Intentar recuperar datos de respaldo antes de fallar
+          try {
+            const userId = localStorage.getItem('user_id');
+            const userEmail = localStorage.getItem('user_email');
+            const cachedPlubots = localStorage.getItem('user_plubots_backup');
+            
+            if (userId && userEmail && cachedPlubots) {
+              const parsedPlubots = JSON.parse(cachedPlubots);
+              if (Array.isArray(parsedPlubots)) {
+                console.warn('[Auth] Usando datos de respaldo para mantener sesión');
+                const backupUser = {
+                  id: userId,
+                  email: userEmail,
+                  name: localStorage.getItem('user_name') || userEmail.split('@')[0],
+                  plubots: parsedPlubots,
+                  is_verified: true
+                };
+                
+                set({
+                  user: backupUser,
+                  isAuthenticated: true,
+                  loading: false,
+                  error: 'Usando datos locales. La conexión con el servidor falló.'
+                });
+                
+                useAuthStore._isLoadingProfile = false;
+                return { success: true, user: backupUser, offline: true };
+              }
+            }
+          } catch (backupError) {
+            console.error('[Auth] Error al recuperar datos de respaldo:', backupError);
+          }
+          
+          // Si hay un error de autenticación y no se pudo usar respaldo, limpiar todo
           if (error.response?.status === 401) {
             localStorage.removeItem('access_token');
+            sessionStorage.removeItem('access_token');
             currentState._profileCache.clear();
             set({
               user: null,

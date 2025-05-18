@@ -51,7 +51,7 @@ instance.interceptors.request.use(
       const token = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
-        if (isDevelopment && !config.url?.includes('/api/auth/me')) {
+        if (isDevelopment && !config.url?.includes('/api/auth/profile')) {
           console.log('[axiosConfig] Token añadido a la petición:', config.url);
         }
       } else if (isDevelopment) {
