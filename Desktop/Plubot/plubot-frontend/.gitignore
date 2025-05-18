@@ -120,3 +120,16 @@ static/js/create-claude.js
 
 # Ignorar plubot-backend y otros proyectos
 ../plubot-backend/
+
+
+edge-fix.js
+fix_edge_type.js
+src/
+Captura*.png
+*.jpg
+*.jpeg
+client_secret*.json
+.trae-aicc/
+.trae/
+endnode/
+*.rdb
