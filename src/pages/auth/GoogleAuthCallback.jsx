@@ -40,53 +40,51 @@ const GoogleAuthCallback = () => {
           }
           
           console.log('Recibido código de autorización de Google:', code);
-          setStatus('loading');
-          setMessage('Procesando autenticación con Google...');
+          console.log('Estado recibido:', state);
           
-          console.log('Iniciando proceso de autenticación con Google...');
-          
-          // Realizar una solicitud directa al backend para procesar el código
+          // Procesar el código de autorización
           try {
-            // Crear una función asíncrona para manejar la solicitud
-            const processCode = async () => {
-              // Determinar la URL base del backend según el entorno
-              const isDevelopment = import.meta.env.DEV || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-              const backendBaseUrl = isDevelopment ? '' : 'https://plubot-backend.onrender.com';
-              
-              console.log('URL base del backend:', backendBaseUrl);
-              
-              // Construir la URL completa
-              const url = `${backendBaseUrl}/api/auth/google/callback?code=${encodeURIComponent(code)}&state=${encodeURIComponent(state || '')}`;
-              console.log('Enviando solicitud a:', url);
-              
-              const response = await fetch(url);
-              
-              // Si la respuesta no es exitosa, mostrar un error
-              if (!response.ok) {
-                throw new Error(`Error al procesar el código: ${response.status} ${response.statusText}`);
-              }
-              
-              // Redirigir a donde nos indique el backend
-              const data = await response.json();
-              if (data.redirect_url) {
-                window.location.href = data.redirect_url;
-              } else {
-                // Si no hay URL de redirección, mostrar un mensaje de éxito
-                setStatus('success');
-                setMessage('Autenticación exitosa. Redirigiendo...');
-                setTimeout(() => navigate('/pluniverse'), 1500);
-              }
-            };
+            // Determinar la URL base del backend según el entorno
+            const isDevelopment = import.meta.env.DEV || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+            const backendBaseUrl = isDevelopment ? '' : 'https://plubot-backend.onrender.com';
             
-            // Ejecutar la función
-            processCode().catch(error => {
-              console.error('Error al procesar el código:', error);
-              setStatus('error');
-              setMessage(`Error: ${error.message}`);
-              setTimeout(() => navigate('/login'), 3000);
-            });
+            console.log('URL base del backend:', backendBaseUrl);
+            
+            // Construir la URL completa
+            const url = `${backendBaseUrl}/api/auth/google/callback?code=${encodeURIComponent(code)}&state=${encodeURIComponent(state || '')}`;
+            console.log('Enviando solicitud a:', url);
+            
+            const response = await fetch(url);
+            
+            if (!response.ok) {
+              throw new Error(`Error al procesar el código: ${response.status} ${response.statusText}`);
+            }
+            
+            const data = await response.json();
+            console.log('Respuesta del backend:', data);
+            
+            if (data.access_token) {
+              // Guardar el token
+              localStorage.setItem('access_token', data.access_token);
+              
+              // Actualizar el estado de autenticación
+              const { setUser, setIsAuthenticated } = useAuthStore.getState();
+              if (data.user) {
+                setUser(data.user);
+                setIsAuthenticated(true);
+              }
+              
+              setStatus('success');
+              setMessage('Autenticación exitosa. Redirigiendo...');
+              setTimeout(() => navigate('/pluniverse'), 1500);
+            } else if (data.redirect_url) {
+              // Redirigir a donde nos indique el backend
+              window.location.href = data.redirect_url;
+            } else {
+              throw new Error('No se recibió un token válido del backend.');
+            }
           } catch (error) {
-            console.error('Error al procesar el código:', error);
+            console.error('Error al procesar el código de autorización:', error);
             setStatus('error');
             setMessage(`Error: ${error.message}`);
             setTimeout(() => navigate('/login'), 3000);
@@ -111,14 +109,12 @@ const GoogleAuthCallback = () => {
           
           if (response?.success) {
             setStatus('success');
-            setMessage('¡Autenticación exitosa! Redirigiendo...');
-            // Mostrar el nombre del usuario si está disponible
-            if (response.user?.name) {
-              setMessage(`¡Bienvenido/a, ${response.user.name}! Redirigiendo...`);
-            }
+            setMessage('Autenticación exitosa. Redirigiendo...');
             setTimeout(() => navigate('/pluniverse'), 1500);
           } else {
-            throw new Error(response?.error || 'Error al procesar la autenticación');
+            setStatus('error');
+            setMessage(response?.error || 'Error al procesar el token.');
+            setTimeout(() => navigate('/login'), 3000);
           }
         }
       } catch (error) {
