@@ -125,6 +125,7 @@ static/js/create-claude.js
 edge-fix.js
 fix_edge_type.js
 src/
+backup-plubot.sh
 Captura*.png
 *.jpg
 *.jpeg

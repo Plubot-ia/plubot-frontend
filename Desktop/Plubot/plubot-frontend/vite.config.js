@@ -4,6 +4,7 @@ import path from 'path';
 
 export default defineConfig({
   plugins: [react()],
+  assetsInclude: ['**/*.webp', '**/*.png', '**/*.svg', '**/*.jpg', '**/*.jpeg', '**/*.gif', '**/*.ico'],
   base: '/',
   resolve: {
     alias: {
@@ -62,7 +63,13 @@ export default defineConfig({
       output: {
         chunkFileNames: 'assets/[name].[hash].js',
         entryFileNames: 'assets/[name].[hash].js',
-        assetFileNames: 'assets/[name].[hash].[ext]'
+        assetFileNames: 'assets/[name].[hash].[ext]',
+        manualChunks: {
+          vendor: ['react', 'react-dom', 'react-router-dom'],
+          ui: ['@mui/material', '@emotion/react', '@emotion/styled'],
+          flow: ['reactflow', 'zustand'],
+          utils: ['axios', 'lodash', 'uuid', 'zod']
+        }
       }
     },
     assetsInlineLimit: 4096,
