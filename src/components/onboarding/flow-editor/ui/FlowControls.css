@@ -1,0 +1,47 @@
+/* Estilos para los controles del editor de flujo */
+
+/* Panel de controles de zoom */
+.react-flow__panel.react-flow__panel-bottom-right {
+  bottom: 20px;
+  right: 20px;
+  margin: 0;
+  padding: 0;
+  z-index: 10;
+}
+
+/* Panel del mini mapa */
+.react-flow__panel.react-flow__panel-bottom-left {
+  bottom: 20px;
+  left: 20px;
+  margin: 0;
+  padding: 0;
+  z-index: 10;
+}
+
+/* Estilo para el fondo */
+.react-flow__background {
+  z-index: 0;
+}
+
+/* Estilo para los nodos seleccionados */
+.react-flow__node.selected {
+  box-shadow: 0 0 0 2px #00e0ff;
+}
+
+/* Estilo para las aristas */
+.react-flow__edge {
+  z-index: 1;
+}
+
+/* Estilo para los handles de los nodos */
+.react-flow__handle {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: #fff;
+  border: 2px solid #000;
+}
+
+.react-flow__handle:hover {
+  background-color: #00e0ff;
+}

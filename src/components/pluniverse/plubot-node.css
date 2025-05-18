@@ -1,0 +1,13 @@
+.plubot-node {
+  background: rgba(0, 224, 255, 0.2);
+  border: 2px solid #00e0ff;
+  border-radius: 8px;
+  padding: 10px;
+  color: #fff;
+  font-weight: bold;
+  text-align: center;
+}
+
+.node-label {
+  font-size: 14px;
+}

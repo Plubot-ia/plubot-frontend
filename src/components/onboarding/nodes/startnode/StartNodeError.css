@@ -1,0 +1,96 @@
+/**
+ * @file StartNodeError.css
+ * @description Estilos para el componente de error del nodo de inicio
+ * @version 1.0.0
+ * @author Plubot Team
+ */
+
+.start-node-error {
+  display: flex;
+  align-items: center;
+  background: linear-gradient(135deg, #ff4d4d, #ff3333);
+  color: white;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(255, 77, 77, 0.4);
+  position: absolute;
+  top: -2.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  max-width: 200px;
+  animation: errorAppear 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
+}
+
+.start-node-error::after {
+  content: '';
+  position: absolute;
+  bottom: -0.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 0.5rem 0.5rem 0;
+  border-style: solid;
+  border-color: #ff3333 transparent transparent;
+}
+
+.start-node-error__icon {
+  width: 1rem;
+  height: 1rem;
+  margin-right: 0.5rem;
+  flex-shrink: 0;
+  animation: errorPulse 2s infinite alternate;
+}
+
+.start-node-error__text {
+  text-align: center;
+  line-height: 1.4;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@keyframes errorAppear {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+@keyframes errorPulse {
+  0% { opacity: 0.7; }
+  100% { opacity: 1; }
+}
+
+/* Modo ultra rendimiento */
+.start-node--ultra-performance .start-node-error {
+  animation: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.start-node--ultra-performance .start-node-error__icon {
+  animation: none;
+}
+
+/* Soporte para preferencias de movimiento reducido */
+@media (prefers-reduced-motion: reduce) {
+  .start-node-error {
+    animation: errorAppearSimple 0.2s ease-out;
+  }
+  
+  @keyframes errorAppearSimple {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  
+  .start-node-error__icon {
+    animation: none;
+  }
+}

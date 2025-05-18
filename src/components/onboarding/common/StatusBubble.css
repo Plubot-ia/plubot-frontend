@@ -1,0 +1,88 @@
+/* StatusBubble.css */
+.status-bubble {
+  position: fixed; /* Posicionado de forma fija en la pantalla */
+  bottom: 30px; /* Ajustado para estar a la altura del icono de Byte */
+  right: 100px;  /* Posicionado a la izquierda del icono de ByteAssistant */
+  background-color: rgba(0, 224, 255, 0.9); /* Color cian brillante, similar a la UI */
+  color: #0a1423; /* Texto oscuro para contraste */
+  padding: 10px 15px;
+  border-radius: 15px;
+  box-shadow: 0 0 15px rgba(0, 224, 255, 0.5), 0 0 25px rgba(0, 224, 255, 0.3);
+  z-index: 10000; /* Asegurar que esté por encima de todos los elementos, incluyendo el mapa */
+  opacity: 0;
+  transform: translateY(20px) scale(0.9);
+  animation: fadeInGrow 0.5s forwards;
+  max-width: 250px;
+  text-align: center;
+  font-size: 0.9rem;
+  pointer-events: auto; /* Permitir interacción para poder cerrar */
+  backdrop-filter: none; /* Eliminado para evitar problemas con el fondo */
+  -webkit-backdrop-filter: none; /* Eliminado para evitar problemas con el fondo */
+  width: auto; /* Asegura que el ancho se ajuste al contenido */
+  height: auto; /* Asegura que la altura se ajuste al contenido */
+  margin: 0; /* Eliminar cualquier margen que pueda afectar el layout */
+  padding: 10px 15px; /* Mantener el padding consistente */
+  border: none; /* Eliminar cualquier borde que pueda afectar el layout */
+  isolation: isolate; /* Evita que afecte a otros elementos */
+}
+
+.status-bubble-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.status-bubble-close {
+  background: rgba(0, 0, 0, 0.2);
+  border: none;
+  color: #0a1423;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer !important;
+  padding: 0 5px;
+  line-height: 1;
+  opacity: 0.9;
+  transition: all 0.2s ease;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  min-height: 24px;
+  z-index: 10001; /* Asegurar que esté por encima de todo */
+  position: relative;
+  pointer-events: auto !important; /* Forzar que reciba eventos de clic */
+}
+
+.status-bubble-close:hover {
+  opacity: 1;
+  background-color: rgba(0, 0, 0, 0.3);
+  transform: scale(1.1);
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+}
+
+.status-bubble-arrow {
+  content: '';
+  position: absolute;
+  top: 50%; /* Centrado verticalmente */
+  right: -8px; /* Sale por la derecha */
+  transform: translateY(-50%) rotate(45deg); /* Apunta a la derecha y ligeramente abajo */
+  width: 16px;
+  height: 16px;
+  background-color: rgba(0, 224, 255, 0.9);
+  z-index: 0;
+  border-radius: 2px;
+  box-shadow: 3px 3px 8px rgba(0, 224, 255, 0.3);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+}
+
+@keyframes fadeInGrow {
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}

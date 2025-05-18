@@ -1,0 +1,120 @@
+.zoom-controls {
+  position: absolute;
+  top: 80px;
+  right: 20px; /* Alineado con el botón de Ultra Rendimiento */
+  display: flex;
+  flex-direction: column;
+  gap: 8px; /* Reducido para botones más pequeños */
+  z-index: 999;
+  pointer-events: auto;
+  background-color: rgba(10, 20, 35, 0.3); /* Fondo sutil para agrupar los botones */
+  padding: 8px 4px;
+  border-radius: 6px;
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+  width: 30px; /* Ancho fijo igual al botón de Ultra Rendimiento */
+}
+
+.zoom-control-button {
+  width: 30px; /* Reducido de 36px */
+  height: 30px; /* Reducido de 36px */
+  border-radius: 6px; /* Reducido de 8px */
+  background-color: rgba(10, 20, 35, 0.7);
+  color: #00e0ff;
+  border: 1px solid rgba(0, 224, 255, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.85em; /* Reducir tamaño de iconos */
+  box-shadow: 0 0 10px rgba(0, 224, 255, 0.3);
+  position: relative; /* Necesario para posicionar el tooltip */
+  overflow: visible; /* Permitir que el tooltip sea visible fuera del botón */
+}
+
+.zoom-control-button:hover {
+  background-color: rgba(0, 224, 255, 0.2);
+  transform: translateY(-2px); /* Mayor movimiento al hacer hover */
+  box-shadow: 0 0 10px rgba(0, 224, 255, 0.5), 0 0 20px rgba(0, 224, 255, 0.3);
+  color: #ffffff;
+}
+
+.zoom-control-button:active {
+  transform: translateY(1px);
+  box-shadow: 0 0 5px rgba(0, 224, 255, 0.4);
+  background-color: rgba(0, 224, 255, 0.3);
+}
+
+/* Estilos para los tooltips */
+.zoom-control-button .button-tooltip {
+  position: absolute;
+  right: 45px; /* Posicionado a la izquierda del botón */
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: rgba(0, 40, 80, 0.9);
+  color: #00e0ff;
+  padding: 4px 8px;
+  border-radius: 3px;
+  font-size: 11px;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+  pointer-events: none;
+  box-shadow: 0 0 10px rgba(0, 224, 255, 0.3);
+  border: 1px solid rgba(0, 224, 255, 0.5);
+  z-index: 1000;
+}
+
+/* Mostrar tooltip al hacer hover */
+.zoom-control-button:hover .button-tooltip {
+  opacity: 1;
+  visibility: visible;
+  right: 50px; /* Pequeña animación al aparecer */
+}
+
+/* Flecha del tooltip */
+.zoom-control-button .button-tooltip::after {
+  content: '';
+  position: absolute;
+  right: -6px;
+  top: 50%;
+  transform: translateY(-50%);
+  border-width: 6px 0 6px 6px;
+  border-style: solid;
+  border-color: transparent transparent transparent rgba(0, 40, 80, 0.9);
+}
+
+/* Separador visual entre grupos de botones */
+.controls-separator {
+  width: 80%;
+  height: 1px;
+  background-color: rgba(0, 224, 255, 0.3);
+  margin: 5px auto;
+  border-radius: 1px;
+  box-shadow: 0 0 5px rgba(0, 224, 255, 0.2);
+}
+
+/* Estilos para botones deshabilitados */
+.zoom-control-button.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  border-color: rgba(0, 224, 255, 0.3);
+  box-shadow: none;
+}
+
+.zoom-control-button.disabled:hover {
+  transform: none;
+  background-color: rgba(10, 20, 35, 0.7);
+  box-shadow: none;
+}
+
+/* Estilos para botón activo (historial) */
+.zoom-control-button.active {
+  background-color: rgba(0, 224, 255, 0.2);
+  box-shadow: 0 0 15px rgba(0, 224, 255, 0.5), inset 0 0 5px rgba(0, 224, 255, 0.3);
+  border-color: #00ffcc;
+  color: #00ffcc;
+}
