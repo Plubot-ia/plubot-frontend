@@ -122,11 +122,3 @@ static/js/create-claude.js
 ../plubot-backend/
 
 
-edge-fix.js
-fix_edge_type.js
-backup-plubot.sh
-Captura*.png
-*.jpg
-*.jpeg
-client_secret*.json
-endnode/

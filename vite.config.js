@@ -29,7 +29,7 @@ export default defineConfig({
     strictPort: true,
     hmr: {
       protocol: 'ws',
-      host: 'localhost',
+      host: '0.0.0.0',
       port: 5173,
     },
     proxy: {
