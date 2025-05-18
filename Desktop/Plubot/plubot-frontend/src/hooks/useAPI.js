@@ -64,22 +64,45 @@ const useAPI = () => {
         }
       }
       
-      const headers = token ? { Authorization: `Bearer ${token}` } : {};
+      // Configurar cabeceras
+      const headers = {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        ...(token && { 'Authorization': `Bearer ${token}` }),
+        ...(config.headers || {})
+      };
+
+      // Para depuración
+      console.log(`Enviando petición a ${url} con datos:`, data);
+      console.log('Cabeceras de la petición:', headers);
 
       const response = await instance({
         method,
         url,
-        data,
+        data: data ? JSON.stringify(data) : null,
         ...config,
-        headers: { ...headers, ...config.headers },
+        headers,
       });
       setLoading(false);
       return response.data;
     } catch (err) {
       setLoading(false);
       const status = err.response?.status || 'unknown';
-      const errorMessage = err.response?.data?.message || 'Error en la solicitud';
+      const errorMessage = err.response?.data?.message || err.message || 'Error en la solicitud';
       
+      // Log detallado del error
+      console.error(`Request failed: ${method} ${url}`);
+      console.error(`Status: ${status}`);
+      console.error(`Message: ${errorMessage}`);
+      if (err.response) {
+        console.error('Error Response Data:', err.response.data);
+        console.error('Error Response Headers:', err.response.headers);
+      }
+      if (err.request) {
+        console.error('Error Request Data:', err.request);
+      }
+      console.error('Full Axios Error Object:', err.toJSON ? err.toJSON() : err);
+
       // Manejar específicamente los errores de autenticación
       if (status === 401) {
         console.error('Error de autenticación. Redirigiendo al login...');

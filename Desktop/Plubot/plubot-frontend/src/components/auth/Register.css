@@ -302,10 +302,9 @@
 }
 
 .register-register-container .register-form-footer {
-  margin-top: 2rem;
+  margin-top: 1rem;
   text-align: center;
-  font-size: 0.95rem;
-  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.9rem;
 }
 
 .register-register-container .register-form-footer a {
@@ -515,6 +514,57 @@
   color: rgba(255, 255, 255, 0.7);
 }
 
+/* Separador para opciones de registro */
+.register-separator {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin: 1.5rem 0;
+}
+
+.register-separator::before,
+.register-separator::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid rgba(0, 224, 255, 0.3);
+}
+
+.register-separator::before {
+  margin-right: 0.5rem;
+}
+
+.register-separator::after {
+  margin-left: 0.5rem;
+}
+
+.register-separator span {
+  color: rgba(0, 224, 255, 0.8);
+  padding: 0 0.5rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+/* Botón de Google */
+.register-register-container .google-auth-button {
+  margin-bottom: 1.5rem;
+  transition: all 0.3s ease;
+  width: 100%;
+  background: linear-gradient(45deg, rgba(0, 224, 255, 0.1), rgba(0, 0, 0, 0.3));
+  border: 1px solid rgba(0, 224, 255, 0.3);
+  border-radius: 8px;
+  box-shadow: 0 0 15px rgba(0, 224, 255, 0.2);
+  color: rgba(255, 255, 255, 0.9);
+  padding: 12px 20px;
+  font-weight: 500;
+  backdrop-filter: blur(5px);
+}
+
+.register-register-container .google-auth-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 25px rgba(0, 224, 255, 0.5);
+  border: 1px solid rgba(0, 224, 255, 0.5);
+}
+
 /* Encapsulated media queries */
 @media (max-width: 768px) {
   .register-register-container {
@@ -544,4 +594,45 @@
     font-size: 1.1rem;
     padding: 0.9rem 1.8rem;
   }
+}
+
+/* Estilos para el separador */
+.register-separator {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin: 1.5rem 0;
+}
+
+.register-separator::before,
+.register-separator::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid rgba(0, 224, 255, 0.3);
+}
+
+.register-separator::before {
+  margin-right: 0.5rem;
+}
+
+.register-separator::after {
+  margin-left: 0.5rem;
+}
+
+.register-separator-text {
+  color: rgba(0, 224, 255, 0.8);
+  padding: 0 0.5rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+/* Ajustes para el botón de Google */
+.register-register-container .google-auth-button {
+  margin-bottom: 1rem;
+  transition: all 0.3s ease;
+}
+
+.register-register-container .google-auth-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 25px rgba(0, 224, 255, 0.5);
 }

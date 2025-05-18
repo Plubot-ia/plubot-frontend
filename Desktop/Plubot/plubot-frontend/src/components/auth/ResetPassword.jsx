@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom'; // Cambia useLocation por useParams
-import axiosInstance from '../../utils/axiosConfig';
+import { useParams, useNavigate } from 'react-router-dom';
+import useAuthStore from '@/stores/useAuthStore';
 import './ResetPassword.css';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 
@@ -13,6 +13,14 @@ const ResetPassword = () => {
     const [message, setMessage] = useState({ text: '', type: '' });
     const [isSubmitting, setIsSubmitting] = useState(false);
     const navigate = useNavigate();
+    const { resetPassword, error: authError } = useAuthStore();
+
+    // Efecto para manejar errores del store
+    useEffect(() => {
+      if (authError) {
+        showMessage(authError, 'error');
+      }
+    }, [authError]);
 
     const showMessage = (text, type) => {
         setMessage({ text, type });
@@ -48,25 +56,21 @@ const ResetPassword = () => {
         }
       
         try {
-          const formData = new FormData();
-          formData.append('new_password', newPassword);
-          formData.append('confirm_password', confirmPassword);
+          const response = await resetPassword(token, newPassword);
       
-          const response = await axiosInstance.post(`/api/auth/reset_password/${token}`, formData);
-      
-          if (response.data.status === 'success') {
-            showMessage('¡Contraseña restablecida exitosamente! Redirigiendo...', 'success');
+          if (response?.success) {
+            showMessage('Contraseña restablecida exitosamente. Redirigiendo...', 'success');
             const card = document.querySelector('.reset-password-card');
             if (card) {
               card.style.boxShadow =
                 '0 0 50px rgba(0, 255, 150, 0.7), 0 0 120px rgba(0, 0, 0, 0.8), inset 0 0 25px rgba(0, 255, 150, 0.4)';
             }
             setTimeout(() => {
-              navigate('/auth/login');
+              navigate('/login');
               window.scrollTo(0, 0);
-            }, 2000);
+            }, 3000);
           } else {
-            showMessage(response.data.message || 'Error al restablecer la contraseña. Intenta nuevamente.', 'error');
+            showMessage('Error al restablecer la contraseña. Intenta nuevamente.', 'error');
             setIsSubmitting(false);
           }
         } catch (error) {

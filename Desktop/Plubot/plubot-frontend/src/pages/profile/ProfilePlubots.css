@@ -530,10 +530,13 @@
     height: 100%;
     background: rgba(0, 0, 0, 0.7);
     backdrop-filter: blur(5px);
-    z-index: 1000;
+    z-index: 999; /* Justo por debajo del header (z-index: 1000) */
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start; /* Alineado en la parte superior */
+    padding-top: 90px; /* Espacio para el encabezado (80px altura + 10px extra) */
+    overflow-y: auto; /* Permitir scroll si el contenido es muy alto */
+    box-sizing: border-box; /* Para que el padding se incluya en la altura total */
   }
   
   .edit-modal-content-styles {
@@ -541,13 +544,15 @@
     border: 2px solid rgba(0, 224, 255, 0.7);
     box-shadow: 0 0 30px rgba(0, 224, 255, 0.5);
     backdrop-filter: blur(12px);
-    max-width: 450px;
+    max-width: 500px;
     width: 90%;
+    margin: 0 auto 40px auto; /* Eliminado margen superior, mantenido margen inferior */
     padding: 2.5rem;
     text-align: center;
     border-radius: 12px;
     position: relative;
-    z-index: 1001;
+    z-index: 1000; /* Al mismo nivel que el header */
+    overflow: visible; /* Asegurar que el contenido no se corte */
   }
   
   .modal-close-styles {

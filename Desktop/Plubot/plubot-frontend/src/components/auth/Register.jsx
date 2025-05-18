@@ -1,8 +1,9 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Register.css';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
-import { AuthContext } from '../../context/AuthContext';
+import useAuthStore from '@/stores/useAuthStore';
+import GoogleAuthButton from './GoogleAuthButton';
 
 const Register = () => {
   const [name, setName] = useState('');
@@ -16,12 +17,30 @@ const Register = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [registrationSuccess, setRegistrationSuccess] = useState(false);
   const navigate = useNavigate();
-  const { register } = useContext(AuthContext);
+  const { register, error: authError } = useAuthStore();
+
+  // Efecto para manejar errores del store
+  useEffect(() => {
+    if (authError) {
+      showMessage(authError, 'error');
+    }
+  }, [authError]);
 
   const showMessage = (text, type) => {
     console.log(`Showing message: ${text} (type: ${type})`);
     setMessage({ text, type });
     setTimeout(() => setMessage({ text: '', type: '' }), 5000);
+  };
+  
+  // Función para manejar cambios en el campo de email
+  const handleEmailChange = (e) => {
+    const value = e.target.value;
+    setEmail(value);
+    
+    // Guardar el email para usarlo en la autenticación con Google
+    if (value) {
+      localStorage.setItem('last_email_used', value);
+    }
   };
 
   const evaluatePasswordStrength = (password) => {
@@ -65,6 +84,11 @@ const Register = () => {
       showMessage('Por favor completa todos los campos', 'error');
       setIsSubmitting(false);
       return;
+    }
+    
+    // Guardar el email para usarlo en la autenticación con Google
+    if (email) {
+      localStorage.setItem('last_email_used', email);
     }
 
     if (password.length < 8) {
@@ -131,8 +155,8 @@ const Register = () => {
   }, []);
 
   const handleNavigateToLogin = () => {
-    console.log('Navigating to /auth/login');
-    navigate('/auth/login');
+    console.log('Navigating to /login');
+    navigate('/login');
     window.scrollTo(0, 0);
   };
 
@@ -208,7 +232,7 @@ const Register = () => {
               className="register-form-input"
               placeholder="correo@ejemplo.com"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={handleEmailChange}
               required
             />
           </div>
@@ -269,6 +293,16 @@ const Register = () => {
             {isSubmitting ? 'Procesando...' : 'REGISTRARSE'}
             <span className="register-btn-glow"></span>
           </button>
+          
+          <div className="register-separator">
+            <span>o</span>
+          </div>
+          
+          <GoogleAuthButton 
+            text="Registrarse con Google" 
+            className="futuristic"
+            isRegister={true}
+          />
         </form>
         <div className="register-form-footer">
           <p>

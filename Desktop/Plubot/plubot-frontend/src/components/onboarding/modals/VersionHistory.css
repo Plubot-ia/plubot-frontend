@@ -1,0 +1,87 @@
+.version-history-modal {
+  width: 90%;
+  max-width: 800px;
+}
+
+.version-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 16px;
+  gap: 10px;
+}
+
+.versions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: 50vh;
+  overflow-y: auto;
+}
+
+.version-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+  border-radius: 6px;
+  background-color: #222240;
+  border: 1px solid #2a2a5a;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.version-item:hover {
+  background-color: #2a2a50;
+}
+
+.version-item.selected {
+  background-color: #2a2a60;
+  border-color: #4a4ae0;
+}
+
+.version-info {
+  flex: 1;
+}
+
+.version-info h3 {
+  margin: 0 0 4px 0;
+  font-size: 1.1rem;
+  color: #e2e2f0;
+}
+
+.version-info p {
+  margin: 2px 0;
+  font-size: 0.9rem;
+  color: #8080a0;
+}
+
+.version-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.no-versions {
+  text-align: center;
+  color: #8080a0;
+  padding: 20px;
+  font-style: italic;
+}
+
+/* Estilos adicionales para botones específicos */
+.restore-button:hover {
+  color: #4a4ae0;
+}
+
+.delete-button:hover {
+  color: #e04a4a;
+}
+
+/* Animación para el modal */
+@keyframes modalFadeIn {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.version-history-modal {
+  animation: modalFadeIn 0.3s ease-out;
+}

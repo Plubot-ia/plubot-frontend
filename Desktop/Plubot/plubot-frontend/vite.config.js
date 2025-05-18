@@ -4,6 +4,7 @@ import path from 'path';
 
 export default defineConfig({
   plugins: [react()],
+  base: '/',
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
@@ -31,19 +32,39 @@ export default defineConfig({
       port: 5173,
     },
     proxy: {
-      '/api': {
+      '^/api/.*': {
         target: 'http://127.0.0.1:5000',
         changeOrigin: true,
         secure: false,
         ws: false,
+        rewrite: (path) => path.replace(/^\/api/, ''),
+        configure: (proxy, _options) => {
+          proxy.on('error', (err, _req, _res) => {
+            console.log('[PROXY ERROR]', err);
+          });
+          proxy.on('proxyReq', (proxyReq, req, _res) => {
+            console.log('[PROXY] Sending request to:', req.method, req.url);
+          });
+          proxy.on('proxyRes', (proxyRes, req, _res) => {
+            console.log('[PROXY] Received response:', req.method, req.url, '->', proxyRes.statusCode);
+          });
+        }
       },
     },
   },
   build: {
-    outDir: 'build',
-    chunkSizeWarningLimit: 1000, // Aumentado para evitar advertencias con dependencias grandes
+    outDir: 'dist', 
+    chunkSizeWarningLimit: 1000,
     minify: 'esbuild',
     target: 'esnext',
-    sourcemap: false, // Desactivado para builds más rápidos, actívalo si necesitas depurar
+    sourcemap: false,
+    rollupOptions: {
+      output: {
+        chunkFileNames: 'assets/[name].[hash].js',
+        entryFileNames: 'assets/[name].[hash].js',
+        assetFileNames: 'assets/[name].[hash].[ext]'
+      }
+    },
+    assetsInlineLimit: 4096,
   },
 });

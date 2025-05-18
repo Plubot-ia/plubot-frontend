@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom'; // Cambiar useParams por useSearchParams
 import useAPI from '../../hooks/useAPI';
-import FlowEditor from '../onboarding/FlowEditor';
+import FlowEditor from '../onboarding/flow-editor/FlowEditor';
 
 const PlubotEdit = () => {
   const [searchParams] = useSearchParams(); // Usar useSearchParams

@@ -490,7 +490,7 @@ const Historyverse = () => {
 
       {/* CTA con animación */}
       <section className="historyverse-cta">
-        <Link to="/plubot/create" className="hero-button">
+        <Link to="/welcome" className="hero-button">
           <span className="button-text">Crear mi Plubot</span>
           <div className="button-particles"></div>
         </Link>

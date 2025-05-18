@@ -1,15 +1,17 @@
-import React, { useEffect, useContext } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import './EmailVerificationNotice.css';
-import { AuthContext } from '../../context/AuthContext';
+import useAuthStore from '@/stores/useAuthStore';
 
 const EmailVerificationNotice = () => {
   const navigate = useNavigate();
-  const { user } = useContext(AuthContext) || {};
+  const location = useLocation();
+  const { user } = useAuthStore();
+  const email = location.state?.email || user?.email || 'tu correo';
 
   const handleNavigateToLogin = () => {
-    navigate('/auth/login');
+    navigate('/login');
     window.scrollTo(0, 0);
   };
 
@@ -40,10 +42,10 @@ const EmailVerificationNotice = () => {
     };
   }, []);
 
-  // Redirección automática después de 10 segundos (opcional)
+  // Redirección automática después de 10 segundos
   useEffect(() => {
     const timer = setTimeout(() => {
-      navigate('/auth/login');
+      navigate('/login');
       window.scrollTo(0, 0);
     }, 10000);
 

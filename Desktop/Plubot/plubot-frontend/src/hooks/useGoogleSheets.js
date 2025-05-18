@@ -1,14 +1,14 @@
 // hooks/useGoogleSheets.js
 import { useState, useEffect } from 'react';
 import useAPI from './useAPI';
-import { useAuth } from '@/context/AuthContext';
+import useAuthStore from '@/stores/useAuthStore';
 
 const useGoogleSheets = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [sheetsData, setSheetsData] = useState(null);
   const { axiosInstance } = useAPI();
-  const { user } = useAuth();
+  const { user } = useAuthStore();
 
   const connectGoogleSheets = async (credentials) => {
     setLoading(true);

@@ -1,0 +1,46 @@
+/* Estilos para el componente FlowMain */
+
+.flow-editor-container {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+}
+
+/* Ocultar controles nativos de ReactFlow */
+.react-flow__controls {
+  display: none !important;
+}
+
+/* Estilos para el panel del mini mapa */
+.custom-minimap-panel {
+  margin: 0;
+  padding: 0;
+}
+
+/* Estilos para el panel de controles de zoom */
+.react-flow__panel.react-flow__panel-bottom-right {
+  margin-right: 10px;
+  margin-bottom: 10px;
+}
+
+/* Asegurar que el fondo se muestre correctamente */
+.react-flow__background {
+  z-index: 0;
+}
+
+/* Estilos para los nodos seleccionados */
+.react-flow__node.selected {
+  box-shadow: 0 0 0 2px #00e0ff;
+}
+
+/* Estilos para el efecto de arrastre */
+.flow-editor-container.drag-over {
+  background-color: rgba(0, 224, 255, 0.05);
+}
+
+.react-flow__pane.drag-over {
+  cursor: grab;
+}

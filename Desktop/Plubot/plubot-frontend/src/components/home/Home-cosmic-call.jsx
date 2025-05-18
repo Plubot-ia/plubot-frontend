@@ -7,7 +7,7 @@ const HomeCosmicCall = () => {
       <div className="call-overlay">
         <h2>¿Cuál es tu destino?</h2>
         <div className="call-cta">
-          <Link to="/plubot/create" className="hero-button">
+          <Link to="/welcome" className="hero-button">
             Forjar mi Plubot
           </Link>
           <Link to="/pluniverse" className="hero-button secondary">

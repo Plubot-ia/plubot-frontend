@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import plubotLogo from '@/assets/img/logo.svg';
 
 /**
  * Componente modal para editar un plubot
@@ -16,48 +17,162 @@ const EditPlubotModal = ({
   showNotification, 
   navigate 
 }) => {
+  const [hoverIdentity, setHoverIdentity] = useState(false);
+  const [hoverFlows, setHoverFlows] = useState(false);
+  const [particleEffect, setParticleEffect] = useState(false);
+  
+  // Función para calcular el nivel de poder basado en diferentes formatos posibles de plubot.powers
+  const calculatePowerLevel = (powers) => {
+    if (!powers) return 0;
+    
+    // Si powers es un string (formato: 'poder1,poder2,poder3')
+    if (typeof powers === 'string') {
+      return powers.split(',').filter(p => p.trim()).length;
+    }
+    
+    // Si powers es un array
+    if (Array.isArray(powers)) {
+      return powers.length;
+    }
+    
+    // Si powers es un objeto (por ejemplo, si viene como un objeto JSON)
+    if (typeof powers === 'object') {
+      return Object.keys(powers).length;
+    }
+    
+    return 0;
+  };
+  
+  // Efecto para mostrar partículas al abrir el modal
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setParticleEffect(true);
+    }, 300);
+    
+    return () => clearTimeout(timer);
+  }, []);
   const handleEditIdentity = () => {
     if (!plubot.id) {
       console.error('[EditPlubotModal] Error: plubotId no válido en Editar Identidad:', plubot.id);
       showNotification('Error: ID del Plubot no válido', 'error');
       return;
     }
+    // Efecto de sonido (opcional)
+    const audio = new Audio('/assets/sounds/click.mp3');
+    audio.volume = 0.3;
+    audio.play().catch(e => console.log('Error reproduciendo sonido:', e));
+    
     console.log('[EditPlubotModal] Navegando a editar identidad para plubotId:', plubot.id);
     setEditModalPlubot(null);
+    // Usar la ruta correcta para editar la identidad del Plubot
     navigate(`/plubot/edit/personalization?plubotId=${plubot.id}`);
   };
 
   return (
     <div className="modal-overlay modal-overlay-immediate" onClick={() => setEditModalPlubot(null)}>
+      {/* Efecto de partículas */}
+      {particleEffect && (
+        <div className="edit-modal-particles">
+          {Array.from({ length: 12 }).map((_, i) => (
+            <div key={i} className="particle" style={{
+              left: `${Math.random() * 100}%`,
+              animationDelay: `${Math.random() * 2}s`,
+              animationDuration: `${3 + Math.random() * 5}s`
+            }}></div>
+          ))}
+        </div>
+      )}
+      
       <div
-        className="edit-modal-content-styles"
+        className="edit-modal-content-styles cyber-panel"
         onClick={(e) => e.stopPropagation()}
       >
+        {/* Decoración de esquinas */}
+        <div className="corner-decoration top-left"></div>
+        <div className="corner-decoration top-right"></div>
+        <div className="corner-decoration bottom-left"></div>
+        <div className="corner-decoration bottom-right"></div>
+        
         <button
           className="modal-close-styles"
           onClick={() => setEditModalPlubot(null)}
         >
-          ✖
+          <span className="close-icon">✖</span>
         </button>
-        <h3 className="edit-modal-title-styles">
-          Personalizar {plubot.name || 'Plubot'}
-        </h3>
+        
+        <div className="edit-modal-header">
+          <div className="edit-modal-avatar">
+            <div className="avatar-hologram">
+              <div className="hologram-ring"></div>
+              <div className="hologram-ring"></div>
+              <div className="hologram-image">
+                <img src={plubotLogo} alt="Plubot Logo" className="plubot-logo" />
+              </div>
+            </div>
+          </div>
+          
+          <h3 className="edit-modal-title-styles">
+            <span className="edit-modal-title-glow">Personalizar</span> {plubot.name || 'Plubot'}
+          </h3>
+        </div>
+        
         <p className="edit-modal-paragraph">
           Selecciona una opción para modificar las características de tu Plubot.
         </p>
+        
         <div className="edit-modal-buttons-container">
           <button
-            className="edit-modal-identity-button"
+            className={`edit-modal-identity-button cyber-button ${hoverIdentity ? 'hover' : ''}`}
             onClick={handleEditIdentity}
+            onMouseEnter={() => setHoverIdentity(true)}
+            onMouseLeave={() => setHoverIdentity(false)}
           >
-            <span className="edit-modal-icon">🎨</span> Editar Identidad
+            <div className="button-glitch"></div>
+            <span className="edit-modal-icon identity-icon">🎨</span>
+            <span className="button-text">Editar Identidad</span>
+            <div className="button-scanner"></div>
           </button>
+          
           <button
-            className="edit-modal-flows-button"
-            onClick={() => handleEditFlows(plubot.id)}
+            className={`edit-modal-flows-button cyber-button ${hoverFlows ? 'hover' : ''}`}
+            onClick={() => {
+              if (!plubot.id) {
+                console.error('[EditPlubotModal] Error: plubotId no válido en Editar Flujos:', plubot);
+                showNotification('Error: ID del Plubot no válido. Por favor, crea un nuevo plubot.', 'error');
+                setEditModalPlubot(null);
+                return;
+              }
+              
+              // Efecto de sonido (opcional)
+              const audio = new Audio('/assets/sounds/click.mp3');
+              audio.volume = 0.3;
+              audio.play().catch(e => console.log('Error reproduciendo sonido:', e));
+              
+              console.log('[EditPlubotModal] Navegando a editar flujos para plubotId:', plubot.id);
+              handleEditFlows(plubot.id);
+            }}
+            onMouseEnter={() => setHoverFlows(true)}
+            onMouseLeave={() => setHoverFlows(false)}
           >
-            <span className="edit-modal-icon">🔄</span> Editar Flujos
+            <div className="button-glitch"></div>
+            <span className="edit-modal-icon flows-icon">🔄</span>
+            <span className="button-text">Editar Flujos</span>
+            <div className="button-scanner"></div>
           </button>
+        </div>
+        
+        <div className="modal-power-level">
+          <div className="power-bar">
+            <div className="power-fill" style={{ 
+              width: `${Math.min(100, calculatePowerLevel(plubot.powers) * 20)}%` 
+            }}></div>
+          </div>
+          <span className="power-text">Nivel de Poder</span>
+        </div>
+        
+        {/* Indicador visual para mostrar que el modal está completo */}
+        <div className="modal-footer-decoration">
+          <div className="footer-line"></div>
         </div>
       </div>
     </div>

@@ -77,16 +77,16 @@ const Footer = () => {
             <ul className="footer-links-column">
               <li><NavLink to="/" onClick={() => scrollToTop('/')}>Inicio</NavLink></li>
               <li><NavLink to="/pluniverse" onClick={() => scrollToTop('/pluniverse')}>Pluniverse</NavLink></li>
-              <li><NavLink to="/pluniverse/sanctuary" onClick={() => scrollToTop('/pluniverse/sanctuary')}>Santuario del Fundador</NavLink></li>
+              <li><NavLink to="/sanctuary" onClick={() => scrollToTop('/sanctuary')}>Santuario del Fundador</NavLink></li>
               <li><NavLink to="/tutoriales" onClick={() => scrollToTop('/tutoriales')}>Tutoriales</NavLink></li>
               <li><NavLink to="/contact" onClick={() => scrollToTop('/contact')}>Contacto</NavLink></li>
             </ul>
             <ul className="footer-links-column">
-              <li><NavLink to="/auth/register" onClick={() => scrollToTop('/auth/register')}>Registrarse</NavLink></li>
-              <li><NavLink to="/auth/login" onClick={() => scrollToTop('/auth/login')}>Iniciar Sesión</NavLink></li>
+              <li><NavLink to="/register" onClick={() => scrollToTop('/register')}>Registrarse</NavLink></li>
+              <li><NavLink to="/login" onClick={() => scrollToTop('/login')}>Iniciar Sesión</NavLink></li>
               <li><NavLink to="/blog" onClick={() => scrollToTop('/blog')}>Blog</NavLink></li>
               <li><NavLink to="/faq" onClick={() => scrollToTop('/faq')}>Preguntas Frecuentes</NavLink></li>
-              <li><NavLink to="/pluniverse/coliseum" onClick={() => scrollToTop('/pluniverse/coliseum')}>Comunidad</NavLink></li>
+              <li><NavLink to="/coliseum" onClick={() => scrollToTop('/coliseum')}>Comunidad</NavLink></li>
             </ul>
           </div>
         </div>

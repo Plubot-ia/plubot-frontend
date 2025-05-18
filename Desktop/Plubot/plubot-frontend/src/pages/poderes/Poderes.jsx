@@ -167,7 +167,7 @@ const Poderes = () => {
           <Link to="/poderes-about" className="hero-button">
             Dime Más
           </Link>
-          <Link to="/pluniverse/marketplace" className="hero-button secondary">
+          <Link to="/marketplace" className="hero-button secondary">
             Explorar Poderes
           </Link>
         </div>
@@ -208,7 +208,7 @@ const Poderes = () => {
       <section className="poderes-cta">
         <h2>Forja un Plubot Épico</h2>
         <p>Desbloquea poderes y crea un asistente que conquiste el Pluniverse.</p>
-        <Link to="/plubot/create" className="hero-button">
+        <Link to="/welcome" className="hero-button">
           Crear mi Plubot
         </Link>
       </section>

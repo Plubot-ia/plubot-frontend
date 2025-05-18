@@ -1,9 +1,10 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import './Login.css';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
-import { AuthContext } from '../../context/AuthContext';
+import useAuthStore from '@/stores/useAuthStore';
+import GoogleAuthButton from './GoogleAuthButton';
 
 const Login = () => {
   const [formData, setFormData] = useState({ email: '', password: '' });
@@ -13,14 +14,14 @@ const Login = () => {
 
   const navigate = useNavigate();
   const location = useLocation();
-  const { login, isAuthenticated } = useContext(AuthContext) || {};
+  const { login, isAuthenticated, loading: authLoading, error: authError } = useAuthStore();
 
-  // Log para debuggear cambios en message e isAuthenticated
+  // Efecto para manejar errores del store
   useEffect(() => {
-    console.log('Estado message actualizado:', message);
-    console.log('Estado isAuthenticated:', isAuthenticated);
-    console.log('Estado isSubmitting:', isSubmitting);
-  }, [message, isAuthenticated, isSubmitting]);
+    if (authError) {
+      setMessage({ text: authError, type: 'error' });
+    }
+  }, [authError]);
 
   // Cargar datos guardados del formulario
   useEffect(() => {
@@ -68,73 +69,74 @@ const Login = () => {
   };
 
   const handleChange = (e) => {
-    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+    
+    // Guardar el email para usarlo en la autenticación con Google
+    if (name === 'email' && value) {
+      localStorage.setItem('last_email_used', value);
+    }
   };
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setMessage({ text: '', type: '' });
 
     if (!formData.email || !formData.password) {
-      console.log('Campos vacíos detectados');
       showMessage('Por favor completa todos los campos', 'error');
+      setIsSubmitting(false);
       return;
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(formData.email)) {
-      console.log('Email inválido:', formData.email);
       showMessage('Por favor ingresa un email válido', 'error');
+      setIsSubmitting(false);
       return;
     }
 
     try {
-      console.log('Enviando solicitud de login con:', formData);
-      const response = await login(formData.email, formData.password);
-      console.log('Respuesta del backend:', response);
-
-      if (response.status === 'success') {
-        console.log('Login exitoso, guardando token');
-        localStorage.setItem('access_token', response.access_token);
-        showMessage('¡Inicio de sesión exitoso! Redirigiendo...', 'success');
-        const card = document.querySelector('.login-login-card');
-        if (card) {
-          card.style.boxShadow =
-            '0 0 50px rgba(0, 255, 150, 0.7), 0 0 120px rgba(0, 0, 0, 0.8), inset 0 0 25px rgba(0, 255, 150, 0.4)';
-        }
-        setTimeout(() => {
-          setIsSubmitting(false);
-          localStorage.removeItem('loginFormData');
-          const from = location.state?.from || '/pluniverse';
-          navigate(from, { replace: true });
-        }, 2000);
-      } else {
-        console.log('Respuesta no exitosa:', response);
-        const errorMsg = response.message || 'Error al iniciar sesión. Intenta nuevamente.';
-        showMessage(errorMsg, 'error');
+      // Asegurarse de que los datos se envían correctamente estructurados
+      const email = formData.email.trim();
+      const password = formData.password;
+      
+      console.log('Intentando login con:', { email });
+      
+      await login(email, password);
+      
+      // Si llegamos aquí, el login fue exitoso
+      showMessage('¡Inicio de sesión exitoso! Redirigiendo...', 'success');
+      
+      // Efecto visual de éxito
+      const card = document.querySelector('.login-login-card');
+      if (card) {
+        card.style.boxShadow =
+          '0 0 50px rgba(0, 255, 150, 0.7), 0 0 120px rgba(0, 0, 0, 0.8), inset 0 0 25px rgba(0, 255, 150, 0.4)';
       }
+      
+      // Redirigir después de un breve retraso
+      setTimeout(() => {
+        localStorage.removeItem('loginFormData');
+        const from = location.state?.from || '/pluniverse';
+        navigate(from, { replace: true });
+      }, 1500);
+      
     } catch (error) {
-      console.error('Error capturado en login:', error);
-      let errorMessage = 'Credenciales incorrectas.';
-      if (error.message) {
-        errorMessage = error.message;
-      } else if (error.response?.data?.message) {
-        errorMessage = error.response.data.message;
-      } else if (error.response?.data?.error) {
-        errorMessage = error.response.data.error;
-      }
-      console.log('Mostrando mensaje de error:', errorMessage);
-      showMessage(errorMessage, 'error');
+      // El error ya es manejado por el store y el efecto que escucha authError
+      console.error('Error en login:', error);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   const handleNavigateToRegister = () => {
-    navigate('/auth/register');
+    navigate('/register');
     window.scrollTo(0, 0);
   };
 
   const handleNavigateToForgotPassword = () => {
-    navigate('/auth/forgot');
+    navigate('/forgot-password');
     window.scrollTo(0, 0);
   };
 
@@ -257,6 +259,13 @@ const Login = () => {
             Entrar
           </motion.button>
         </form>
+        
+        <div className="login-separator">
+          <span className="login-separator-text">o</span>
+        </div>
+        
+        <GoogleAuthButton text="Iniciar sesión con Google" className="futuristic" />
+        
         <div className="login-form-footer">
           <p>
             ¿No tenés cuenta?{' '}

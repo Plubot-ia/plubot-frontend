@@ -152,7 +152,7 @@ const PlubotSection = memo(({
       ) : (
         <div className="empty-state">
           <div className="empty-icon">
-            <img src="/src/assets/img/plubot.svg" alt="Plubot Logo" className="empty-icon-image" />
+            <img src="/assets/img/plubot.svg" alt="Plubot Logo" className="empty-icon-image" />
           </div>
           <p>¡Crea tu primer Plubot en la Fábrica!</p>
           <button
