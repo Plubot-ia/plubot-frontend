@@ -364,7 +364,9 @@ const AppWrapper = () => {
                     } />
                     <Route path="/plubot/edit/training/:plubotId" element={
                       <PrivateRoute>
-                        <TrainingScreen />
+                        <Layout hideHeaderFooter={true}>
+                          <TrainingScreen />
+                        </Layout>
                       </PrivateRoute>
                     } />
                     <Route path="/welcome" element={<WelcomeSequence />} />
@@ -379,7 +381,9 @@ const AppWrapper = () => {
                     <Route path="/plubot/create/personalization" element={<Navigate to="/personalization" replace />} />
                     <Route path="/training" element={
                       <PrivateRoute>
-                        <TrainingScreen />
+                        <Layout hideHeaderFooter={true}>
+                          <TrainingScreen />
+                        </Layout>
                       </PrivateRoute>
                     } />
                     <Route path="/plubot/edit/training" element={<Navigate to="/training" replace />} />
