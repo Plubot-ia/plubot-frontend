@@ -26,7 +26,7 @@ import SuggestionsModal from '../modals/SuggestionsModal';
 import ImportExportModal from '../modals/ImportExportModal';
 import EmbedModal from '../modals/EmbedModal';
 import TemplateSelector from '../modals/TemplateSelector';
-import VersionHistory from '../modals/VersionHistory';
+// VersionHistory ha sido eliminado
 import { prepareEdgesForSaving, backupEdgesToLocalStorage } from '../flow-editor/utils/edgeFixUtil';
 
 // Modal Manager para manejar la renderización condicional de modales
@@ -85,11 +85,7 @@ const ModalManager = ({ modals, modalProps, onClose }) => {
         />
       )}
       
-      {modals.showVersionHistoryPanel && (
-        <VersionHistory
-          onClose={() => onClose('showVersionHistoryPanel')}
-        />
-      )}
+      {/* El panel de historial de versiones ha sido eliminado */}
     </>
   );
 };
@@ -699,17 +695,6 @@ const TrainingScreen = () => {
               <h2>Incrustar Plubot</h2>
               <button onClick={() => setShowEmbedModal(false)} className="modal-close-btn">×</button>
               {/* Contenido del modal de incrustación */}
-            </div>
-          </div>
-        )}
-
-        {showVersionHistoryPanel && (
-          <div className="modal-overlay">
-            <div className="modal-content version-history-modal">
-              <VersionHistory 
-                onClose={() => setShowVersionHistoryPanel(false)} 
-                plubotId={plubotIdFromUrl}
-              />
             </div>
           </div>
         )}

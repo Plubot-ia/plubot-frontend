@@ -1,0 +1,55 @@
+/* Estilos para el modo Ultra Rendimiento */
+
+/* Clase que se añade al body cuando el modo Ultra Rendimiento está activado */
+body.ultra-mode .zoom-control-button,
+body.ultra-mode .sync-control-button {
+  animation: none !important;
+  transition: transform 0.1s ease !important;
+  box-shadow: none !important;
+}
+
+body.ultra-mode .zoom-control-button:hover,
+body.ultra-mode .sync-control-button:hover {
+  transform: none !important;
+  box-shadow: none !important;
+  background-color: rgba(10, 20, 35, 0.7) !important;
+}
+
+body.ultra-mode .button-tooltip {
+  display: none !important;
+}
+
+body.ultra-mode .sync-control-button .sync-icon {
+  animation: none !important;
+}
+
+/* Deshabilitar completamente todas las animaciones en el modo Ultra Rendimiento */
+body.ultra-mode * {
+  transition: none !important;
+  animation: none !important;
+  animation-duration: 0s !important;
+  transition-duration: 0s !important;
+  animation-delay: 0s !important;
+  transition-delay: 0s !important;
+}
+
+/* Estilos específicos para ByteAssistant en modo Ultra Rendimiento */
+body.ultra-mode .byte-assistant-container,
+body.ultra-mode .byte-assistant-bubble,
+body.ultra-mode .byte-assistant-icon {
+  transform: none !important;
+  animation: none !important;
+  transition: none !important;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* Estilos específicos para el botón de Ultra Rendimiento */
+body.ultra-mode .performance-mode-button {
+  animation: none !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+body.ultra-mode .performance-mode-button .feedback-indicator {
+  display: none !important;
+}

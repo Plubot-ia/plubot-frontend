@@ -1,7 +1,6 @@
 import React from 'react';
 import { useReactFlow } from 'reactflow';
 import { FiZoomIn, FiZoomOut, FiMaximize, FiRotateCcw, FiRotateCw } from 'react-icons/fi';
-import { History } from 'lucide-react';
 import './ZoomControls.css';
 import useFlowStore from '@/stores/useFlowStore';
 import useTrainingStore from '@/stores/useTrainingStore';
@@ -84,23 +83,7 @@ const ZoomControls = ({
         <div className="button-tooltip">Rehacer</div>
       </button>
       
-      {/* Botón de historial */}
-      <button
-        className={`zoom-control-button ${historyActive ? 'active' : ''}`}
-        onClick={() => {
-          console.log('[ZoomControls] Botón de historial clickeado');
-          if (onToggleHistory) {
-            onToggleHistory();
-          } else {
-            // Emitir un evento personalizado como fallback
-            const event = new CustomEvent('open-version-history');
-            window.dispatchEvent(event);
-          }
-        }}
-      >
-        <History />
-        <div className="button-tooltip">Historial de versiones</div>
-      </button>
+      {/* El botón de historial de versiones ha sido eliminado */}
     </div>
   );
 };

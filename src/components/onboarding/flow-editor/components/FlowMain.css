@@ -1,6 +1,6 @@
 /* Estilos para el componente FlowMain */
 
-.flow-editor-container {
+.flow-editor-wrapper.flow-editor-container {
   width: 100%;
   height: 100%;
   position: relative;
@@ -37,10 +37,7 @@
 }
 
 /* Estilos para el efecto de arrastre */
-.flow-editor-container.drag-over {
+.flow-editor-wrapper.flow-editor-container .react-flow__pane.drag-over {
   background-color: rgba(0, 224, 255, 0.05);
-}
-
-.react-flow__pane.drag-over {
   cursor: grab;
 }

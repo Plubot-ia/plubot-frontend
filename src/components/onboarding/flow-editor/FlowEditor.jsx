@@ -10,7 +10,7 @@ import EmbedModal from '../modals/EmbedModal';
 import useNodeStyles from './hooks/useNodeStyles';
 import StatusBubble from '../common/StatusBubble';
 import ByteAssistant from '../common/ByteAssistant';
-import VersionHistory from "../modals/VersionHistory";
+// VersionHistory ha sido eliminado
 import TransparentOverlay from '../common/TransparentOverlay'; // Nuevo overlay transparente
 import PerformanceStats from '@/components/flow/PerformanceStats';
 import './FlowEditor.css'; // Archivo CSS fusionado
@@ -62,7 +62,7 @@ class NodeErrorBoundary extends React.Component {
           Error rendering node: {this.state.error.message}
         </div>
       );
-    }
+  }
     return this.props.children;
   }
 }
@@ -257,11 +257,15 @@ const FlowEditorInner = ({
   plubotId,
   name,
   notifyByte,
-  showVersionHistoryPanel,
-  setShowVersionHistoryPanel,
   saveFlowData,
   hideHeader = false // Añadir la prop hideHeader con valor por defecto false
 }) => {
+  // Obtener acceso al store FUERA de las funciones
+  const flowStore = useFlowStore(state => ({
+    setNodes: state.setNodes,
+    setEdges: state.setEdges,
+    setFlowName: state.setFlowName
+  }));
   // Estado local
   const navigate = useNavigate();
   const { request } = useAPI();
@@ -278,10 +282,10 @@ const FlowEditorInner = ({
     try {
       const saved = window.localStorage.getItem('plubot-performance-mode');
       return saved === 'ultra';
-    } catch (e) {
+  } catch (e) {
       console.warn('[UltraRendimiento] No se pudo acceder a localStorage:', e);
       return false;
-    }
+  }
   };
 
   // Estado del modo ultra rendimiento
@@ -290,35 +294,30 @@ const FlowEditorInner = ({
   // Agregar listeners para los eventos de los botones
   useEffect(() => {
     // Listener para historial de versiones
-    const handleVersionHistoryEvent = () => {
-      console.log('Abriendo historial de versiones desde evento');
-      setShowVersionHistoryPanel(true);
-    };
+    // La funciu00f3n handleVersionHistoryEvent ha sido eliminada
     
     // Listener para compartir (EmbedModal)
     const handleEmbedModalEvent = () => {
       console.log('Abriendo modal de compartir desde evento');
       setShowEmbedModal(true);
-    };
+  };
     
     // Listener para plantillas (TemplateSelector)
     const handleTemplateSelectorEvent = () => {
       console.log('Abriendo selector de plantillas desde evento');
       setShowTemplateSelector(true);
-    };
+  };
     
     // Registrar todos los listeners
-    window.addEventListener('open-version-history', handleVersionHistoryEvent);
     window.addEventListener('open-embed-modal', handleEmbedModalEvent);
     window.addEventListener('open-template-selector', handleTemplateSelectorEvent);
     
     // Limpiar todos los listeners al desmontar
     return () => {
-      window.removeEventListener('open-version-history', handleVersionHistoryEvent);
       window.removeEventListener('open-embed-modal', handleEmbedModalEvent);
       window.removeEventListener('open-template-selector', handleTemplateSelectorEvent);
-    };
-  }, [setShowVersionHistoryPanel, setShowEmbedModal, setShowTemplateSelector]);
+  };
+  }, [setShowEmbedModal, setShowTemplateSelector]);
   
   // Sincronizar la clase global SIEMPRE que cambie el estado
   useEffect(() => {
@@ -327,17 +326,17 @@ const FlowEditorInner = ({
       if (isUltraPerformanceMode) {
         document.body.classList.add(className);
         console.info('[UltraRendimiento] Clase global aplicada (modo ultra)');
-      } else {
+    } else {
         document.body.classList.remove(className);
         console.info('[UltraRendimiento] Clase global removida (modo normal)');
-      }
-    } catch (e) {
-      console.error('[UltraRendimiento] Error al manipular la clase global:', e);
     }
+  } catch (e) {
+      console.error('[UltraRendimiento] Error al manipular la clase global:', e);
+  }
     // Limpieza en caso de hot-reload/react strict mode
     return () => {
       document.body.classList.remove(className);
-    };
+  };
   }, [isUltraPerformanceMode]);
 
   // Alternar el modo de ultra rendimiento con robustez y feedback
@@ -350,22 +349,22 @@ const FlowEditorInner = ({
         if (newMode) {
           document.body.classList.add(className);
           setByteMessage('🚀 Modo Ultra Rendimiento activado. Optimizando visualización...');
-        } else {
+      } else {
           document.body.classList.remove(className);
           setByteMessage('🎨 Modo Normal activado. Restaurando efectos visuales...');
-        }
-      } catch (e) {
+      }
+    } catch (e) {
         setByteMessage('⚠️ Error visual al alternar modo de rendimiento.');
         console.error('[UltraRendimiento] Error al alternar clase global:', e);
-      }
+    }
       try {
         window.localStorage.setItem('plubot-performance-mode', newMode ? 'ultra' : 'normal');
-      } catch (e) {
+    } catch (e) {
         setByteMessage('⚠️ No se pudo guardar preferencia de rendimiento.');
         console.warn('[UltraRendimiento] No se pudo guardar en localStorage:', e);
-      }
+    }
       return newMode;
-    });
+  });
   }, [setByteMessage]);
 
   // Inicializar hooks personalizados
@@ -378,19 +377,16 @@ const FlowEditorInner = ({
     setShowTemplateSelector(false);
     setShowEmbedModal(false);
     setShowSimulation(false);
-    // También cerrar el panel de historial de versiones si está abierto
-    if (showVersionHistoryPanel) {
-      setShowVersionHistoryPanel(false);
-    }
+    // El panel de historial de versiones ha sido eliminado
     // Agregar aquí cualquier otro modal que necesite cerrarse
-  }, [setShowTemplateSelector, setShowEmbedModal, setShowSimulation, showVersionHistoryPanel, setShowVersionHistoryPanel]);
+  }, [setShowTemplateSelector, setShowEmbedModal, setShowSimulation]);
   
   // Exponer la función globalmente para poder llamarla desde otros componentes
   useEffect(() => {
     window.closeAllModals = handleCloseAllModals;
     return () => {
       delete window.closeAllModals;
-    };
+  };
   }, [handleCloseAllModals]);
   
   const nodesState = useFlowNodes(nodes, setNodes, addToHistory);
@@ -416,9 +412,9 @@ const FlowEditorInner = ({
     // Actualizar el mensaje de Byte según el estado de la simulación
     if (!showSimulation) {
       setByteMessage('🎬 Simulación iniciada.');
-    } else {
+  } else {
       setByteMessage('🔍 Simulador cerrado.');
-    }
+  }
   }, [showSimulation, setShowSimulation, setByteMessage]);
 
   // Función para cargar datos del flujo
@@ -426,245 +422,93 @@ const FlowEditorInner = ({
     setIsLoading(true);
     
     try {  
-      // Obtener datos del backend
-      const response = await request('GET', `/api/plubots/${plubotId}/flow`);
-      const { nodes, edges } = response.data;
+      // Inicializar variables para evitar errores de destructuración
+      let backendNodes = [];
+      let backendEdges = [];
+      let processedNodes = [];
+      let flowName = 'Flujo sin título';
       
-      if (nodes && Array.isArray(nodes)) {
+      try {
+        // Obtener datos del backend
+        const response = await request('GET', `/api/plubots/${plubotId}/flow`);
+        
+        // Verificar que la respuesta es válida
+        if (response && response.data) {
+          // Extraer nodos y aristas de la respuesta
+          backendNodes = response.data.nodes || [];
+          backendEdges = response.data.edges || [];
+          flowName = response.data.name || 'Flujo sin título';
+          
+          console.log(`[FlowEditor] Datos cargados: ${backendNodes.length} nodos, ${backendEdges.length} aristas`);
+        } else {
+          console.warn('[FlowEditor] La respuesta del backend no contiene datos válidos');
+        }
+      } catch (error) {
+        console.error('[FlowEditor] Error al obtener datos del backend:', error);
+        // Intentar cargar desde localStorage como respaldo
+        try {
+          const localBackup = localStorage.getItem(`plubot-flow-${plubotId}`);
+          if (localBackup) {
+            const parsedBackup = JSON.parse(localBackup);
+            backendNodes = parsedBackup.nodes || [];
+            backendEdges = parsedBackup.edges || [];
+            flowName = parsedBackup.name || 'Flujo sin título (respaldo)';
+            console.log('[FlowEditor] Datos cargados desde respaldo local');
+          }
+        } catch (backupError) {
+          console.error('[FlowEditor] Error al cargar respaldo local:', backupError);
+        }
+      }
+      
+      // Verificar si tenemos nodos para procesar
+      if (Array.isArray(backendNodes) && backendNodes.length > 0) {
         // Procesar los nodos para asegurar que tengan las propiedades correctas
-        const processedNodes = nodes.map(node => ({
+        processedNodes = backendNodes.map(node => ({
           ...node,
+          // Asegurar que los nodos tengan ID único
+          id: node.id || `node-${Math.random().toString(36).substr(2, 9)}`,
           // Asegurar que los nodos tengan posición
-          position: node.position || { x: 0, y: 0 },
+          position: node.position || { x: Math.random() * 500, y: Math.random() * 300 },
           // Asegurar que los nodos tengan la propiedad data
           data: node.data || {}
         }));
         
-        // Usar directamente la función setNodes del store
-        const flowStore = useFlowStore.getState();
-        if (flowStore && typeof flowStore.setNodes === 'function') {
-          console.log('[FlowEditor] Actualizando nodos con setNodes');
-          flowStore.setNodes(processedNodes);
-        } else {
-          console.error('[FlowEditor] Error: No se pudo acceder a setNodes desde el store');
+        // Guardar una copia en localStorage como respaldo
+        try {
+          localStorage.setItem(`plubot-flow-backup-${plubotId}`, JSON.stringify({
+            nodes: processedNodes,
+            edges: backendEdges,
+            name: flowName,
+            timestamp: new Date().toISOString()
+          }));
+        } catch (storageError) {
+          console.warn('[FlowEditor] Error al guardar respaldo en localStorage:', storageError);
         }
+      } else {
+        console.warn('[FlowEditor] No hay nodos para procesar');
       }
       
-      // Mostrar información detallada sobre las aristas recibidas
-      console.log('Aristas recibidas del backend:', edges);
+      // Obtener la referencia al store de Zustand
+      const flowStore = useFlowStore.getState();
       
-      if (edges && Array.isArray(edges)) {
-        console.log(`Procesando ${edges.length} aristas recibidas del backend`);
-        
-        // Procesar las aristas para asegurar que tengan los IDs correctos
-        // Primero crear un mapa de los nodos para verificar que las conexiones son válidas
-        const nodeMap = {};
-        const originalIdToNodeId = {};
-        
-        if (nodes && Array.isArray(nodes)) {
-          // Mapear todos los IDs de nodos para facilitar la búsqueda
-          nodes.forEach(node => {
-            nodeMap[node.id] = true;
-            
-            // Si el ID es del formato 'node-X', mapear también el número X
-            if (node.id.startsWith('node-')) {
-              const numericId = node.id.replace('node-', '');
-              originalIdToNodeId[numericId] = node.id;
-              nodeMap[numericId] = true; // También considerar el ID numérico como válido
-            }
-            
-            // También mapear el ID original si existe
-            if (node.originalId) {
-              originalIdToNodeId[node.originalId] = node.id;
-              nodeMap[node.originalId] = true;
-            }
-            
-            // Extraer el índice numérico del ID del nodo (node-0 -> 0)
-            const numericId = node.id.replace('node-', '');
-            if (!isNaN(parseInt(numericId))) {
-              originalIdToNodeId[numericId] = node.id;
-              nodeMap[numericId] = true;
-            }
-            
-            // Mapear IDs del backend si existen
-            if (node.data && node.data.nodeId) {
-              originalIdToNodeId[node.data.nodeId] = node.id;
-              nodeMap[node.data.nodeId] = true;
-            }
-          });
-        
-        console.log('Mapa de nodos disponibles:', nodeMap);
-        console.log('Mapa de traducción de IDs en FlowEditor:', originalIdToNodeId);
-        
-        // Array para almacenar las aristas procesadas
-        const processedEdges = [];
-        
-        // Procesar cada arista individualmente para mayor robustez
-        for (const edge of edges) {
-          try {
-            console.log('Procesando arista:', edge);
-            
-            // Obtener source y target, asegurándose de que sean strings
-            let source = edge.source;
-            let target = edge.target;
-            
-            // Intentar usar sourceOriginal/targetOriginal si están disponibles
-            if (edge.sourceOriginal) source = edge.sourceOriginal;
-            if (edge.targetOriginal) target = edge.targetOriginal;
-            
-            console.log(`Arista source: ${source}, target: ${target}`);
-            
-            // Convertir a string si es necesario
-            source = String(source);
-            target = String(target);
-            
-            // Procesar sourceHandle si tiene formato JSON serializado
-            let sourceHandle = edge.sourceHandle || null;
-            let targetHandle = edge.targetHandle || null;
-            
-            if (typeof sourceHandle === 'string' && sourceHandle.startsWith('|||{')) {
-              try {
-                // Extraer el JSON después del prefijo '|||'
-                const jsonStr = sourceHandle.substring(3);
-                const handleData = JSON.parse(jsonStr);
-                
-                console.log('Procesando sourceHandle con formato JSON en FlowEditor:', handleData);
-                
-                // IMPORTANTE: Reemplazar completamente el sourceHandle en la arista original
-                // para evitar que ReactFlow intente usarlo directamente
-                edge.sourceHandle = handleData.sourceHandle || 'default';
-                sourceHandle = edge.sourceHandle;
-                
-                // Extraer otros datos útiles
-                if (handleData.source_original) {
-                  edge.sourceOriginal = handleData.source_original;
-                  // Intentar actualizar el source con el ID original
-                  if (nodeMap[handleData.source_original]) {
-                    console.log(`Actualizando source de ${source} a ${handleData.source_original}`);
-                    edge.source = handleData.source_original;
-                    source = handleData.source_original;
-                  }
-                }
-                
-                if (handleData.target_original) {
-                  edge.targetOriginal = handleData.target_original;
-                  // Intentar actualizar el target con el ID original
-                  if (nodeMap[handleData.target_original]) {
-                    console.log(`Actualizando target de ${target} a ${handleData.target_original}`);
-                    edge.target = handleData.targetOriginal;
-                    target = handleData.targetOriginal;
-                  }
-                }
-                
-                // Si hay un targetHandle, actualizarlo también
-                if (handleData.targetHandle) {
-                  edge.targetHandle = handleData.targetHandle;
-                  targetHandle = handleData.targetHandle;
-                }
-                
-                // Si hay un edge_id, usarlo como ID de la arista
-                if (handleData.edge_id) {
-                  edge.id = handleData.edge_id;
-                }
-                
-                console.log(`Arista normalizada en FlowEditor: source=${source}, target=${target}, sourceHandle=${sourceHandle}`);
-              } catch (error) {
-                console.error('Error al procesar sourceHandle con formato JSON en FlowEditor:', error);
-                // Reemplazar el sourceHandle corrupto para evitar errores
-                edge.sourceHandle = 'default';
-                sourceHandle = 'default';
-              }
-            }
-            
-            // Ya tenemos el mapa de traducción de IDs creado anteriormente
-            
-            // Intentar traducir los IDs usando el mapa de traducción
-            let translatedSource = source;
-            let translatedTarget = target;
-            
-            if (originalIdToNodeId[source]) {
-              translatedSource = originalIdToNodeId[source];
-              console.log(`Traduciendo source en FlowEditor: ${source} -> ${translatedSource}`);
-            }
-            
-            if (originalIdToNodeId[target]) {
-              translatedTarget = originalIdToNodeId[target];
-              console.log(`Traduciendo target en FlowEditor: ${target} -> ${translatedTarget}`);
-            }
-            
-            // Verificar que los nodos existen (usando IDs traducidos si están disponibles)
-            if (!nodeMap[translatedSource] && !nodeMap[source]) {
-              console.warn(`Arista ignorada al cargar: nodo source no encontrado - ${source} (traducido: ${translatedSource})`);
-              continue;
-            }
-            
-            if (!nodeMap[translatedTarget] && !nodeMap[target]) {
-              console.warn(`Arista ignorada al cargar: nodo target no encontrado - ${target} (traducido: ${translatedTarget})`);
-              continue;
-            }
-            
-            // Usar los IDs traducidos si existen en el mapa de nodos
-            if (nodeMap[translatedSource]) {
-              source = translatedSource;
-            }
-            
-            if (nodeMap[translatedTarget]) {
-              target = translatedTarget;
-            }
-            
-            // Crear una arista correctamente formateada
-            const formattedEdge = {
-              id: edge.id || `edge-${processedEdges.length}-${source}-${target}`,
-              source,
-              target,
-              sourceHandle: sourceHandle || 'default', // Usar 'default' si no hay sourceHandle
-              targetHandle,
-              type: 'default', // Usar siempre 'default' para compatibilidad con EliteEdge
-              animated: false,
-              style: edge.style || { stroke: '#00e0ff', strokeWidth: 2 },
-              label: edge.label,
-              data: edge.data || {},
-              // Guardar los IDs originales para referencia futura
-              sourceOriginal: edge.sourceOriginal || source,
-              targetOriginal: edge.targetOriginal || target,
-            };
-            
-            // Forzar la actualización visual de la arista después de crearla
-            setTimeout(() => {
-              try {
-                document.dispatchEvent(new CustomEvent('elite-edge-update-required', { 
-                  detail: { id: formattedEdge.id } 
-                }));
-              } catch (error) {
-                console.error('Error al emitir evento de actualización de arista:', error);
-              }
-            }, 500);
-            
-            console.log('Arista procesada correctamente:', formattedEdge);
-            
-            // Agregar la arista procesada al array
-            processedEdges.push(formattedEdge);
-            
-          } catch (error) {
-            console.error('Error al procesar arista durante la carga:', error, edge);
-          }
+      // Actualizar los nodos en el store si tenemos nodos procesados
+      if (processedNodes.length > 0 && flowStore && typeof flowStore.setNodes === 'function') {
+        console.log('[FlowEditor] Actualizando nodos con setNodes');
+        flowStore.setNodes(processedNodes);
+        // Actualizar el nombre del flujo si es necesario
+        if (flowStore.setFlowName && flowName) {
+          flowStore.setFlowName(flowName);
         }
-
-        console.log('Aristas procesadas para cargar:', processedEdges);
-        
-        // Usar directamente la función setEdges del store
-        const flowStore = useFlowStore.getState();
-        if (flowStore && typeof flowStore.setEdges === 'function') {
-          console.log('[FlowEditor] Actualizando aristas con setEdges');
-          flowStore.setEdges(processedEdges);
-        } else {
-          console.error('[FlowEditor] Error: No se pudo acceder a setEdges desde el store');
-        }
+      } else {
+        console.error('[FlowEditor] Error: No se pudo actualizar los nodos en el store');
       }
-    }
-  } catch (error) {
-      console.error('Error al cargar el flujo:', error);
       
+      // Actualizar las aristas en el store si tenemos aristas
+      if (Array.isArray(backendEdges) && backendEdges.length > 0 && flowStore && typeof flowStore.setEdges === 'function') {
+        console.log('[FlowEditor] Actualizando aristas con setEdges');
+        flowStore.setEdges(backendEdges);
+      }
+    } catch (error) {
       // Para cualquier error, usar el manejador normal
       handleError(error);
       
@@ -707,17 +551,8 @@ const FlowEditorInner = ({
           }
         }));
         
-        // Preparar las aristas para guardar, preservando los IDs originales de los nodos source y target
-        // Primero crear un mapa de los nodos para verificar que las conexiones son válidas
-        const nodeMap = {};
-        internalNodes.forEach(node => {
-          nodeMap[node.id] = true;
-        });
-        
-        // Crear un respaldo de las aristas en localStorage
-        backupEdgesToLocalStorage(internalEdges);
+        // Preparar las aristas para guardar
 
-        // Procesar las aristas para asegurar que se guarden correctamente
         const preparedEdges = [];
         
         // Iterar sobre cada arista y asegurarse de que esté correctamente formateada
@@ -734,7 +569,7 @@ const FlowEditorInner = ({
             if (!sourceExists || !targetExists) {
               console.warn(`Arista ignorada al guardar: nodos no encontrados - source: ${source}, target: ${target}`);
               continue; // Saltar esta arista
-            }
+          }
             
             // Crear una arista correctamente formateada
             const preparedEdge = {
@@ -747,20 +582,20 @@ const FlowEditorInner = ({
               // Guardar explícitamente los IDs originales para el backend
               sourceOriginal: source,
               targetOriginal: target
-            };
+          };
             
             // Si hay una etiqueta, incluirla
             if (edge.label) {
               preparedEdge.label = edge.label;
-            }
+          }
             
             // Agregar la arista preparada al array
             preparedEdges.push(preparedEdge);
             
-          } catch (error) {
+        } catch (error) {
             console.error('Error al procesar arista:', error, edge);
-          }
         }
+      }
         
         console.log('Aristas preparadas para guardar:', preparedEdges);
         
@@ -798,7 +633,7 @@ const FlowEditorInner = ({
             if (!sourceExists || !targetExists) {
               console.warn(`Arista ignorada al guardar: nodos no encontrados - source: ${source}, target: ${target}`);
               continue; // Saltar esta arista
-            }
+          }
             
             // Crear una arista correctamente formateada
             const preparedEdge = {
@@ -811,20 +646,20 @@ const FlowEditorInner = ({
               // Guardar explícitamente los IDs originales para el backend
               sourceOriginal: source,
               targetOriginal: target
-            };
+          };
             
             // Si hay una etiqueta, incluirla
             if (edge.label) {
               preparedEdge.label = edge.label;
-            }
+          }
             
             // Agregar la arista preparada al array
             preparedEdges.push(preparedEdge);
             
-          } catch (error) {
+        } catch (error) {
             console.error('Error al procesar arista:', error, edge);
-          }
         }
+      }
         
         console.log('Aristas preparadas para guardar (implementación por defecto):', preparedEdges);
         
@@ -832,20 +667,20 @@ const FlowEditorInner = ({
         console.log('Datos enviados al backend:', {
           nodes: internalNodes,
           edges: preparedEdges,
-          name: flowName,
+          name: flowName
         });
         
         // Enviar los datos al backend - IMPORTANTE: Asegurarse de que las aristas se envíen correctamente
         const response = await request('POST', `/api/plubots/${plubotId}/flow`, {
           nodes: internalNodes,
           edges: preparedEdges,
-          name: flowName,
+          name: flowName
         });
         
         if (!response.success) {
           throw new Error('Error al guardar el flujo');
         }
-      }
+    }
       
       // Solo actualizamos la hora de guardado
       setLastSaved(new Date());
@@ -855,7 +690,7 @@ const FlowEditorInner = ({
       if (notifyByte) {
         notifyByte('💾 Flujo guardado correctamente.');
       }
-    } catch (error) {
+  } catch (error) {
       console.error('Error al guardar el flujo:', error);
       // Usar notifyByte para mostrar el mensaje de error sin mover el fondo
       if (notifyByte) {
@@ -888,7 +723,7 @@ const FlowEditorInner = ({
 
   // Renderizar el componente
   return (
-    <div className="flow-editor-wrapper">
+    <div className="flow-editor-wrapper flow-editor-container">
       {/* Solo renderizar el EpicHeader si no estamos en la pantalla de entrenamiento */}
       {!hideHeader && (
         <EpicHeader
@@ -930,8 +765,7 @@ const FlowEditorInner = ({
             canUndo: canUndo,
             canRedo: canRedo
           }}
-          showVersionHistoryPanel={showVersionHistoryPanel}
-          onVersionHistoryClick={() => setShowVersionHistoryPanel(!showVersionHistoryPanel)}
+          /* Referencias a historial de versiones eliminadas */
           isUltraPerformanceMode={isUltraPerformanceMode}
           onTogglePerformanceMode={handleTogglePerformanceMode}
         />
@@ -968,7 +802,7 @@ const FlowEditorInner = ({
                   setByteMessage('📋 Plantilla seleccionada.');
                   handleSaveFlow();
                 }, 50);
-              }}
+            }}
               onClose={() => setShowTemplateSelector(false)}
             />
           </Suspense>
@@ -995,8 +829,7 @@ const FlowEditor = ({
   handleError,
   showSimulation,
   setShowSimulation,
-  showVersionHistoryPanel,
-  setShowVersionHistoryPanel,
+  // Referencias a historial de versiones eliminadas
   plubotId,
   name,
   notifyByte,
@@ -1019,8 +852,7 @@ const FlowEditor = ({
           setSelectedConnection={setSelectedConnection}
           setConnectionProperties={setConnectionProperties}
           handleError={handleError}
-          showVersionHistoryPanel={showVersionHistoryPanel}
-          setShowVersionHistoryPanel={setShowVersionHistoryPanel}
+          /* Referencias a historial de versiones eliminadas */
           plubotId={plubotId}
           name={name}
           notifyByte={notifyByte}

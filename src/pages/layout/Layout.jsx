@@ -113,14 +113,7 @@ const Layout = ({ children, hideHeaderFooter }) => {
       {/* <WhatsAppButton /> */}
       {!hideHeaderFooter && <Footer />}
       
-      {/* Indicador de sincronización flotante - solo en páginas relevantes */}
-      {location.pathname.includes('/training') || 
-       location.pathname.includes('/plubot/edit') || 
-       location.pathname.includes('/profile') ? (
-        <div className="sync-indicator-container">
-          <SyncStatusIndicator expanded={false} />
-        </div>
-      ) : null}
+      {/* Indicador de sincronizaciu00f3n flotante eliminado para evitar que tape a ByteAssistant */}
     </div>
   );
 };

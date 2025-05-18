@@ -28,6 +28,13 @@ const PerformanceModeButton = () => {
       // Llamar a la función toggleUltraMode del store
       toggleUltraMode();
       
+      // Aplicar o quitar la clase 'ultra-mode' al body
+      if (!isUltraMode) {
+        document.body.classList.add('ultra-mode');
+      } else {
+        document.body.classList.remove('ultra-mode');
+      }
+      
       // Ocultar el feedback después de un tiempo
       setTimeout(() => {
         setShowFeedback(false);

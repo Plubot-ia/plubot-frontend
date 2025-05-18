@@ -3,21 +3,32 @@
   position: absolute;
   top: 20px;
   right: 20px;
-  width: 30px; /* Reducido de 36px */
-  height: 30px; /* Reducido de 36px */
-  border-radius: 6px; /* Reducido de 8px */
-  background-color: rgba(10, 20, 35, 0.7);
-  color: #ff00cc; /* Magenta neón */
-  border: 1px solid rgba(255, 0, 204, 0.5);
+  width: 30px; /* Reducido para que coincida con los otros botones */
+  height: 30px; /* Reducido para que coincida con los otros botones */
+  border-radius: 6px; /* Reducido para que coincida con los otros botones */
+  background-color: rgba(10, 20, 35, 0.5);
+  color: #ff00ff; /* Magenta */
+  border: 1px solid rgba(255, 0, 255, 0.8);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   transition: all 0.2s ease;
-  z-index: 999;
-  box-shadow: 0 0 10px rgba(255, 0, 204, 0.3);
-  overflow: visible; /* Para permitir que el tooltip sea visible */
-  animation: subtle-pulse 2s infinite; /* Pulso sutil constante */
+  box-shadow: 0 0 15px rgba(255, 0, 255, 0.5);
+  position: relative;
+  animation: pulse-magenta 2s infinite alternate;
+}
+
+/* Animación de pulso para el botón de Ultra Rendimiento */
+@keyframes pulse-magenta {
+  0% {
+    box-shadow: 0 0 8px rgba(255, 0, 255, 0.4);
+    border-color: rgba(255, 0, 255, 0.6);
+  }
+  100% {
+    box-shadow: 0 0 15px rgba(255, 0, 255, 0.7), 0 0 20px rgba(255, 0, 255, 0.3);
+    border-color: rgba(255, 0, 255, 0.9);
+  }
 }
 
 /* Animación de pulso sutil */

@@ -5,6 +5,7 @@ import ReactFlow, {
   Controls,
   useReactFlow,
 } from 'reactflow';
+import { FiZoomIn, FiZoomOut, FiMaximize, FiRotateCcw, FiRotateCw } from 'react-icons/fi';
 import { ensureEdgesAreVisible } from '../utils/edgeFixUtil';
 import { REACT_FLOW_STYLE, SNAP_GRID } from '../utils/flowEditorConstants';
 import CustomEdge from '../../nodes/customedge/CustomEdge';
@@ -12,14 +13,14 @@ import EdgeMarker from '../ui/EdgeMarker';
 import ContextMenuComponent from '../ui/ContextMenuComponent';
 import ZoomControls from '../ui/ZoomControls';
 import PerformanceModeButton from '../ui/PerformanceModeButton';
+import SyncButton from '../ui/SyncButton';
+import { useSyncService } from '@/services/syncService'; // Importar el servicio de sincronización
 import { NODE_TYPES } from '@/utils/nodeConfig';
 import BackgroundScene from '../ui/BackgroundScene';
 import CustomMiniMap from '../ui/CustomMiniMap';
 import useFlowStore from '@/stores/useFlowStore';
 import './FlowMain.css';
-import '../ui/FlowControls.css';
-import '../ui/ZoomControls.css';
-import '../ui/PerformanceModeButton.css';
+import '../ui/VerticalButtons.css'; // Importar el nuevo archivo CSS simplificado para los botones verticales
 // La importación de ReactFlowEdgeFix.css ha sido eliminada para evitar conflictos con EliteEdge.css
 
 /**
@@ -48,8 +49,6 @@ const FlowMain = ({
   onPaneClick,
   onContextMenu,
   onAddNode,
-  showVersionHistoryPanel,
-  onVersionHistoryClick,
   children,
 }) => {
   // Obtener estado y acciones del store de Zustand
@@ -67,8 +66,14 @@ const FlowMain = ({
     canRedo
   } = useFlowStore();
   
+  // Obtener la instancia de ReactFlow para operaciones como zoom, pan, etc.
+  const { fitView, zoomIn, zoomOut, setCenter, project } = useReactFlow();
+  
+  // Referencia al contenedor de ReactFlow para calcular posiciones
   const reactFlowWrapper = useRef(null);
-  const { fitView, project } = useReactFlow();
+  
+  // Obtener la función de sincronización del servicio
+  const { syncAllPlubots } = useSyncService();
   
   // Estado para el minimapa
   const [miniMapExpanded, setMiniMapExpanded] = useState(false);
@@ -166,12 +171,21 @@ const FlowMain = ({
           
           // Verificar que los datos son válidos para un nodo personalizado
           if (data.type === 'custom-node' && data.nodeInfo) {
-            // Extraer la información del nodo
-            const { nodeType } = data.nodeInfo;
-            
-            console.log(`[FlowMain] Añadiendo nodo de tipo ${nodeType} en posición:`, position);
-            // Añadir el nodo en la posición donde se soltó
-            onAddNode(nodeType, position, data.nodeInfo);
+            try {
+              // Extraer la información del nodo de forma segura
+              const nodeType = data.nodeInfo.nodeType;
+              
+              if (!nodeType) {
+                console.error('[FlowMain] Error: nodeType no definido en data.nodeInfo', data.nodeInfo);
+                return;
+              }
+              
+              console.log(`[FlowMain] Añadiendo nodo de tipo ${nodeType} en posición:`, position);
+              // Añadir el nodo en la posición donde se soltó
+              onAddNode(nodeType, position, data.nodeInfo);
+            } catch (error) {
+              console.error('[FlowMain] Error al procesar nodeInfo:', error);
+            }
           }
         } else {
           console.warn('[FlowMain] No se encontraron datos válidos en el evento de drop');
@@ -229,14 +243,92 @@ const FlowMain = ({
         {/* Fondo personalizado - Solo BackgroundScene */}
         <BackgroundScene isUltraMode={isUltraMode} />
         
-        {/* Botón de modo Ultra Rendimiento */}
-        <Panel position="top-right" className="performance-mode-panel">
-          <PerformanceModeButton 
-            isActive={isUltraMode} 
-            onClick={toggleUltraMode} 
-          />
-        </Panel>
-        {/* Quitamos las grillas para mostrar solo el fondo personalizado */}
+        {/* Botones organizados en grupos con espaciado especial */}
+        <div className="vertical-buttons-container">
+          {/* Grupo 1: Botón Ultra Rendimiento */}
+          <div className="button-group">
+            <button 
+              className="editor-button ultra" 
+              onClick={toggleUltraMode}
+              title="Ultra Rendimiento"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path>
+              </svg>
+              <span className="tooltip">Ultra Rendimiento</span>
+            </button>
+          </div>
+          
+          {/* Espaciador */}
+          <div className="button-spacer"></div>
+          
+          {/* Grupo 2: Botones de Control */}
+          <div className="button-group">
+            {/* Botón Acercar */}
+            <button 
+              className="editor-button control" 
+              onClick={() => zoomIn()}
+              title="Acercar"
+            >
+              <FiZoomIn />
+              <span className="tooltip">Acercar</span>
+            </button>
+            
+            {/* Botón Alejar */}
+            <button 
+              className="editor-button control" 
+              onClick={() => zoomOut()}
+              title="Alejar"
+            >
+              <FiZoomOut />
+              <span className="tooltip">Alejar</span>
+            </button>
+            
+            {/* Botón Ajustar Vista */}
+            <button 
+              className="editor-button control" 
+              onClick={() => fitView({ padding: 0.2 })}
+              title="Ajustar Vista"
+            >
+              <FiMaximize />
+              <span className="tooltip">Ajustar Vista</span>
+            </button>
+            
+            {/* Botón Deshacer */}
+            <button 
+              className="editor-button control" 
+              onClick={undo} 
+              disabled={!canUndo}
+              title="Deshacer"
+            >
+              <FiRotateCcw />
+              <span className="tooltip">Deshacer</span>
+            </button>
+            
+            {/* Botón Rehacer */}
+            <button 
+              className="editor-button control" 
+              onClick={redo} 
+              disabled={!canRedo}
+              title="Rehacer"
+            >
+              <FiRotateCw />
+              <span className="tooltip">Rehacer</span>
+            </button>
+          </div>
+          
+          {/* Espaciador */}
+          <div className="button-spacer"></div>
+          
+          {/* Grupo 3: Botón de Sincronización */}
+          <div className="button-group">
+            <SyncButton />
+          </div>
+          
+        </div>
+        
+        {/* Controles nativos de ReactFlow - Ocultamos para usar nuestros propios controles */}
+        <Controls style={{ display: 'none' }} />
         
         {/* Menú contextual */}
         {contextMenu && (
@@ -246,29 +338,6 @@ const FlowMain = ({
             onAddNode={onAddNode}
           />
         )}
-        
-        {/* Controles nativos de ReactFlow - Ocultamos para usar nuestros propios controles */}
-        <Controls style={{ display: 'none' }} />
-        
-        {/* Controles unificados: zoom, historial y versiones */}
-        <Panel position="right" className="flow-controls-panel">
-          <ZoomControls 
-            onUndo={undo} 
-            onRedo={redo}
-            canUndo={canUndo}
-            canRedo={canRedo}
-            onToggleHistory={() => onVersionHistoryClick && onVersionHistoryClick()}
-            historyActive={showVersionHistoryPanel}
-          />
-        </Panel>
-        
-        {/* Mini mapa - Directamente en el flujo sin Panel */}
-        <CustomMiniMap
-          nodes={nodes}
-          edges={edges}
-          isExpanded={miniMapExpanded}
-          toggleMiniMap={toggleMiniMap}
-        />
         
         {/* Contenido adicional */}
         {children}
