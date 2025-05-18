@@ -129,7 +129,4 @@ Captura*.png
 *.jpg
 *.jpeg
 client_secret*.json
-.trae-aicc/
-.trae/
 endnode/
-*.rdb
