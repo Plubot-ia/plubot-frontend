@@ -1664,7 +1664,7 @@ const useFlowStore = create(
         set({ isSaving: true, plubotId: plubotId, hasChanges: false }); // Marcar como cargando, setear ID y resetear cambios
 
         try {
-          const flowData = await flowService.getFlowData(plubotId);
+          const flowData = await flowService.loadFlow(plubotId);
           if (flowData && typeof flowData === 'object') {
             console.log(`[FlowStore] Datos recibidos para Plubot ID ${plubotId}:`, flowData);
             
