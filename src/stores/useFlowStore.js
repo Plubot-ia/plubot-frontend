@@ -1584,6 +1584,82 @@ const useFlowStore = create(
           };
         }
       },
+      
+      // Nueva acción para cargar datos de un flujo específico
+      loadFlow: async (plubotId) => {
+        if (!plubotId) {
+          console.warn('[FlowStore] loadFlow llamado sin plubotId. Reseteando a estado vacío.');
+          get().reset(); // Resetea al estado inicial completo
+          return;
+        }
+        console.log(`[FlowStore] Iniciando carga de flujo para Plubot ID: ${plubotId}`);
+        set({ isSaving: true, plubotId: plubotId, hasChanges: false }); // Marcar como cargando, setear ID y resetear cambios
+
+        try {
+          const flowData = await flowService.getFlowData(plubotId);
+          if (flowData && typeof flowData === 'object') {
+            console.log(`[FlowStore] Datos recibidos para Plubot ID ${plubotId}:`, flowData);
+            
+            const nodes = Array.isArray(flowData.nodes) ? flowData.nodes : [];
+            const edges = Array.isArray(flowData.edges) ? flowData.edges : [];
+            const flowName = flowData.name || `Flujo de ${plubotId}`;
+            const viewport = flowData.viewport || initialState.viewport;
+
+            const validatedNodes = validateNodePositions(nodes);
+            const finalNodes = preventNodeStacking(validatedNodes);
+            
+            set({
+              nodes: finalNodes,
+              edges: edges,
+              flowName: flowName,
+              plubotId: plubotId,
+              viewport: viewport,
+              isSaving: false,
+              lastSaved: new Date().toISOString(),
+              hasChanges: false, // Un flujo recién cargado no tiene cambios no guardados
+              history: { undoStack: [], redoStack: [], maxHistory: 50 }, // Resetear historial
+              selectedNode: null,
+              selectedEdge: null,
+            });
+            
+            // Sanear paths de aristas después de cargar y actualizar nodos
+            // Usar un pequeño timeout para asegurar que los nodos estén renderizados
+            setTimeout(() => sanitizeEdgePaths(), 0);
+
+            console.log(`[FlowStore] Flujo ${plubotId} cargado y estado actualizado.`);
+          } else {
+            console.warn(`[FlowStore] No se encontraron datos válidos o estructura incorrecta para Plubot ID ${plubotId}. Datos recibidos:`, flowData, `Reseteando a un flujo vacío con ese ID.`);
+            set({
+              nodes: [], 
+              edges: [],
+              flowName: `Nuevo Flujo para ${plubotId}`,
+              plubotId: plubotId,
+              viewport: initialState.viewport,
+              isSaving: false,
+              lastSaved: null,
+              hasChanges: false, 
+              history: { undoStack: [], redoStack: [], maxHistory: 50 },
+              selectedNode: null,
+              selectedEdge: null,
+            });
+          }
+        } catch (error) {
+          console.error(`[FlowStore] Error cargando el flujo ${plubotId}:`, error);
+          set({ 
+            isSaving: false,
+            nodes: [], 
+            edges: [],
+            flowName: `Error al cargar ${plubotId}`,
+            plubotId: plubotId,
+            viewport: initialState.viewport,
+            lastSaved: null,
+            hasChanges: false,
+            history: { undoStack: [], redoStack: [], maxHistory: 50 },
+            selectedNode: null,
+            selectedEdge: null,
+          });
+        }
+      },
     }),
     {
       name: 'flow-editor-store',
