@@ -103,7 +103,6 @@ backup-plubot.sh
 # Archivos y carpetas no relacionados con plubot-frontend
 plubot-backend/
 PAGROK/
-endnode/
 edge-fix.js
 fix_edge_type.js
 dump.rdb
