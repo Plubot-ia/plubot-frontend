@@ -34,6 +34,7 @@ const initialState = {
   lastSaved: null,
   plubotId: null,
   flowName: 'Flujo sin título',
+  isLoaded: false, // Nuevo flag para indicar si el flujo actual está cargado
   isUndoing: false,
   isRedoing: false,
   shouldMoveToCenter: false,
@@ -1423,7 +1424,7 @@ const useFlowStore = create(
         const currentPlubotId = get().plubotId;
         console.log(`[FlowStore] resetFlow: currentPlubotId = ${currentPlubotId}`);
 
-        const shouldAttemptLoad = (!options.skipLoad && plubotIdToSet && plubotIdToSet !== currentPlubotId) || 
+        const shouldAttemptLoad = (!options.skipLoad && plubotIdToSet && plubotIdToSet !== get().plubotId) || 
                                   (plubotIdToSet && options.skipLoad === false);
         console.log(`[FlowStore] resetFlow: shouldAttemptLoad = ${shouldAttemptLoad}`);
 
@@ -1445,6 +1446,7 @@ const useFlowStore = create(
               selectedNode: null,
               selectedEdge: null,
               hasChanges: false,
+              isLoaded: false, // Nuevo estado de carga
             });
             return;
           }
@@ -1476,6 +1478,7 @@ const useFlowStore = create(
                   selectedNode: null,
                   selectedEdge: null,
                   hasChanges: false,
+                  isLoaded: true, // Estado de carga completado
                 });
               });
           } else {
@@ -1490,6 +1493,7 @@ const useFlowStore = create(
               selectedNode: null,
               selectedEdge: null,
               hasChanges: false,
+              isLoaded: true, // Estado de carga completado
             });
           }
         } else {
@@ -1504,6 +1508,7 @@ const useFlowStore = create(
             selectedNode: null,
             selectedEdge: null,
             hasChanges: false,
+            isLoaded: true, // Estado de carga completado
           });
         }
 
@@ -1688,6 +1693,7 @@ const useFlowStore = create(
               history: { undoStack: [], redoStack: [], maxHistory: 50 }, // Resetear historial
               selectedNode: null,
               selectedEdge: null,
+              isLoaded: true, // Estado de carga completado
             });
             
             // Sanear paths de aristas después de cargar y actualizar nodos
@@ -1709,6 +1715,7 @@ const useFlowStore = create(
               history: { undoStack: [], redoStack: [], maxHistory: 50 },
               selectedNode: null,
               selectedEdge: null,
+              isLoaded: true, // Estado de carga completado
             });
           }
         } catch (error) {
@@ -1725,6 +1732,7 @@ const useFlowStore = create(
             history: { undoStack: [], redoStack: [], maxHistory: 50 },
             selectedNode: null,
             selectedEdge: null,
+            isLoaded: true, // Estado de carga completado
           });
         }
       },
@@ -1741,7 +1749,8 @@ const useFlowStore = create(
         isUltraMode: state.isUltraMode,
         flowName: state.flowName,
         plubotId: state.plubotId,
-        lastSaved: state.lastSaved
+        lastSaved: state.lastSaved,
+        isLoaded: state.isLoaded, // Nuevo estado de carga
       })
     }
   )
