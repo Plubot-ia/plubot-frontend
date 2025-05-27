@@ -1418,38 +1418,106 @@ const useFlowStore = create(
       // Resetear solo los nodos y aristas manteniendo el resto del estado
       // Útil para cambiar de un Plubot a otro sin perder configuraciones
       resetFlow: (plubotIdToSet, flowNameToSet, options = {}) => { 
-        console.log(`[FlowStore] resetFlow llamado para Plubot ID: ${plubotIdToSet}, Nombre: ${flowNameToSet}, Opciones:`, options);
+        console.log(`[FlowStore] resetFlow ENTERED. ID: ${plubotIdToSet}, Name: ${flowNameToSet}, Opts:`, options);
         
-        let loadedState = null;
-        // Intentar cargar desde el flowStateManager si el plubotId es válido Y no se indica skipLoad
-        if (plubotIdToSet && !options.skipLoad) { 
-          loadedState = flowStateManager.loadFlow(plubotIdToSet);
-        } else if (options.skipLoad) {
-          console.log(`[FlowStore] resetFlow: skipLoad es true, no se intentará cargar desde flowStateManager para ${plubotIdToSet}.`);
+        const currentPlubotId = get().plubotId;
+        console.log(`[FlowStore] resetFlow: currentPlubotId = ${currentPlubotId}`);
+
+        const shouldAttemptLoad = (!options.skipLoad && plubotIdToSet && plubotIdToSet !== currentPlubotId) || 
+                                  (plubotIdToSet && options.skipLoad === false);
+        console.log(`[FlowStore] resetFlow: shouldAttemptLoad = ${shouldAttemptLoad}`);
+
+        if (shouldAttemptLoad) {
+          console.log(`[FlowStore] resetFlow: INSIDE shouldAttemptLoad block. Attempting to get loadFlow.`);
+          let loadFlowFn;
+          try {
+            loadFlowFn = get().loadFlow;
+            console.log(`[FlowStore] resetFlow: get().loadFlow retrieved. Type: ${typeof loadFlowFn}, Value:`, loadFlowFn);
+          } catch (e) {
+            console.error(`[FlowStore] resetFlow: ERROR during get().loadFlow access:`, e);
+            set({
+              nodes: [],
+              edges: [],
+              flowName: flowNameToSet || 'Flujo sin título',
+              plubotId: plubotIdToSet,
+              viewport: initialState.viewport,
+              history: { undoStack: [], redoStack: [], maxHistory: 50 },
+              selectedNode: null,
+              selectedEdge: null,
+              hasChanges: false,
+            });
+            return;
+          }
+
+          if (typeof loadFlowFn === 'function') {
+            console.log(`[FlowStore] resetFlow: loadFlowFn IS a function. Calling for ID: ${plubotIdToSet}`);
+            loadFlowFn(plubotIdToSet)
+              .then(() => {
+                console.log(`[FlowStore] resetFlow: loadFlowFn(${plubotIdToSet}) .then() reached.`);
+                // Aseguramos que el nombre y el ID se actualicen si loadFlow no lo hizo explícitamente
+                // o si se pasaron como argumentos a resetFlow y son diferentes.
+                if (flowNameToSet && get().flowName !== flowNameToSet) {
+                   set({ flowName: flowNameToSet });
+                }
+                if (plubotIdToSet && get().plubotId !== plubotIdToSet) {
+                  set({ plubotId: plubotIdToSet });
+                }
+                console.log(`[FlowStore] Carga de datos completada para ${plubotIdToSet} después de resetFlow.`);
+              })
+              .catch(error => {
+                console.error(`[FlowStore] resetFlow: loadFlowFn(${plubotIdToSet}) .catch() reached:`, error);
+                set({
+                  nodes: [],
+                  edges: [],
+                  flowName: flowNameToSet || `Error al cargar ${plubotIdToSet}`,
+                  plubotId: plubotIdToSet,
+                  viewport: initialState.viewport,
+                  history: { undoStack: [], redoStack: [], maxHistory: 50 },
+                  selectedNode: null,
+                  selectedEdge: null,
+                  hasChanges: false,
+                });
+              });
+          } else {
+            console.error(`[FlowStore] resetFlow: loadFlowFn is NOT a function. Type: ${typeof loadFlowFn}. Reseteando a vacío.`);
+            set({
+              nodes: [],
+              edges: [],
+              flowName: flowNameToSet || 'Flujo sin título',
+              plubotId: plubotIdToSet,
+              viewport: initialState.viewport,
+              history: { undoStack: [], redoStack: [], maxHistory: 50 },
+              selectedNode: null,
+              selectedEdge: null,
+              hasChanges: false,
+            });
+          }
+        } else {
+          console.log(`[FlowStore] resetFlow: SKIPPING load. Applying base state for ID: ${plubotIdToSet}`);
+          set({
+            nodes: options.nodes || [],
+            edges: options.edges || [],
+            flowName: flowNameToSet || 'Flujo sin título',
+            plubotId: plubotIdToSet,
+            viewport: initialState.viewport,
+            history: { undoStack: [], redoStack: [], maxHistory: 50 },
+            selectedNode: null,
+            selectedEdge: null,
+            hasChanges: false,
+          });
         }
 
-        if (loadedState && loadedState.nodes && loadedState.nodes.length > 0) {
-          console.log(`[FlowStore] resetFlow: Estado cargado desde flowStateManager para ${plubotIdToSet}:`, loadedState.nodes.length, 'nodos');
-          set({
-            nodes: loadedState.nodes,
-            edges: loadedState.edges || [],
-            plubotId: plubotIdToSet, // Asegurar que el ID del plubot se establece
-            flowName: flowNameToSet || loadedState.flowName || `Plubot ${plubotIdToSet}`, // Usar el nombre proporcionado o el del estado cargado
-            history: { undoStack: [], redoStack: [], maxHistory: 50 }, // Limpiar historial
-            hasChanges: false, // Indicar que no hay cambios pendientes después de resetear/cargar
-          });
-        } else {
-          console.log(`[FlowStore] resetFlow: No se encontró estado en flowStateManager para ${plubotIdToSet} (o skipLoad fue true) o estaba vacío. Reseteando a estado inicial.`);
-          set({
-            ...initialState, // Restablecer a todo el estado inicial
-            nodes: [], // Asegurar que los nodos estén vacíos
-            edges: [], // Asegurar que las aristas estén vacías
-            plubotId: plubotIdToSet, // Establecer el ID del plubot
-            flowName: flowNameToSet || `Plubot ${plubotIdToSet}`, // Establecer el nombre del flujo
-            history: { undoStack: [], redoStack: [], maxHistory: 50 }, // Limpiar historial
-            hasChanges: false, // Indicar que no hay cambios pendientes
-          });
+        // Doble verificación para asegurar que el nombre y el ID del plubot estén seteados
+        // al final de resetFlow, si se proporcionaron.
+        if (flowNameToSet && get().flowName !== flowNameToSet) {
+          console.log(`[FlowStore] resetFlow: Final check - Ensuring flowName is set to ${flowNameToSet}`);
+          set({ flowName: flowNameToSet });
         }
+        if (plubotIdToSet && get().plubotId !== plubotIdToSet) {
+          console.log(`[FlowStore] resetFlow: Final check - Ensuring plubotId is set to ${plubotIdToSet}`);
+          set({ plubotId: plubotIdToSet });
+        }
+        console.log(`[FlowStore] resetFlow EXITED for ID: ${plubotIdToSet}`);
       },
       
       // Sistema de guardado optimizado con caché inteligente
