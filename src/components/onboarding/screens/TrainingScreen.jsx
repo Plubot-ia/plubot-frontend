@@ -264,6 +264,7 @@ const TrainingScreen = () => {
         targetFlowName = savedPlubotName;
       }
       
+      console.log('[TrainingScreen Diagnostic] Before needsFlowSetup calculation. currentPlubotIdInStore:', currentPlubotIdInStore, 'targetPlubotId:', targetPlubotId, 'nodesInStore:', nodesInStore);
       // Determine if a flow reset/setup is needed
       const needsFlowSetup = 
         currentPlubotIdInStore !== targetPlubotId || 
@@ -997,6 +998,7 @@ async function saveFlowData() {
         targetFlowName = savedPlubotName;
       }
       
+      console.log('[TrainingScreen Diagnostic] Before needsFlowSetup calculation. currentPlubotIdInStore:', currentPlubotIdInStore, 'targetPlubotId:', targetPlubotId, 'nodesInStore:', nodesInStore);
       // Determine if a flow reset/setup is needed
       const needsFlowSetup = 
         currentPlubotIdInStore !== targetPlubotId || 
