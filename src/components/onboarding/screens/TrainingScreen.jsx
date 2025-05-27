@@ -258,49 +258,81 @@ const TrainingScreen = () => {
 
   // Efecto para inicializar el estado con los datos del plubot
   useEffect(() => {
-    console.log('[TrainingScreen Flow Load Logic]', {
-      plubotIdFromUrl,
-      currentPlubotIdInStore: plubotId, // de useFlowStore
-      isLoaded, // de useFlowStore
-      nodesLength: nodes ? nodes.length : 'undefined', // de useFlowStore
-      currentFlowName: flowName, // de useFlowStore
-    });
+    const storeState = useFlowStore.getState();
+    const currentPlubotIdInStore = storeState.plubotId;
+    const currentFlowNameInStore = storeState.flowName;
+    const currentNodesInStore = storeState.nodes;
+    const currentIsLoadedInStore = storeState.isLoaded;
+    const setFlowNameFromStore = storeState.setFlowName; // Para el Caso 2
 
-    if (plubotIdFromUrl) {
-      // Caso 1: Se necesita una carga desde el backend (ID de Plubot diferente o el flujo actual aún no se ha intentado cargar)
-      if (plubotIdFromUrl !== plubotId || !isLoaded) {
-        console.log(`[TrainingScreen] Case 1: Needs load. URL ID: ${plubotIdFromUrl}, Store ID: ${plubotId}, IsLoaded: ${isLoaded}`);
-        const targetFlowName = plubotData?.name || `Plubot ${plubotIdFromUrl}`;
+    console.log(
+      `[TrainingScreen] useEffect TRIGGERED. ` +
+      `plubotIdFromUrl: ${plubotIdFromUrl}, plubotData?.name: ${plubotData?.name}, ` +
+      `Store State Before Logic: plubotId: ${currentPlubotIdInStore}, flowName: '${currentFlowNameInStore}', ` +
+      `isLoaded: ${currentIsLoadedInStore}, nodes.length: ${currentNodesInStore?.length}`
+    );
+
+    // Caso 1: Hay un ID en la URL, y (no está cargado O el ID de la URL es diferente al del store)
+    if (plubotIdFromUrl && (!currentIsLoadedInStore || plubotIdFromUrl !== currentPlubotIdInStore)) {
+      console.log(`[TrainingScreen] Case 1: Needs to load or Plubot ID changed. URL ID: ${plubotIdFromUrl}`);
+      const targetFlowName = plubotData?.name || `Plubot ${plubotIdFromUrl}`; // Nombre inicial tentativo
+      console.log(`[TrainingScreen] Case 1: Calculated targetFlowName: '${targetFlowName}'. Calling resetFlow with skipLoad: false.`);
+      try {
+        window.__allowResetFromTrainingScreenForNewPlubot = true;
+        console.log('[TrainingScreen] FLAG SET: __allowResetFromTrainingScreenForNewPlubot = true (Case 1)');
         resetFlow(plubotIdFromUrl, targetFlowName, { skipLoad: false });
+      } finally {
+        window.__allowResetFromTrainingScreenForNewPlubot = false;
+        console.log('[TrainingScreen] FLAG CLEARED: __allowResetFromTrainingScreenForNewPlubot = false (Case 1)');
       }
-      // Caso 2: El flujo se cargó, es el Plubot correcto, pero está vacío
-      else if (plubotIdFromUrl === plubotId && isLoaded && (!nodes || nodes.length === 0)) {
-        console.log(`[TrainingScreen] Case 2: Loaded, correct Plubot, but empty. URL ID: ${plubotIdFromUrl}. Initializing with default nodes/edges.`);
-        // NO llamar a resetFlow para cargar del backend.
-        // Configurar un flujo nuevo por defecto.
-        setNodes(initialNodes); // Usar initialNodes definido localmente
-        setEdges(initialEdges); // Usar initialEdges definido localmente
-        
-        // Opcionalmente, asegurar que flowName sea apropiado para un flujo nuevo/vacío.
-        // Si el nombre cargado es genérico (como el ID del plubot o un placeholder), se podría establecer uno por defecto.
-        // Ejemplo: if (flowName === plubotIdFromUrl || flowName === 'Flujo sin título') {
-        //   setFlowName(`Nuevo Flujo Local ${plubotIdFromUrl}`);
-        // }
-      }
-      // Caso 3: El flujo ya está cargado, es el Plubot correcto y tiene contenido
-      else if (plubotIdFromUrl === plubotId && isLoaded && nodes && nodes.length > 0) {
-        console.log(`[TrainingScreen] Case 3: Flow loaded and has content. URL ID: ${plubotIdFromUrl}. No action needed for loading.`);
-        // Opcionalmente, sincronizar flowName si es diferente y se tiene una fuente autoritativa (ej. plubotData.name)
-        // if (plubotData?.name && plubotData.name !== flowName) {
-        //   setFlowName(plubotData.name);
-        // }
-      }
-    } else {
-      // Caso 4: No hay plubotIdFromUrl (ej. se accede a la ruta base del editor como /training)
-      console.log('[TrainingScreen] Case 4: No plubotIdFromUrl. Resetting to a clean, empty state without backend load.');
-      // Limpiar el editor a un estado por defecto sin intentar una carga del backend.
-      resetFlow(null, 'Flujo sin título', { skipLoad: true });
     }
+    // Caso 2: El flujo se cargó, es el Plubot correcto, pero está vacío
+    else if (plubotIdFromUrl === currentPlubotIdInStore && currentIsLoadedInStore && (!currentNodesInStore || currentNodesInStore.length === 0)) {
+      console.log(`[TrainingScreen] Case 2: Loaded, correct Plubot, but empty. URL ID: ${plubotIdFromUrl}. Initializing with default nodes/edges.`);
+      setNodes(initialNodes); 
+      setEdges(initialEdges); 
+      // Actualizar el nombre si el actual no es descriptivo para un flujo vacío inicializado.
+      const currentStoreFlowName = useFlowStore.getState().flowName;
+      const genericEmptyNamePattern = `Nuevo Flujo para ${plubotIdFromUrl}`;
+      const errorNamePattern = `Error al cargar ${plubotIdFromUrl}`;
+      
+      if (
+        currentStoreFlowName === 'Flujo sin título' || 
+        currentStoreFlowName === genericEmptyNamePattern || 
+        currentStoreFlowName === errorNamePattern || // Cubrir el caso donde loadFlow falló pero isLoaded es true
+        (plubotData?.name && currentStoreFlowName !== plubotData.name) // Si tenemos un nombre mejor en plubotData
+      ) {
+        const newNameForEmpty = plubotData?.name || `Plubot ${plubotIdFromUrl}`;
+        if (currentStoreFlowName !== newNameForEmpty) {
+          console.log(`[TrainingScreen] Case 2: Updating flow name from '${currentStoreFlowName}' to '${newNameForEmpty}' for empty loaded flow.`);
+          setFlowName(newNameForEmpty); 
+        }
+      }
+    }
+    // Caso 3: El flujo ya está cargado, es el Plubot correcto y tiene contenido
+    else if (plubotIdFromUrl === currentPlubotIdInStore && currentIsLoadedInStore && currentNodesInStore && currentNodesInStore.length > 0) {
+      console.log(`[TrainingScreen] Case 3: Already loaded, correct Plubot, has content. URL ID: ${plubotIdFromUrl}. No action needed here.`);
+      // No es necesario hacer nada aquí, el flujo ya está como debería.
+      // Asegurarse de que el nombre sea correcto si plubotData tiene uno más reciente (ej. después de crear y guardar)
+      if (plubotData?.name && plubotData.name !== currentFlowNameInStore) {
+        console.log(`[TrainingScreen] Case 3: plubotData.name ('${plubotData.name}') differs from store name ('${currentFlowNameInStore}'). Updating store name.`);
+        setFlowNameFromStore(plubotData.name);
+      }
+    }
+    // Caso 4: No hay ID en la URL (ej. creando un flujo nuevo desde cero sin un ID predefinido)
+    else if (!plubotIdFromUrl) {
+      console.log(`[TrainingScreen] Case 4: No plubotIdFromUrl. Resetting to 'Flujo sin título'.`);
+      try {
+        window.__allowResetFromTrainingScreenForNewPlubot = true;
+        console.log('[TrainingScreen] FLAG SET: __allowResetFromTrainingScreenForNewPlubot = true (Case 4)');
+        resetFlow(null, 'Flujo sin título', { skipLoad: true });
+      } finally {
+        window.__allowResetFromTrainingScreenForNewPlubot = false;
+        console.log('[TrainingScreen] FLAG CLEARED: __allowResetFromTrainingScreenForNewPlubot = false (Case 4)');
+      }
+    }
+
+    // Limpieza del efecto
   }, [
     plubotIdFromUrl,
     plubotId, // de useFlowStore
@@ -1222,8 +1254,7 @@ async function saveFlowData() {
       </div>
     );
   }
-  
-  // Renderizar loader si está cargando
+
   if (isLoading) {
     return (
       <div className="ts-loading" style={{ 

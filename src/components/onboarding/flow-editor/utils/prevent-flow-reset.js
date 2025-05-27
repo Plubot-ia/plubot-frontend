@@ -79,25 +79,31 @@ export const preventFlowReset = () => {
         
         flowStore.setState((prevState) => ({
           resetFlow: (...args) => {
-            // BLOQUEAR TODOS LOS RESETEOS independientemente de dónde vengan
             const callStack = new Error().stack || '';
             const nodes = prevState.nodes || [];
             
-            // BLOQUEO AGRESIVO: Si viene de TrainingScreen.jsx, SIEMPRE bloquear
+            // Comprobar si la llamada viene de TrainingScreen.jsx
             if (callStack.includes('TrainingScreen.jsx')) {
-              console.log('[preventFlowReset] \u26A0\uFE0F BLOQUEANDO reseteo desde TrainingScreen');
-              return prevState; // Mantener el estado actual sin importar nada
+              // Si la bandera global permite el reseteo desde TrainingScreen, proceder.
+              if (window.__allowResetFromTrainingScreenForNewPlubot === true) {
+                console.log('[preventFlowReset] Permitido reseteo desde TrainingScreen (flag __allowResetFromTrainingScreenForNewPlubot=true)');
+                return originalResetFlow(...args); // Permitir el reseteo
+              } else {
+                // Si la bandera no está, mantener el bloqueo agresivo original para TrainingScreen.
+                console.log('[preventFlowReset] \u26A0\uFE0F BLOQUEANDO reseteo desde TrainingScreen (flag __allowResetFromTrainingScreenForNewPlubot no es true)');
+                return prevState; // Mantener el estado actual, bloqueando el reseteo
+              }
             }
             
-            // PROTECCIÓN ADICIONAL: Si hay nodos, nunca permitir reseteo
+            // Lógica original para llamadas que NO vienen de TrainingScreen.jsx
+            // PROTECCIÓN ADICIONAL: Si hay nodos, nunca permitir reseteo (a menos que sea el caso especial de arriba)
             if (nodes.length > 0) {
-              console.log('[preventFlowReset] Bloqueando reseteo con', nodes.length, 'nodos existentes');
-              // NO PERMITIR RESETEO si hay nodos existentes
+              console.log('[preventFlowReset] Bloqueando reseteo (no desde TrainingScreen o sin flag) con', nodes.length, 'nodos existentes');
               return prevState; // Mantener el estado actual
             }
             
-            // Solo permitir reseteo si no hay nodos y no viene de TrainingScreen
-            console.log('[preventFlowReset] Permitido reseteo legítimo desde:', callStack.split('\n')[2] || 'desconocido');
+            // Solo permitir reseteo si no hay nodos y no viene de TrainingScreen (o si TrainingScreen tiene el flag)
+            console.log('[preventFlowReset] Permitido reseteo legítimo (no desde TrainingScreen o sin nodos / TrainingScreen con flag). Origen:', callStack.split('\n')[2] || 'desconocido');
             return originalResetFlow(...args);
           }
         }));

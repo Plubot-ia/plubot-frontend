@@ -1456,22 +1456,24 @@ const useFlowStore = create(
             loadFlowFn(plubotIdToSet)
               .then(() => {
                 console.log(`[FlowStore] resetFlow: loadFlowFn(${plubotIdToSet}) .then() reached.`);
-                // Aseguramos que el nombre y el ID se actualicen si loadFlow no lo hizo explícitamente
-                // o si se pasaron como argumentos a resetFlow y son diferentes.
-                if (flowNameToSet && get().flowName !== flowNameToSet) {
-                   set({ flowName: flowNameToSet });
-                }
+                // loadFlow ya debería haber establecido el flowName desde el backend.
+                // Solo aseguramos que plubotIdToSet esté correctamente en el store si es diferente.
                 if (plubotIdToSet && get().plubotId !== plubotIdToSet) {
                   set({ plubotId: plubotIdToSet });
                 }
-                console.log(`[FlowStore] Carga de datos completada para ${plubotIdToSet} después de resetFlow.`);
+                // NO sobrescribir get().flowName con flowNameToSet aquí si loadFlow tuvo éxito,
+                // ya que loadFlow obtiene el nombre autoritativo del backend.
+                console.log(`[FlowStore] Carga de datos completada para ${plubotIdToSet} después de resetFlow. Nombre actual en store (debería ser de loadFlow): ${get().flowName}`);
               })
               .catch(error => {
                 console.error(`[FlowStore] resetFlow: loadFlowFn(${plubotIdToSet}) .catch() reached:`, error);
+                // loadFlow también tiene un catch que actualiza el estado.
+                // Aquí, nos aseguramos de que, si ese catch falló o si llegamos aquí por otra razón,
+                // el estado se resetea de forma segura con el flowNameToSet como fallback.
                 set({
                   nodes: [],
                   edges: [],
-                  flowName: flowNameToSet || `Error al cargar ${plubotIdToSet}`,
+                  flowName: flowNameToSet || `Error al cargar ${plubotIdToSet}`, // Usar flowNameToSet como fallback principal en error de carga
                   plubotId: plubotIdToSet,
                   viewport: initialState.viewport,
                   history: { undoStack: [], redoStack: [], maxHistory: 50 },
@@ -1514,10 +1516,25 @@ const useFlowStore = create(
 
         // Doble verificación para asegurar que el nombre y el ID del plubot estén seteados
         // al final de resetFlow, si se proporcionaron.
-        if (flowNameToSet && get().flowName !== flowNameToSet) {
-          console.log(`[FlowStore] resetFlow: Final check - Ensuring flowName is set to ${flowNameToSet}`);
-          set({ flowName: flowNameToSet });
+        if (flowNameToSet) {
+          const currentStoreName = get().flowName;
+          // Solo actualizar con flowNameToSet si el nombre actual es el inicial por defecto,
+          // o un nombre genérico de error que loadFlow podría haber puesto si falló en obtener uno específico,
+          // o si el nombre actual es simplemente el plubotId (otro fallback de loadFlow).
+          const isDefaultOrGenericError = 
+            currentStoreName === initialState.flowName || 
+            currentStoreName === `Flujo de ${plubotIdToSet}` || // Fallback de loadFlow
+            currentStoreName === `Nuevo Flujo para ${plubotIdToSet}` || // Fallback de loadFlow para datos no válidos
+            currentStoreName === `Error al cargar ${plubotIdToSet}`; // Fallback de loadFlow en error
+
+          if (isDefaultOrGenericError && currentStoreName !== flowNameToSet) {
+            console.log(`[FlowStore] resetFlow: Final check - Current name ('${currentStoreName}') is default/error/generic. Updating with flowNameToSet ('${flowNameToSet}').`);
+            set({ flowName: flowNameToSet });
+          } else if (currentStoreName !== flowNameToSet) {
+            console.log(`[FlowStore] resetFlow: Final check - Current name ('${currentStoreName}') is specific (likely from backend via loadFlow). Not overwriting with flowNameToSet ('${flowNameToSet}').`);
+          }
         }
+
         if (plubotIdToSet && get().plubotId !== plubotIdToSet) {
           console.log(`[FlowStore] resetFlow: Final check - Ensuring plubotId is set to ${plubotIdToSet}`);
           set({ plubotId: plubotIdToSet });
@@ -1670,8 +1687,10 @@ const useFlowStore = create(
 
         try {
           const flowData = await flowService.loadFlow(plubotId);
+          console.log(`[FlowStore] loadFlow: Received flowData from service for plubotId ${plubotId}:`, JSON.stringify(flowData, null, 2));
+          console.log(`[FlowStore] loadFlow: Data is valid. Setting flowName to: '${flowData.name || `Flujo de ${plubotId}`}'`);
           if (flowData && typeof flowData === 'object') {
-            console.log(`[FlowStore] Datos recibidos para Plubot ID ${plubotId}:`, flowData);
+            console.log(`[FlowStore] loadFlow: Data is valid. Setting flowName to: '${flowData.name || `Flujo de ${plubotId}`}'`);
             
             const nodes = Array.isArray(flowData.nodes) ? flowData.nodes : [];
             const edges = Array.isArray(flowData.edges) ? flowData.edges : [];
