@@ -1,0 +1,66 @@
+/**
+ * reset-transform.css
+ * 
+ * Este archivo restablece las transformaciones de ReactFlow a su comportamiento predeterminado.
+ * Elimina cualquier interferencia con el sistema de transformación de ReactFlow.
+ */
+
+/* 1. RESTAURAR VIEWPORT - Crítico para el posicionamiento de nodos */
+.react-flow__viewport {
+  /* IMPORTANTE: NO forzar ninguna transformación específica para el viewport */
+  /* transform: unset !important; */ /* Eliminado: esto interfiere con ReactFlow */
+  transform-origin: 0 0 !important; /* Restaurar origen de transformación */
+  
+  /* Asegurar visibilidad */
+  visibility: visible !important;
+  opacity: 1 !important;
+  
+  /* Asegurar que los eventos pasen a los nodos */
+  pointer-events: none !important;
+}
+
+/* 2. RESTAURAR NODOS - Dejar que ReactFlow maneje sus posiciones */
+.react-flow__node {
+  /* IMPORTANTE: NO forzar ninguna transformación para los nodos */
+  /* transform: unset !important; */ /* Eliminado: esto interfiere con ReactFlow */
+  
+  /* Asegurar visibilidad */
+  visibility: visible !important;
+  opacity: 1 !important;
+  display: block !important;
+  
+  /* Asegurar interactividad */
+  pointer-events: all !important;
+}
+
+/* 3. RESTAURAR PANE - Permitir navegación */
+.react-flow__pane {
+  /* IMPORTANTE: NO forzar ninguna transformación para el pane */
+  /* transform: unset !important; */ /* Eliminado: esto interfiere con ReactFlow */
+  
+  /* Asegurar tamaño correcto */
+  width: 100% !important;
+  height: 100% !important;
+  
+  /* Asegurar interactividad */
+  pointer-events: all !important;
+}
+
+/* 4. RESTAURAR ARISTAS */
+.react-flow__edge-path {
+  visibility: visible !important;
+  stroke-width: 2px !important;
+}
+
+/* 5. RESTAURAR CONTROLES */
+.react-flow__controls {
+  z-index: 5 !important;
+  pointer-events: all !important;
+}
+
+/* 6. VIEWPORT FIJO - Impedir NaN en transformaciones */
+.react-flow__viewport {
+  /* Este truco evita que las transformaciones tengan NaN */
+  will-change: transform !important;
+  backface-visibility: hidden !important;
+}

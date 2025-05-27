@@ -1,0 +1,1246 @@
+/* DecisionNode.css - Versión Premium 4.0 */
+
+/* Importación de fuentes premium */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+/* Variables CSS para el nodo de decisión - Nivel Premium */
+:root {
+  /* Paleta de colores refinada */
+  --node-decision-bg: linear-gradient(145deg, #ffffff, #f8fafc);
+  --node-decision-bg-solid: #f8fafc;
+  --node-decision-border: #d1d5db;
+  --node-decision-shadow: 0 6px 24px rgba(0, 0, 0, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04);
+  --node-decision-accent: 37, 99, 235; /* Azul vibrante en formato RGB */
+  --node-decision-accent-color: rgba(var(--node-decision-accent), 1);
+  --node-decision-accent-light: rgba(var(--node-decision-accent), 0.1);
+  
+  /* Colores para condiciones */
+  --node-decision-true: 22, 163, 74; /* Verde en formato RGB */
+  --node-decision-false: 220, 38, 38; /* Rojo en formato RGB */
+  --node-decision-default: var(--node-decision-accent);
+  --node-decision-true-color: rgba(var(--node-decision-true), 1);
+  --node-decision-false-color: rgba(var(--node-decision-false), 1);
+  --node-decision-true-light: rgba(var(--node-decision-true), 0.15);
+  --node-decision-false-light: rgba(var(--node-decision-false), 0.15);
+  
+  /* Tipografía premium */
+  --node-decision-font: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --text-primary: #1f2937; /* Gris oscuro para mejor contraste */
+  --text-secondary: #4b5563; /* Gris medio para texto secundario */
+  --text-tertiary: #9ca3af; /* Gris claro para elementos menos importantes */
+  
+  /* Dimensiones y espaciado mejorado */
+  --node-decision-border-radius: 12px;
+  --node-decision-padding: 1.5rem;
+  --node-decision-gap: 1rem;
+  --node-decision-condition-border-radius: 8px;
+  --node-decision-button-radius: 6px;
+  --node-decision-input-radius: 6px;
+  
+  /* Transiciones y animaciones refinadas */
+  --node-decision-transition: all 0.25s cubic-bezier(0.25, 1, 0.5, 1);
+  --node-decision-transition-fast: all 0.15s cubic-bezier(0.25, 1, 0.5, 1);
+  
+  /* Efectos visuales */
+  --node-decision-backdrop-filter: blur(8px);
+  --node-decision-glass-bg: rgba(255, 255, 255, 0.7);
+  --node-decision-glass-border: rgba(255, 255, 255, 0.3);
+  
+  /* Variables para modo ultra rendimiento */
+  --node-decision-ultra-bg: #f1f5f9;
+  --node-decision-ultra-border: #cbd5e1;
+  --node-decision-ultra-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  --node-decision-ultra-border-width: 1px;
+  --node-decision-ultra-padding: 1rem;
+  --node-decision-ultra-transition: none;
+  --node-decision-ultra-animation: none;
+
+  /* Variables for Ultra Blue theme (from JSX) */
+  --node-decision-ultra-blue-bg: #60a5fa;
+  --node-decision-ultra-blue-border-color: rgba(30, 58, 138, 0.3);
+  --node-decision-ultra-blue-text-color: #1e3a8a;
+  --node-decision-ultra-blue-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  --node-decision-ultra-blue-border-width: 1px;
+  
+  }
+
+/* Soporte para modo oscuro */
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* Variables para modo oscuro general */
+    --node-decision-dark-bg: linear-gradient(145deg, #1f2937, #111827);
+    --node-decision-dark-bg-solid: #1f2937;
+    --node-decision-dark-border: #4b5563;
+    --node-decision-dark-text: #f3f4f6;
+    --node-decision-dark-text-secondary: #9ca3af;
+
+    /* Variables para modo oscuro del tema Ultra Blue */
+    --node-decision-ultra-blue-bg: #2563eb; /* Azul más oscuro para fondo ultra en dark mode */
+    --node-decision-ultra-blue-border-color: rgba(30, 58, 138, 0.6); /* Borde ligeramente más opaco */
+    --node-decision-ultra-blue-text-color: #dbeafe; /* Texto más claro para contraste */
+    --node-decision-ultra-blue-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Sombra un poco más oscura */
+
+    /* Aquí se podrían redefinir otras variables si es necesario para el modo oscuro, 
+       por ejemplo, los colores de acento, texto primario/secundario, etc., 
+       si los valores por defecto de :root no son adecuados para el fondo oscuro. 
+       Por ahora, solo se sobreescriben los directamente relacionados con 'dark' y 'ultra-blue' en dark. 
+       El CSS actual ya tiene algunas variables como --text-primary que son oscuras, 
+       lo que podría necesitar ajuste para el modo oscuro si el fondo del nodo cambia drásticamente. 
+       Sin embargo, .decision-node usa 'color: white;' que funciona bien en fondos oscuros. 
+       El .decision-node--ultra usa --node-decision-ultra-blue-text-color, que ahora tendrá variante dark. 
+    */
+  }
+}
+
+/**
+ * Componente DecisionNode
+ * Estructura BEM (Block Element Modifier)
+ */
+
+/* Contenedor principal del nodo */
+.decision-node {
+  /* Diseño premium con degradado suave de azul claro a azul oscuro */
+  background: linear-gradient(145deg, #bfdbfe, #3b82f6); /* Degradado de azul claro a azul medio */
+  border: 1px solid rgba(30, 58, 138, 0.3);
+  border-radius: var(--node-decision-border-radius);
+  padding: var(--node-decision-padding);
+  box-shadow: 0 8px 24px rgba(59, 130, 246, 0.25), 0 4px 8px rgba(59, 130, 246, 0.15);
+  min-width: 220px;
+  min-height: 140px;
+  position: relative;
+  font-family: var(--node-decision-font);
+  color: white; /* Texto blanco para contraste */
+  transition: var(--node-decision-transition);
+  overflow: visible;
+  display: flex;
+  flex-direction: column;
+  gap: var(--node-decision-gap);
+  will-change: transform, box-shadow, opacity;
+  
+  /* Optimizaciones de rendimiento */
+  contain: layout paint;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  backface-visibility: hidden;
+}
+
+/* Efecto de borde con gradiente */
+.decision-node::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: -1;
+  margin: -1px;
+  border-radius: inherit;
+  background: linear-gradient(to right bottom, rgba(var(--node-decision-accent), 0.3), transparent);
+  opacity: 0.5;
+  transition: opacity 0.3s ease;
+}
+
+/* Hover effect para el borde con gradiente */
+.decision-node:hover::before {
+  opacity: 0.8;
+}
+
+/* Animaciones refinadas */
+@keyframes decisionNodeAppear {
+  0% {
+    opacity: 0;
+    transform: translateY(12px) scale(0.97);
+    filter: blur(3px);
+  }
+  50% {
+    opacity: 0.8;
+    filter: blur(1px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+/* Animación para el nodo */
+.decision-node {
+  animation: decisionNodeAppear 0.4s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+/* Estado seleccionado - feedback visual premium */
+.decision-node--selected {
+  box-shadow: 0 8px 32px rgba(var(--node-decision-accent), 0.2), 0 0 0 3px rgba(var(--node-decision-accent), 0.3);
+  transform: translateY(-2px) scale(1.01);
+  z-index: 10;
+}
+
+.decision-node--selected::before {
+  opacity: 0.9;
+  background: linear-gradient(to right bottom, rgba(var(--node-decision-accent), 0.5), rgba(var(--node-decision-accent), 0.1));
+}
+
+/* Estado hover - microinteracción elegante */
+.decision-node:hover {
+  transform: translateY(-3px) scale(1.01);
+  box-shadow: 0 12px 28px rgba(37, 99, 235, 0.2), 0 4px 12px rgba(37, 99, 235, 0.1);
+  background: linear-gradient(145deg, rgba(37, 99, 235, 0.12), rgba(37, 99, 235, 0.2));
+  border: 1px solid rgba(37, 99, 235, 0.3);
+}
+
+/* Estado de edición - modo profesional */
+.decision-node--editing {
+  box-shadow: 0 12px 36px rgba(var(--node-decision-accent), 0.15), 0 0 0 3px rgba(var(--node-decision-accent), 0.3);
+  z-index: 20;
+  transform: translateY(-3px) scale(1.02);
+}
+
+.decision-node--editing::before {
+  opacity: 1;
+  background: linear-gradient(to right bottom, rgba(var(--node-decision-accent), 0.6), rgba(var(--node-decision-accent), 0.2));
+}
+
+/* Modo Ultra Rendimiento - optimizado pero elegante */
+.decision-node--ultra {
+  background: var(--node-decision-ultra-blue-bg);
+  border: var(--node-decision-ultra-blue-border-width) solid var(--node-decision-ultra-blue-border-color);
+  color: var(--node-decision-ultra-blue-text-color);
+  box-shadow: var(--node-decision-ultra-blue-shadow);
+  padding: var(--node-decision-ultra-padding);
+  transition: var(--node-decision-ultra-transition); /* Should be 'none' */
+  animation: var(--node-decision-ultra-animation); /* Should be 'none' */
+  backdrop-filter: none;
+  gap: 0.5rem;
+  /* Optimizaciones para rendimiento */
+  will-change: auto;
+  transform: none;
+  filter: none;
+}
+
+.decision-node--ultra:hover {
+  transform: none;
+  box-shadow: var(--node-decision-ultra-blue-shadow); /* Ensure hover doesn't change ultra style */
+}
+
+/* Cabecera del nodo - diseño premium */
+.decision-node__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 0.75rem;
+  margin-bottom: var(--node-decision-gap);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  position: relative;
+}
+
+/* Efecto de línea de separación con gradiente */
+.decision-node__header::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(to right, transparent, rgba(var(--node-decision-accent), 0.3), transparent);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.decision-node:hover .decision-node__header::after,
+.decision-node--selected .decision-node__header::after,
+.decision-node--editing .decision-node__header::after {
+  opacity: 1;
+}
+
+.decision-node__title {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+  letter-spacing: -0.01em;
+  color: var(--text-secondary);
+  transition: color 0.2s ease;
+}
+
+.decision-node--selected .decision-node__title,
+.decision-node--editing .decision-node__title {
+  color: rgba(var(--node-decision-accent), 0.9);
+}
+
+/* Icono del nodo - diseño premium con efecto de profundidad */
+.decision-node__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(var(--node-decision-accent), 0.15), rgba(var(--node-decision-accent), 0.05));
+  color: rgba(var(--node-decision-accent), 0.9);
+  transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+  box-shadow: 0 2px 6px rgba(var(--node-decision-accent), 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Efecto de brillo en el icono */
+.decision-node__icon::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 0%, transparent 70%);
+  opacity: 0;
+  transition: opacity 0.5s ease, transform 0.5s ease;
+  transform: scale(0.5);
+  pointer-events: none;
+}
+
+.decision-node:hover .decision-node__icon::after {
+  opacity: 0.8;
+  transform: scale(1);
+}
+
+/* Animación para el icono */
+.decision-node__icon-svg {
+  animation: iconPulse 3s infinite alternate cubic-bezier(0.455, 0.03, 0.515, 0.955);
+}
+
+@keyframes iconPulse {
+  0% { transform: scale(1); opacity: 0.9; }
+  100% { transform: scale(1.15); opacity: 1; }
+}
+
+/* Icono en modo ultra rendimiento */
+.decision-node__icon--ultra {
+  width: 22px;
+  height: 22px;
+  background: rgba(var(--node-decision-accent), 0.1);
+  box-shadow: none;
+  transition: none;
+}
+
+.decision-node__icon--ultra .decision-node__icon-svg {
+  animation: none;
+}
+
+/* Metadatos del nodo - diseño elegante */
+.decision-node__metadata {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 11px;
+  color: var(--text-tertiary);
+  transition: opacity 0.3s ease;
+}
+
+.decision-node:not(:hover) .decision-node__metadata {
+  opacity: 0.7;
+}
+
+/* Fecha del nodo */
+.decision-node__date {
+  white-space: nowrap;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  background: rgba(var(--node-decision-accent), 0.08);
+  padding: 2px 6px;
+  border-radius: 4px;
+  transition: background 0.2s ease;
+}
+
+.decision-node:hover .decision-node__date {
+  background: rgba(var(--node-decision-accent), 0.15);
+}
+
+/* Avatar del propietario */
+.decision-node__owner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(var(--node-decision-accent), 0.2), rgba(var(--node-decision-accent), 0.4));
+  color: white;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.decision-node:hover .decision-node__owner {
+  transform: scale(1.1);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
+}
+
+/* Contenido principal */
+.decision-node__content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 1;
+}
+
+/* Estilos para la pregunta */
+.decision-node__question-wrapper {
+  position: relative;
+}
+
+.decision-node__question {
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.5;
+  padding: 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  background-color: rgba(255, 255, 255, 0.3);
+  min-height: 36px;
+  word-break: break-word;
+}
+
+.decision-node__question:hover {
+  background-color: rgba(255, 255, 255, 0.5);
+}
+
+.decision-node--ultra .decision-node__question {
+  background-color: rgba(255, 255, 255, 0.2);
+  transition: var(--transition-none);
+}
+
+.decision-node--ultra .decision-node__question:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.decision-node__question-input {
+  width: 100%;
+  min-height: 60px;
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid var(--decision-border-normal);
+  background-color: white;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-size: 14px;
+  resize: vertical;
+  outline: none;
+  line-height: 1.5;
+}
+
+.decision-node__question-input:focus {
+  border-color: #d97706;
+  box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.3);
+}
+
+.decision-node__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.decision-node__button {
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  transition: background-color 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.decision-node__button--cancel {
+  background-color: #e5e7eb;
+  color: #4b5563;
+}
+
+.decision-node__button--cancel:hover {
+  background-color: #d1d5db;
+}
+
+.decision-node__button--save {
+  background-color: var(--decision-border-normal);
+  color: white;
+}
+
+.decision-node__button--save:hover {
+  background-color: #d97706;
+}
+
+.decision-node__button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Estilos para las condiciones */
+.decision-node__conditions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.decision-node__conditions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.decision-node__condition {
+  padding: 6px 8px;
+  background-color: rgba(255, 255, 255, 0.6);
+  border-radius: 6px;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  transition: background-color 0.2s ease;
+  cursor: pointer;
+  position: relative;
+  border: 1px solid transparent;
+}
+
+.decision-node__condition:hover {
+  background-color: rgba(255, 255, 255, 0.8);
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+.decision-node__condition--true {
+  border-left: 3px solid var(--condition-true-color);
+}
+
+.decision-node__condition--false {
+  border-left: 3px solid var(--condition-false-color);
+}
+
+.decision-node__condition--default {
+  border-left: 3px solid var(--condition-default-color);
+}
+
+.decision-node__condition--active {
+  background-color: rgba(255, 255, 255, 0.9);
+  border-color: rgba(0, 0, 0, 0.2);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.decision-node__condition--ultra {
+  background-color: rgba(255, 255, 255, 0.4);
+  padding: 4px 6px;
+  transition: var(--transition-none);
+  border-width: 0 0 0 2px;
+}
+
+.decision-node__condition--ultra:hover {
+  background-color: rgba(255, 255, 255, 0.4);
+}
+
+.decision-node__condition-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 6px;
+  color: rgba(0, 0, 0, 0.5);
+}
+
+.decision-node__condition-icon--true {
+  color: var(--condition-true-color);
+}
+
+.decision-node__condition-icon--false {
+  color: var(--condition-false-color);
+}
+
+.decision-node__condition-text {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.decision-node__condition-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.decision-node__condition:hover .decision-node__condition-actions {
+  opacity: 1;
+}
+
+.decision-node__condition-button {
+  width: 22px;
+  height: 22px;
+  border-radius: 4px;
+  border: none;
+  background-color: rgba(0, 0, 0, 0.05);
+  color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.decision-node__condition-button:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+.decision-node__condition-button--edit:hover {
+  background-color: var(--condition-default-color);
+  color: white;
+}
+
+.decision-node__condition-button--delete:hover {
+  background-color: var(--condition-false-color);
+  color: white;
+}
+
+.decision-node__condition-button--confirm {
+  background-color: var(--condition-false-color);
+  color: white;
+}
+
+.decision-node__condition-button--move {
+  position: relative;
+}
+
+.decision-node__condition-move-buttons {
+  position: absolute;
+  display: none;
+  flex-direction: column;
+  top: -30px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: white;
+  border-radius: 4px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  z-index: 10;
+}
+
+.decision-node__condition-button--move:hover .decision-node__condition-move-buttons {
+  display: flex;
+}
+
+.decision-node__condition-move-button {
+  width: 24px;
+  height: 24px;
+  border: none;
+  background-color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.decision-node__condition-move-button:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.decision-node__condition-move-button:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.decision-node__add-condition-container {
+  margin-top: 4px;
+}
+
+.decision-node__add-condition {
+  padding: 6px 8px;
+  background-color: rgba(255, 255, 255, 0.5);
+  border: 1px dashed var(--decision-border-normal);
+  border-radius: 6px;
+  color: var(--decision-text-normal);
+  font-size: 13px;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: var(--node-decision-transition);
+  width: 100%;
+}
+
+.decision-node__add-condition:hover {
+  background-color: rgba(var(--node-decision-accent), 0.25);
+  border-color: rgba(var(--node-decision-accent), 0.4);
+  color: var(--node-decision-accent-color);
+  transform: scale(1.04);
+  box-shadow: 0 2px 8px rgba(var(--node-decision-accent), 0.2);
+}
+
+/* Contenido principal - diseño premium */
+.decision-node__content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--node-decision-gap);
+  flex: 1;
+}
+
+/* Contenedor de la pregunta con efecto de profundidad */
+.decision-node__question-container {
+  position: relative;
+  transition: transform 0.3s ease;
+}
+
+.decision-node--editing .decision-node__question-container {
+  transform: scale(1.02);
+}
+
+/* Pregunta del nodo - estilo premium con fondo azul claro */
+.decision-node__question {
+  width: 100%;
+  padding: 0.875rem 1.125rem;
+  border-radius: var(--node-decision-input-radius);
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(59, 130, 246, 0.5);
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  font-weight: 500;
+  color: #1f2937; /* Color oscuro para el texto */
+  transition: var(--node-decision-transition);
+  resize: none;
+  overflow: hidden;
+  box-shadow: 0 2px 6px rgba(59, 130, 246, 0.1);
+}
+
+/* Estado de focus mejorado */
+.decision-node__question:focus {
+  outline: none;
+  border-color: rgba(var(--node-decision-accent), 0.5);
+  box-shadow: 0 0 0 3px rgba(var(--node-decision-accent), 0.15), 0 2px 8px rgba(0, 0, 0, 0.05);
+  background: white;
+}
+
+/* Estilo de placeholder mejorado */
+.decision-node__question::placeholder {
+  color: var(--text-tertiary);
+  opacity: 0.8;
+  font-style: italic;
+}
+
+/* Visualización de la pregunta con estilo premium */
+.decision-node__question-display {
+  width: 100%;
+  padding: 0.875rem 1.125rem;
+  border-radius: var(--node-decision-input-radius);
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(59, 130, 246, 0.5);
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  font-weight: 500;
+  color: #1f2937; /* Color oscuro para asegurar visibilidad */
+  cursor: pointer;
+  transition: var(--node-decision-transition);
+  box-shadow: 0 2px 6px rgba(59, 130, 246, 0.1);
+}
+
+/* Efecto hover mejorado */
+.decision-node__question-display:hover {
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.85));
+  border-color: rgba(var(--node-decision-accent), 0.3);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.04);
+  transform: translateY(-1px);
+}
+
+/* Botón de editar pregunta - diseño premium */
+.decision-node__edit-question {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  background: rgba(var(--node-decision-accent), 0.08);
+  color: rgba(var(--node-decision-accent), 0.7);
+  opacity: 0;
+  transition: all 0.2s cubic-bezier(0.25, 1, 0.5, 1);
+  backdrop-filter: blur(2px);
+  transform: scale(0.9);
+}
+
+/* Animación de aparición del botón de editar */
+.decision-node__question-container:hover .decision-node__edit-question {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* Efecto hover mejorado para el botón de editar */
+.decision-node__edit-question:hover {
+  background: rgba(var(--node-decision-accent), 0.15);
+  color: rgba(var(--node-decision-accent), 1);
+  box-shadow: 0 2px 8px rgba(var(--node-decision-accent), 0.2);
+  transform: scale(1.05);
+}
+
+/* Editor de condición - diseño premium */
+.decision-node__condition-edit {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  width: 100%;
+  position: relative;
+  padding: 0.25rem;
+  border-radius: var(--node-decision-condition-border-radius);
+  transition: background-color 0.2s ease;
+}
+
+.decision-node__condition-edit:hover {
+  background-color: rgba(var(--node-decision-accent), 0.03);
+}
+
+/* Input de condición con estilo premium */
+.decision-node__condition-input {
+  flex: 1;
+  padding: 0.625rem 0.875rem;
+  border: 1px solid rgba(209, 213, 219, 0.7);
+  border-radius: 20px;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  background: rgba(255, 255, 255, 0.9);
+  transition: var(--node-decision-transition);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+}
+
+/* Estado focus mejorado */
+.decision-node__condition-input:focus {
+  outline: none;
+  border-color: rgba(var(--node-decision-accent), 0.5);
+  box-shadow: 0 0 0 2px rgba(var(--node-decision-accent), 0.12), 0 2px 4px rgba(0, 0, 0, 0.04);
+  background: white;
+}
+
+/* Estilos específicos para condiciones true/false */
+.decision-node__condition-input--true {
+  border-color: rgba(var(--node-decision-true), 0.3);
+  background: rgba(var(--node-decision-true), 0.05);
+}
+
+.decision-node__condition-input--true:focus {
+  border-color: rgba(var(--node-decision-true), 0.5);
+  box-shadow: 0 0 0 2px rgba(var(--node-decision-true), 0.12), 0 2px 4px rgba(0, 0, 0, 0.04);
+}
+
+.decision-node__condition-input--false {
+  border-color: rgba(var(--node-decision-false), 0.3);
+  background: rgba(var(--node-decision-false), 0.05);
+}
+
+.decision-node__condition-input--false:focus {
+  border-color: rgba(var(--node-decision-false), 0.5);
+  box-shadow: 0 0 0 2px rgba(var(--node-decision-false), 0.12), 0 2px 4px rgba(0, 0, 0, 0.04);
+}
+
+/* Acciones de edición de condición */
+.decision-node__condition-edit-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  opacity: 0.7;
+  transition: opacity 0.2s ease;
+}
+
+.decision-node__condition-edit:hover .decision-node__condition-edit-actions {
+  opacity: 1;
+}
+
+/* Botones de acción - diseño premium */
+.decision-node__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.625rem;
+  margin-top: 0.75rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.03);
+}
+
+/* Botón base con diseño premium */
+.decision-node__button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.875rem;
+  border-radius: var(--node-decision-button-radius);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.25, 1, 0.5, 1);
+  border: none;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  will-change: transform, box-shadow;
+}
+
+/* Efecto de onda al hacer clic */
+.decision-node__button::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 5px;
+  height: 5px;
+  background: rgba(255, 255, 255, 0.5);
+  opacity: 0;
+  border-radius: 100%;
+  transform: scale(1, 1) translate(-50%, -50%);
+  transform-origin: 50% 50%;
+}
+
+.decision-node__button:active::after {
+  animation: ripple 0.4s ease-out;
+}
+
+@keyframes ripple {
+  0% {
+    transform: scale(0, 0);
+    opacity: 0.5;
+  }
+  100% {
+    transform: scale(30, 30);
+    opacity: 0;
+  }
+}
+
+/* Botón de cancelar - mismo color que guardar */
+.decision-node__button--cancel {
+  background: linear-gradient(to bottom, #1e40af, #1e3a8a);
+  color: white;
+  border: 1px solid #1e3a8a;
+  box-shadow: 0 1px 3px rgba(30, 64, 175, 0.3);
+}
+
+.decision-node__button--cancel:hover {
+  background: linear-gradient(to bottom, #2563eb, #1e40af);
+  color: white;
+  border-color: #1e3a8a;
+  box-shadow: 0 2px 4px rgba(30, 64, 175, 0.4);
+  transform: translateY(-1px);
+}
+
+.decision-node__button--cancel:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 2px rgba(30, 64, 175, 0.3);
+}
+
+/* Botón de guardar */
+.decision-node__button--save {
+  background: linear-gradient(to bottom, rgba(var(--node-decision-accent), 1), rgba(var(--node-decision-accent), 0.9));
+  color: white;
+  box-shadow: 0 1px 3px rgba(var(--node-decision-accent), 0.3);
+}
+
+.decision-node__button--save:hover {
+  background: linear-gradient(to bottom, rgba(var(--node-decision-accent), 1), rgba(var(--node-decision-accent), 0.85));
+  box-shadow: 0 3px 6px rgba(var(--node-decision-accent), 0.4);
+  transform: translateY(-1px);
+}
+
+.decision-node__button--save:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 3px rgba(var(--node-decision-accent), 0.3);
+}
+
+/* Conectores - diseño premium */
+.decision-node__handle {
+  width: 12px;
+  height: 12px;
+  background-color: rgba(var(--node-decision-accent), 1);
+  border: 2px solid white;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.05), 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: all 0.25s cubic-bezier(0.25, 1, 0.5, 1);
+  z-index: 10;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Efecto de brillo en los conectores */
+.decision-node__handle::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.8) 0%, transparent 70%);
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  pointer-events: none;
+}
+
+.decision-node__handle:hover {
+  transform: scale(1.2);
+  box-shadow: 0 0 0 2px rgba(var(--node-decision-accent), 0.2), 0 3px 6px rgba(0, 0, 0, 0.15);
+}
+
+.decision-node__handle:hover::after {
+  opacity: 0.8;
+}
+
+/* Conector de entrada */
+.decision-node__handle--target {
+  top: -6px;
+  border-radius: 50%;
+}
+
+/* Conector de salida */
+.decision-node__handle--source {
+  bottom: -6px; /* Ajustado para alinear todos los handles */
+  top: auto;
+  border-radius: 50%;
+}
+
+/* Conector para condición verdadera */
+.decision-node__handle--true {
+  background-color: rgba(var(--node-decision-true), 1);
+}
+
+.decision-node__handle--true:hover {
+  box-shadow: 0 0 0 2px rgba(var(--node-decision-true), 0.2), 0 3px 6px rgba(0, 0, 0, 0.15);
+}
+
+/* Conector para condición falsa */
+.decision-node__handle--false {
+  background-color: rgba(var(--node-decision-false), 1);
+}
+
+.decision-node__handle--false:hover {
+  box-shadow: 0 0 0 2px rgba(var(--node-decision-false), 0.2), 0 3px 6px rgba(0, 0, 0, 0.15);
+}
+
+/* Animación de pulso para conectores activos */
+.decision-node__handle--active {
+  animation: handlePulse 1.5s infinite alternate cubic-bezier(0.455, 0.03, 0.515, 0.955);
+}
+
+@keyframes handlePulse {
+  0% { transform: scale(1); box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.05), 0 2px 4px rgba(0, 0, 0, 0.1); }
+  100% { transform: scale(1.3); box-shadow: 0 0 0 2px rgba(var(--node-decision-accent), 0.3), 0 4px 8px rgba(0, 0, 0, 0.2); }
+}
+
+.decision-node__handle:hover {
+  transform: scale(1.2);
+  box-shadow: 0 0 12px rgba(var(--connector-color), 0.6);
+  animation: connectorPulse 1.5s infinite;
+}
+
+.decision-node__handle--true:hover {
+  box-shadow: 0 0 12px var(--node-decision-true);
+  animation: connectorPulseTrue 1.5s infinite;
+}
+
+.decision-node__handle--false:hover {
+  box-shadow: 0 0 12px var(--node-decision-false);
+  animation: connectorPulseFalse 1.5s infinite;
+}
+
+.decision-node__handle--ultra {
+  width: 8px;
+  height: 8px;
+  border-width: 1px;
+  transition: none;
+}
+
+.decision-node__handle--ultra:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+.decision-node__handle-wrapper {
+  position: relative;
+  width: 100%;
+  height: 20px; /* Altura reducida aún más */
+  margin-top: 0.1rem; /* Margen superior mínimo */
+  margin-bottom: 0.1rem; /* Margen inferior mínimo */
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding-bottom: 0; /* Sin padding inferior */
+}
+
+.decision-node__handle-label {
+  position: absolute;
+  bottom: -25px;
+  transform: translateX(-50%);
+  font-size: 10px;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  text-align: center;
+  max-width: 80px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  z-index: 10; /* Asegurar que las etiquetas estén por encima de otros elementos */
+}
+
+/* Accesibilidad */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+.decision-node:focus {
+  outline: 2px solid #4ea0ff;
+  outline-offset: 2px;
+}
+
+.decision-node:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* Animaciones para conectores */
+@keyframes connectorPulse {
+  0% {
+    box-shadow: 0 0 4px rgba(var(--connector-color), 0.4);
+  }
+  50% {
+    box-shadow: 0 0 12px rgba(var(--connector-color), 0.6);
+  }
+  100% {
+    box-shadow: 0 0 4px rgba(var(--connector-color), 0.4);
+  }
+}
+
+@keyframes connectorPulseTrue {
+  0% {
+    box-shadow: 0 0 4px rgba(16, 185, 129, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 12px rgba(16, 185, 129, 0.6);
+  }
+  100% {
+    box-shadow: 0 0 4px rgba(16, 185, 129, 0.4);
+  }
+}
+
+@keyframes connectorPulseFalse {
+  0% {
+    box-shadow: 0 0 4px rgba(239, 68, 68, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 12px rgba(239, 68, 68, 0.6);
+  }
+  100% {
+    box-shadow: 0 0 4px rgba(239, 68, 68, 0.4);
+  }
+}
+
+@keyframes conditionAppear {
+  0% {
+    opacity: 0;
+    transform: translateY(4px) scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes nodeConnected {
+  0% {
+    box-shadow: 0 0 0 2px rgba(var(--node-decision-accent), 0.2);
+  }
+  50% {
+    box-shadow: 0 0 0 4px rgba(var(--node-decision-accent), 0.4);
+  }
+  100% {
+    box-shadow: 0 0 0 2px rgba(var(--node-decision-accent), 0.2);
+  }
+}
+
+/* Soporte para modo oscuro */
+@media (prefers-color-scheme: dark) {
+  .decision-node {
+    --node-decision-border: rgba(255, 255, 255, 0.1);
+    --text-primary: rgba(255, 255, 255, 0.9);
+    --text-secondary: rgba(255, 255, 255, 0.6);
+  }
+}
+
+/* Optimizaciones para pantallas táctiles */
+@media (hover: none) {
+  .decision-node__condition-actions {
+    opacity: 1;
+  }
+  
+  .decision-node:hover {
+    transform: none;
+  }
+}
+
+/* Optimizaciones para pantallas pequeñas */
+@media (max-width: 768px) {
+  .decision-node {
+    width: 200px;
+    padding: 0.75rem;
+  }
+  
+  .decision-node__question {
+    font-size: 0.875rem;
+  }
+  
+  .decision-node__condition {
+    padding: 0.375rem 0.625rem;
+  }
+}
+
+/* Optimizaciones para pantallas de alta densidad */
+@media (min-resolution: 2dppx) {
+  .decision-node {
+    border-width: 0.5px;
+  }
+  
+  .decision-node__handle {
+    border-width: 1.5px;
+  }
+}
+
+/* Soporte para navegadores que no soportan grid */
+@supports not (display: grid) {
+  .decision-node__conditions {
+    display: block;
+  }
+  
+  .decision-node__condition {
+    margin-bottom: 0.5rem;
+  }
+}
+
+/* Soporte para navegadores que no soportan variables CSS */
+@supports not (--custom: property) {
+  .decision-node {
+    background-color: #ffffff;
+    border: 1px solid #e5e5e5;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.06);
+  }
+  
+  .decision-node__condition {
+    background-color: rgba(59, 130, 246, 0.1);
+  }
+  
+  .decision-node__handle--true {
+    background-color: #10b981;
+  }
+  
+  .decision-node__handle--false {
+    background-color: #ef4444;
+  }
+}

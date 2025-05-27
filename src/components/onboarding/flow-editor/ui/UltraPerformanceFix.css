@@ -1,0 +1,76 @@
+/**
+ * UltraPerformanceFix.css
+ * Solución radical para el modo ultra rendimiento que elimina completamente
+ * todos los efectos visuales y comportamientos que puedan causar problemas
+ */
+
+/* SOLUCIÓN MODIFICADA: Hacer que los nodos sean inmunes a efectos de hover pero permitir interacción */
+body.performance-mode-active .react-flow__node {
+  /* Fijar todas las propiedades que podrían cambiar con hover, EXCEPTO transform */
+  /* transform: none !important; */ /* ELIMINADO: Interfiere con el posicionamiento de nodos */
+  filter: none !important;
+  box-shadow: none !important;
+  text-shadow: none !important;
+  border-color: inherit !important;
+  background-color: inherit !important;
+  z-index: 0 !important;
+  opacity: 1 !important;
+  scale: 1 !important;
+  /* Permitir eventos de click y arrastre */
+  pointer-events: auto !important;
+}
+
+/* Evitar que los nodos cambien al hacer hover, pero permitir transformaciones de posición */
+body.performance-mode-active .react-flow__node:hover {
+  /* transform: none !important; */ /* ELIMINADO: Interfiere con el posicionamiento de nodos */
+  filter: none !important;
+  box-shadow: none !important;
+  text-shadow: none !important;
+  border-color: inherit !important;
+  background-color: inherit !important;
+  z-index: 0 !important;
+  opacity: 1 !important;
+  scale: 1 !important;
+}
+
+/* Asegurar que las aristas magenta sean visibles en modo ultra rendimiento */
+body.performance-mode-active .elite-edge-path-ultra {
+  display: block !important;
+  opacity: 1 !important;
+  stroke: #ff00cc !important;
+  stroke-width: 3px !important;
+  pointer-events: none !important;
+}
+
+/* Ocultar elementos animados en modo ultra rendimiento */
+body.performance-mode-active .elite-edge-flow,
+body.performance-mode-active .elite-edge-flow-secondary,
+body.performance-mode-active .elite-edge-glow,
+body.performance-mode-active .elite-edge-center {
+  display: none !important;
+}
+
+/* Resaltar nodos seleccionados en modo ultra rendimiento */
+body.performance-mode-active .react-flow__node.selected {
+  outline: 2px solid #ff00cc !important;
+}
+
+/* Desactivar todas las transiciones y animaciones en modo ultra rendimiento */
+body.performance-mode-active * {
+  transition: none !important;
+  animation: none !important;
+}
+
+/* Mensaje informativo para el usuario */
+body.performance-mode-active::after {
+  content: "Modo Ultra Rendimiento: Hover desactivado";
+  position: fixed;
+  bottom: 10px;
+  right: 10px;
+  background: rgba(0, 0, 0, 0.7);
+  color: #fff;
+  padding: 5px 10px;
+  border-radius: 5px;
+  font-size: 12px;
+  z-index: 9999;
+}

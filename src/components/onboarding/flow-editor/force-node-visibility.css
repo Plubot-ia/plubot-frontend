@@ -1,0 +1,114 @@
+/**
+ * force-node-visibility.css
+ * 
+ * SOLUCIÓN CRÍTICA: Este archivo contiene reglas CSS de máxima prioridad
+ * para garantizar que los nodos sean siempre visibles en el editor, sin importar
+ * qué ocurra con ReactFlow.
+ * 
+ * También incluye reglas para eliminar el rectángulo azul y hacer el pane transparente.
+ * 
+ * Estas reglas tienen especificidad muy alta para evitar ser sobrescritas.
+ */
+
+/* Regla general para todos los nodos */
+.react-flow__node {
+  visibility: visible !important;
+  display: block !important;
+  opacity: 1 !important;
+  z-index: 10 !important;
+  pointer-events: all !important;
+}
+
+/* Asegurar que los nodos sean interactivos */
+.react-flow__node:hover {
+  z-index: 1000 !important;
+}
+
+/* Viewport debe ser visible pero NO forzar transformación */
+.react-flow__viewport {
+  visibility: visible !important;
+  display: block !important;
+  /* Se eliminó la transformación forzada que impedía el posicionamiento correcto */
+}
+
+/* Viewport inicial - mantener visible sin forzar transformación */
+.react-flow__viewport:not([style*="transform"]) {
+  visibility: visible !important;
+  /* Eliminamos transformación forzada para permitir posicionamiento correcto */
+}
+
+/* Nodos específicos por tipo */
+.react-flow__node-start,
+.react-flow__node-end,
+.react-flow__node-message,
+.react-flow__node-decision,
+.react-flow__node-action,
+.react-flow__node-option {
+  visibility: visible !important;
+  display: block !important;
+  opacity: 1 !important;
+}
+
+/* Aumentar visibilidad de handles */
+.react-flow__handle {
+  visibility: visible !important;
+  opacity: 1 !important;
+  z-index: 15 !important;
+}
+
+/* Corregir aristas */
+.react-flow__edge {
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+/* Forzar overflow visible */
+.react-flow {
+  overflow: visible !important;
+}
+
+/* Forzar que el contenedor principal tenga dimensiones */
+.react-flow,
+.react-flow__renderer {
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 500px !important;
+}
+
+/* ELIMINACIÓN DEL RECTÁNGULO AZUL */
+
+/* Hacer que el pane sea completamente transparente */
+.react-flow__pane {
+  background-color: transparent !important;
+  cursor: grab !important;
+}
+
+/* Eliminar cualquier selección de rectángulo azul */
+.react-flow__selection {
+  background-color: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  display: none !important;
+}
+
+/* Estilos adicionales para garantizar que no haya elementos azules */
+.react-flow__selection-rect {
+  background-color: transparent !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+  display: none !important;
+}
+
+/* Eliminar cualquier overlay azulado */
+.react-flow__edges {
+  pointer-events: none !important;
+}
+
+.react-flow__edge-path {
+  stroke-width: 2px !important;
+}
+
+/* Asegurar que el fondo no tenga color */
+.react-flow__background {
+  background-color: transparent !important;
+}
