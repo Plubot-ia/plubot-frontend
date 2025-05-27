@@ -20,25 +20,44 @@ export const preventFlowReset = () => {
   
   // Función para guardar nodos en localStorage como respaldo
   const backupNodesToLocalStorage = (nodes) => {
+    const flowStoreState = useFlowStore.getState();
+    const plubotId = flowStoreState.plubotId;
+
     if (!nodes || !Array.isArray(nodes) || nodes.length === 0) return;
     
     try {
-      localStorage.setItem('plubot-nodes-emergency-backup', JSON.stringify(nodes));
-      console.log(`[preventFlowReset] Respaldo de emergencia guardado: ${nodes.length} nodos`);
+      const backupKey = `plubot-nodes-emergency-backup-${plubotId}`;
+      console.log(`[preventFlowReset] Attempting to save emergency backup. Key: ${backupKey}, Nodes count: ${nodes.length}`);
+      localStorage.setItem(backupKey, JSON.stringify(nodes));
+      console.log(`[preventFlowReset] Emergency backup saved successfully for plubotId: ${plubotId}`);
     } catch (e) {
-      console.error('[preventFlowReset] Error al guardar respaldo de emergencia:', e);
+      console.error(`[preventFlowReset] Error saving emergency backup for plubotId: ${plubotId}`, e);
     }
   };
   
   // Función para recuperar nodos de respaldo
   const restoreNodesFromBackup = () => {
+    const flowStoreState = useFlowStore.getState();
+    const plubotId = flowStoreState.plubotId;
+
+    if (!plubotId) {
+      console.warn('[preventFlowReset] No plubotId provided to restoreNodesFromBackup.');
+      return null;
+    }
     try {
-      const backup = localStorage.getItem('plubot-nodes-emergency-backup');
+      const backupKey = `plubot-nodes-emergency-backup-${plubotId}`;
+      console.log(`[preventFlowReset] Emergency backup found for plubotId: ${plubotId}. Restoring...`);
+      const backup = localStorage.getItem(backupKey);
       if (backup) {
-        const nodes = JSON.parse(backup);
-        if (Array.isArray(nodes) && nodes.length > 0) {
-          console.log(`[preventFlowReset] Recuperados ${nodes.length} nodos del respaldo de emergencia`);
-          return nodes;
+        try {
+          const nodes = JSON.parse(backup);
+          if (Array.isArray(nodes) && nodes.length > 0) {
+            console.log(`[preventFlowReset] Recuperados ${nodes.length} nodos del respaldo de emergencia para ${plubotId} desde ${backupKey}`);
+            return nodes;
+          }
+        } catch (error) {
+          console.error(`[preventFlowReset] Error parsing emergency backup for plubotId: ${plubotId}`, error);
+          return null;
         }
       }
     } catch (e) {
@@ -92,27 +111,26 @@ export const preventFlowReset = () => {
         
         flowStore.setState((prevState) => ({
           setNodes: (newNodes) => {
-            // Validar que no se estén eliminando todos los nodos sin razón
             const callStack = new Error().stack || '';
-            const currentNodes = prevState.nodes || [];
+            // MODIFICADO: Obtener nodos y plubotId del estado MÁS RECIENTE del store
+            const storeState = flowStore.getState();
+            const currentNodes = storeState.nodes || [];
+            const currentPlubotId = storeState.plubotId;
             
-            // Si hay nodos actuales, pero los nuevos son un array vacío o nulo
             if (currentNodes.length > 0 && (!newNodes || (Array.isArray(newNodes) && newNodes.length === 0))) {
-              // Si no viene de un contexto legítimo para eliminar nodos
               if (!callStack.includes('TrainingScreen') && !callStack.includes('deleteNode')) {
                 console.warn('[preventFlowReset] Intento de eliminar todos los nodos bloqueado');
-                // Guardar respaldo de emergencia
-                backupNodesToLocalStorage(currentNodes);
-                return; // No hacer nada, preservar nodos actuales
+                backupNodesToLocalStorage(currentNodes); // Guardar los nodos *antes* de la eliminación
+                return;
               }
             }
             
-            // En caso normal, permitir la operación
             if (Array.isArray(newNodes) && newNodes.length > 0) {
-              lastNodes = [...newNodes]; // Guardar copia de seguridad en memoria
-              // Solo guardar respaldo si hay más de 3 nodos (para no sobrecargar localStorage)
+              lastNodes = [...newNodes];
               if (newNodes.length > 3) {
-                backupNodesToLocalStorage(newNodes);
+                // MODIFICADO: Obtener plubotId del estado MÁS RECIENTE también aquí por consistencia
+                const freshPlubotIdForBackup = flowStore.getState().plubotId;
+                backupNodesToLocalStorage(newNodes); // Guardar los nodos *antes* de la eliminación
               }
             }
             
@@ -127,6 +145,7 @@ export const preventFlowReset = () => {
       flowStore.setState((prevState) => ({
         recoverNodesEmergency: () => {
           const currentNodes = prevState.nodes || [];
+          const currentPlubotId = prevState.plubotId;
           
           // Solo recuperar si no hay nodos actualmente
           if (currentNodes.length === 0) {
@@ -162,14 +181,14 @@ export const preventFlowReset = () => {
           if (currentPlubotId) {
             emergencyBackupKey = `plubot-nodes-emergency-backup-${currentPlubotId}`;
             emergencyBackupForThisFlowExists = localStorage.getItem(emergencyBackupKey) !== null;
-            console.log(`[preventFlowReset] Checking for emergency backup. Plubot ID: ${currentPlubotId}, Key: ${emergencyBackupKey}, Found: ${emergencyBackupForThisFlowExists}`);
+            // console.log(`[preventFlowReset] Checking for emergency backup. Plubot ID: ${currentPlubotId}, Key: ${emergencyBackupKey}, Found: ${emergencyBackupForThisFlowExists}`);
           } else {
-            console.log('[preventFlowReset] No currentPlubotId in store, cannot check for specific emergency backup.');
+            // console.log('[preventFlowReset] No currentPlubotId in store, cannot check for specific emergency backup.');
           }
 
           if (currentNodes.length === 0 && lastNodes.length > 0 && !emergencyBackupForThisFlowExists) {
-            console.warn(`[preventFlowReset] RESTAURACIÓN AUTOMÁTICA (desde lastNodes). Key '${emergencyBackupKey}' not found or no Plubot ID. Nodes desaparecidos.`);
-            currentState.setNodes(lastNodes);
+            console.warn(`[preventFlowReset] Nodos desaparecidos. Key '${emergencyBackupKey}' no encontrada (o no hay Plubot ID). NO SE RESTAURARÁ AUTOMÁTICAMENTE desde lastNodes.`);
+            // currentState.setNodes(lastNodes); // <--- COMENTADO PARA EVITAR RESTAURACIÓN AUTOMÁTICA
           } else if (currentNodes.length === 0 && lastNodes.length > 0 && emergencyBackupForThisFlowExists) {
             console.log(`[preventFlowReset] Nodos desaparecidos, pero Key '${emergencyBackupKey}' existe. TrainingScreen.jsx gestionará.`);
           }

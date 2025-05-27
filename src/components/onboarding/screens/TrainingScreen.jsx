@@ -166,13 +166,16 @@ const TrainingScreen = () => {
     nodes,
     edges,
     flowName,
+    plubotId,
     selectedNode,
     selectedEdge,
     isUltraMode,
     onNodesChange,
-    setNodes, // Added setNodes
+    setNodes,
     setEdges,
     setFlowName,
+    setPlubotId: storeSetPlubotId,
+    resetFlow,
     setSelectedNode,
     onEdgesChange,
     onConnect,
@@ -227,7 +230,11 @@ const TrainingScreen = () => {
     openTemplatesModal: originalOpenTemplatesModal,
     openSettingsModal: originalOpenSettingsModal
   } = useTrainingStore();
-  
+
+  // Estado local para el modal de recuperación y los datos del backup
+  const [showRecoveryModal, setShowRecoveryModal] = useState(false);
+  const [emergencyBackupData, setEmergencyBackupData] = useState(null);
+
   // Reemplazamos con versiones stub que no hacen nada para evitar conflictos con GlobalProvider
   const openShareModal = useCallback(() => {
     console.log('[TrainingScreen] openShareModal: Usando GlobalProvider en su lugar');
@@ -943,6 +950,55 @@ async function saveFlowData() {
     // Limpieza del efecto si es necesario
     // return () => { ... };
   }, [nodes, plubotId, showRecoveryMessage]); // Dependencias: nodes y plubotId del store, y estado local showRecoveryMessage
+
+  useEffect(() => {
+    // Solo actuar si tenemos un plubotId, los nodos están definidos, y no estamos en medio de una carga inicial.
+    // Y crucialmente, que el plubotId del store coincida con el de la URL para evitar actuar sobre datos "viejos".
+    if (plubotId && nodes && plubotId === plubotIdFromUrl && !isLoading) {
+      const currentNodesLength = nodes.length;
+      console.log(`[TS Recovery Check] useEffect triggered. Nodes length: ${currentNodesLength}, plubotId: ${plubotId}, isLoading: ${isLoading}, showRecoveryModal: ${showRecoveryModal}`);
+
+      if (currentNodesLength === 0) {
+        console.log(`[TS Recovery Check] NODES ARE ZERO for plubotId ${plubotId}. Attempting to show recovery modal.`);
+        const emergencyBackupKey = `plubot-nodes-emergency-backup-${plubotId}`;
+        const emergencyBackup = localStorage.getItem(emergencyBackupKey);
+
+        if (emergencyBackup) {
+          console.log(`[TS Recovery Check] Found emergency backup in localStorage with key ${emergencyBackupKey}. Data: ${emergencyBackup.substring(0, 100)}...`);
+          try {
+            setEmergencyBackupData(JSON.parse(emergencyBackup));
+            console.log('[TS Recovery Check] Successfully parsed emergency backup data.');
+          } catch (e) {
+            console.error('[TS Recovery Check] Failed to parse emergency backup data:', e);
+            setEmergencyBackupData(null); // Fallback to no data if parsing fails
+          }
+          if (!showRecoveryModal) {
+            console.log('[TS Recovery Check] Setting showRecoveryModal to true.');
+            setShowRecoveryModal(true);
+          } else {
+            console.log('[TS Recovery Check] showRecoveryModal is already true.');
+          }
+        } else {
+          console.log(`[TS Recovery Check] NO emergency backup found in localStorage with key ${emergencyBackupKey}. Modal will offer to start fresh.`);
+          setEmergencyBackupData(null);
+          if (!showRecoveryModal) {
+            console.log('[TS Recovery Check] Setting showRecoveryModal to true (no backup found path).');
+            setShowRecoveryModal(true);
+          } else {
+            console.log('[TS Recovery Check] showRecoveryModal is already true (no backup found path).');
+          }
+        }
+      } else { // nodes.length > 0
+        if (showRecoveryModal) {
+          console.log('[TS Recovery Check] Nodes are present, ensuring recovery modal is hidden.');
+          setShowRecoveryModal(false);
+        }
+      }
+    } else {
+      // Log por qué no se activa la lógica principal de este useEffect
+      // console.log(`[TS Recovery Check] Conditions not met: plubotId=${plubotId}, nodesDefined=${!!nodes}, idMatch=${plubotId === plubotIdFromUrl}, isLoading=${isLoading}`);
+    }
+  }, [nodes, plubotId, plubotIdFromUrl, isLoading, showRecoveryModal, setEmergencyBackupData, setShowRecoveryModal]);
 
   const handleRecoverNodes = () => {
     const currentPlubotId = useFlowStore.getState().plubotId;
