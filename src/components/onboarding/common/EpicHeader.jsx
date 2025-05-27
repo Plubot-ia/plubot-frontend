@@ -27,19 +27,19 @@ const EpicHeader = ({
   openSettingsModal,
   saveFlow: propsSaveFlow,
   getVisibleNodeCount,
-  plubotId // ID del plubot para el BackupManager
+  plubotId // ID del plubot para el BackupManager. También usado para lógica de nombre anterior.
 }) => {
   // Usar el contexto global para los modales y notificaciones
   const { openModal, showNotification, setByteMessage } = useGlobalContext();
   // Obtener datos del store de Flow
-  const { 
-    flowName: initialFlowName = 'Flujo sin título',
+  const {
+    flowName: flowNameFromStore = 'Flujo sin título', // Renombrado para claridad, valor por defecto
     nodes, 
     edges, 
     lastSaved,
-    saveFlow,
+    saveFlow, // Acción de guardado del store
     getVisibleEdgeCount,
-    forceUpdate
+    // forceUpdate // Ya no es necesario suscribirse manualmente
   } = useFlowStore(state => ({
     flowName: state.flowName,
     nodes: state.nodes,
@@ -47,147 +47,17 @@ const EpicHeader = ({
     lastSaved: state.lastSaved,
     saveFlow: state.saveFlow,
     getVisibleEdgeCount: state.getVisibleEdgeCount,
-    forceUpdate: state.forceUpdate
+    // forceUpdate: state.forceUpdate // Ya no es necesario
   }));
   
-  // Estado local para el nombre del flujo
-  // Si se proporciona un flowName como prop, usarlo; de lo contrario, usar el del store
-  const [flowName, setFlowName] = React.useState(propsFlowName || initialFlowName);
-  
-  // Efecto para cargar el nombre del Plubot directamente desde el backend o localStorage
-  React.useEffect(() => {
-    // Si se proporciona un nombre explícito como prop, usarlo
-    if (propsFlowName) {
-      setFlowName(propsFlowName);
-      return;
-    }
-    
-    // Función para cargar el nombre del Plubot directamente del backend
-    const loadPlubotName = async () => {
-      // Si tenemos un ID de Plubot, intentar obtener su nombre
-      if (plubotId) {
-        console.log(`[EpicHeader] Intentando obtener nombre para Plubot ID: ${plubotId}`);
-        
-        // Primero intentar obtener del localStorage (respuesta inmediata)
-        const localName = localStorage.getItem(`plubot-name-${plubotId}`);
-        if (localName) {
-          console.log(`[EpicHeader] Nombre encontrado en localStorage: ${localName}`);
-          setFlowName(localName);
-        }
-        
-        try {
-          // Luego intentar obtener del backend (más actualizado)
-          const response = await fetch(`/api/plubots/${plubotId}`);
-          if (response.ok) {
-            const data = await response.json();
-            if (data?.status === 'success' && data?.plubot?.name) {
-              console.log(`[EpicHeader] Nombre obtenido del backend: ${data.plubot.name}`);
-              setFlowName(data.plubot.name);
-              
-              // Actualizar también el store para mantener consistencia
-              const flowStore = useFlowStore.getState();
-              flowStore.setFlowName(data.plubot.name);
-              
-              // Guardar en localStorage para futuros usos
-              localStorage.setItem(`plubot-name-${plubotId}`, data.plubot.name);
-            }
-          }
-        } catch (error) {
-          console.error('[EpicHeader] Error al obtener nombre del Plubot:', error);
-          // No hacemos nada aquí, ya que ya tenemos un nombre de respaldo
-        }
-      }
-    };
-    
-    // Suscribirse a cambios en el store 
-    const unsubscribe = useFlowStore.subscribe(
-      (state) => ({
-        flowName: state.flowName,
-        forceUpdate: state.forceUpdate
-      }),
-      (state) => {
-        console.log('[EpicHeader] Cambio detectado en el store:', state);
-        if (state.flowName && state.flowName !== flowName) {
-          console.log('[EpicHeader] Actualizando nombre del flujo local:', state.flowName);
-          setFlowName(state.flowName);
-        }
-      }
-    );
-    
-    // Si hay un cambio forzado, actualizar el estado local con el estado actual
-    if (forceUpdate) {
-      console.log('[EpicHeader] Forzando actualización');
-      const currentState = useFlowStore.getState();
-      if (currentState.flowName) {
-        setFlowName(currentState.flowName);
-      }
-    }
-    
-    // Actualizar el estado local con el valor actual del store
-    const currentState = useFlowStore.getState();
-    if (currentState.flowName && currentState.flowName !== flowName) {
-      console.log('[EpicHeader] Inicializando con nombre del store:', currentState.flowName);
-      setFlowName(currentState.flowName);
-    } else {
-      // Si no hay nombre en el store o es el nombre por defecto, intentar cargarlo
-      loadPlubotName();
-    }
-    
-    return () => {
-      console.log('[EpicHeader] Limpiando suscripción');
-      unsubscribe();
-    };
-  }, [propsFlowName, plubotId, flowName, forceUpdate]);
-  
+  // Determinar el nombre del flujo a mostrar.
+  // Si se proporciona un flowName como prop, usarlo; de lo contrario, usar el del store.
+  const displayFlowName = propsFlowName || flowNameFromStore;
+
   // Log para depuración
   React.useEffect(() => {
-    console.log('[EpicHeader] Renderizado con nombre del flujo:', flowName);
-  }, [flowName]);
-  
-  // Efecto adicional para cargar el nombre del Plubot directamente desde el backend
-  React.useEffect(() => {
-    // Solo hacer esto si hay un ID de Plubot y no hay un nombre explícito por prop
-    if (plubotId && !propsFlowName) {
-      // Función para cargar el nombre del Plubot desde el backend
-      const fetchPlubotName = async () => {
-        try {
-          // Primero intentar obtener del localStorage (respuesta inmediata)
-          const localName = localStorage.getItem(`plubot-name-${plubotId}`);
-          if (localName) {
-            console.log(`[EpicHeader] Nombre encontrado en localStorage: ${localName}`);
-            setFlowName(localName);
-          }
-          
-          // Luego intentar obtener del backend (más actualizado)
-          const response = await fetch(`/api/plubots/${plubotId}`);
-          if (response.ok) {
-            const data = await response.json();
-            if (data?.status === 'success' && data?.plubot?.name) {
-              console.log(`[EpicHeader] Nombre obtenido del backend: ${data.plubot.name}`);
-              setFlowName(data.plubot.name);
-              
-              // Guardar en localStorage para futuros usos
-              try {
-                localStorage.setItem(`plubot-name-${plubotId}`, data.plubot.name);
-              } catch (e) {
-                console.warn('[EpicHeader] Error al guardar en localStorage:', e);
-              }
-              
-              // Actualizar también el store para mantener consistencia
-              useFlowStore.getState().setFlowName(data.plubot.name);
-            }
-          }
-        } catch (error) {
-          console.error('[EpicHeader] Error al obtener nombre del Plubot:', error);
-        }
-      };
-      
-      // Ejecutar la petición después de un breve retraso para no bloquear el renderizado
-      setTimeout(() => {
-        fetchPlubotName();
-      }, 100);
-    }
-  }, [plubotId, propsFlowName]);
+    console.log('[EpicHeader] Renderizado. PropsFlowName:', propsFlowName, 'FlowNameFromStore:', flowNameFromStore, 'DisplayFlowName:', displayFlowName);
+  }, [propsFlowName, flowNameFromStore, displayFlowName]);
   
   // Obtener funciones del store de Training
   const {
@@ -458,7 +328,7 @@ const EpicHeader = ({
           style={{ cursor: 'pointer' }}
           title="Volver al editor"
         >
-          <h1 className="epic-header-title">{flowName}</h1>
+          <h1 className="epic-header-title">{displayFlowName}</h1>
           <p className="epic-header-subtitle">Diseñador de Flujos Avanzado</p>
         </div>
       </div>

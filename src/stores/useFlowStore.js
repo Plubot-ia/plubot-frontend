@@ -1446,7 +1446,7 @@ const useFlowStore = create(
               selectedNode: null,
               selectedEdge: null,
               hasChanges: false,
-              isLoaded: false, // Nuevo estado de carga
+              isLoaded: true, // Nuevo estado de carga
             });
             return;
           }

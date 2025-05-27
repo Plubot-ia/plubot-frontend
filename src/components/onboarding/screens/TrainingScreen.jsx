@@ -185,7 +185,8 @@ const TrainingScreen = () => {
     redo,
     canUndo,
     canRedo,
-    getVisibleNodeCount
+    getVisibleNodeCount,
+    isLoaded, // Nueva dependencia
   } = useFlowStore();
   
   const {
@@ -257,100 +258,65 @@ const TrainingScreen = () => {
 
   // Efecto para inicializar el estado con los datos del plubot
   useEffect(() => {
-    const initializePlubotData = () => {
-      const { 
-        plubotId: currentPlubotIdInStore,
-        nodes: nodesInStore,
-        flowName: currentFlowNameInStore,
-        resetFlow,
-        setFlowName,
-        setPlubotId
-      } = useFlowStore.getState();
-      
-      const targetPlubotId = plubotIdFromUrl; // Extracted earlier in TrainingScreen component
-      let targetFlowName = `Plubot ${targetPlubotId}`;
-      const savedPlubotName = localStorage.getItem(`plubot-name-${targetPlubotId}`);
-      if (savedPlubotName) {
-        targetFlowName = savedPlubotName;
-      }
-      
-      console.log('[TrainingScreen Diagnostic] Before needsFlowSetup calculation. currentPlubotIdInStore:', currentPlubotIdInStore, 'targetPlubotId:', targetPlubotId, 'nodesInStore:', nodesInStore);
-      // Determine if a flow reset/setup is needed
-      const needsFlowSetup = 
-        currentPlubotIdInStore !== targetPlubotId || 
-        (currentPlubotIdInStore === targetPlubotId && (!nodesInStore || nodesInStore.length === 0));
-      
-      if (needsFlowSetup && targetPlubotId) {
-        console.log(`[TrainingScreen] Needs flow setup for ${targetPlubotId}. Store ID: ${currentPlubotIdInStore}, Store Nodes: ${nodesInStore?.length}`);
-        const emergencyBackupKey = `plubot-nodes-emergency-backup-${targetPlubotId}`;
-        const emergencyBackupExists = localStorage.getItem(emergencyBackupKey) !== null;
-        
-        const resetOptions = emergencyBackupExists ? { skipLoad: true } : { skipLoad: false };
-        
-        if (emergencyBackupExists) {
-            console.log(`[TrainingScreen] Emergency backup found for ${targetPlubotId}. Resetting flow with skipLoad: true.`);
-        } else {
-            console.log(`[TrainingScreen] No emergency backup for ${targetPlubotId}. Resetting flow with skipLoad: false (will attempt load).`);
-        }
-        
-        resetFlow(targetPlubotId, targetFlowName, resetOptions);
-        
-        const plubotDataToSet = { id: targetPlubotId, name: targetFlowName };
-        if (!plubotData || plubotData.id !== targetPlubotId || plubotData.name !== targetFlowName) {
-          setPlubotData(plubotDataToSet); // from PlubotCreationContext
-        }
-        // Check against the potentially updated flowName in store after resetFlow
-        if (useFlowStore.getState().flowName !== targetFlowName) {
-            setFlowName(targetFlowName);
-        }
-        localStorage.setItem(`plubot-name-${targetPlubotId}`, targetFlowName);
-      
-      } else if (plubotData?.id === targetPlubotId && plubotData.name !== targetFlowName && targetPlubotId) {
-        console.log(`[TrainingScreen] Plubot ID ${targetPlubotId} matches, synchronizing name to: ${targetFlowName}`);
-        const plubotDataToSet = { id: targetPlubotId, name: targetFlowName };
-        setPlubotData(plubotDataToSet);
-        if (currentFlowNameInStore !== targetFlowName) {
-          setFlowName(targetFlowName);
-        }
-        localStorage.setItem(`plubot-name-${targetPlubotId}`, targetFlowName);
-      } else if ((!plubotData || plubotData.id !== targetPlubotId) && targetPlubotId) {
-        console.log(`[TrainingScreen] Fallback: Syncing plubotData context with URL: ${targetPlubotId}`);
-        const plubotDataToSet = { id: targetPlubotId, name: targetFlowName };
-        setPlubotData(plubotDataToSet);
-        if (currentFlowNameInStore !== targetFlowName) {
-           setFlowName(targetFlowName);
-        }
-        localStorage.setItem(`plubot-name-${targetPlubotId}`, targetFlowName);
-        if(currentPlubotIdInStore !== targetPlubotId && nodesInStore && nodesInStore.length > 0){
-           console.log(`[TrainingScreen] Fallback: Syncing flowStore.plubotId to ${targetPlubotId} without full reset, as nodes are present.`);
-           setPlubotId(targetPlubotId); 
-        }
-      }
-    };
-    
-    initializePlubotData();
-    
-    if (!byteMessage) {
-      setByteMessage('¡Hola! Estoy aquí para ayudarte a crear tu Plubot. Arrastra un nodo desde la paleta para comenzar.');
-    }
-  }, [plubotIdFromUrl, plubotData, setPlubotData, byteMessage, setByteMessage, nodes, plubotId, resetFlow, setFlowName, storeSetPlubotId, flowName]);
+    console.log('[TrainingScreen Flow Load Logic]', {
+      plubotIdFromUrl,
+      currentPlubotIdInStore: plubotId, // de useFlowStore
+      isLoaded, // de useFlowStore
+      nodesLength: nodes ? nodes.length : 'undefined', // de useFlowStore
+      currentFlowName: flowName, // de useFlowStore
+    });
 
-  // Efecto para mantener sincronizado el nombre del Plubot con el flowName
-  useEffect(() => {
-    if (plubotData?.name) {
-      // Obtener acceso directo al store para evitar problemas de re-renderizado
-      const flowStore = useFlowStore.getState();
-      
-      // Sincronizar el nombre del Plubot con el nombre del flujo en el store
-      if (flowStore.flowName !== plubotData.name) {
-        console.log(`[TrainingScreen] Sincronizando nombre: "${plubotData.name}"`);
-        flowStore.setFlowName(plubotData.name);
-        // Forzar actualización para que EpicHeader se actualice
-        flowStore.forceUpdate = Date.now();
+    if (plubotIdFromUrl) {
+      // Caso 1: Se necesita una carga desde el backend (ID de Plubot diferente o el flujo actual aún no se ha intentado cargar)
+      if (plubotIdFromUrl !== plubotId || !isLoaded) {
+        console.log(`[TrainingScreen] Case 1: Needs load. URL ID: ${plubotIdFromUrl}, Store ID: ${plubotId}, IsLoaded: ${isLoaded}`);
+        const targetFlowName = plubotData?.name || `Plubot ${plubotIdFromUrl}`;
+        resetFlow(plubotIdFromUrl, targetFlowName, { skipLoad: false });
       }
+      // Caso 2: El flujo se cargó, es el Plubot correcto, pero está vacío
+      else if (plubotIdFromUrl === plubotId && isLoaded && (!nodes || nodes.length === 0)) {
+        console.log(`[TrainingScreen] Case 2: Loaded, correct Plubot, but empty. URL ID: ${plubotIdFromUrl}. Initializing with default nodes/edges.`);
+        // NO llamar a resetFlow para cargar del backend.
+        // Configurar un flujo nuevo por defecto.
+        setNodes(initialNodes); // Usar initialNodes definido localmente
+        setEdges(initialEdges); // Usar initialEdges definido localmente
+        
+        // Opcionalmente, asegurar que flowName sea apropiado para un flujo nuevo/vacío.
+        // Si el nombre cargado es genérico (como el ID del plubot o un placeholder), se podría establecer uno por defecto.
+        // Ejemplo: if (flowName === plubotIdFromUrl || flowName === 'Flujo sin título') {
+        //   setFlowName(`Nuevo Flujo Local ${plubotIdFromUrl}`);
+        // }
+      }
+      // Caso 3: El flujo ya está cargado, es el Plubot correcto y tiene contenido
+      else if (plubotIdFromUrl === plubotId && isLoaded && nodes && nodes.length > 0) {
+        console.log(`[TrainingScreen] Case 3: Flow loaded and has content. URL ID: ${plubotIdFromUrl}. No action needed for loading.`);
+        // Opcionalmente, sincronizar flowName si es diferente y se tiene una fuente autoritativa (ej. plubotData.name)
+        // if (plubotData?.name && plubotData.name !== flowName) {
+        //   setFlowName(plubotData.name);
+        // }
+      }
+    } else {
+      // Caso 4: No hay plubotIdFromUrl (ej. se accede a la ruta base del editor como /training)
+      console.log('[TrainingScreen] Case 4: No plubotIdFromUrl. Resetting to a clean, empty state without backend load.');
+      // Limpiar el editor a un estado por defecto sin intentar una carga del backend.
+      resetFlow(null, 'Flujo sin título', { skipLoad: true });
     }
-  }, [plubotData?.name]);
-  
+  }, [
+    plubotIdFromUrl,
+    plubotId, // de useFlowStore
+    isLoaded, // de useFlowStore
+    nodes,    // de useFlowStore
+    flowName, // de useFlowStore
+    resetFlow, // acción de useFlowStore
+    setNodes,  // acción de useFlowStore
+    setEdges,  // acción de useFlowStore
+    setFlowName, // acción de useFlowStore
+    plubotData, // de usePlubotCreation context
+    // initialNodes e initialEdges son estables (definidos como const arrays en el scope del componente)
+    // por lo que no son estrictamente necesarios como dependencias si no cambian.
+    // Si fueran props o estado, o se recrearan en cada render, sí serían necesarios.
+  ]);
+
   // Estado local simplificado para mantener compatibilidad con el código existente
   const [state, setState] = useState({
     notification: null,
@@ -485,6 +451,9 @@ const TrainingScreen = () => {
   ];
 
   // Inicializar los nodos y aristas en el store de Zustand solo al cargar por primera vez
+  // NOTA: Revisar si este useEffect sigue siendo necesario o si su lógica se solapa
+  // con el nuevo useEffect de carga de flujo (especialmente el Caso 2).
+  // Podría ser redundante o necesitar ajustes.
   const initialSetupDoneRef = useRef(false);
   
   useEffect(() => {
