@@ -1,72 +1,32 @@
-import React, { useState, useEffect } from 'react';
-import useFlowStore from '@/stores/useFlowStore';
+import React from 'react';
 
 /**
- * Componente de recuperación de emergencia que monitorea la pérdida de nodos
- * y ofrece un botón para recuperarlos si desaparecen
+ * Componente de recuperación de emergencia que muestra un modal cuando se le indica.
+ * Controlado por props desde un componente padre (ej. TrainingScreen).
  */
-const EmergencyRecovery = () => {
-  const [showRecovery, setShowRecovery] = useState(false);
-  const [nodeCount, setNodeCount] = useState(0);
-  const [hasBackup, setHasBackup] = useState(false);
-  
-  // Obtener nodos y función de recuperación
-  const nodes = useFlowStore(state => state.nodes);
-  const recoverNodesEmergency = useFlowStore(state => state.recoverNodesEmergency);
-  const plubotId = useFlowStore(state => state.plubotId); // Get plubotId for backup key
-  
-  // Verificar si existe un respaldo de emergencia
-  useEffect(() => {
-    if (!plubotId) return; // Don't check for backup if no plubotId
-    try {
-      const backup = localStorage.getItem(`plubot-nodes-emergency-backup-${plubotId}`);
-      setHasBackup(!!backup);
-    } catch (e) {
-      console.error('[EmergencyRecovery] Error al verificar respaldo:', e);
-    }
-  }, [plubotId]);
-  
-  // Monitorear cambios en los nodos
-  useEffect(() => {
-    // Si tenemos el conteo anterior y ahora no hay nodos, mostrar recuperación
-    if (nodeCount > 0 && (!nodes || nodes.length === 0)) {
-      console.log('[EmergencyRecovery] Nodos perdidos detectados, activando recuperación');
-      setShowRecovery(true);
-    }
-    
-    // Actualizar conteo de nodos
-    setNodeCount(nodes?.length || 0);
-  }, [nodes, nodeCount]);
-  
-  // Función para recuperar nodos
+const EmergencyRecovery = ({ isOpen, onRecover, onDismiss, hasBackup }) => {
+  // La función handleRecovery ahora simplemente llama a la prop onRecover
   const handleRecovery = () => {
-    try {
-      if (recoverNodesEmergency && typeof recoverNodesEmergency === 'function') {
-        const success = recoverNodesEmergency();
-        if (success) {
-          console.log('[EmergencyRecovery] Nodos recuperados con éxito');
-          setShowRecovery(false);
-        } else {
-          console.warn('[EmergencyRecovery] No se pudieron recuperar los nodos');
-        }
-      }
-    } catch (e) {
-      console.error('[EmergencyRecovery] Error al recuperar nodos:', e);
+    if (onRecover) {
+      onRecover();
     }
-  };
-  
-  // Función para cerrar el mensaje
-  const handleClose = () => {
-    setShowRecovery(false);
   };
 
-  // Si no hay que mostrar recuperación o no hay respaldo, no renderizar nada
-  if (!showRecovery || !hasBackup) {
+  // La función handleClose ahora simplemente llama a la prop onDismiss
+  const handleClose = () => {
+    if (onDismiss) {
+      onDismiss();
+    }
+  };
+
+  // Si no está abierto o no hay backup, no renderizar nada.
+  // TrainingScreen decidirá si mostrar este modal o uno para "empezar de nuevo".
+  if (!isOpen || !hasBackup) {
     return null;
   }
-  
+
   return (
-    <div 
+    <div
       style={{
         position: 'absolute',
         bottom: '30px',
@@ -88,7 +48,7 @@ const EmergencyRecovery = () => {
       }}
     >
       <button
-        onClick={handleClose}
+        onClick={handleClose} // Conectar al onDismiss general
         style={{
           position: 'absolute',
           top: '8px',
@@ -108,7 +68,7 @@ const EmergencyRecovery = () => {
       </button>
       <div style={{ fontSize: '1.1em', fontWeight: 'bold' }}>⚠️ ¡Alerta de Fusión de Quanta! ⚠️</div>
       <div>Se detectó una anomalía en la matriz de nodos. ¿Restaurar desde la última singularidad estable?</div>
-      <button 
+      <button
         onClick={handleRecovery}
         style={{
           backgroundColor: '#FF00FF', // Magenta button
@@ -128,6 +88,9 @@ const EmergencyRecovery = () => {
       >
         Recuperar Continuidad Nodal
       </button>
+      {/* Podríamos añadir un botón "Empezar de Nuevo" aquí si quisiéramos que este modal maneje ambos casos 
+          pero por ahora, lo mantenemos simple y dejamos que TrainingScreen decida si mostrar este u otro mensaje/acción 
+          cuando no hay backup. El botón de cerrar (X) llamará a onDismiss. */}
     </div>
   );
 };

@@ -32,7 +32,7 @@ const PersonalizationForm = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { request, createBot, loading, error } = useAPI();
-  const { user, updateProfile } = useAuthStore();
+  const { user, updateProfile, setUser } = useAuthStore();
   
   // Obtener el ID del plubot y la fuente de navegación
   const plubotId = searchParams.get('plubotId');
@@ -142,7 +142,7 @@ const PersonalizationForm = () => {
       : "Selecciona poderes gratuitos para tu Plubot. Los poderes Pro desbloquean integraciones avanzadas.",
     preview: plubotId
       ? "¡Tu Plubot está actualizado! Revisa los cambios antes de guardar."
-      : "¡Tu Plubot Despierto está listo! Actívalo para configurar sus respuestas."
+      : "¡Tu Plubot Despierto está listo! Actívalo para configurar sus respuestas.",
   };
 
   // Función para cargar datos del Plubot
@@ -424,7 +424,7 @@ const PersonalizationForm = () => {
         color: payload.color,
         purpose: payload.purpose,
         initial_message: payload.initial_message,
-        powers: Array.isArray(payload.powers) ? payload.powers.join(',') : payload.powers,
+        powers: payload.powers, // Mantener como array si payload.powers es un array
         _offlineCreated: isOfflineMode
       };
       
@@ -438,38 +438,32 @@ const PersonalizationForm = () => {
       
       // Actualizar el contexto de creación con datos completos
       updatePlubotData({
-        id: newPlubotId,
-        name: payload.name,
-        tone: payload.tone,
-        color: payload.color,
-        purpose: payload.purpose,
-        initial_message: payload.initial_message,
+        ...newPlubot,
         powers: payload.powers,
         flowData: { nodes: [], edges: [] },
-        flowVersions: [],
-        _offlineCreated: isOfflineMode
+        flowVersions: []
       });
       
-      // Actualizar el perfil del usuario
-      const authStore = useAuthStore.getState();
-      const updatedPlubots = [...(authStore.user?.plubots || []), newPlubot];
-      
-      // Usar updateProfile en lugar de updateUser
-      updateProfile({ plubots: updatedPlubots });
-      
-      // Actualizar el estado local para evitar problemas de sincronización
-      if (authStore.user) {
-        authStore.setUser({
-          ...authStore.user,
-          plubots: updatedPlubots
-        });
-      }
-      
-      // Actualizar respaldo local
+      // Actualizar el perfil del usuario CON DATOS FRESCOS DEL BACKEND
       try {
-        localStorage.setItem('user_plubots_backup', JSON.stringify(updatedPlubots));
-      } catch (error) {
-        console.error('Error al actualizar respaldo local:', error);
+        console.log('[PersonalizationForm] Forzando recarga de perfil después de crear Plubot...');
+        const profileResponse = await request('GET', '/api/auth/profile');
+        if (profileResponse?.status === 'success' && profileResponse?.user) {
+          console.log('[PersonalizationForm] Perfil recargado exitosamente:', profileResponse.user);
+          setUser(profileResponse.user); // Actualizar directamente el estado del usuario
+        } else {
+          console.warn('[PersonalizationForm] No se pudo recargar el perfil, usando datos locales para PlubotSection.');
+          // Fallback a la lógica anterior si la recarga del perfil falla
+          const authStore = useAuthStore.getState();
+          const updatedPlubots = [...(authStore.user?.plubots || []), newPlubot];
+          updateProfile({ plubots: updatedPlubots });
+        }
+      } catch (profileError) {
+        console.error('[PersonalizationForm] Error al recargar el perfil:', profileError);
+        // Fallback en caso de error en la petición de recarga
+        const authStore = useAuthStore.getState();
+        const updatedPlubots = [...(authStore.user?.plubots || []), newPlubot];
+        updateProfile({ plubots: updatedPlubots });
       }
       
       // Mostrar mensaje apropiado

@@ -30,6 +30,7 @@ const SuggestionsModal = lazy(() => import('../modals/SuggestionsModal'));
 const ImportExportModal = lazy(() => import('../modals/ImportExportModal'));
 const EmbedModal = lazy(() => import('../modals/EmbedModal'));
 const TemplateSelector = lazy(() => import('../modals/TemplateSelector'));
+const EmergencyRecovery = lazy(() => import('../flow-editor/components/EmergencyRecovery'));
 
 // Utilidades
 import { backupEdgesToLocalStorage } from '../flow-editor/utils/edgeFixUtil';
@@ -234,6 +235,8 @@ const TrainingScreen = () => {
   // Estado local para el modal de recuperación y los datos del backup
   const [showRecoveryModal, setShowRecoveryModal] = useState(false);
   const [emergencyBackupData, setEmergencyBackupData] = useState(null);
+  const [hadBackup, setHadBackup] = useState(false); // Nuevo estado para rastrear si había backup
+  const userJustDismissedModal = useRef(false); // Para evitar que el modal reaparezca instantáneamente
 
   // Reemplazamos con versiones stub que no hacen nada para evitar conflictos con GlobalProvider
   const openShareModal = useCallback(() => {
@@ -891,229 +894,91 @@ async function saveFlowData() {
     setShowVersionHistoryPanel
   ]);
 
-  const [emergencyBackupExistsForSession, setEmergencyBackupExistsForSession] = useState(false);
-  const [showRecoveryMessage, setShowRecoveryMessage] = useState(false);
-
-  useEffect(() => {
-    const currentPlubotId = useFlowStore.getState().plubotId;
-    const currentNodes = useFlowStore.getState().nodes;
-    const allNodesFromStore = useFlowStore.getState().nodes; // For backup
-
-    console.log(`[TrainingScreen Recovery Check] Active Plubot ID: ${currentPlubotId}, Node count: ${currentNodes.length}`);
-
-    if (currentPlubotId && currentNodes.length === 0 && allNodesFromStore.length > 0) {
-      const emergencyBackupKey = `plubot-nodes-emergency-backup-${currentPlubotId}`;
-      console.log(`[TrainingScreen Recovery Logic] All nodes deleted for Plubot ID: ${currentPlubotId}. Attempting to save emergency backup with key: ${emergencyBackupKey}`);
-      
-      // Guardar los nodos que estaban justo antes de la eliminación
-      // Asegurarse de que no guardamos un array vacío si la detección es tardía.
-      // Este es un punto crítico: necesitamos los nodos ANTES de que se borren.
-      // El estado 'allNodesFromStore' podría ya estar vacío aquí si el store se actualizó muy rápido.
-      // Considerar obtener 'previousNodes' de alguna manera o asegurar que 'allNodesFromStore' es el correcto.
-      // Por ahora, asumimos que 'allNodesFromStore' capturó los nodos antes de la eliminación masiva.
-      // Esto se basa en la suposición de que este efecto se ejecuta después de que los nodos se eliminan
-      // pero 'allNodesFromStore' fue capturado al inicio del efecto, potencialmente antes de la actualización completa.
-      // Si 'allNodesFromStore' también está vacío, el backup será inútil.
-      
-      // Corrección: El problema es que `allNodesFromStore` se obtiene en el mismo ciclo que `currentNodes`.
-      // Si `currentNodes` está vacío, `allNodesFromStore` también lo estará si la eliminación ya ocurrió.
-      // La lógica de guardar el backup debe ocurrir ANTES de que los nodos se eliminen del store,
-      // o debemos tener una copia de los nodos de un estado anterior.
-
-      // La lógica actual de 'EmergencyRecovery.js' (que llama a 'saveEmergencyBackup') 
-      // se activa en el 'onNodesChange' y guarda los nodos ANTES de que se aplique el cambio de eliminación.
-      // Por lo tanto, cuando este efecto en TrainingScreen se ejecuta, el backup ya DEBERÍA estar guardado por EmergencyRecovery.js
-      // con la misma convención de clave.
-
-      // Verificamos si el backup ya fue creado por EmergencyRecovery.js
-      const backupAlreadyExists = localStorage.getItem(emergencyBackupKey) !== null;
-      if (backupAlreadyExists) {
-        console.log(`[TrainingScreen Recovery Logic] Emergency backup with key ${emergencyBackupKey} already exists (likely saved by EmergencyRecovery.js).`);
-        setEmergencyBackupExistsForSession(true);
-        setShowRecoveryMessage(true);
-      } else {
-        // Esto no debería ocurrir si EmergencyRecovery.js funciona como se espera.
-        // Pero si ocurre, significa que necesitamos una forma de guardar los nodos aquí.
-        // Por ahora, solo registraremos esto como una condición inesperada.
-        console.warn(`[TrainingScreen Recovery Logic] UNEXPECTED: All nodes deleted for ${currentPlubotId}, but NO emergency backup found with key ${emergencyBackupKey}. Recovery message might not work as expected.`);
-        setEmergencyBackupExistsForSession(false);
-        setShowRecoveryMessage(false); // No mostrar si no hay backup
-      }
-
-    } else if (currentNodes.length > 0 && showRecoveryMessage) {
-      // Si los nodos vuelven a aparecer (por ejemplo, por deshacer o restauración manual), ocultar el mensaje.
-      console.log('[TrainingScreen Recovery Logic] Nodes are present again, hiding recovery message.');
-      setShowRecoveryMessage(false);
-      setEmergencyBackupExistsForSession(false); // Resetear estado del backup
-    }
-
-    // Limpieza del efecto si es necesario
-    // return () => { ... };
-  }, [nodes, plubotId, showRecoveryMessage]); // Dependencias: nodes y plubotId del store, y estado local showRecoveryMessage
-
-  useEffect(() => {
-    // Solo actuar si tenemos un plubotId, los nodos están definidos, y no estamos en medio de una carga inicial.
-    // Y crucialmente, que el plubotId del store coincida con el de la URL para evitar actuar sobre datos "viejos".
-    if (plubotId && nodes && plubotId === plubotIdFromUrl && !isLoading) {
-      const currentNodesLength = nodes.length;
-      console.log(`[TS Recovery Check] useEffect triggered. Nodes length: ${currentNodesLength}, plubotId: ${plubotId}, isLoading: ${isLoading}, showRecoveryModal: ${showRecoveryModal}`);
-
-      if (currentNodesLength === 0) {
-        console.log(`[TS Recovery Check] NODES ARE ZERO for plubotId ${plubotId}. Attempting to show recovery modal.`);
-        const emergencyBackupKey = `plubot-nodes-emergency-backup-${plubotId}`;
-        const emergencyBackup = localStorage.getItem(emergencyBackupKey);
-
-        if (emergencyBackup) {
-          console.log(`[TS Recovery Check] Found emergency backup in localStorage with key ${emergencyBackupKey}. Data: ${emergencyBackup.substring(0, 100)}...`);
-          try {
-            setEmergencyBackupData(JSON.parse(emergencyBackup));
-            console.log('[TS Recovery Check] Successfully parsed emergency backup data.');
-          } catch (e) {
-            console.error('[TS Recovery Check] Failed to parse emergency backup data:', e);
-            setEmergencyBackupData(null); // Fallback to no data if parsing fails
-          }
-          if (!showRecoveryModal) {
-            console.log('[TS Recovery Check] Setting showRecoveryModal to true.');
-            setShowRecoveryModal(true);
-          } else {
-            console.log('[TS Recovery Check] showRecoveryModal is already true.');
-          }
-        } else {
-          console.log(`[TS Recovery Check] NO emergency backup found in localStorage with key ${emergencyBackupKey}. Modal will offer to start fresh.`);
-          setEmergencyBackupData(null);
-          if (!showRecoveryModal) {
-            console.log('[TS Recovery Check] Setting showRecoveryModal to true (no backup found path).');
-            setShowRecoveryModal(true);
-          } else {
-            console.log('[TS Recovery Check] showRecoveryModal is already true (no backup found path).');
-          }
-        }
-      } else { // nodes.length > 0
-        if (showRecoveryModal) {
-          console.log('[TS Recovery Check] Nodes are present, ensuring recovery modal is hidden.');
-          setShowRecoveryModal(false);
-        }
-      }
-    } else {
-      // Log por qué no se activa la lógica principal de este useEffect
-      // console.log(`[TS Recovery Check] Conditions not met: plubotId=${plubotId}, nodesDefined=${!!nodes}, idMatch=${plubotId === plubotIdFromUrl}, isLoading=${isLoading}`);
-    }
-  }, [nodes, plubotId, plubotIdFromUrl, isLoading, showRecoveryModal, setEmergencyBackupData, setShowRecoveryModal]);
-
   const handleRecoverNodes = () => {
     const currentPlubotId = useFlowStore.getState().plubotId;
-    const emergencyBackupKey = `plubot-nodes-emergency-backup-${currentPlubotId}`;
-    console.log(`[TrainingScreen] handleRecoverNodes called for plubotId: ${currentPlubotId}, using key: ${emergencyBackupKey}`);
-    const backup = localStorage.getItem(emergencyBackupKey);
-    if (backup) {
-      try {
-        const parsedBackup = JSON.parse(backup);
-        if (parsedBackup.nodes && parsedBackup.edges) {
-          console.log(`[TrainingScreen] Restoring ${parsedBackup.nodes.length} nodes and ${parsedBackup.edges.length} edges from emergency backup.`);
-          useFlowStore.getState().setNodes(parsedBackup.nodes);
-          useFlowStore.getState().setEdges(parsedBackup.edges);
-          setShowRecoveryMessage(false);
-          setEmergencyBackupExistsForSession(false);
-          // Opcional: eliminar el backup después de usarlo
-          // localStorage.removeItem(emergencyBackupKey);
-        } else {
-          console.error('[TrainingScreen] Emergency backup format is invalid.');
-        }
-      } catch (error) {
-        console.error('[TrainingScreen] Failed to parse emergency backup:', error);
-      }
+    console.log(`[TrainingScreen] handleRecoverNodes called for plubotId: ${currentPlubotId}`);
+    if (emergencyBackupData && emergencyBackupData.nodes && emergencyBackupData.edges) {
+      console.log(`[TrainingScreen] Restoring ${emergencyBackupData.nodes.length} nodes and ${emergencyBackupData.edges.length} edges from emergency backup data.`);
+      useFlowStore.getState().setNodes(emergencyBackupData.nodes);
+      useFlowStore.getState().setEdges(emergencyBackupData.edges);
+      // Considerar limpiar el backup de localStorage aquí si se desea que solo se use una vez
+      // localStorage.removeItem(`plubot-nodes-emergency-backup-${currentPlubotId}`);
+      // setHadBackup(false); // Actualizar estado si se limpia el backup
     } else {
-      console.warn('[TrainingScreen] No emergency backup found to restore.');
+      console.warn('[TrainingScreen] No valid emergency backup data found in state to restore.');
     }
   };
 
   const handleDismissRecovery = () => {
     const currentPlubotId = useFlowStore.getState().plubotId;
+    const targetFlowName = useFlowStore.getState().flowName || `Plubot ${currentPlubotId}`;
+    console.log(`[TrainingScreen] handleDismissRecovery called for plubotId: ${currentPlubotId}. Had backup: ${hadBackup}`);
+    
     const emergencyBackupKey = `plubot-nodes-emergency-backup-${currentPlubotId}`;
-    console.log(`[TrainingScreen] handleDismissRecovery called for plubotId: ${currentPlubotId}. Removing backup key: ${emergencyBackupKey}`);
     localStorage.removeItem(emergencyBackupKey);
-    setShowRecoveryMessage(false);
-    setEmergencyBackupExistsForSession(false);
+    setEmergencyBackupData(null);
+    setHadBackup(false); // Importante: actualizar el estado
+
+    // Siempre resetear a un flujo limpio (con nodos por defecto) al descartar, 
+    // independientemente de si había un backup o no, porque el usuario eligió no restaurar o no había nada que restaurar.
+    console.log('[TrainingScreen] Reseteando flujo a estado por defecto.');
+    useFlowStore.getState().resetFlow(currentPlubotId, targetFlowName, { skipLoad: false, forceDefaultNodes: true });
+  };
+
+  // Wrappers para las acciones del modal EmergencyRecovery
+  const wrappedHandleRecoverNodes = () => {
+    userJustDismissedModal.current = true;
+    setShowRecoveryModal(false);
+    handleRecoverNodes();
+  };
+
+  const wrappedHandleDismissRecovery = () => {
+    userJustDismissedModal.current = true;
+    setShowRecoveryModal(false);
+    handleDismissRecovery();
   };
 
   useEffect(() => {
-    const initializePlubotData = () => {
-      const { 
-        plubotId: currentPlubotIdInStore,
-        nodes: nodesInStore,
-        flowName: currentFlowNameInStore,
-        resetFlow,
-        setFlowName,
-        setPlubotId
-      } = useFlowStore.getState();
-      
-      const targetPlubotId = plubotIdFromUrl; // Extracted earlier in TrainingScreen component
-      let targetFlowName = `Plubot ${targetPlubotId}`;
-      const savedPlubotName = localStorage.getItem(`plubot-name-${targetPlubotId}`);
-      if (savedPlubotName) {
-        targetFlowName = savedPlubotName;
-      }
-      
-      console.log('[TrainingScreen Diagnostic] Before needsFlowSetup calculation. currentPlubotIdInStore:', currentPlubotIdInStore, 'targetPlubotId:', targetPlubotId, 'nodesInStore:', nodesInStore);
-      // Determine if a flow reset/setup is needed
-      const needsFlowSetup = 
-        currentPlubotIdInStore !== targetPlubotId || 
-        (currentPlubotIdInStore === targetPlubotId && (!nodesInStore || nodesInStore.length === 0));
-      
-      if (needsFlowSetup && targetPlubotId) {
-        console.log(`[TrainingScreen] Needs flow setup for ${targetPlubotId}. Store ID: ${currentPlubotIdInStore}, Store Nodes: ${nodesInStore?.length}`);
-        const emergencyBackupKey = `plubot-nodes-emergency-backup-${targetPlubotId}`;
-        const emergencyBackupExists = localStorage.getItem(emergencyBackupKey) !== null;
-        
-        const resetOptions = emergencyBackupExists ? { skipLoad: true } : { skipLoad: false };
-        
-        if (emergencyBackupExists) {
-            console.log(`[TrainingScreen] Emergency backup found for ${targetPlubotId}. Resetting flow with skipLoad: true.`);
-        } else {
-            console.log(`[TrainingScreen] No emergency backup for ${targetPlubotId}. Resetting flow with skipLoad: false (will attempt load).`);
-        }
-        
-        resetFlow(targetPlubotId, targetFlowName, resetOptions);
-        
-        const plubotDataToSet = { id: targetPlubotId, name: targetFlowName };
-        if (!plubotData || plubotData.id !== targetPlubotId || plubotData.name !== targetFlowName) {
-          setPlubotData(plubotDataToSet); // from PlubotCreationContext
-        }
-        // Check against the potentially updated flowName in store after resetFlow
-        if (useFlowStore.getState().flowName !== targetFlowName) {
-            setFlowName(targetFlowName);
-        }
-        localStorage.setItem(`plubot-name-${targetPlubotId}`, targetFlowName);
-      
-      } else if (plubotData?.id === targetPlubotId && plubotData.name !== targetFlowName && targetPlubotId) {
-        console.log(`[TrainingScreen] Plubot ID ${targetPlubotId} matches, synchronizing name to: ${targetFlowName}`);
-        const plubotDataToSet = { id: targetPlubotId, name: targetFlowName };
-        setPlubotData(plubotDataToSet);
-        if (currentFlowNameInStore !== targetFlowName) {
-          setFlowName(targetFlowName);
-        }
-        localStorage.setItem(`plubot-name-${targetPlubotId}`, targetFlowName);
-      } else if ((!plubotData || plubotData.id !== targetPlubotId) && targetPlubotId) {
-        console.log(`[TrainingScreen] Fallback: Syncing plubotData context with URL: ${targetPlubotId}`);
-        const plubotDataToSet = { id: targetPlubotId, name: targetFlowName };
-        setPlubotData(plubotDataToSet);
-        if (currentFlowNameInStore !== targetFlowName) {
-           setFlowName(targetFlowName);
-        }
-        localStorage.setItem(`plubot-name-${targetPlubotId}`, targetFlowName);
-        if(currentPlubotIdInStore !== targetPlubotId && nodesInStore && nodesInStore.length > 0){
-           console.log(`[TrainingScreen] Fallback: Syncing flowStore.plubotId to ${targetPlubotId} without full reset, as nodes are present.`);
-           setPlubotId(targetPlubotId); 
-        }
-      }
-    };
+    const currentPlubotId = useFlowStore.getState().plubotId;
+    if (!currentPlubotId) return; // No hacer nada si no hay plubotId
+
+    const allNodes = useFlowStore.getState().nodes;
+    const emergencyBackupKey = `plubot-nodes-emergency-backup-${currentPlubotId}`;
+    const backupJson = localStorage.getItem(emergencyBackupKey);
     
-    initializePlubotData();
-    
-    if (!byteMessage) {
-      setByteMessage('¡Hola! Estoy aquí para ayudarte a crear tu Plubot. Arrastra un nodo desde la paleta para comenzar.');
+    let localEmergencyBackupData = null;
+    let localHadBackup = false;
+
+    if (backupJson) {
+      try {
+        localEmergencyBackupData = JSON.parse(backupJson);
+        if (localEmergencyBackupData && localEmergencyBackupData.nodes && localEmergencyBackupData.edges) {
+          localHadBackup = true;
+        }
+      } catch (error) {
+        console.error('[TrainingScreen] Error al parsear emergency backup data:', error);
+        localStorage.removeItem(emergencyBackupKey); // Eliminar backup corrupto
+      }
     }
-  }, [plubotIdFromUrl, plubotData, setPlubotData, byteMessage, setByteMessage]);
+    
+    setEmergencyBackupData(localEmergencyBackupData);
+    setHadBackup(localHadBackup);
+
+    // Lógica para mostrar el modal o actuar
+    if ((!allNodes || allNodes.length === 0) && !showRecoveryModal && !userJustDismissedModal.current) {
+      if (localHadBackup) {
+        console.log('[TrainingScreen] Todos los nodos eliminados y existe backup. Mostrando modal de recuperación Quanta.');
+        setShowRecoveryModal(true);
+      } else {
+        console.log('[TrainingScreen] Todos los nodos eliminados y NO existe backup. Forjando nuevo destino automáticamente.');
+        // Si no hay backup, y se borran todos los nodos, iniciamos un nuevo flujo directamente.
+        // handleDismissRecovery se encarga de resetear el flujo con nodos por defecto.
+        handleDismissRecovery(); 
+      }
+    } else if (userJustDismissedModal.current) {
+      userJustDismissedModal.current = false; // Resetear la bandera
+    }
+  }, [nodes, showRecoveryModal, plubotId]); // Depender de 'nodes' del store y 'plubotId' del store
 
   if (state.errorMessage) {
     return (
@@ -1506,12 +1371,15 @@ async function saveFlowData() {
       {/* StatusBubble condicional */}
       {byteMessage && !showSimulation && <StatusBubble message={byteMessage} />}
       
-      {showRecoveryMessage && (
-        <div className="recovery-message">
-          <p>¡Atención! Todos los nodos han sido eliminados. ¿Quieres restaurarlos desde un backup de emergencia?</p>
-          <button onClick={handleRecoverNodes}>Restaurar nodos</button>
-          <button onClick={handleDismissRecovery}>Descartar</button>
-        </div>
+      {showRecoveryModal && (
+        <Suspense fallback={null}>
+          <EmergencyRecovery 
+            isOpen={showRecoveryModal}
+            onRecover={wrappedHandleRecoverNodes}
+            onDismiss={wrappedHandleDismissRecovery} // El botón 'X' del modal llamará a esto
+            hasBackup={hadBackup} // Pasar el estado que indica si hay un backup válido
+          />
+        </Suspense>
       )}
     </div>
   );
