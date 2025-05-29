@@ -19,12 +19,12 @@ const Tooltip = lazy(() => import('../../ui/ToolTip'));
 const NODE_CONFIG = {
   TYPE: 'start',
   DEFAULT_LABEL: 'Inicio',
-  MIN_WIDTH: 100,
-  MIN_HEIGHT: 50,
-  INITIAL_WIDTH: 150,
-  INITIAL_HEIGHT: 60,
+  DEFAULT_DYNAMIC_CONTENT: 'Bienvenido al flujo de inicio.',
+  MIN_WIDTH: 180, // Ajustado para más contenido
+  MIN_HEIGHT: 100, // Ajustado para más contenido
   DEBOUNCE_DELAY: 300,
   MAX_LABEL_LENGTH: 50,
+  MAX_DYNAMIC_CONTENT_LENGTH: 200,
   TRANSITION_DURATION: 200,
   ANIMATION_DURATION: 300,
   COLORS: {
@@ -43,12 +43,7 @@ const NODE_CONFIG = {
     BACKGROUND_HOVER: 'linear-gradient(135deg, #0090ff 0%, #0070d0 100%)',
     BACKGROUND_SELECTED: 'linear-gradient(135deg, #00a0ff 0%, #0080e0 100%)',
   },
-  HANDLE_POSITIONS: {
-    TOP: Position.Top,
-    RIGHT: Position.Right,
-    BOTTOM: Position.Bottom,
-    LEFT: Position.Left,
-  },
+  // HANDLE_POSITIONS eliminado, ya no es configurable para StartNode
   ACCESSIBILITY: {
     ARIA_LABEL: 'Nodo de inicio del flujo',
     ROLE: 'button',
@@ -66,15 +61,13 @@ const NODE_CONFIG = {
       TRANSITION: 'all 0.3s ease',
     },
     ULTRA_PERFORMANCE: {
-      ENABLED: false,
+      ENABLED: false, // Esto se controlará por prop isUltraPerformanceMode
     },
   },
 };
 
 /**
  * Subcomponente para la cabecera del nodo de inicio
- * @param {Object} props - Propiedades del componente
- * @returns {JSX.Element} - Cabecera del nodo de inicio
  */
 const StartNodeHeader = memo(({ label, isEditing, isUltraMode, lastModified }) => {
   const formattedDate = useMemo(() => {
@@ -89,6 +82,7 @@ const StartNodeHeader = memo(({ label, isEditing, isUltraMode, lastModified }) =
         minute: '2-digit'
       });
     } catch (e) {
+      console.warn('[StartNodeHeader] Error formatting date:', e);
       return '';
     }
   }, [lastModified]);
@@ -96,16 +90,17 @@ const StartNodeHeader = memo(({ label, isEditing, isUltraMode, lastModified }) =
   return (
     <div className="start-node__header">
       <div className="start-node__icon-container">
-        <div className="start-node__icon" aria-hidden="true">
-          <div className="start-node__icon-circle" />
-        </div>
+        {/* Icono SVG de 'Play' para representar inicio */}
+        <svg className="start-node__icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="20px" height="20px" aria-hidden="true">
+          <path d="M8 6.82v10.36c0 .79.87 1.27 1.54.84l8.14-5.18c.62-.39.62-1.29 0-1.69L9.54 5.98C8.87 5.55 8 6.03 8 6.82z"/>
+        </svg>
       </div>
-      <div className="start-node__title">
+      <div className="start-node__title-container">
         {isEditing ? null : (
-          <span className="start-node__label">{label}</span>
+          <span className="start-node__label">{label || NODE_CONFIG.DEFAULT_LABEL}</span>
         )}
       </div>
-      {!isUltraMode && lastModified && (
+      {!isUltraMode && formattedDate && (
         <div className="start-node__timestamp" title={`Última modificación: ${formattedDate}`}>
           <small>{formattedDate}</small>
         </div>
@@ -113,38 +108,65 @@ const StartNodeHeader = memo(({ label, isEditing, isUltraMode, lastModified }) =
     </div>
   );
 });
+StartNodeHeader.propTypes = {
+  label: PropTypes.string,
+  isEditing: PropTypes.bool,
+  isUltraMode: PropTypes.bool,
+  lastModified: PropTypes.string,
+};
 
 /**
- * Subcomponente para el contenido editable del nodo de inicio
- * @param {Object} props - Propiedades del componente
- * @returns {JSX.Element} - Contenido editable del nodo de inicio
+ * Subcomponente para el contenido editable y visualización del nodo de inicio
  */
 const StartNodeContent = memo(({ 
   isEditing, 
-  label, 
+  currentLabel, 
+  currentDynamicContent,
   inputRef, 
-  handleBlur, 
-  handleKeyDown, 
+  textareaRef, // Nueva ref para textarea
   handleLabelChange, 
+  handleDynamicContentChange, // Nuevo handler
+  handleKeyDown, // Puede usarse para ambos inputs
+  handleBlur, // Puede usarse para ambos inputs
   isUltraMode, 
   errorMessage 
 }) => {
   return (
-    <div className="start-node__content">
+    <div className={`start-node__content ${isEditing ? 'start-node__content--editing' : ''}`}>
       {isEditing ? (
-        <input
-          ref={inputRef}
-          className="start-node__input"
-          value={label}
-          onChange={handleLabelChange}
-          onBlur={handleBlur}
-          onKeyDown={handleKeyDown}
-          placeholder="Nombre del inicio..."
-          maxLength={NODE_CONFIG.MAX_LABEL_LENGTH}
-          aria-label="Nombre del nodo de inicio"
-          autoFocus
-        />
-      ) : null}
+        <>
+          <input
+            ref={inputRef}
+            className="start-node__input start-node__input--label"
+            value={currentLabel}
+            onChange={handleLabelChange}
+            onBlur={handleBlur} // El blur general guardará
+            onKeyDown={handleKeyDown}
+            placeholder="Título del inicio..."
+            maxLength={NODE_CONFIG.MAX_LABEL_LENGTH}
+            aria-label="Título del nodo de inicio"
+            autoFocus
+          />
+          <textarea
+            ref={textareaRef} // Usar la nueva ref
+            className="start-node__input start-node__input--dynamic-content"
+            value={currentDynamicContent}
+            onChange={handleDynamicContentChange}
+            onBlur={handleBlur} // El blur general guardará
+            onKeyDown={handleKeyDown} // Podría tener lógica específica si es necesario (ej. Shift+Enter)
+            placeholder="Mensaje de inicio..."
+            maxLength={NODE_CONFIG.MAX_DYNAMIC_CONTENT_LENGTH}
+            aria-label="Contenido dinámico del nodo de inicio"
+            rows={3} // Ajustar según necesidad
+          />
+        </>
+      ) : (
+        <div className="start-node__display-content">
+          <p className="start-node__display-dynamic-content">
+            {currentDynamicContent || NODE_CONFIG.DEFAULT_DYNAMIC_CONTENT}
+          </p>
+        </div>
+      )}
       
       {errorMessage && (
         <div className="start-node__error" role="alert">
@@ -152,7 +174,7 @@ const StartNodeContent = memo(({
         </div>
       )}
       
-      {isUltraMode && (
+      {isUltraMode && !isEditing && (
         <div className="start-node__ultra-indicator" aria-hidden="true">
           ULTRA
         </div>
@@ -160,357 +182,291 @@ const StartNodeContent = memo(({
     </div>
   );
 });
+StartNodeContent.propTypes = {
+  isEditing: PropTypes.bool,
+  currentLabel: PropTypes.string,
+  currentDynamicContent: PropTypes.string,
+  inputRef: PropTypes.oneOfType([PropTypes.func, PropTypes.shape({ current: PropTypes.instanceOf(Element) })]),
+  textareaRef: PropTypes.oneOfType([PropTypes.func, PropTypes.shape({ current: PropTypes.instanceOf(Element) })]),
+  handleLabelChange: PropTypes.func,
+  handleDynamicContentChange: PropTypes.func,
+  handleKeyDown: PropTypes.func,
+  handleBlur: PropTypes.func,
+  isUltraMode: PropTypes.bool,
+  errorMessage: PropTypes.string,
+};
+
 
 /**
- * Componente principal StartNode - Nodo de inicio para el flujo
- * Implementado con integración directa a Zustand para mejor rendimiento y mantenibilidad
- * @param {Object} props - Propiedades del componente
- * @returns {JSX.Element} - Componente StartNode
+ * Componente principal StartNode
  */
-const StartNode = memo(({ id, selected = false, isConnectable = true, isUltraPerformanceMode = false }) => {
+const StartNode = memo(({ id, data, selected = false, isConnectable = true, isUltraPerformanceMode = false }) => {
   // Referencias
   const inputRef = useRef(null);
+  const textareaRef = useRef(null); // Nueva ref para textarea
   const nodeRef = useRef(null);
   const menuRef = useRef(null);
-  const dataRef = useRef({});
   
   // Estado local
   const [isEditing, setIsEditing] = useState(false);
+  const [currentLabel, setCurrentLabel] = useState(data?.label || NODE_CONFIG.DEFAULT_LABEL);
+  const [currentDynamicContent, setCurrentDynamicContent] = useState(data?.dynamicContent || NODE_CONFIG.DEFAULT_DYNAMIC_CONTENT);
   const [isHovered, setIsHovered] = useState(false);
-  const [showTooltip, setShowTooltip] = useState(false);
+  const [showTooltip, setShowTooltip] = useState(false); // Considerar si aún es necesario
   const [showContextMenu, setShowContextMenu] = useState(false);
   const [contextMenuPosition, setContextMenuPosition] = useState({ x: 0, y: 0 });
   const [errorMessage, setErrorMessage] = useState('');
-  const [isSaving, setIsSaving] = useState(false);
+  const [isSaving, setIsSaving] = useState(false); // Para feedback visual de guardado
   
   // ReactFlow hooks
-  const reactFlow = useReactFlow();
+  const { setNodes, getNodes } = useReactFlow(); // Para actualizar el nodo localmente si es necesario
   
-  // Zustand store
-  const {
-    nodes,
-    edges,
-    deleteNode,
-    updateStartNodeLabel,
-    updateStartNodeHandlePosition,
-    toggleStartNodeFeature,
-  } = useFlowStore(state => ({
-    nodes: state.nodes,
-    edges: state.edges,
-    deleteNode: state.deleteNode,
-    updateStartNodeLabel: state.updateStartNodeLabel,
-    updateStartNodeHandlePosition: state.updateStartNodeHandlePosition,
-    toggleStartNodeFeature: state.toggleStartNodeFeature,
-  }));
-  
-  // Obtener datos del nodo
-  const node = useMemo(() => nodes.find(n => n.id === id), [nodes, id]);
-  
-  // Extraer datos del nodo
-  const { data = {} } = node || {};
-  const {
-    label = NODE_CONFIG.DEFAULT_LABEL,
-    handlePosition = 'bottom',
-    lastModified,
-    isMinimized = false,
-    isLocked = false,
-    features = {},
-  } = data;
-  
-  // Clases CSS
-  const nodeClasses = useMemo(() => {
-    const classes = ['start-node'];
-    
-    if (selected) classes.push('start-node--selected');
-    if (isHovered) classes.push('start-node--hovered');
-    if (isEditing) classes.push('start-node--editing');
-    if (isMinimized) classes.push('start-node--minimized');
-    if (isLocked) classes.push('start-node--locked');
-    if (isUltraPerformanceMode) classes.push('start-node--ultra');
-    
-    return classes.join(' ');
-  }, [selected, isHovered, isEditing, isMinimized, isLocked, isUltraPerformanceMode]);
-  
-  // Funciones de manejo de eventos que podrían ser usadas en menuOptions
-  const handleDoubleClick = useCallback((e) => {
-    if (e) {
-      e.stopPropagation();
+  // Zustand store actions
+  // Asumimos que updateNodeData es la acción correcta para actualizar y persistir.
+  // Si no existe, se debería crear en useFlowStore.
+  const updateNodeDataInStore = useFlowStore(state => state.updateNodeData); 
+  const deleteNodeFromStore = useFlowStore(state => state.deleteNode);
+
+  // Sincronizar estado local si 'data' prop cambia desde el exterior
+  useEffect(() => {
+    if (data?.label !== currentLabel) {
+      setCurrentLabel(data?.label || NODE_CONFIG.DEFAULT_LABEL);
     }
-    
+    if (data?.dynamicContent !== currentDynamicContent) {
+      setCurrentDynamicContent(data?.dynamicContent || NODE_CONFIG.DEFAULT_DYNAMIC_CONTENT);
+    }
+  }, [data?.label, data?.dynamicContent]);
+
+  const handleSave = useCallback(() => {
+    setIsEditing(false);
+    setErrorMessage(''); // Limpiar errores al guardar
+
+    const trimmedLabel = currentLabel.trim();
+    const finalLabel = trimmedLabel || NODE_CONFIG.DEFAULT_LABEL;
+    const finalDynamicContent = currentDynamicContent.trim() || NODE_CONFIG.DEFAULT_DYNAMIC_CONTENT;
+
+    if (updateNodeDataInStore) {
+      setIsSaving(true);
+      // Preparamos el objeto de datos completo para el nodo
+      const newNodeData = {
+        ...data, // Mantenemos otros datos existentes
+        label: finalLabel,
+        dynamicContent: finalDynamicContent,
+        lastModified: new Date().toISOString(),
+      };
+      updateNodeDataInStore(id, newNodeData)
+        .then(() => {
+          // Opcional: actualizar localmente si el store no fuerza re-render inmediato con nuevos datos
+          // const nodes = getNodes().map(n => n.id === id ? { ...n, data: newNodeData } : n);
+          // setNodes(nodes);
+        })
+        .catch(err => {
+          console.error('[StartNode] Error saving data:', err);
+          setErrorMessage('Error al guardar. Intente de nuevo.');
+        })
+        .finally(() => setIsSaving(false));
+    } else {
+      console.warn('[StartNode] updateNodeDataInStore no está disponible en useFlowStore.');
+      // Fallback: actualizar solo visualmente si no hay función de guardado (no recomendado para producción)
+      const nodes = getNodes().map(n => n.id === id ? { ...n, data: { ...data, label: finalLabel, dynamicContent: finalDynamicContent } } : n);
+      setNodes(nodes);
+    }
+    setCurrentLabel(finalLabel); // Actualiza el estado local también
+    setCurrentDynamicContent(finalDynamicContent);
+  }, [id, currentLabel, currentDynamicContent, data, updateNodeDataInStore, getNodes, setNodes]);
+
+  const debouncedSave = useMemo(() => debounce(handleSave, NODE_CONFIG.DEBOUNCE_DELAY), [handleSave]);
+
+  const handleDoubleClick = useCallback(() => {
     setIsEditing(true);
-    
-    // Enfoque en input después de renderizado
-    setTimeout(() => {
+  }, []);
+
+  const handleLabelChange = useCallback((event) => {
+    setCurrentLabel(event.target.value);
+    debouncedSave();
+  }, [debouncedSave]);
+
+  const handleDynamicContentChange = useCallback((event) => {
+    setCurrentDynamicContent(event.target.value);
+    debouncedSave();
+  }, [debouncedSave]);
+
+  const handleKeyDown = useCallback((event) => {
+    if (event.key === 'Enter' && !event.shiftKey) { // Guardar con Enter (si no es Shift+Enter en textarea)
+      if (event.target.tagName.toLowerCase() === 'input' || (event.target.tagName.toLowerCase() === 'textarea' && !event.shiftKey)) {
+        event.preventDefault();
+        handleSave();
+      }
+    }
+    if (event.key === 'Escape') { // Cancelar edición con Escape
+      setIsEditing(false);
+      setCurrentLabel(data?.label || NODE_CONFIG.DEFAULT_LABEL); // Revertir
+      setCurrentDynamicContent(data?.dynamicContent || NODE_CONFIG.DEFAULT_DYNAMIC_CONTENT); // Revertir
+      setErrorMessage('');
+    }
+  }, [handleSave, data?.label, data?.dynamicContent]);
+
+  const handleBlur = useCallback(() => {
+    // Solo guardar si realmente se estaba editando para evitar guardados innecesarios
+    if (isEditing) {
+      handleSave();
+    }
+  }, [isEditing, handleSave]);
+
+  // Manejo del menú contextual
+  const handleContextMenu = useCallback((event) => {
+    event.preventDefault();
+    setShowContextMenu(true);
+    setContextMenuPosition({ x: event.pageX, y: event.pageY });
+  }, []);
+
+  const closeContextMenu = useCallback(() => {
+    setShowContextMenu(false);
+  }, []);
+
+  const contextMenuItems = useMemo(() => [
+    {
+      label: isEditing ? 'Guardar Cambios' : 'Editar Nodo',
+      icon: isEditing ? 'save' : 'edit',
+      action: () => {
+        if (isEditing) {
+          handleSave();
+        } else {
+          setIsEditing(true);
+        }
+      },
+    },
+    // Ya no hay opción para cambiar posición del handle
+    {
+      label: 'Eliminar Nodo',
+      icon: 'delete',
+      action: () => deleteNodeFromStore && deleteNodeFromStore(id),
+      className: 'context-menu-item--danger',
+    },
+  ], [id, isEditing, handleSave, deleteNodeFromStore]);
+  
+  // Clases dinámicas para el nodo
+  const nodeClasses = useMemo(() => {
+    let baseClass = 'start-node';
+    if (isUltraPerformanceMode) baseClass += ' start-node--ultra-performance';
+    if (selected) baseClass += ' start-node--selected';
+    if (isHovered && !selected) baseClass += ' start-node--hovered'; // Solo hover si no está seleccionado
+    if (isEditing) baseClass += ' start-node--editing';
+    if (errorMessage) baseClass += ' start-node--has-error';
+    if (isSaving) baseClass += ' start-node--saving'; // Clase para feedback de guardado
+    return baseClass;
+  }, [selected, isHovered, isEditing, errorMessage, isSaving, isUltraPerformanceMode]);
+
+  // Efecto para enfocar el input/textarea al entrar en modo edición
+  useEffect(() => {
+    if (isEditing) {
       if (inputRef.current) {
         inputRef.current.focus();
         inputRef.current.select();
+      } else if (textareaRef.current) { // Si no hay input de label (ej. solo textarea)
+        textareaRef.current.focus();
       }
-    }, 0);
-  }, [setIsEditing, inputRef]);
+    }
+  }, [isEditing]);
 
-  // Opciones del menú contextual
-  const menuOptions = useMemo(() => [
-    {
-      label: 'Editar etiqueta',
-      icon: 'edit',
-      action: () => handleDoubleClick(),
-    },
-    {
-      label: 'Cambiar posición del conector',
-      icon: 'swap_vert',
-      subItems: [
-        {
-          label: 'Arriba',
-          action: () => updateStartNodeHandlePosition(id, 'top'),
-          checked: handlePosition === 'top',
-        },
-        {
-          label: 'Derecha',
-          action: () => updateStartNodeHandlePosition(id, 'right'),
-          checked: handlePosition === 'right',
-        },
-        {
-          label: 'Abajo',
-          action: () => updateStartNodeHandlePosition(id, 'bottom'),
-          checked: handlePosition === 'bottom',
-        },
-        {
-          label: 'Izquierda',
-          action: () => updateStartNodeHandlePosition(id, 'left'),
-          checked: handlePosition === 'left',
-        },
-      ],
-    },
-    {
-      label: 'Eliminar nodo',
-      icon: 'delete',
-      action: () => {
-        if (window.confirm('¿Estás seguro de eliminar este nodo de inicio?')) {
-          deleteNode(id);
-        }
-      },
-      className: 'context-menu-item--danger',
-    },
-  ], [id, handlePosition, updateStartNodeHandlePosition, deleteNode, handleDoubleClick]);
-  
-  // Función para manejar clicks fuera del menú - definida fuera del effect
-  const handleOutsideClick = useCallback((e) => {
-    try {
-      console.log('[StartNode] handleOutsideClick: menuRef is', menuRef, 'e is', e);
-      // Verificar que menuRef.current existe y que contiene es una función
-      if (menuRef?.current && typeof menuRef.current.contains === 'function' && e?.target) {
-        if (!menuRef.current.contains(e.target)) {
-          setShowContextMenu(false);
-        }
-      } else {
-        // Esta rama se alcanza si menuRef.current es null/undefined, o .contains no es una función, o e.target es falsy.
-        console.log('[StartNode] handleOutsideClick: Main condition failed. menuRef.current:', menuRef?.current, 'typeof menuRef.current.contains:', typeof menuRef?.current?.contains, 'e.target:', e?.target);
-        setShowContextMenu(false);
-      }
-    } catch (error) {
-      // En caso de cualquier error, simplemente cerrar el menú
-      console.error('[StartNode] CATCH BLOCK in handleOutsideClick: Error:', error, 'menuRef was:', menuRef, 'e was:', e);
-      setShowContextMenu(false);
-    }
-  }, [menuRef, setShowContextMenu]);
+  // Tooltip content
+  const tooltipContent = useMemo(() => {
+    if (isEditing) return "Haz clic fuera o presiona Enter para guardar, Esc para cancelar.";
+    // Simplificamos el tooltip
+    return "Doble clic para editar."; 
+  }, [isEditing]);
 
-  // Uso de un único effect para manejar la adición y eliminación de eventos
-  useEffect(() => {
-    // No hacer nada si no se muestra el menú contextual
-    if (!showContextMenu) return;
-    
-    // Solo agregamos el listener si el menú está abierto
-    document.addEventListener('mousedown', handleOutsideClick);
-    
-    // Cleanup function - siempre se ejecuta cuando el componente se desmonta
-    return () => {
-      document.removeEventListener('mousedown', handleOutsideClick);
-    };
-  }, [showContextMenu, handleOutsideClick]); // Dependemos de showContextMenu y handleOutsideClick
-  
-  // Funciones de manejo de eventos
-  const handleContextMenu = useCallback((e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    
-    setContextMenuPosition({ x: e.clientX, y: e.clientY });
-    setShowContextMenu(true);
-  }, []);
-  
-  const handleLabelChange = useCallback((e) => {
-    const value = e.target.value;
-    dataRef.current = { ...dataRef.current, label: value };
-  }, []);
-  
-  const handleKeyDown = useCallback((e) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      inputRef.current.blur();
-    } else if (e.key === 'Escape') {
-      e.preventDefault();
-      setIsEditing(false);
-    }
-  }, []);
-  
-  const handleBlur = useCallback(() => {
-    const newLabel = dataRef.current.label;
-    
-    if (newLabel !== undefined && newLabel !== label) {
-      try {
-        updateStartNodeLabel(id, newLabel);
-      } catch (error) {
-        setErrorMessage('Error al actualizar la etiqueta');
-        console.error('Error actualizando etiqueta:', error);
-        
-        // Limpiar mensaje de error después de un tiempo
-        setTimeout(() => setErrorMessage(''), 3000);
-      }
-    }
-    
-    setIsEditing(false);
-  }, [id, label, updateStartNodeLabel]);
-  
-  const handleMouseEnter = useCallback(() => {
-    setIsHovered(true);
-    
-    // Mostrar tooltip después de un tiempo
-    const tooltipTimer = setTimeout(() => {
-      if (isHovered) {
-        setShowTooltip(true);
-      }
-    }, 800);
-    
-    return () => clearTimeout(tooltipTimer);
-  }, [isHovered]);
-  
-  const handleMouseLeave = useCallback(() => {
-    setIsHovered(false);
-    setShowTooltip(false);
-  }, []);
-  
-  // Posición del handle según configuración
-  const handlePositionValue = useMemo(() => {
-    switch (handlePosition) {
-      case 'top': return Position.Top;
-      case 'right': return Position.Right;
-      case 'left': return Position.Left;
-      case 'bottom':
-      default: return Position.Bottom;
-    }
-  }, [handlePosition]);
-  
-  // Renderizado del componente
   return (
     <div
       className={nodeClasses}
       ref={nodeRef}
       onDoubleClick={handleDoubleClick}
       onContextMenu={handleContextMenu}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      style={{
+        minWidth: NODE_CONFIG.MIN_WIDTH,
+        minHeight: NODE_CONFIG.MIN_HEIGHT,
+        // Las transformaciones de scale y shadow se manejarán por CSS para mejor rendimiento
+      }}
       role={NODE_CONFIG.ACCESSIBILITY.ROLE}
       aria-label={NODE_CONFIG.ACCESSIBILITY.ARIA_LABEL}
       tabIndex={NODE_CONFIG.ACCESSIBILITY.TABINDEX}
-      data-testid="start-node"
-      data-node-id={id}
-      style={{
-        opacity: isSaving ? 0.7 : 1,
-      }}
     >
-      <StartNodeHeader
-        label={label}
-        isEditing={isEditing}
-        isUltraMode={isUltraPerformanceMode}
-        lastModified={lastModified}
-      />
+      <Tooltip 
+        content={tooltipContent} 
+        visible={isHovered || selected} 
+        position="top" // Cambiado de top-start a top
+        delay={500}
+      >
+        <StartNodeHeader 
+          label={currentLabel} 
+          isEditing={isEditing} 
+          isUltraMode={isUltraPerformanceMode} 
+          lastModified={data?.lastModified} 
+        />
+      </Tooltip>
       
       <StartNodeContent
         isEditing={isEditing}
-        label={dataRef.current.label !== undefined ? dataRef.current.label : label}
+        currentLabel={currentLabel}
+        currentDynamicContent={currentDynamicContent}
         inputRef={inputRef}
-        handleBlur={handleBlur}
-        handleKeyDown={handleKeyDown}
+        textareaRef={textareaRef}
         handleLabelChange={handleLabelChange}
+        handleDynamicContentChange={handleDynamicContentChange}
+        handleKeyDown={handleKeyDown}
+        handleBlur={handleBlur} // Un solo blur para guardar todo
         isUltraMode={isUltraPerformanceMode}
         errorMessage={errorMessage}
       />
-      
-      {/* Handle de conexión según posición configurada */}
+
+      {/* Handle de salida fijo a la derecha */}
       <Handle
         type="source"
-        position={handlePositionValue}
-        isConnectable={isConnectable && !isLocked}
-        className={`start-node__handle start-node__handle--${handlePosition}`}
-        id="start-handle"
-        style={{ opacity: isUltraPerformanceMode ? 0.5 : 1 }}
+        position={Position.Right} // Fijo
+        id="start-source" // ID único para el handle
+        isConnectable={isConnectable}
+        className="start-node__handle start-node__handle--source"
       />
-      
-      {/* Menú contextual */}
+
       {showContextMenu && (
-        <Suspense fallback={null}>
+        <Suspense fallback={<div>Cargando menú...</div>}>
           <ContextMenu
-            ref={menuRef}
-            options={menuOptions}
-            position={contextMenuPosition}
-            onClose={() => setShowContextMenu(false)}
+            x={contextMenuPosition.x}
+            y={contextMenuPosition.y}
+            items={contextMenuItems}
+            onClose={closeContextMenu}
+            menuRef={menuRef}
           />
         </Suspense>
-      )}
-      
-      {/* Tooltip */}
-      {showTooltip && !isUltraPerformanceMode && (
-        <Suspense fallback={null}>
-          <Tooltip
-            content={
-              <div>
-                <strong>{label}</strong>
-                <div>ID: {id}</div>
-                {lastModified && (
-                  <div>Última modificación: {new Date(lastModified).toLocaleString()}</div>
-                )}
-                <div>Posición del conector: {handlePosition}</div>
-                <div>Conexiones: {edges.filter(e => e.source === id).length}</div>
-              </div>
-            }
-            position="top"
-          />
-        </Suspense>
-      )}
-      
-      {/* Indicador de guardado */}
-      {isSaving && (
-        <div className="start-node__saving-indicator">
-          Guardando...
-        </div>
       )}
     </div>
   );
 });
 
-// PropTypes
 StartNode.propTypes = {
   id: PropTypes.string.isRequired,
+  data: PropTypes.shape({
+    label: PropTypes.string,
+    dynamicContent: PropTypes.string,
+    lastModified: PropTypes.string, // ISO string date
+    // Otros datos específicos que pueda tener el nodo
+  }),
   selected: PropTypes.bool,
   isConnectable: PropTypes.bool,
   isUltraPerformanceMode: PropTypes.bool,
 };
 
-StartNodeHeader.propTypes = {
-  label: PropTypes.string.isRequired,
-  isEditing: PropTypes.bool,
-  isUltraMode: PropTypes.bool,
-  lastModified: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-};
-
-StartNodeContent.propTypes = {
-  isEditing: PropTypes.bool,
-  label: PropTypes.string,
-  inputRef: PropTypes.object,
-  handleBlur: PropTypes.func.isRequired,
-  handleKeyDown: PropTypes.func.isRequired,
-  handleLabelChange: PropTypes.func.isRequired,
-  isUltraMode: PropTypes.bool,
-  errorMessage: PropTypes.string,
+StartNode.defaultProps = {
+  data: {
+    label: NODE_CONFIG.DEFAULT_LABEL,
+    dynamicContent: NODE_CONFIG.DEFAULT_DYNAMIC_CONTENT,
+    lastModified: null,
+  },
+  selected: false,
+  isConnectable: true,
+  isUltraPerformanceMode: false,
 };
 
 export default StartNode;

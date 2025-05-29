@@ -374,6 +374,22 @@ const OptionNode = ({
       aria-busy={isSaving}
       aria-describedby={`option-node-description-${id}`}
     >
+      {/* Conector de entrada en la parte superior */}
+      <OptionNodeHandle
+        type="target"
+        position={Position.Top}
+        id="target"
+        isConnectable={isConnectable}
+        isEditing={isEditing}
+        isUltraPerformanceMode={isUltraPerformanceMode}
+        handleColor={borderColor}
+        style={{
+          top: '-12px',
+          left: '50%',
+          transform: 'translateX(-50%)'
+        }}
+      />
+
       <div className="option-node__content">
         <div className="option-node__header">
           <div className="option-node__title">

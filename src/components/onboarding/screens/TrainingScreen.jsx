@@ -337,7 +337,7 @@ const TrainingScreen = () => {
     plubotIdFromUrl,
     plubotId, // de useFlowStore
     isLoaded, // de useFlowStore
-    nodes,    // de useFlowStore
+    nodes.length,    // de useFlowStore
     flowName, // de useFlowStore
     resetFlow, // acción de useFlowStore
     setNodes,  // acción de useFlowStore
@@ -511,7 +511,7 @@ const TrainingScreen = () => {
       console.log('[TrainingScreen] Initial Setup: Nodes and edges already present or set.');
       initialSetupDoneRef.current = true;
     }
-  }, [nodes, edges, setNodes, setEdges, initialNodes, initialEdges]); // initialNodes e initialEdges deben ser estables
+  }, [nodes.length, edges, setNodes, setEdges, initialNodes, initialEdges]); // initialNodes e initialEdges deben ser estables
 
   useEffect(() => {
     document.body.classList.add('training-screen');
@@ -807,7 +807,7 @@ async function saveFlowData() {
       // Guardar automáticamente cuando hay cambios significativos
       debouncedSave();
     }
-  }, [nodes, edges, debouncedSave]);
+  }, [nodes.length, edges, debouncedSave]);
   
   // Función para cerrar todos los modales (mantiene compatibilidad con código existente)
   // pero NO cierra los modales gestionados por GlobalProvider
@@ -979,7 +979,7 @@ async function saveFlowData() {
     } else if (userJustDismissedModal.current) {
       userJustDismissedModal.current = false; // Resetear la bandera
     }
-  }, [nodes, showRecoveryModal, plubotId]); // Depender de 'nodes' del store y 'plubotId' del store
+  }, [nodes.length, showRecoveryModal, plubotId]); // Depender de 'nodes' del store y 'plubotId' del store
 
   if (state.errorMessage) {
     return (

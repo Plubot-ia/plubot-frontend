@@ -100,8 +100,8 @@
   overflow: visible !important;
 }
 
-/* Asegurar que el contenido interno de los nodos sea visible */
-.react-flow__node * {
+/* Asegurar que el contenido interno de los nodos sea visible, EXCEPTO los tooltips */
+.react-flow__node *:not(.tooltip-content) {
   visibility: visible !important;
   opacity: 1 !important;
 }

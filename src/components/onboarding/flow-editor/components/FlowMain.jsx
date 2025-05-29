@@ -793,22 +793,32 @@ const FlowMain = ({
         // console.log('[FlowMain Periodic Edge Check] Drag in progress, skipping ensureEdgesAreVisible.');
         return;
       }
-      const visibleEdges = ensureEdgesAreVisible(edges);
-      if (JSON.stringify(visibleEdges) !== JSON.stringify(edges)) {
-        // En FlowMain, externalSetReactFlowInstance no existe directamente aquí para setEdges.
-        // Deberíamos usar la función setEdges que viene de las props o del store si es el caso.
-        // Asumiendo que setEdges es la función correcta del store o props:
-        if (typeof setEdges === 'function') {
-          setEdges(visibleEdges);
-        } else if (externalOnEdgesChange) {
-          // Si tenemos un externalOnEdgesChange, podríamos necesitar construir los cambios adecuados
-          // Esto es más complejo y depende de cómo se espere que funcione externalOnEdgesChange
-          // Por ahora, nos enfocaremos en la llamada directa a setEdges si está disponible.
-          console.warn('[FlowMain Periodic Edge Check] setEdges no está disponible directamente, y externalOnEdgesChange requeriría una lógica de transformación de cambios.');
+      
+      // Modificación para manejar la promesa de ensureEdgesAreVisible
+      (async () => {
+        try {
+          // Llamamos a ensureEdgesAreVisible con los parámetros que espera.
+          // Si isUltraMode, maxAttempts, delay no están disponibles aquí, tomarán sus defaults.
+          // Por ahora, solo pasamos 'edges' como en el código original.
+          const resolvedVisibleEdges = await ensureEdgesAreVisible(edges);
+          
+          // Comparamos las aristas resueltas con las actuales
+          if (JSON.stringify(resolvedVisibleEdges) !== JSON.stringify(edges)) {
+            if (typeof setEdges === 'function') {
+              console.log('[FlowMain Periodic Edge Check] Actualizando aristas porque se detectó una diferencia.');
+              setEdges(resolvedVisibleEdges);
+            } else if (externalOnEdgesChange) {
+              console.log('[FlowMain Periodic Edge Check] Llamando a externalOnEdgesChange porque se detectó una diferencia.');
+              externalOnEdgesChange(resolvedVisibleEdges);
+            }
+          }
+        } catch (error) {
+          console.error('[FlowMain Periodic Edge Check] Error al asegurar la visibilidad de las aristas:', error);
         }
-      }
-    }, 10000);
-    
+      })();
+    }, 10000); // Verificar cada 10 segundos
+
+    // Limpiar el intervalo cuando el componente se desmonte o las dependencias cambien
     return () => clearInterval(interval);
   }, [edges, setEdges, externalOnEdgesChange]); // Añadido externalOnEdgesChange a las dependencias por si se usa
   

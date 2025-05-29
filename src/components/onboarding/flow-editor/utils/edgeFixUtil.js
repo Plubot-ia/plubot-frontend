@@ -157,37 +157,58 @@ export const prepareEdgesForSaving = (edges, nodeIdMap = {}) => {
 // Usamos una variable global para almacenar la referencia y evitar recrearla
 let throttledEnsureEdgesVisible;
 
-export const ensureEdgesAreVisible = (edges, isUltraMode, maxAttempts = 5, delay = 300) => {
-  // Verificación de rendimiento: solo ejecutar el 20% de las veces para movimientos frecuentes
-  // Excepto para operaciones críticas (primeros intentos, etc.)
-  if (maxAttempts < 5 && Math.random() > 0.2) {
-    return; // Salir temprano para ahorrar recursos durante movimientos frecuentes
-  }
-  
-  // Si no hay aristas, no hacer nada
-  if (!edges || !Array.isArray(edges) || edges.length === 0) {
-    return;
-  }
-  
-  // Usar una versión throttled para limitar el impacto en el rendimiento
-  if (!throttledEnsureEdgesVisible) {
-    // Inicializar solo una vez para evitar recrear la función
-    throttledEnsureEdgesVisible = throttle(
-      (edges, isUltraMode, maxAttempts, delay) => {
-        // Solo registrar en la consola en modo desarrollo o para depuración específica
-        if (process.env.NODE_ENV === 'development') {
-          console.log('Verificando visibilidad de ' + (edges?.length || 0) + ' aristas en el DOM');
-        }
-        _ensureEdgesAreVisibleImpl(edges, isUltraMode, maxAttempts, delay);
+const executionTimestamps = {};
+
+const getThrottledCheck = (cacheKey, isUltraMode, maxAttempts, delay) => {
+  // console.log(`[edgeFixUtil|getThrottledCheck] Llamado para cacheKey: ${cacheKey}`);
+  if (!executionTimestamps[cacheKey]) {
+    // console.log(`[edgeFixUtil|getThrottledCheck] Creando nueva función throttled para cacheKey: ${cacheKey}`);
+    executionTimestamps[cacheKey] = throttle(
+      (currentEdges, currentIsUltraMode, currentMaxAttempts, currentDelay) => {
+        const callId = Math.random().toString(36).substring(2, 7);
+        console.log(`[edgeFixUtil|THROTTLED_FUNC_EXEC ${callId}] Ejecutando. Aristas: ${currentEdges?.length}, isUltraMode: ${currentIsUltraMode}`);
+        const resultFromImpl = _ensureEdgesAreVisibleImpl(currentEdges, currentIsUltraMode, currentMaxAttempts, currentDelay);
+        console.log(`[edgeFixUtil|THROTTLED_FUNC_EXEC ${callId}] _ensureEdgesAreVisibleImpl devolvió (tipo: ${typeof resultFromImpl}, esArray: ${Array.isArray(resultFromImpl)}, long: ${resultFromImpl?.length}):`, JSON.stringify(resultFromImpl)?.substring(0,100) + (JSON.stringify(resultFromImpl)?.length > 100 ? '...' : ''));
+        return resultFromImpl;
       },
-      500, // Limitar a una ejecución cada 500ms
-      { leading: true, trailing: true }
+      1000, { leading: true, trailing: false }
     );
+  } else {
+    // console.log(`[edgeFixUtil|getThrottledCheck] Reutilizando función throttled para cacheKey: ${cacheKey}`);
   }
-  
-  // Llamar a la versión throttled
-  throttledEnsureEdgesVisible(edges, isUltraMode, maxAttempts, delay);
+  return executionTimestamps[cacheKey];
 };
+
+export const ensureEdgesAreVisible = async (currentEdges, currentIsUltraMode, currentMaxAttempts, currentDelay) => {
+  const uniqueId = Math.random().toString(36).substring(2, 7);
+  console.log(`[edgeFixUtil|ensureEdgesAreVisible ENTRADA ${uniqueId}] Llamada. Aristas: ${currentEdges?.length}, isUltraMode: ${currentIsUltraMode}`);
+
+  try {
+    // Obtener la función throttled (se crea una vez y se reutiliza)
+    const throttledCheck = getThrottledCheck();
+    console.log(`[edgeFixUtil|ensureEdgesAreVisible ${uniqueId}] A punto de llamar a throttledCheck.`);
+    const resultFromThrottledCheck = await throttledCheck(currentEdges, currentIsUltraMode, currentMaxAttempts, currentDelay);
+    console.log(`[edgeFixUtil|ensureEdgesAreVisible ${uniqueId}] Resultado de throttledCheck (tipo: ${typeof resultFromThrottledCheck}, esArray: ${Array.isArray(resultFromThrottledCheck)}, long: ${resultFromThrottledCheck?.length}):`, JSON.stringify(resultFromThrottledCheck)?.substring(0,100) + (JSON.stringify(resultFromThrottledCheck)?.length > 100 ? '...' : ''));
+
+    // Si throttledCheck devuelve undefined, significa que _ensureEdgesAreVisibleImpl no pudo garantizar
+    // la visibilidad o encontró un problema. En lugar de devolver un array vacío (lo que eliminaría las aristas),
+    // devolvemos las aristas originales que entraron a esta función.
+    // Esto previene la pérdida de aristas si la verificación de visibilidad es temporalmente incorrecta.
+    if (resultFromThrottledCheck === undefined) {
+      console.warn(`[edgeFixUtil|ensureEdgesAreVisible ${uniqueId}] throttledCheck devolvió UNDEFINED. Devolviendo las aristas originales que se pasaron a ensureEdgesAreVisible para evitar su pérdida. Aristas originales: ${currentEdges?.length}.`);
+      return currentEdges; // Devolver las aristas originales
+    }
+    
+    // Si resultFromThrottledCheck no es undefined, debería ser un array de aristas.
+    // console.log(`[edgeFixUtil|ensureEdgesAreVisible ${uniqueId}] throttledCheck devolvió un array de aristas (long: ${resultFromThrottledCheck?.length}). Se devolverá este array.`);
+    return resultFromThrottledCheck;
+
+  } catch (error) {
+    console.error(`[edgeFixUtil|ensureEdgesAreVisible ERROR ${uniqueId}] Error durante la ejecución de ensureEdgesAreVisible:`, error, '\nEntrada:', { currentEdges, currentIsUltraMode });
+    // En caso de un error inesperado en esta función wrapper, devolver las aristas originales como medida de seguridad
+    return currentEdges;
+  }
+}; // Fin de ensureEdgesAreVisible
 
 // Implementación real separada para mejor mantenibilidad
 const _ensureEdgesAreVisibleImpl = (edges, isUltraMode, maxAttempts = 5, delay = 300) => {
@@ -269,13 +290,18 @@ const _ensureEdgesAreVisibleImpl = (edges, isUltraMode, maxAttempts = 5, delay =
     try {
       // En modo ultra, omitir la mayoría de verificaciones visuales para maximizar rendimiento
       if (isUltraMode) {
-        return true; // Simplemente retornar éxito en modo ultra
+        return repairedEdges; // Devolver las aristas reparadas en modo ultra
       }
       
       // Limitar la frecuencia de verificaciones DOM según cantidad de aristas
       // Para flujos grandes, realizar verificaciones menos frecuentes
       if (repairedEdges.length > 30 && Math.random() > 0.3) {
-        return false; // Salir sin verificar para ahorrar recursos en flujos grandes
+        // Si salimos temprano por optimización, no podemos garantizar la visibilidad, devolvemos undefined
+        // o podríamos devolver repairedEdges asumiendo que están bien si no se verifican.
+        // Por consistencia con la lógica de 'visibilidad garantizada', devolvemos undefined.
+        // Sin embargo, para evitar perder aristas, es mejor devolverlas.
+        // Consideremos que si se omite la verificación, se asume que están bien.
+        return repairedEdges;
       }
       
       // Usar performance API para medir el tiempo de ejecución
@@ -335,7 +361,7 @@ const _ensureEdgesAreVisibleImpl = (edges, isUltraMode, maxAttempts = 5, delay =
             document.head.appendChild(style);
           }
         }
-        return;
+        return repairedEdges; // Devolver las aristas reparadas
       }
       
       // Medir el tiempo que tomó la operación y registrarlo si es excesivo
@@ -370,13 +396,22 @@ const _ensureEdgesAreVisibleImpl = (edges, isUltraMode, maxAttempts = 5, delay =
         }
       }
 
-      return visibleEdgesCount >= totalExpectedEdges * 0.9; // Devolver éxito si hay suficientes aristas
+      // Devolver las aristas reparadas si se consideran suficientemente visibles, sino undefined.
+      if (visibleEdgesCount >= totalExpectedEdges * 0.9) {
+        return repairedEdges;
+      } else {
+        // Si no son suficientemente visibles, devolvemos undefined para que el fallback en ensureEdgesAreVisible se active.
+        // Esto es mejor que devolver un 'false' que luego nuestro parche convertiría en currentEdges.
+        // El objetivo es que setEdges reciba un array de aristas o undefined.
+        return undefined;
+      }
+
     } catch (error) {
       // Reducir verbosidad en logs para mejorar rendimiento
       if (process.env.NODE_ENV === 'development') {
         console.error('Error al verificar visibilidad de aristas:', error);
       }
-      return false;
+      return undefined; // En caso de error, devolver undefined
     }
     
     // Intentar nuevamente después de un retraso si es necesario, pero con lógica mejorada
@@ -400,11 +435,10 @@ const _ensureEdgesAreVisibleImpl = (edges, isUltraMode, maxAttempts = 5, delay =
     }
   };
   
-  // Iniciar la verificación
-  checkEdges();
-  
-  return true;
-};
+  // Llamar a checkEdges y devolver su resultado explícitamente
+  return checkEdges();
+
+}; // Fin de _ensureEdgesAreVisibleImpl
 
 /**
  * Verifica si hay aristas en el estado de ReactFlow

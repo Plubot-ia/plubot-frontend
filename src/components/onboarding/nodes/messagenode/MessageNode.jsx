@@ -7,7 +7,7 @@
  */
 
 import React, { useState, useEffect, useRef, useCallback, memo, useMemo } from 'react';
-import { Handle, Position } from 'reactflow';
+import { Handle, Position, useUpdateNodeInternals } from 'reactflow';
 import { 
   MessageSquare, 
   User, 
@@ -23,11 +23,13 @@ import {
   ChevronDown, 
   ChevronUp,
   Send,
+  Save, // Añadido Save
   UserCheck,
   Trash2,
   CornerDownRight,
   Maximize2,
-  Minimize2
+  Minimize2,
+  Loader2
 } from 'lucide-react';
 import PropTypes from 'prop-types';
 import Tooltip from '../../ui/ToolTip';
@@ -38,12 +40,48 @@ import { shallow } from 'zustand/shallow';
 // Importamos el store de Zustand
 import useFlowStore from '@/stores/useFlowStore';
 import ReactMarkdown from '@/lib/simplified-markdown';
+import { replaceVariablesInMessage } from '@/utils/messageUtils';
 import './MessageNode.css';
 
-// Constantes y configuración
-const DEFAULT_MESSAGE = 'Escribe tu mensaje aquí...';
-const MAX_PREVIEW_LINES = 2;
-const TRANSITION_DURATION = 300; // ms
+// Configuración centralizada para el MessageNode
+const NODE_CONFIG = {
+  TYPE: 'message', // O podría ser dinámico basado en data.messageType
+  DEFAULT_MESSAGE_PLACEHOLDER: 'Escribe tu mensaje aquí...',
+  DEFAULT_TITLE_PREFIX: 'Mensaje',
+  TRANSITION_DURATION: 300, // ms, igual que en CSS
+  ANIMATION_DURATION: 500, // ms, igual que en CSS
+  MAX_PREVIEW_LINES: 2,
+  COLORS: {
+    // Estos se mapearán/refinarán con las variables CSS
+    // Ejemplo:
+    // USER_PRIMARY: 'rgb(var(--message-node-bg-user-color-rgb))',
+    // BOT_PRIMARY: 'rgb(var(--message-node-bg-bot-color-rgb))',
+    TEXT_PRIMARY: 'var(--message-node-text)',
+    BORDER_SELECTED: 'var(--message-node-border-selected)',
+  },
+  DIMENSIONS: {
+    MIN_WIDTH: '200px', // Desde CSS
+    MAX_WIDTH: '320px', // Desde CSS
+    MIN_HEIGHT: '100px', // Desde CSS
+    BORDER_RADIUS: '12px', // Desde CSS
+    PADDING: '1rem', // Desde CSS
+  },
+  HANDLES: {
+    INPUT_TYPE: 'target',
+    OUTPUT_TYPE: 'source',
+    DEFAULT_POSITION: Position.Top, // O Position.Left/Right si cambia el diseño
+  }
+};
+
+// Constantes y configuración (Mantenemos las específicas si NODE_CONFIG no las cubre todas aún)
+const DEFAULT_MESSAGE = NODE_CONFIG.DEFAULT_MESSAGE_PLACEHOLDER;
+const MAX_PREVIEW_LINES = NODE_CONFIG.MAX_PREVIEW_LINES;
+const TRANSITION_DURATION = NODE_CONFIG.TRANSITION_DURATION;
+
+/**
+ * Tipos de mensajes disponibles
+ * @type {Object}
+ */
 
 /**
  * Tipos de mensajes disponibles
@@ -57,6 +95,20 @@ const MESSAGE_TYPES = {
   WARNING: 'warning', // Advertencia
   INFO: 'info',     // Información
   QUESTION: 'question' // Pregunta
+};
+
+// Helper function to generate titles based on message type
+const typeToTitle = (type) => {
+  switch (type) {
+    case MESSAGE_TYPES.USER: return 'Mensaje de Usuario';
+    case MESSAGE_TYPES.BOT: return 'Respuesta del Bot';
+    case MESSAGE_TYPES.SYSTEM: return 'Mensaje de Sistema';
+    case MESSAGE_TYPES.ERROR: return 'Error';
+    case MESSAGE_TYPES.WARNING: return 'Advertencia';
+    case MESSAGE_TYPES.INFO: return 'Información';
+    case MESSAGE_TYPES.QUESTION: return 'Pregunta';
+    default: return NODE_CONFIG.DEFAULT_TITLE_PREFIX;
+  }
 };
 
 /**
@@ -246,9 +298,11 @@ MessagePreview.propTypes = {
  * @param {Function} props.onUpdateVariable - Función para actualizar una variable
  * @param {Function} props.onDeleteVariable - Función para eliminar una variable
  * @param {boolean} props.isUltraPerformanceMode - Indica si está en modo ultra rendimiento
+ * @param {string} props.nodeId - Identificador del nodo
  * @returns {JSX.Element} - Editor de variables
  */
 const VariableEditor = ({ 
+  nodeId, // <--- Añadir nodeId como prop
   variables, 
   onAddVariable, 
   onUpdateVariable, 
@@ -258,6 +312,7 @@ const VariableEditor = ({
   const [newVariable, setNewVariable] = useState({ name: '', value: '' });
   const [isAdding, setIsAdding] = useState(false);
   const newNameInputRef = useRef(null);
+  const updateNodeInternals = useUpdateNodeInternals(); // <--- Hook de React Flow
 
   // Enfocar el campo de nombre al agregar una nueva variable
   useEffect(() => {
@@ -265,6 +320,13 @@ const VariableEditor = ({
       newNameInputRef.current.focus();
     }
   }, [isAdding]);
+
+  // Efecto para actualizar las dimensiones del nodo cuando el form de añadir aparece/desaparece
+  useEffect(() => {
+    if (nodeId) {
+      updateNodeInternals(nodeId);
+    }
+  }, [isAdding, nodeId, updateNodeInternals]);
 
   /**
    * Iniciar la adición de una nueva variable
@@ -320,8 +382,13 @@ const VariableEditor = ({
       role="region"
       aria-label="Editor de variables"
     >
-      <div className="message-node__variables-title">
-        <span id="variables-heading">Variables</span>
+      <div className="message-node__variables-header" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <h4 className="message-node__variables-title">Variables</h4>
+        <Tooltip 
+          content="**¿Qué son las Variables?**\nSon como etiquetas para guardar información que cambia, como el nombre de un cliente o una fecha.\n\n**¿Cómo las uso?**\n1.  **Crea una:** Haz clic en el botón `+` de abajo.\n    *   **Nombre:** Un nombre corto para recordar qué es (ej: `nombre_cliente`).\n    *   **Valor:** La información que quieres guardar (ej: `Ana Sofía`).\n2.  **Insértala en tu mensaje:** Escribe el Nombre de tu variable entre llaves dobles, así: `{{nombre_cliente}}`.\n    Cuando el mensaje se envíe, `{{nombre_cliente}}` se reemplazará automáticamente por `Ana Sofía`.\n\n¡Así puedes personalizar mensajes fácilmente!"
+        >
+          <HelpCircle size={16} className="message-node__help-icon" style={{ cursor: 'help' }} />
+        </Tooltip>
         {!isAdding && (
           <button 
             type="button" 
@@ -369,7 +436,7 @@ const VariableEditor = ({
               onClick={handleSubmitAdd}
               aria-label="Guardar variable"
             >
-              <UserCheck size={14} aria-hidden="true" />
+              <Save size={14} aria-hidden="true" />
             </button>
             <button 
               type="button" 
@@ -412,11 +479,11 @@ const VariableEditor = ({
             />
             {!isUltraPerformanceMode && (
               <div className="message-node__variable-actions">
-                <button 
-                  type="button" 
-                  className="message-node__variable-button"
+                <button
+                  type="button"
+                  className="message-node__variable-button message-node__variable-button--delete"
                   onClick={() => onDeleteVariable(index)}
-                  aria-label={`Eliminar variable ${variable.name}`}
+                  aria-label={`Eliminar variable ${variable.name || 'sin nombre'}`}
                 >
                   <Trash2 size={14} aria-hidden="true" />
                 </button>
@@ -430,6 +497,7 @@ const VariableEditor = ({
 };
 
 VariableEditor.propTypes = {
+  nodeId: PropTypes.string.isRequired, // <--- Añadir nodeId como propType
   variables: PropTypes.arrayOf(
     PropTypes.shape({
       name: PropTypes.string.isRequired,
@@ -446,6 +514,217 @@ VariableEditor.defaultProps = {
   variables: [],
   isUltraPerformanceMode: false
 };
+
+/**
+ * Componente para el ícono del nodo de mensaje
+ * @param {Object} props - Propiedades del componente
+ * @param {string} props.type - Tipo de mensaje (user, bot, system, etc.)
+ * @param {boolean} props.isUltraPerformanceMode - Indica si está en modo ultra rendimiento
+ * @returns {JSX.Element} - Ícono del nodo de mensaje
+ */
+const MessageNodeHeader = memo(({ 
+  id, 
+  titleFromData, 
+  messageType, 
+  isUltraMode, 
+  isSaving, 
+  isSelected, 
+  onDoubleClickHeader,
+  lastUpdatedTimestamp,
+  disableAnimations // Prop recibida
+}) => {
+  const displayTitle = titleFromData || typeToTitle(messageType);
+  const headerClasses = [
+    'message-node__header',
+    isSaving ? 'message-node__header--saving' : '',
+    disableAnimations ? 'message-node__header--no-anim' : '', // Usar la prop
+    isSelected ? 'message-node__header--selected' : '' // Mantener si es necesario
+  ].filter(Boolean).join(' ');
+
+  return (
+    <header className={headerClasses} onDoubleClick={onDoubleClickHeader}>
+      <div className="message-node__title-container">
+        <MessageNodeIcon type={messageType} isUltraPerformanceMode={isUltraMode} />
+        <h2 className="message-node__title" title={displayTitle}>{displayTitle}</h2>
+      </div>
+      <div className="message-node__header-actions"> {/* Contenedor para acciones del header */}
+        {isSaving && <SavingIndicator />}
+        {!isUltraMode && lastUpdatedTimestamp && (
+          <Tooltip content={`Última modificación: ${formatDateRelative(lastUpdatedTimestamp)} a las ${formatTime(lastUpdatedTimestamp)}`}>
+            <Clock size={12} className="message-node__timestamp-icon" aria-hidden="true" />
+          </Tooltip>
+        )}
+      </div>
+    </header>
+  );
+}); // Corregido el cierre del componente MessageNodeHeader
+
+MessageNodeHeader.propTypes = {
+  id: PropTypes.string.isRequired,
+  titleFromData: PropTypes.string,
+  messageType: PropTypes.string,
+  isUltraMode: PropTypes.bool,
+  isSaving: PropTypes.bool,
+  isSelected: PropTypes.bool,
+  onDoubleClickHeader: PropTypes.func,
+  lastUpdatedTimestamp: PropTypes.string, // Cambiado de number a string si es un timestamp ISO
+  disableAnimations: PropTypes.bool // PropType para disableAnimations
+};
+
+/**
+ * Componente para el contenido del nodo de mensaje
+ * @param {Object} props - Propiedades del componente
+ * @param {string} props.id - Identificador único del nodo
+ * @param {Object} props.data - Datos del nodo
+ * @param {boolean} props.isEditing - Indica si el nodo está en modo edición
+ * @param {boolean} props.isUltraMode - Indica si está en modo ultra rendimiento
+ * @param {Function} props.onUpdateNodeData - Función para actualizar los datos del nodo
+ * @param {Object} props.safeData - Datos procesados del nodo (con valores por defecto)
+ * @param {string} props.message - Mensaje actual del nodo
+ * @param {Array} props.variables - Variables actuales del nodo
+ * @param {Function} props.handleMessageChange - Función para manejar cambios en el mensaje
+ * @param {Function} props.handleSave - Función para guardar cambios
+ * @param {Function} props.handleCancel - Función para cancelar edición
+ * @param {Function} props.handleAddVariable - Función para agregar una nueva variable
+ * @param {Function} props.handleUpdateVariable - Función para actualizar una variable existente
+ * @param {Function} props.handleDeleteVariable - Función para eliminar una variable
+ * @returns {JSX.Element} - Contenido del nodo de mensaje
+ */
+const MessageNodeContent = memo(({
+  id, 
+  message,
+  variables,
+  isEditing,
+  isUltraMode,
+  textareaRef,
+  handleMessageChange,
+  handleSave,
+  handleCancel,
+  onUpdateNodeData,
+  safeData, 
+  DEFAULT_MESSAGE,
+  handleAddVariable,
+  handleUpdateVariable,
+  handleDeleteVariable
+}) => {
+  const renderUltraContent = () => (
+    <div className="message-node__content message-node__content--ultra">
+      <p className="message-node__ultra-text">
+        {(() => {
+          if (!safeData.message) return DEFAULT_MESSAGE;
+          const processedMessage = replaceVariablesInMessage(safeData.message, safeData.variables);
+          return processedMessage.substring(0, 50) + (processedMessage.length > 50 ? '...' : '');
+        })()}
+      </p>
+      {safeData.variables && safeData.variables.length > 0 && (
+        <div className="message-node__variables-count-ultra">
+          {safeData.variables.length} var.
+        </div>
+      )}
+    </div>
+  );
+
+  return (
+    <main className="message-node__content" role="main" id={`message-node-content-${id}`}>
+      {isUltraMode && !isEditing ? (
+        renderUltraContent()
+      ) : (
+        <>
+          <div className={`message-node__editor ${isEditing ? 'message-node__editor--active' : ''}`}>
+            {isEditing && ( // Conditionally render editor internals
+              <>
+                <textarea
+                  ref={textareaRef}
+                  className="message-node__textarea nodrag"
+                  value={message} // Usa estado local currentMessage
+                  onChange={handleMessageChange}
+                  placeholder={DEFAULT_MESSAGE}
+                  aria-label="Editor de mensaje"
+                  rows={4} 
+                  onKeyDown={(e) => {
+                    if (e.key === 'Escape') {
+                      e.stopPropagation(); // Evitar que se propague a otros listeners de 'Escape'
+                      handleCancel();
+                    }
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                      e.preventDefault();
+                      handleSave();
+                    }
+                  }}
+                />
+                <VariableEditor
+                  nodeId={id}
+                  variables={variables} // Usar el estado local 'variables' que se sincroniza con props
+                  onAddVariable={handleAddVariable} // Conectar a la función correcta de MessageNode
+                  onUpdateVariable={handleUpdateVariable} // Conectar a la función correcta de MessageNode
+                  onDeleteVariable={handleDeleteVariable} // Conectar a la función correcta de MessageNode
+                  isUltraPerformanceMode={isUltraMode && !isEditing} /* VariableEditor completo si se está editando */
+                />
+                <div className="message-node__editor-actions">
+                  <Tooltip content="Guardar cambios (Ctrl+Enter o Cmd+Enter)">
+                    <button onClick={handleSave} className="message-node__editor-button message-node__editor-button--save" aria-label="Guardar mensaje">
+                      <Send size={14} /> Guardar
+                    </button>
+                  </Tooltip>
+                  <Tooltip content="Descartar cambios (Esc)">
+                    <button onClick={handleCancel} className="message-node__editor-button message-node__editor-button--cancel" aria-label="Cancelar edición">
+                      <X size={14} /> Cancelar
+                    </button>
+                  </Tooltip>
+                </div>
+              </>
+            )}
+          </div>
+
+          <div className={`message-node__preview-display ${!isEditing ? 'message-node__preview-display--active' : ''}`}>
+            {!isEditing && ( // Conditionally render preview internals
+              <MessagePreview
+                message={safeData.message || DEFAULT_MESSAGE} // Muestra el mensaje guardado de safeData
+                variables={safeData.variables}
+                isUltraPerformanceMode={isUltraMode}
+              />
+            )}
+          </div>
+        </>
+      )}
+    </main>
+  );
+});
+
+MessageNodeContent.propTypes = {
+  id: PropTypes.string.isRequired,
+  message: PropTypes.string,
+  variables: PropTypes.array,
+  isEditing: PropTypes.bool,
+  isUltraMode: PropTypes.bool,
+  onUpdateNodeData: PropTypes.func.isRequired,
+  safeData: PropTypes.object.isRequired,
+  DEFAULT_MESSAGE: PropTypes.string,
+  handleMessageChange: PropTypes.func,
+  handleSave: PropTypes.func,
+  handleCancel: PropTypes.func,
+  handleAddVariable: PropTypes.func.isRequired,
+  handleUpdateVariable: PropTypes.func.isRequired,
+  handleDeleteVariable: PropTypes.func.isRequired,
+};
+
+/**
+ * Componente para el indicador de guardado
+ * @returns {JSX.Element} - Indicador de guardado
+ */
+const SavingIndicator = () => {
+  return (
+    <div className="message-node__saving-indicator" aria-live="polite" aria-label="Guardando cambios">
+      <Loader2 size={14} className="animate-spin" /> {/* Usando Loader2 de lucide-react con animación */} 
+      <span>Guardando...</span>
+    </div>
+  );
+};
+
+/**
+ * Nombre para mostrar en DevTools
+ */
+SavingIndicator.displayName = 'SavingIndicator';
 
 /**
  * Componente principal MessageNode
@@ -474,6 +753,7 @@ const MessageNode = memo(({
   onDuplicate = () => {},
   onDelete = () => {}
 }) => {
+  console.log(`[MessageNode ${id} RENDER] data.variables received in props:`, data?.variables ? JSON.parse(JSON.stringify(data.variables)) : data?.variables);
   // Acceso seguro a los datos del nodo
   const safeData = useMemo(() => ({
     message: data?.message || DEFAULT_MESSAGE,
@@ -486,6 +766,11 @@ const MessageNode = memo(({
   // Usar performanceMode como fallback para isUltraPerformanceMode (compatibilidad)
   const isUltraMode = isUltraPerformanceMode || performanceMode || false;
   
+  // Obtener el estado de las animaciones globales desde Zustand
+  const globalDisableAnimations = useFlowStore(state => state.disableAnimations);
+  // Determinar si las animaciones deben estar deshabilitadas para este nodo
+  const disableAnimations = isUltraMode || globalDisableAnimations;
+
   // Integramos Zustand para operaciones específicas del nodo
   const { 
     updateMessageNodeContent,
@@ -518,13 +803,43 @@ const MessageNode = memo(({
   const [isEditing, setIsEditing] = useState(false);
   const [showVariables, setShowVariables] = useState(false);
   const [message, setMessage] = useState(safeData.message);
-  const [variables, setVariables] = useState(safeData.variables);
+  const [variables, setVariables] = useState(data.variables || []); // Inicializar desde data.variables
+  const [nodeState, setNodeState] = useState({ isSaving: false });
+
+  // Sincronizar estado local con props actualizadas desde Zustand
+  useEffect(() => {
+    const currentId = id || data.id; // Asegurar que tenemos un ID para los logs
+    console.log(`[MessageNode ${currentId}] useEffect SYNC START. data.variables from props:`, JSON.parse(JSON.stringify(data.variables || [])));
+    console.log(`[MessageNode ${currentId}] useEffect SYNC. Local 'variables' state BEFORE sync:`, JSON.parse(JSON.stringify(variables || [])));
+
+    const newPropsVars = data.variables || [];
+    const currentLocalVars = variables || [];
+
+    // Comparación profunda (simplificada con JSON.stringify, considera una librería para casos complejos)
+    const newPropsVarsString = JSON.stringify(newPropsVars);
+    const currentLocalVarsString = JSON.stringify(currentLocalVars);
+
+    if (newPropsVarsString !== currentLocalVarsString) {
+      console.log(`[MessageNode ${currentId}] Variables differ. Updating local state.`);
+      console.log(`[MessageNode ${currentId}]   Current local (string):`, currentLocalVarsString);
+      console.log(`[MessageNode ${currentId}]   New from props (string):`, newPropsVarsString);
+      console.log(`[MessageNode ${currentId}] Calling setVariables with:`, JSON.parse(JSON.stringify(newPropsVars)));
+      setVariables(newPropsVars);
+      console.log(`[MessageNode ${currentId}] Called setVariables.`);
+    } else {
+      console.log(`[MessageNode ${currentId}] Variables are the same (strings). No local state update needed.`);
+    }
+    console.log(`[MessageNode ${currentId}] useEffect SYNC END.`);
+  }, [data.variables, id]); // Depender directamente de data.variables
+
+  useEffect(() => {
+    setMessage(safeData.message);
+  }, [safeData.message]);
   
   // Compatibilidad con el setNodes proporcionado por props
   const setNodes = legacySetNodes || useFlowStore.getState().setNodes;
   
   // Referencias
-  const textareaRef = useRef(null);
   const nodeRef = useRef(null);
   
   // Hooks personalizados eliminados ya que implementamos la lógica directamente
@@ -540,7 +855,7 @@ const MessageNode = memo(({
    * Solo si no está en modo ultra rendimiento
    */
   const handleDoubleClick = useCallback(() => {
-    if (!isEditing && !isUltraMode) {
+    if (!isEditing) { // Permitir edición incluso en modo ultra
       setIsEditing(true);
     }
   }, [isEditing, isUltraMode]);
@@ -563,16 +878,6 @@ const MessageNode = memo(({
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [isEditing, message, variables]);
-
-  /**
-   * Enfocar textarea al entrar en modo edición
-   */
-  useEffect(() => {
-    if (isEditing && textareaRef.current) {
-      textareaRef.current.focus();
-      textareaRef.current.setSelectionRange(0, textareaRef.current.value.length);
-    }
-  }, [isEditing]);
 
   /**
    * Guardar cambios en el nodo
@@ -642,7 +947,7 @@ const MessageNode = memo(({
    */
   const handleAddVariable = useCallback((newVar) => {
     // Mantener el estado local actualizado para la edición en curso
-    setVariables(prev => [...prev, newVar]);
+    setVariables(prev => [...(prev || []), newVar]);
     
     // Si no estamos en modo edición, actualizar también a través de Zustand
     if (!isEditing && addMessageNodeVariable) {
@@ -740,7 +1045,11 @@ const MessageNode = memo(({
         <span className="message-node__ultra-title">{messageType}</span>
       </div>
       <div className="message-node__ultra-message">
-        {message.length > 50 ? `${message.substring(0, 50)}...` : message}
+        {(() => {
+          if (!safeData.message) return DEFAULT_MESSAGE; // O un string vacío si es preferible
+          const processed = replaceVariablesInMessage(safeData.message, safeData.variables);
+          return processed.length > 50 ? `${processed.substring(0, 50)}...` : processed;
+        })()}
       </div>
     </div>
   );
@@ -760,159 +1069,35 @@ const MessageNode = memo(({
     >
       <ContextMenu options={contextMenuOptions}>
         {/* Cabecera del nodo */}
-        <header className="message-node__header">
-          <div className="message-node__title">
-            <MessageNodeIcon 
-              type={messageType} 
-              isUltraPerformanceMode={isUltraMode} 
-            />
-            <span>
-              {messageType === MESSAGE_TYPES.USER ? 'Usuario' : 
-               messageType === MESSAGE_TYPES.BOT ? 'Bot' : 
-               messageType === MESSAGE_TYPES.SYSTEM ? 'Sistema' : 
-               messageType === MESSAGE_TYPES.ERROR ? 'Error' : 
-               messageType === MESSAGE_TYPES.WARNING ? 'Advertencia' : 
-               messageType === MESSAGE_TYPES.INFO ? 'Información' : 
-               messageType === MESSAGE_TYPES.QUESTION ? 'Pregunta' : 'Mensaje'}
-            </span>
-          </div>
-          
-          {/* Botón para mostrar/ocultar variables */}
-          {!isEditing && variables && variables.length > 0 && !isUltraMode && (
-            <Tooltip content={showVariables ? "Ocultar variables" : "Mostrar variables"}>
-              <button
-                type="button"
-                className="message-node__variable-button"
-                onClick={() => setShowVariables(prev => !prev)}
-                aria-label={showVariables ? "Ocultar variables" : "Mostrar variables"}
-                aria-expanded={showVariables}
-                aria-controls="variables-list"
-              >
-                {showVariables ? 
-                  <ChevronUp size={16} aria-hidden="true" /> : 
-                  <ChevronDown size={16} aria-hidden="true" />
-                }
-              </button>
-            </Tooltip>
-          )}
-        </header>
-
-        {/* Contenido principal */}
-        <main className="message-node__content">
-          {isUltraMode && !isEditing ? (
-            renderUltraPerformanceContent()
-          ) : isEditing ? (
-            <div 
-              className="message-node__edit-area"
-              role="form"
-              aria-label="Editar mensaje"
-            >
-              <label htmlFor={`message-textarea-${id}`} className="sr-only">
-                Contenido del mensaje
-              </label>
-              <textarea
-                id={`message-textarea-${id}`}
-                ref={textareaRef}
-                className="message-node__textarea"
-                value={message}
-                onChange={handleMessageChange}
-                onKeyDown={handleKeyDown}
-                placeholder={DEFAULT_MESSAGE}
-                aria-label="Contenido del mensaje"
-                aria-describedby={`message-help-${id}`}
-                rows={4}
-                autoFocus
-                spellCheck="true"
-                data-testid="message-node-textarea"
-              />
-              <div id={`message-help-${id}`} className="sr-only">
-                Presiona Enter para crear un salto de línea. Presiona Ctrl+Enter o Cmd+Enter para guardar los cambios.
-              </div>
-              
-              <VariableEditor
-                variables={variables}
-                onAddVariable={handleAddVariable}
-                onUpdateVariable={handleUpdateVariable}
-                onDeleteVariable={handleDeleteVariable}
-                isUltraPerformanceMode={isUltraMode}
-              />
-              
-              <div className="message-node__actions">
-                <button
-                  type="button"
-                  className="message-node__button message-node__button--secondary"
-                  onClick={cancelEdit}
-                  aria-label="Cancelar edición"
-                  tabIndex="0"
-                  title="Cancelar la edición del mensaje"
-                >
-                  <X size={14} className="message-node__button-icon" aria-hidden="true" />
-                  <span>Cancelar</span>
-                </button>
-                <button
-                  type="button"
-                  className="message-node__button"
-                  onClick={saveChanges}
-                  aria-label="Guardar cambios"
-                  tabIndex="0"
-                  title="Guardar los cambios realizados"
-                >
-                  <Send size={14} className="message-node__button-icon" aria-hidden="true" />
-                  <span>Guardar</span>
-                </button>
-              </div>
-            </div>
-          ) : (
-            <>
-              <MessagePreview 
-                message={message} 
-                variables={variables} 
-                isUltraPerformanceMode={isUltraMode}
-              />
-              
-              {/* Lista de variables (visible solo cuando showVariables es true) */}
-              {showVariables && variables && variables.length > 0 && (
-                <div 
-                  id="variables-list"
-                  className="message-node__variables"
-                  role="region"
-                  aria-label="Variables del mensaje"
-                  tabIndex={0}
-                >
-                  <div className="message-node__variables-title">
-                    <span>Variables</span>
-                    <span className="sr-only">{variables.length} variables disponibles</span>
-                  </div>
-                  <div 
-                    className="message-node__variables-list"
-                    role="list"
-                    aria-label="Lista de variables del mensaje"
-                  >
-                    {variables.map((variable, index) => (
-                      <div 
-                        key={`var-preview-${index}`} 
-                        className="message-node__variable"
-                        role="listitem"
-                        aria-label={`Variable ${variable.name} con valor ${variable.value || 'vacío'}`}
-                        tabIndex={0}
-                      >
-                        <span className="message-node__variable-name" title={`Nombre de variable: ${variable.name}`}>{variable.name}</span>
-                        <span className="message-node__variable-value" title={`Valor: ${variable.value || 'vacío'}`}>
-                          <CornerDownRight 
-                            size={12} 
-                            style={{ marginRight: '4px', opacity: 0.7 }} 
-                            aria-hidden="true" 
-                          />
-                          {variable.value || '(vacío)'}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </>
-          )}
-        </main>
+        <MessageNodeHeader
+          id={id}
+          titleFromData={safeData.title} 
+          messageType={safeData.type} // Usar safeData.type que es el tipo procesado
+          isUltraMode={isUltraMode}
+          isSaving={nodeState.isSaving} // Usar el estado local isSaving
+          isSelected={selected}
+          onDoubleClickHeader={handleDoubleClick}
+          lastUpdatedTimestamp={safeData.lastUpdated}
+          disableAnimations={disableAnimations} // Pasar la prop disableAnimations
+        />
+        
+        {/* Contenido principal del nodo */}
+        <MessageNodeContent
+          id={id}
+          message={message} 
+          variables={variables} 
+          isEditing={isEditing}
+          isUltraMode={isUltraMode}
+          onUpdateNodeData={updateMessageNodeData}
+          safeData={safeData}
+          handleMessageChange={handleMessageChange}
+          handleSave={saveChanges}
+          handleCancel={cancelEdit}
+          DEFAULT_MESSAGE={DEFAULT_MESSAGE}
+          handleAddVariable={handleAddVariable}
+          handleUpdateVariable={handleUpdateVariable}
+          handleDeleteVariable={handleDeleteVariable}
+        />
 
         {/* Pie del nodo con información de última actualización */}
         {!isEditing && safeData.lastUpdated && !isUltraMode && (
@@ -979,18 +1164,10 @@ const MessageNode = memo(({
       </span>
     </div>
   );
-});
+}); // Corrected closing for: const MessageNode = memo(...) 
 
-/**
- * Nombre para mostrar en DevTools
- * @type {string}
- */
 MessageNode.displayName = 'MessageNode';
 
-/**
- * Validación de propiedades
- * @type {Object}
- */
 MessageNode.propTypes = {
   data: PropTypes.shape({
     message: PropTypes.string,
@@ -1017,10 +1194,4 @@ MessageNode.propTypes = {
   performanceMode: PropTypes.bool // Alias para isUltraPerformanceMode (compatibilidad)
 };
 
-// Los valores predeterminados ahora están definidos directamente en los parámetros de la función
-
-/**
- * Exportar el componente MessageNode
- * Memoizado para evitar renderizados innecesarios
- */
 export default MessageNode;

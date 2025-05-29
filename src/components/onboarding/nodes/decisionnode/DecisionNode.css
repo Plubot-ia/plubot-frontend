@@ -1,196 +1,406 @@
-/* DecisionNode.css - Versión Premium 4.0 */
-
-/* Importación de fuentes premium */
+/* DecisionNode.css - Versión Elite 5.0 */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
-/* Variables CSS para el nodo de decisión - Nivel Premium */
 :root {
-  /* Paleta de colores refinada */
-  --node-decision-bg: linear-gradient(145deg, #ffffff, #f8fafc);
-  --node-decision-bg-solid: #f8fafc;
-  --node-decision-border: #d1d5db;
-  --node-decision-shadow: 0 6px 24px rgba(0, 0, 0, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04);
-  --node-decision-accent: 37, 99, 235; /* Azul vibrante en formato RGB */
-  --node-decision-accent-color: rgba(var(--node-decision-accent), 1);
-  --node-decision-accent-light: rgba(var(--node-decision-accent), 0.1);
-  
-  /* Colores para condiciones */
-  --node-decision-true: 22, 163, 74; /* Verde en formato RGB */
-  --node-decision-false: 220, 38, 38; /* Rojo en formato RGB */
-  --node-decision-default: var(--node-decision-accent);
-  --node-decision-true-color: rgba(var(--node-decision-true), 1);
-  --node-decision-false-color: rgba(var(--node-decision-false), 1);
-  --node-decision-true-light: rgba(var(--node-decision-true), 0.15);
-  --node-decision-false-light: rgba(var(--node-decision-false), 0.15);
-  
-  /* Tipografía premium */
-  --node-decision-font: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --text-primary: #1f2937; /* Gris oscuro para mejor contraste */
-  --text-secondary: #4b5563; /* Gris medio para texto secundario */
-  --text-tertiary: #9ca3af; /* Gris claro para elementos menos importantes */
-  
-  /* Dimensiones y espaciado mejorado */
+  --node-decision-primary-start: #4F46E5;
+  --node-decision-primary-end: #2563EB;
+  --node-decision-primary-accent-rgb: 99, 102, 241;
+  --node-decision-primary-accent-color: rgba(var(--node-decision-primary-accent-rgb), 1);
+  --node-decision-text-color: #FFFFFF;
+  --node-decision-text-secondary-color: #E0E7FF;
+  --node-decision-bg-gradient: linear-gradient(145deg, var(--node-decision-primary-start), var(--node-decision-primary-end));
+  --node-decision-border-color: rgba(255, 255, 255, 0.2);
+  --node-decision-border-color-hover: rgba(255, 255, 255, 0.4);
+  --node-decision-inner-bg: rgba(255, 255, 255, 0.05);
+  --node-decision-shadow-base: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
+  --node-decision-shadow-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.15), 0 4px 6px -2px rgba(0, 0, 0, 0.1);
+  --node-decision-shadow-selected: 0 0 0 3px rgba(var(--node-decision-primary-accent-rgb), 0.5), 0 10px 20px rgba(var(--node-decision-primary-accent-rgb), 0.2);
+  --node-decision-font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --node-decision-font-size: 14px;
+  --node-decision-font-size-small: 12px;
+  --node-decision-font-weight-normal: 400;
+  --node-decision-font-weight-medium: 500;
+  --node-decision-font-weight-semibold: 600;
   --node-decision-border-radius: 12px;
-  --node-decision-padding: 1.5rem;
-  --node-decision-gap: 1rem;
-  --node-decision-condition-border-radius: 8px;
+  --node-decision-padding: 20px;
+  --node-decision-gap: 12px;
+  --node-decision-input-radius: 8px;
   --node-decision-button-radius: 6px;
-  --node-decision-input-radius: 6px;
-  
-  /* Transiciones y animaciones refinadas */
-  --node-decision-transition: all 0.25s cubic-bezier(0.25, 1, 0.5, 1);
-  --node-decision-transition-fast: all 0.15s cubic-bezier(0.25, 1, 0.5, 1);
-  
-  /* Efectos visuales */
-  --node-decision-backdrop-filter: blur(8px);
-  --node-decision-glass-bg: rgba(255, 255, 255, 0.7);
-  --node-decision-glass-border: rgba(255, 255, 255, 0.3);
-  
-  /* Variables para modo ultra rendimiento */
-  --node-decision-ultra-bg: #f1f5f9;
-  --node-decision-ultra-border: #cbd5e1;
-  --node-decision-ultra-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  --node-decision-transition-duration: 0.2s;
+  --node-decision-transition-timing: ease-in-out;
+  --node-decision-input-bg: #FFFFFF; /* Fondo blanco opaco para inputs */
+  --node-decision-input-text-color: #333333; /* Texto oscuro para contraste en input claro */
+  --node-decision-input-placeholder-color: #AAAAAA;
+  --node-decision-input-border-color: #D1D5DB; /* Borde gris claro para input */
+  --node-decision-input-bg-focus: #FFFFFF; /* Mantener fondo blanco en focus */
+  --node-decision-input-border-focus-color: var(--node-decision-primary-start, #4F46E5); /* Borde de acento en focus */
+  --node-decision-ultra-bg: #EBF4FF;
+  --node-decision-ultra-border-color: #BEE3F8;
+  --node-decision-ultra-text-color: #2C5282;
+  --node-decision-ultra-padding: 16px;
   --node-decision-ultra-border-width: 1px;
-  --node-decision-ultra-padding: 1rem;
-  --node-decision-ultra-transition: none;
-  --node-decision-ultra-animation: none;
+  --node-decision-true-rgb: 34, 197, 94;
+  --node-decision-false-rgb: 239, 68, 68;
+  --node-decision-default-rgb: var(--node-decision-primary-accent-rgb);
+}
 
-  /* Variables for Ultra Blue theme (from JSX) */
-  --node-decision-ultra-blue-bg: #60a5fa;
-  --node-decision-ultra-blue-border-color: rgba(30, 58, 138, 0.3);
-  --node-decision-ultra-blue-text-color: #1e3a8a;
-  --node-decision-ultra-blue-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  --node-decision-ultra-blue-border-width: 1px;
-  
-  }
-
-/* Soporte para modo oscuro */
 @media (prefers-color-scheme: dark) {
   :root {
-    /* Variables para modo oscuro general */
-    --node-decision-dark-bg: linear-gradient(145deg, #1f2937, #111827);
-    --node-decision-dark-bg-solid: #1f2937;
-    --node-decision-dark-border: #4b5563;
-    --node-decision-dark-text: #f3f4f6;
-    --node-decision-dark-text-secondary: #9ca3af;
+    --node-decision-primary-start: #3730A3;
+    --node-decision-primary-end: #1D4ED8;
+    --node-decision-primary-accent-rgb: 79, 70, 229;
+    --node-decision-text-color: #F3F4F6;
+    --node-decision-text-secondary-color: #9CA3AF;
+    --node-decision-border-color: rgba(255, 255, 255, 0.15);
+    --node-decision-border-color-hover: rgba(255, 255, 255, 0.3);
+    --node-decision-inner-bg: rgba(0, 0, 0, 0.1);
+    --node-decision-shadow-base: 0 4px 6px rgba(0, 0, 0, 0.2), 0 1px 3px rgba(0, 0, 0, 0.15);
+    --node-decision-shadow-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.25), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
+    --node-decision-ultra-bg: #1E293B;
+    --node-decision-ultra-border-color: #334155;
+    --node-decision-ultra-text-color: #94A3B8;
+    --node-decision-bg-hover-overlay-dark: rgba(255, 255, 255, 0.08); /* Nueva variable para overlay en hover oscuro */
+    /* Variables de input para modo oscuro */
+    --node-decision-input-bg: #FFFFFF; /* Fondo blanco para input en modo oscuro */
+    --node-decision-input-text-color: #222222; /* Texto oscuro para contraste con fondo blanco en modo oscuro */
+    --node-decision-input-placeholder-color: #757575; /* Placeholder gris medio en modo oscuro */
+    /* --node-decision-input-border-color: rgba(255, 255, 255, 0.2); Ya se define en :root y se hereda, o se puede sobreescribir si es necesario */
+    --node-decision-input-bg-focus: #FFFFFF; /* Mantener fondo blanco en focus en modo oscuro */
+    --node-decision-input-border-focus-color: var(--node-decision-primary-accent-color-dark, var(--node-decision-primary-accent-color));
+  }
 
-    /* Variables para modo oscuro del tema Ultra Blue */
-    --node-decision-ultra-blue-bg: #2563eb; /* Azul más oscuro para fondo ultra en dark mode */
-    --node-decision-ultra-blue-border-color: rgba(30, 58, 138, 0.6); /* Borde ligeramente más opaco */
-    --node-decision-ultra-blue-text-color: #dbeafe; /* Texto más claro para contraste */
-    --node-decision-ultra-blue-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Sombra un poco más oscura */
-
-    /* Aquí se podrían redefinir otras variables si es necesario para el modo oscuro, 
-       por ejemplo, los colores de acento, texto primario/secundario, etc., 
-       si los valores por defecto de :root no son adecuados para el fondo oscuro. 
-       Por ahora, solo se sobreescriben los directamente relacionados con 'dark' y 'ultra-blue' en dark. 
-       El CSS actual ya tiene algunas variables como --text-primary que son oscuras, 
-       lo que podría necesitar ajuste para el modo oscuro si el fondo del nodo cambia drásticamente. 
-       Sin embargo, .decision-node usa 'color: white;' que funciona bien en fondos oscuros. 
-       El .decision-node--ultra usa --node-decision-ultra-blue-text-color, que ahora tendrá variante dark. 
-    */
+  /* Estilo de hover específico para modo oscuro */
+  .decision-node:hover {
+    /* Usar filter para aclarar también en modo oscuro, o ajustar el overlay si se prefiere */
+    filter: brightness(120%); 
+    /* background: linear-gradient(var(--node-decision-bg-hover-overlay-dark), var(--node-decision-bg-hover-overlay-dark)), 
+                var(--node-decision-bg-gradient); */
+    /* Las propiedades transform, box-shadow y border-color se heredan o se definen aquí si es necesario */
   }
 }
 
-/**
- * Componente DecisionNode
- * Estructura BEM (Block Element Modifier)
- */
-
-/* Contenedor principal del nodo */
 .decision-node {
-  /* Diseño premium con degradado suave de azul claro a azul oscuro */
-  background: linear-gradient(145deg, #bfdbfe, #3b82f6); /* Degradado de azul claro a azul medio */
-  border: 1px solid rgba(30, 58, 138, 0.3);
+  position: absolute !important; /* Asegurar que React Flow lo maneje correctamente */
+  background: var(--node-decision-bg-gradient);
+  border: 1px solid var(--node-decision-border-color);
   border-radius: var(--node-decision-border-radius);
   padding: var(--node-decision-padding);
-  box-shadow: 0 8px 24px rgba(59, 130, 246, 0.25), 0 4px 8px rgba(59, 130, 246, 0.15);
-  min-width: 220px;
-  min-height: 140px;
+  box-shadow: var(--node-decision-shadow-base);
+  min-width: 250px;
+  min-height: 150px;
   position: relative;
-  font-family: var(--node-decision-font);
-  color: white; /* Texto blanco para contraste */
-  transition: var(--node-decision-transition);
+  font-family: var(--node-decision-font-family);
+  font-size: var(--node-decision-font-size);
+  color: var(--node-decision-text-color);
+  transition: all var(--node-decision-transition-duration) var(--node-decision-transition-timing);
   overflow: visible;
   display: flex;
   flex-direction: column;
   gap: var(--node-decision-gap);
   will-change: transform, box-shadow, opacity;
-  
-  /* Optimizaciones de rendimiento */
-  contain: layout paint;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   backface-visibility: hidden;
 }
 
-/* Efecto de borde con gradiente */
-.decision-node::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  z-index: -1;
-  margin: -1px;
-  border-radius: inherit;
-  background: linear-gradient(to right bottom, rgba(var(--node-decision-accent), 0.3), transparent);
-  opacity: 0.5;
-  transition: opacity 0.3s ease;
-}
-
-/* Hover effect para el borde con gradiente */
-.decision-node:hover::before {
-  opacity: 0.8;
-}
-
-/* Animaciones refinadas */
 @keyframes decisionNodeAppear {
-  0% {
-    opacity: 0;
-    transform: translateY(12px) scale(0.97);
-    filter: blur(3px);
-  }
-  50% {
-    opacity: 0.8;
-    filter: blur(1px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-    filter: blur(0);
-  }
+  0% { opacity: 0; transform: translateY(10px) scale(0.98); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
 }
-
-/* Animación para el nodo */
 .decision-node {
-  animation: decisionNodeAppear 0.4s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+  animation: decisionNodeAppear 0.3s var(--node-decision-transition-timing) forwards;
 }
 
-/* Estado seleccionado - feedback visual premium */
-.decision-node--selected {
-  box-shadow: 0 8px 32px rgba(var(--node-decision-accent), 0.2), 0 0 0 3px rgba(var(--node-decision-accent), 0.3);
+.decision-node:hover {
   transform: translateY(-2px) scale(1.01);
+  box-shadow: var(--node-decision-shadow-hover);
+  border-color: var(--node-decision-border-color-hover);
+  filter: brightness(110%); /* Aclarar el nodo en hover */
+}
+
+.decision-node.selected,
+.decision-node[data-selected="true"] {
+  box-shadow: var(--node-decision-shadow-selected);
+  transform: translateY(-1px) scale(1.005);
   z-index: 10;
 }
 
-.decision-node--selected::before {
-  opacity: 0.9;
-  background: linear-gradient(to right bottom, rgba(var(--node-decision-accent), 0.5), rgba(var(--node-decision-accent), 0.1));
+.decision-node.editing,
+.decision-node[data-editing="true"] {
+  box-shadow: var(--node-decision-shadow-selected);
+  z-index: 20;
 }
+
+.decision-node.ultra-performance {
+  background: var(--node-decision-ultra-bg);
+  border: var(--node-decision-ultra-border-width) solid var(--node-decision-ultra-border-color);
+  color: var(--node-decision-ultra-text-color);
+  box-shadow: none;
+  padding: var(--node-decision-ultra-padding);
+  animation: none !important;
+  transition: none !important;
+}
+
+.decision-node.ultra-performance .react-flow__handle {
+  background-color: var(--node-decision-ultra-text-color) !important;
+  border-color: var(--node-decision-ultra-bg) !important;
+  box-shadow: none !important;
+}
+
+.nodrag {
+  user-select: text !important;
+  -webkit-user-select: text !important;
+  -moz-user-select: text !important;
+  -ms-user-select: text !important;
+  cursor: text !important;
+}
+.react-flow__node-decision .nodrag::selection {
+  background-color: rgba(var(--node-decision-primary-accent-rgb), 0.3);
+  color: var(--node-decision-text-color);
+}
+.decision-node.ultra-performance .nodrag::selection {
+  background-color: rgba(var(--node-decision-ultra-text-color), 0.3);
+  color: var(--node-decision-ultra-bg);
+}
+
+.decision-node__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: var(--node-decision-gap);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: var(--node-decision-gap);
+}
+.decision-node.ultra-performance .decision-node__header {
+  border-bottom-color: rgba(var(--node-decision-ultra-text-color), 0.2);
+}
+
+.decision-node__title {
+  font-weight: var(--node-decision-font-weight-semibold);
+  font-size: calc(var(--node-decision-font-size) + 2px);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.decision-node__title svg {
+  width: 18px;
+  height: 18px;
+  color: var(--node-decision-primary-accent-color);
+}
+.decision-node.ultra-performance .decision-node__title svg {
+  color: var(--node-decision-ultra-text-color);
+}
+
+.decision-node__content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--node-decision-gap);
+}
+
+.decision-node__question-wrapper {
+  position: relative;
+  margin-top: 8px; /* Añadir espacio encima del textarea */
+  width: 100% !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+.decision-node__question-input,
+.decision-node__condition-input {
+  background-color: var(--node-decision-input-bg);
+  color: var(--node-decision-input-text-color);
+  border: 1px solid var(--node-decision-input-border-color);
+  border-radius: var(--node-decision-input-radius);
+  padding: 10px;
+  font-family: var(--node-decision-font-family);
+  font-size: var(--node-decision-font-size);
+  transition: border-color var(--node-decision-transition-duration) var(--node-decision-transition-timing), background-color var(--node-decision-transition-duration) var(--node-decision-transition-timing);
+  width: 100%;
+}
+.decision-node__question-input::placeholder,
+.decision-node__condition-input::placeholder {
+  color: var(--node-decision-input-placeholder-color);
+  opacity: 1; /* Firefox */
+}
+
+.decision-node__question-input:focus,
+.decision-node__condition-input:focus {
+  outline: none;
+  background-color: var(--node-decision-input-bg-focus);
+  border-color: var(--node-decision-input-border-focus-color);
+  box-shadow: 0 0 0 2px rgba(var(--node-decision-primary-accent-rgb, 60, 80, 220), 0.2); /* Usar fallback si la variable no está definida */
+}
+.decision-node.ultra-performance .decision-node__question-input {
+  background-color: #FFF; /* Simplified */
+}
+.decision-node.ultra-performance .decision-node__condition-input {
+  background-color: #FFF; /* Simplified */
+}
+.decision-node.ultra-performance .decision-node__question-input:focus,
+.decision-node.ultra-performance .decision-node__condition-input:focus {
+  border-color: var(--node-decision-ultra-text-color);
+}
+
+/* Estilo para resaltar variables {{variable}} */
+.variable-highlight {
+  background-color: rgba(var(--node-decision-primary-accent-rgb), 0.15);
+  color: var(--node-decision-text-color); /* Asegurar contraste, podría ser un color de acento también */
+  padding: 1px 3px;
+  border-radius: 4px;
+  font-weight: var(--node-decision-font-weight-medium);
+  font-size: 0.95em; /* Ligeramente más pequeño para encajar bien */
+}
+
+.decision-node__conditions-list {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--node-decision-gap) / 2);
+  padding-bottom: 20px; /* Añadir espacio debajo de los botones de condición para los handles */
+}
+.decision-node__condition-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  background-color: transparent;
+  border-radius: var(--node-decision-input-radius);
+  transition: background-color var(--node-decision-transition-duration) var(--node-decision-transition-timing);
+}
+.decision-node__condition-item:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+}
+.decision-node.ultra-performance .decision-node__condition-item:hover {
+  background-color: rgba(0,0,0,0.05);
+}
+
+.decision-node__button {
+  padding: 8px 12px; /* Simplified */
+}
+.decision-node__button:hover {
+  background-color: #3730A3;
+  transform: translateY(-1px);
+}
+.decision-node__button:active {
+  transform: translateY(0);
+}
+.decision-node__button--secondary {
+  background-color: var(--node-decision-inner-bg);
+  border: 1px solid var(--node-decision-border-color);
+  color: var(--node-decision-text-secondary-color);
+}
+.decision-node__button--secondary:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-color: var(--node-decision-border-color-hover);
+}
+.decision-node.ultra-performance .decision-node__button {
+  background-color: var(--node-decision-ultra-text-color);
+  color: var(--node-decision-ultra-bg);
+}
+.decision-node.ultra-performance .decision-node__button:hover {
+  background-color: #1A365D;
+}
+.decision-node.ultra-performance .decision-node__button--secondary {
+  background-color: transparent;
+  border: 1px solid var(--node-decision-ultra-text-color);
+  color: var(--node-decision-ultra-text-color);
+}
+
+.decision-node .react-flow__handle {
+  width: 12px;
+  height: 12px;
+  background-color: var(--node-decision-primary-accent-color);
+  border: 2px solid var(--node-decision-text-color);
+  border-radius: 50%;
+  box-shadow: 0 0 5px rgba(var(--node-decision-primary-accent-rgb), 0.5);
+  transition: all var(--node-decision-transition-duration) var(--node-decision-transition-timing);
+  z-index: 1;
+}
+.decision-node .react-flow__handle:hover {
+  transform: scale(1.2);
+  box-shadow: 0 0 10px rgba(var(--node-decision-primary-accent-rgb), 0.8);
+}
+.decision-node .react-flow__handle.connecting {
+  background-color: #10B981;
+  box-shadow: 0 0 10px #10B981;
+}
+.decision-node .react-flow__handle-target { /* Handle de ENTRADA (superior) */
+  top: -7px; /* Ajuste vertical para que sobresalga un poco */
+  left: 50% !important;
+  transform: translateX(-50%) !important; /* Asegurar centrado horizontal */
+}
+/* Regla base para TODOS los handles de salida con selector ultra-específico y mayor especificidad */
+.decision-node .decision-node__source-handles-wrapper > .react-flow__handle.react-flow__handle-bottom.decision-node__handle.react-flow__handle-source {
+  position: absolute !important;
+  top: auto !important;
+  bottom: -16px !important; /* Forzar el posicionamiento desde abajo */
+  left: auto !important; /* Permitir que el 'left' en línea controle la distribución horizontal */
+  transform: translateX(-50%) translateY(0px) !important; /* Base: Y=0 para el primer handle */
+
+  /* Estilos para consistencia y evitar interferencias */
+  box-sizing: border-box !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  width: 14px !important; /* Coincidir con el estilo en línea */
+  height: 14px !important; /* Coincidir con el estilo en línea */
+
+  /* Permitir que los estilos en línea definan la apariencia visual */
+  background-color: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  border-radius: 50% !important;
+  z-index: 100 !important;
+  transition: none !important;
+}
+
+/* Regla de COMPENSACIÓN para el SEGUNDO (y subsiguientes) handles de salida con mayor especificidad */
+.decision-node .decision-node__source-handles-wrapper > .react-flow__handle.react-flow__handle-bottom.decision-node__handle.react-flow__handle-source:nth-of-type(n+2) {
+  bottom: -16px !important; /* AÑADIDO: Ser explícito con el bottom también aquí */
+  /* Anula la transformación Y de la regla anterior y aplica la compensación */
+  transform: translateX(-50%) translateY(-28px) !important; /* Compensación: Y = -28px */
+}
+
+/* Contenedor para los handles de salida, asegura que 'left: %' funcione bien */
+.decision-node__source-handles-wrapper {
+  position: relative; /* Necesario para el posicionamiento absoluto de los handles hijos */
+  width: 100%;
+  /* height: 0; */ /* Los handles se posicionan fuera de este contenedor - PRUEBA: Comentado */
+  display: block; /* Asegurar que ocupe el espacio */
+}
+
+/* .decision-node__handles-container { */
+  /* Comentado para evitar ruleset vacío, el wrapper interno es el principal. */
+/* } */
+
+.decision-node__handle--condition-true .react-flow__handle {
+  background-color: rgba(var(--node-decision-true-rgb), 1);
+  box-shadow: 0 0 5px rgba(var(--node-decision-true-rgb), 0.5);
+}
+.decision-node__handle--condition-false .react-flow__handle {
+  background-color: rgba(var(--node-decision-false-rgb), 1);
+  box-shadow: 0 0 5px rgba(var(--node-decision-false-rgb), 0.5);
+}
+
+.decision-node-loading {
+  padding: var(--node-decision-padding);
+  color: var(--node-decision-text-secondary-color);
+  text-align: center;
+  font-family: var(--node-decision-font-family);
+}
+
 
 /* Estado hover - microinteracción elegante */
 .decision-node:hover {
   transform: translateY(-3px) scale(1.01);
-  box-shadow: 0 12px 28px rgba(37, 99, 235, 0.2), 0 4px 12px rgba(37, 99, 235, 0.1);
-  background: linear-gradient(145deg, rgba(37, 99, 235, 0.12), rgba(37, 99, 235, 0.2));
-  border: 1px solid rgba(37, 99, 235, 0.3);
+  /* Gradiente mucho más claro y vibrante para el hover */
+  background: linear-gradient(145deg, #A7A1F8, #D8BBF8); /* Tonos pastel de violeta/lavanda */
+  box-shadow: 0 8px 22px rgba(124, 58, 237, 0.15), 0 4px 10px rgba(124, 58, 237, 0.1);
+  border-color: rgba(255, 255, 255, 0.5);
 }
 
 /* Estado de edición - modo profesional */
-.decision-node--editing {
+.decision-node.editing, .decision-node--editing {
+  box-shadow: var(--node-decision-shadow-selected); /* Similar a selected para destacar */
+  z-index: 20;
   box-shadow: 0 12px 36px rgba(var(--node-decision-accent), 0.15), 0 0 0 3px rgba(var(--node-decision-accent), 0.3);
   z-index: 20;
   transform: translateY(-3px) scale(1.02);
@@ -202,6 +412,32 @@
 }
 
 /* Modo Ultra Rendimiento - optimizado pero elegante */
+.decision-node.ultra-performance, .decision-node--ultra {
+  background: var(--node-decision-ultra-bg);
+  border: var(--node-decision-ultra-border-width) solid var(--node-decision-ultra-border-color);
+  color: var(--node-decision-ultra-text-color);
+  box-shadow: none;
+  padding: var(--node-decision-ultra-padding);
+  animation: none !important; /* Desactivar animaciones */
+  transition: none !important; /* Desactivar transiciones */
+}
+
+.decision-node.ultra-performance .react-flow__handle,
+.decision-node--ultra .react-flow__handle {
+  background-color: var(--node-decision-ultra-text-color) !important;
+  border-color: var(--node-decision-ultra-bg) !important;
+  box-shadow: none !important;
+}
+
+/* Estilo para textareas con nodrag */
+.nodrag {
+  user-select: text; /* Permite seleccionar texto */
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+  /* La propiedad 'resize' para textareas se maneja mejor directamente en el elemento o su clase específica */
+}
+
 .decision-node--ultra {
   background: var(--node-decision-ultra-blue-bg);
   border: var(--node-decision-ultra-blue-border-width) solid var(--node-decision-ultra-blue-border-color);
@@ -385,6 +621,7 @@
   flex-direction: column;
   gap: 12px;
   flex: 1;
+  align-items: stretch !important; /* Forzar que los hijos ocupen el ancho */
 }
 
 /* Estilos para la pregunta */
@@ -403,6 +640,8 @@
   background-color: rgba(255, 255, 255, 0.3);
   min-height: 36px;
   word-break: break-word;
+  text-align: left !important; /* Forzar alineación de texto a la izquierda */
+  width: 100%; /* Asegurar que ocupe el ancho disponible */
 }
 
 .decision-node__question:hover {
@@ -418,23 +657,33 @@
   background-color: rgba(255, 255, 255, 0.2);
 }
 
+/* Wrapper para el componente de opciones, asegurar alineación a la izquierda */
+.decision-node__options-wrapper {
+  display: flex; /* Usar flex para controlar alineación del hijo */
+  justify-content: flex-start; /* Alinear el componente DecisionNodeOptions a la izquierda */
+  width: 100%; /* Asegurar que el wrapper ocupe el ancho completo */
+}
+
 .decision-node__question-input {
-  width: 100%;
   min-height: 60px;
   padding: 8px;
   border-radius: 6px;
   border: 1px solid var(--decision-border-normal);
-  background-color: white;
+  background-color: white; /* Usar var(--node-decision-input-bg) si se quiere consistencia */
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  color: var(--node-decision-input-text-color);
   font-size: 14px;
-  resize: vertical;
-  outline: none;
   line-height: 1.5;
+  resize: vertical;
+  box-shadow: var(--node-decision-shadow-input);
+  box-sizing: border-box !important;
+  width: 100% !important;
 }
 
 .decision-node__question-input:focus {
-  border-color: #d97706;
-  box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.3);
+  border-color: var(--node-decision-input-border-focus-color, #d97706); /* Usar variable con fallback */
+  box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.3); /* Considerar variable para esto también si existe */
+  outline: none; /* Buena práctica para estados de foco personalizados */
 }
 
 .decision-node__actions {
@@ -573,6 +822,16 @@
 
 .decision-node__condition:hover .decision-node__condition-actions {
   opacity: 1;
+}
+
+/* Barra de acciones para botones Guardar/Cancelar */
+.decision-node__actions-toolbar {
+  display: flex;
+  justify-content: space-between; /* O 'flex-end' si solo quieres alinearlos a la derecha con espacio */
+  align-items: center;
+  gap: var(--node-decision-gap, 10px);
+  margin-top: calc(var(--node-decision-gap, 10px) * 1.5); /* Espacio arriba de los botones */
+  padding: 0 var(--node-decision-padding-sm, 8px); /* Alinear con el padding general si es necesario */
 }
 
 .decision-node__condition-button {

@@ -94,7 +94,7 @@ const DecisionNodeHeader = memo(({
           type={iconType} 
           isUltraPerformanceMode={isUltraPerformanceMode} 
         />
-        <span className="decision-node__title-text">{title}</span>
+        <span className="decision-node__title-text">Nodo de Decisión</span>
       </div>
       
       {!isUltraPerformanceMode && metadata && (

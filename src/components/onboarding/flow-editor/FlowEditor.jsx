@@ -931,15 +931,15 @@ const FlowEditorInner = ({
         return;
       }
       if (edges && edges.length > 0) {
-        const visibleEdges = ensureEdgesAreVisible(edges);
-        if (JSON.stringify(visibleEdges) !== JSON.stringify(edges)) {
+        const visibleEdges = ensureEdgesAreVisible(edges, isUltraMode);
+        if (visibleEdges !== undefined && JSON.stringify(visibleEdges) !== JSON.stringify(edges)) {
           setEdges(visibleEdges);
         }
       }
     }, 10000); // Verificar cada 10 segundos
     
     return () => clearInterval(interval);
-  }, [edges, setEdges]);
+  }, [edges, setEdges, isUltraMode]);
 
   // Ajustar la vista cuando la instancia de ReactFlow esté lista o los nodos cambien
   // useEffect(() => {

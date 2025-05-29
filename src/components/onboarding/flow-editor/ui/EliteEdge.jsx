@@ -255,7 +255,7 @@ const EliteEdge = ({
   useEffect(() => {
     if (process.env.NODE_ENV === 'development') {
       if (isFinite(sourceX) && isFinite(sourceY) && isFinite(targetX) && isFinite(targetY)) {
-        console.log(`[EliteEdge] Coordenadas VÁLIDAS RECIBIDAS para arista ${id}: sx:${sourceX}, sy:${sourceY}, tx:${targetX}, ty:${targetY}`);
+        // console.log(`[EliteEdge] Coordenadas VÁLIDAS RECIBIDAS para arista ${id}: sx:${sourceX}, sy:${sourceY}, tx:${targetX}, ty:${targetY}`);
       } else {
         // Este caso ya está cubierto por el console.warn en el useMemo de edgePath, 
         // pero lo mantenemos aquí por si queremos diferenciar el momento de la actualización vs el cálculo inicial.

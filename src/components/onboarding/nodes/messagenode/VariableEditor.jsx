@@ -153,9 +153,10 @@ const VariableEditor = memo(({
                     onChange={(e) => setEditingName(e.target.value)}
                     onKeyDown={handleKeyDown}
                     placeholder="Nombre"
-                    className="message-node__variable-input"
+                    className="message-node__variable-input nodrag"
                     aria-label="Nombre de variable"
                     autoFocus
+                    onMouseDown={(e) => e.stopPropagation()}
                   />
                   <input
                     type="text"
@@ -163,8 +164,9 @@ const VariableEditor = memo(({
                     onChange={(e) => setEditingValue(e.target.value)}
                     onKeyDown={handleKeyDown}
                     placeholder="Valor"
-                    className="message-node__variable-input"
+                    className="message-node__variable-input nodrag"
                     aria-label="Valor de variable"
+                    onMouseDown={(e) => e.stopPropagation()}
                   />
                   <div className="message-node__variable-actions">
                     <button
@@ -178,7 +180,7 @@ const VariableEditor = memo(({
                     </button>
                     <button
                       type="button"
-                      onClick={saveEditing}
+                      onClick={saveEditing} onMouseDown={(e) => e.stopPropagation()}
                       className="message-node__variable-btn message-node__variable-btn--save"
                       aria-label="Guardar cambios"
                       title="Guardar"
@@ -227,8 +229,9 @@ const VariableEditor = memo(({
             onChange={(e) => setNewVarName(e.target.value)}
             onKeyDown={(e) => handleKeyDown(e, true)}
             placeholder="Nombre"
-            className="message-node__variable-input"
+            className="message-node__variable-input nodrag"
             aria-label="Nuevo nombre de variable"
+            onMouseDown={(e) => e.stopPropagation()}
           />
           <input
             type="text"
@@ -236,13 +239,14 @@ const VariableEditor = memo(({
             onChange={(e) => setNewVarValue(e.target.value)}
             onKeyDown={(e) => handleKeyDown(e, true)}
             placeholder="Valor"
-            className="message-node__variable-input"
+            className="message-node__variable-input nodrag"
             aria-label="Nuevo valor de variable"
+            onMouseDown={(e) => e.stopPropagation()}
           />
         </div>
         <button
           type="button"
-          onClick={handleAddNewVariable}
+          onClick={handleAddNewVariable} onMouseDown={(e) => e.stopPropagation()}
           disabled={!newVarName.trim()}
           className="message-node__add-btn"
           aria-label="Agregar variable"

@@ -372,6 +372,7 @@ const DecisionNodeConditions = memo(({
                 ref={conditionInputRef}
                 type="text"
                 className="decision-node__condition-input"
+                  onMouseDown={(e) => e.stopPropagation()} // Evitar que el drag del nodo interfiera con la selección de texto
                 value={editingText}
                 onChange={handleNewConditionChange}
                 onKeyDown={editingConditionId !== null ? handleEditConditionKeyDown : handleNewConditionKeyDown}

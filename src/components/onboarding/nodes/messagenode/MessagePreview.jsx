@@ -6,6 +6,7 @@
  */
 
 import React, { memo, useMemo } from 'react';
+import { replaceVariablesInMessage } from '@/utils/messageUtils';
 import PropTypes from 'prop-types';
 import ReactMarkdown from '@/lib/simplified-markdown';
 
@@ -24,20 +25,7 @@ const MessagePreview = memo(({
    * Procesa el mensaje reemplazando las variables
    */
   const processedMessage = useMemo(() => {
-    if (!message) return '';
-    if (!variables || variables.length === 0) return message;
-
-    // Reemplazar todas las variables en el mensaje
-    let processedText = message;
-    variables.forEach(variable => {
-      if (variable && variable.name) {
-        const regex = new RegExp(`{{\\s*${variable.name}\\s*}}`, 'g');
-        const replacement = variable.value || '';
-        processedText = processedText.replace(regex, replacement);
-      }
-    });
-
-    return processedText;
+    return replaceVariablesInMessage(message, variables);
   }, [message, variables]);
 
   /**

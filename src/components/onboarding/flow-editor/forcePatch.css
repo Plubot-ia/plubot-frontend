@@ -97,7 +97,7 @@
   /* Importante: dimensiones naturales para evitar estiramientos */
   height: auto !important;
   /* Crucial: mostrar una línea de borde para ver límites */
-  outline: 1px solid rgba(0, 100, 255, 0.1) !important;
+  /* outline: 1px solid rgba(0, 100, 255, 0.1) !important; */ /* Eliminado para quitar borde fino */
 }
 
 /* Capa 5: Nodo seleccionado (prioridad superior) */
@@ -120,10 +120,10 @@
 .react-flow__node:active {
   z-index: 1000 !important; /* Superar cualquier otro elemento */
   /* Mostrar un halo sutil para identificar bordes */
-  box-shadow: 0 0 0 2px rgba(0, 150, 255, 0.2),
-              0 0 10px rgba(0, 0, 0, 0.2) !important;
+  /* box-shadow: 0 0 0 2px rgba(0, 150, 255, 0.2),
+              0 0 10px rgba(0, 0, 0, 0.2) !important; */ /* Eliminado para quitar halo/margen */
   /* Marcar visualmente para debugging */
-  outline: 2px dashed rgba(255, 150, 0, 0.3) !important;
+  /* outline: 2px dashed rgba(255, 150, 0, 0.3) !important; */ /* Eliminado para quitar borde de guiones */
 }
 
 /* ==== 5. AJUSTES VISUALES SOLO PARA EL CANVAS DE REACTFLOW ==== */
@@ -138,7 +138,7 @@
 .flow-editor-container .react-flow__node {
   z-index: 10 !important;
   opacity: 1 !important;
-  outline: 1px solid rgba(0, 100, 255, 0.1) !important;
+  /* outline: 1px solid rgba(0, 100, 255, 0.1) !important; */ /* Eliminado para quitar borde fino */
 }
 
 .flow-editor-container .react-flow__node.selected {
@@ -188,4 +188,3 @@
 /* .react-flow__node { outline: 1px solid red !important; } */
 /* .react-flow__viewport { outline: 2px dashed blue !important; } */
 /* .flow-editor-container { outline: 2px solid green !important; } */
-

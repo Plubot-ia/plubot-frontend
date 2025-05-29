@@ -5,7 +5,7 @@
 
 import React, { memo, useRef, useEffect, useCallback, useState } from 'react';
 import PropTypes from 'prop-types';
-import { X, Save } from 'lucide-react';
+import { X, Save, Check } from 'lucide-react';
 import Tooltip from '../../../ui/ToolTip';
 import { NODE_CONFIG } from '../DecisionNode.types';
 
@@ -35,6 +35,7 @@ const DecisionNodeQuestion = memo(({
   onCancel,
   isSaving = false,
   enableMarkdown = false,
+  enableVariables = false, // Asegurarse de que se recibe y se usa
   isUltraPerformanceMode = false
 }) => {
   const textareaRef = useRef(null);
@@ -75,7 +76,7 @@ const DecisionNodeQuestion = memo(({
   
   // Manejar teclas al editar
   const handleKeyDown = useCallback((e) => {
-    if (e.key === 'Enter' && e.ctrlKey) {
+    if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
       e.preventDefault();
       onSave();
     } else if (e.key === 'Escape') {
@@ -95,12 +96,13 @@ const DecisionNodeQuestion = memo(({
             value={localQuestion}
             onChange={handleChange}
             onKeyDown={handleKeyDown}
+            onMouseDown={(e) => e.stopPropagation()} // Evitar que el drag del nodo interfiera con la selección de texto
             placeholder={NODE_CONFIG.DEFAULT_QUESTION}
             aria-label={NODE_CONFIG.ARIA_LABELS.question}
             disabled={isSaving}
           />
           
-          <div className="decision-node__actions">
+          <div className="decision-node__actions-toolbar">
             <Tooltip content={`Cancelar (${NODE_CONFIG.KEY_SHORTCUTS.cancel.key})`} position="top">
               <button
                 onClick={onCancel}
@@ -113,15 +115,16 @@ const DecisionNodeQuestion = memo(({
                 <span>Cancelar</span>
               </button>
             </Tooltip>
-            <Tooltip content={`Guardar (Ctrl+${NODE_CONFIG.KEY_SHORTCUTS.save.key})`} position="top">
+            <Tooltip content="Guardar (Ctrl/Cmd + Enter)" position="top">
               <button
                 onClick={onSave}
                 className="decision-node__button decision-node__button--save"
                 aria-label={NODE_CONFIG.ARIA_LABELS.saveChanges}
-                aria-keyshortcuts={`Ctrl+${NODE_CONFIG.KEY_SHORTCUTS.save.key}`}
+                aria-keyshortcuts="Control+Enter Meta+Enter"
                 disabled={isSaving}
+                type="submit" 
               >
-                <Save size={14} />
+                <Check size={14} />
                 <span>{isSaving ? 'Guardando...' : 'Guardar'}</span>
               </button>
             </Tooltip>
@@ -152,9 +155,14 @@ const DecisionNodeQuestion = memo(({
             <React.Suspense fallback={<div>{question}</div>}>
               <ReactMarkdown>{question}</ReactMarkdown>
             </React.Suspense>
+          ) : enableVariables ? (
+            // Renderizar con variables resaltadas si enableVariables es true y enableMarkdown es false
+            <span dangerouslySetInnerHTML={{ __html: question.replace(/\{\{(.*?)\}\}/g, '<span class="variable-highlight">{{$1}}</span>') }} />
           ) : (
             question
           )}
+          {/* Nota: Si enableMarkdown y enableVariables están activos, Markdown tiene precedencia. 
+              Para tener ambos, ReactMarkdown necesitaría un componente personalizado para los spans. */}
         </div>
       </div>
     );
@@ -174,6 +182,7 @@ DecisionNodeQuestion.propTypes = {
   onCancel: PropTypes.func.isRequired,
   isSaving: PropTypes.bool,
   enableMarkdown: PropTypes.bool,
+  enableVariables: PropTypes.bool, // Añadir a propTypes
   isUltraPerformanceMode: PropTypes.bool
 };
 

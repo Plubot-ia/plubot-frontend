@@ -18,14 +18,15 @@
 /* Variables CSS para el nodo de inicio - Nivel Premium */
 :root {
   /* Paleta de colores premium con azul vibrante */
-  --start-node-accent: 37, 99, 235; /* Azul vibrante como color principal */
+  --start-node-accent-rgb: 37, 99, 235; /* Azul vibrante como color principal (RGB for opacity) */
+  --start-node-accent-hex: #2563eb; /* Azul vibrante como color principal (HEX) */
   --start-node-bg: linear-gradient(145deg, #ffffff, #f8fafc);
   --start-node-border: #d1d5db;
-  --start-node-border-selected: #3b82f6;
-  --start-node-border-hover: rgba(59, 130, 246, 0.5);
+  --start-node-border-selected: var(--start-node-accent-hex);
+  --start-node-border-hover: rgba(var(--start-node-accent-rgb), 0.5);
   --start-node-text: #1f2937;
   --start-node-text-secondary: #4b5563;
-  --start-node-icon: #3b82f6;
+  --start-node-icon: var(--start-node-accent-hex);
   
   /* Tipografía premium */
   --start-node-font-family: 'Inter', system-ui, -apple-system, sans-serif;
@@ -44,7 +45,7 @@
   /* Sombras y efectos */
   --start-node-shadow: 0 8px 32px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.2);
   --start-node-shadow-hover: 0 10px 36px rgba(0, 0, 0, 0.12);
-  --start-node-shadow-selected: 0 0 0 2px rgba(var(--start-node-accent), 0.5), 0 8px 32px rgba(0, 0, 0, 0.12);
+  --start-node-shadow-selected: 0 0 0 2px rgba(var(--start-node-accent-rgb), 0.5), 0 8px 32px rgba(0, 0, 0, 0.12);
   
   /* Transiciones y animaciones suaves */
   --start-node-transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -55,7 +56,8 @@
   --start-node-ultra-border: #4b5563;
   --start-node-ultra-text: #e5e7eb;
   --start-node-ultra-text-secondary: #9ca3af;
-  --start-node-ultra-accent: 59, 130, 246;
+  --start-node-ultra-accent-rgb: 59, 130, 246;
+  --start-node-ultra-accent-hex: #3b82f6;
   --start-node-ultra-padding: 0.75rem;
   --start-node-ultra-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   --start-node-ultra-border-radius: 8px;
@@ -64,10 +66,10 @@
   --start-node-bg-base-jsx: linear-gradient(135deg, #0080ff 0%, #0060c0 100%);
   --start-node-bg-hover-jsx: linear-gradient(135deg, #0090ff 0%, #0070d0 100%);
   --start-node-bg-selected-jsx: linear-gradient(135deg, #00a0ff 0%, #0080e0 100%);
-  --start-node-shadow-base-jsx: none;
+  --start-node-shadow-base-jsx: 0 4px 12px rgba(0, 100, 200, 0.15); /* Softer base shadow */
   --start-node-shadow-hover-jsx: 0 8px 20px rgba(0, 128, 255, 0.3);
   --start-node-shadow-selected-jsx: 0 10px 25px rgba(0, 128, 255, 0.4);
-  --start-node-selected-outline-color-jsx: #00c0ff;
+  --start-node-selected-outline-color-jsx: #00c0ff; /* Bright blue for selected outline */
   --start-node-scale-hover-jsx: 1.02;
   --start-node-scale-selected-jsx: 1.05;
   --start-node-transition-jsx: all 0.3s ease;
@@ -83,16 +85,17 @@
     --start-node-shadow: 0 8px 24px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.05);
     --start-node-shadow-hover: 0 12px 32px rgba(0, 0, 0, 0.25);
     --start-node-ultra-bg: #111827;
-    --start-node-ultra-icon-color: #64748b;
+    --start-node-ultra-icon-color: #64748b; /* Ensure this is used or remove if not */
 
-    /* Dark mode variants for styles from JSX */
-    --start-node-bg-base-jsx: linear-gradient(135deg, #0059b3 0%, #004080 100%); /* Darker blue */
-    --start-node-bg-hover-jsx: linear-gradient(135deg, #006bb3 0%, #005090 100%); /* Darker hover blue */
-    --start-node-bg-selected-jsx: linear-gradient(135deg, #007acc 0%, #0060a0 100%); /* Darker selected blue */
+    /* Dark mode variants for styles from JSX (blue theme) */
+    --start-node-bg-base-jsx: linear-gradient(135deg, #0059b3 0%, #004080 100%);
+    --start-node-bg-hover-jsx: linear-gradient(135deg, #006bb3 0%, #005090 100%);
+    --start-node-bg-selected-jsx: linear-gradient(135deg, #007acc 0%, #0060a0 100%);
     
-    --start-node-shadow-hover-jsx: 0 8px 20px rgba(0, 89, 179, 0.25); /* Adjusted shadow for dark */
-    --start-node-shadow-selected-jsx: 0 10px 25px rgba(0, 89, 179, 0.35); /* Adjusted shadow for dark */
-    --start-node-selected-outline-color-jsx: #008cff; /* Slightly brighter outline for dark */
+    --start-node-shadow-base-jsx: 0 4px 12px rgba(0, 60, 120, 0.25); /* Darker base shadow for dark mode */
+    --start-node-shadow-hover-jsx: 0 8px 20px rgba(0, 89, 179, 0.25);
+    --start-node-shadow-selected-jsx: 0 10px 25px rgba(0, 89, 179, 0.35);
+    --start-node-selected-outline-color-jsx: #008cff;
   }
 }
 
@@ -107,7 +110,7 @@
 .start-node {
   /* Diseño base premium con glassmorphism */
   background: var(--start-node-bg-base-jsx);
-  border: var(--start-node-border-width) solid var(--start-node-border);
+  border: var(--start-node-border-width) solid transparent; /* Border color set by states or default to transparent if using box-shadow for outline */
   border-radius: var(--start-node-border-radius);
   display: flex;
   flex-direction: column;
@@ -121,13 +124,13 @@
   transition: var(--start-node-transition-jsx);
   padding: var(--start-node-padding);
   box-shadow: var(--start-node-shadow-base-jsx);
-  min-width: var(--start-node-min-width);
-  min-height: var(--start-node-min-height);
+  min-width: var(--start-node-min-width); /* Ensure this uses the value from JS NODE_CONFIG if different */
+  min-height: var(--start-node-min-height); /* Ensure this uses the value from JS NODE_CONFIG if different */
   
   /* Optimizaciones de rendimiento */
   user-select: none;
   will-change: transform, box-shadow;
-  transform: translateZ(0);
+  transform: translateY(0) scale(1);
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -175,14 +178,29 @@
 
 /* Editando - Modo de edición con estilo premium */
 .start-node--editing {
-  border-color: rgba(var(--start-node-accent), 0.6);
-  box-shadow: 0 0 0 2px rgba(var(--start-node-accent), 0.3), var(--start-node-shadow);
+  border-color: rgba(var(--start-node-accent-rgb), 0.6);
+  box-shadow: 0 0 0 2px rgba(var(--start-node-accent-rgb), 0.3), var(--start-node-shadow-base-jsx);
 }
 
 /* Error - Indicación visual clara de error */
 .start-node--has-error {
   border-color: rgba(239, 68, 68, 0.7);
-  box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.3), var(--start-node-shadow);
+  box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.3), var(--start-node-shadow-base-jsx);
+}
+
+/* Saving state */
+.start-node--saving {
+  opacity: 0.8;
+  animation: savingPulse 1.5s infinite ease-in-out;
+}
+
+@keyframes savingPulse {
+  0%, 100% {
+    box-shadow: var(--start-node-shadow-base-jsx), 0 0 0 0px rgba(var(--start-node-accent-rgb), 0.3);
+  }
+  50% {
+    box-shadow: var(--start-node-shadow-base-jsx), 0 0 0 4px rgba(var(--start-node-accent-rgb), 0.15);
+  }
 }
 
 /* ======================================================
@@ -199,42 +217,62 @@
   background: var(--start-node-ultra-bg);
   border: 1px solid var(--start-node-ultra-border);
   border-radius: var(--start-node-ultra-border-radius);
-  padding: var(--start-node-ultra-padding);
   color: var(--start-node-ultra-text);
-  
-  /* Optimizaciones críticas de rendimiento */
+  padding: var(--start-node-ultra-padding);
   box-shadow: var(--start-node-ultra-shadow);
-  transition: none;
-  animation: none;
-  transform: none;
-  will-change: auto;
-  
-  /* Eliminar efectos visuales costosos */
-  backdrop-filter: none;
-  -webkit-backdrop-filter: none;
-  
-  /* Reducir complejidad visual */
-  min-width: 100px;
-  min-height: 50px;
-  gap: 0.5rem;
+  backdrop-filter: none; /* Disable expensive blur */
+  -webkit-backdrop-filter: none; /* Disable expensive blur */
+  transition: none !important; /* Disable transitions */
+  animation: none !important; /* Disable animations */
+  transform: none !important; /* Reset any transform */
+  will-change: auto; /* Reset will-change */
 }
 
-/* Eliminar efectos hover en modo ultra rendimiento */
-.start-node--ultra-performance:hover {
-  transform: none;
-  box-shadow: var(--start-node-ultra-shadow);
-  border-color: var(--start-node-ultra-border);
+/* En modo ultra, los hijos también deben tener transiciones/animaciones deshabilitadas */
+.start-node--ultra-performance * {
+  transition: none !important;
+  animation: none !important;
 }
 
-/* Eliminar animaciones en modo seleccionado para ultra rendimiento */
-.start-node--ultra-performance.start-node--selected {
-  border-color: rgba(var(--start-node-ultra-accent), 0.6);
-  box-shadow: var(--start-node-ultra-shadow);
-  animation: none;
+.start-node--ultra-performance .start-node__header,
+.start-node--ultra-performance .start-node__content,
+.start-node--ultra-performance .start-node__icon,
+.start-node--ultra-performance .start-node__label,
+.start-node--ultra-performance .start-node__timestamp,
+.start-node--ultra-performance .start-node__dynamic-content-display,
+.start-node--ultra-performance .start-node__input,
+.start-node--ultra-performance .start-node__textarea {
+  background: transparent;
+  color: var(--start-node-ultra-text);
+  text-shadow: none;
+  box-shadow: none;
+}
+
+.start-node--ultra-performance .start-node__label {
+  font-size: 0.875rem; /* Consistent with non-ultra label if desired, or smaller */
+  color: var(--start-node-ultra-text);
+  font-weight: var(--start-node-label-weight); /* Maintain weight for readability */
+}
+
+.start-node--ultra-performance .start-node__timestamp {
+  color: var(--start-node-ultra-text-secondary);
+  font-size: 0.7rem;
+}
+
+.start-node--ultra-performance .start-node__handle {
+  background-color: rgba(var(--start-node-ultra-accent-rgb), 0.7);
+  box-shadow: none;
+  border: 1px solid rgba(var(--start-node-ultra-accent-rgb), 1);
+  width: 10px;
+  height: 10px;
+}
+
+.start-node--ultra-performance .start-node__handle::after {
+  content: none; /* Remove pulse animation element */
 }
 
 /* ======================================================
-   CONTENIDO DEL NODO
+   ELEMENTOS INTERNOS
    ====================================================== */
 
 /**
@@ -260,263 +298,159 @@
   position: relative;
 }
 
-/* Etiqueta del nodo */
+/* Icono (si se usa uno, como un rayo o similar) */
+.start-node__icon {
+  color: var(--start-node-text); /* White text on blue gradient */
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+/* Etiqueta (Título del nodo) */
 .start-node__label {
-  font-weight: var(--start-node-label-weight);
+  flex-grow: 1;
   font-size: var(--start-node-label-size);
-  letter-spacing: -0.01em;
-  text-align: center;
-  color: var(--start-node-text);
+  font-weight: var(--start-node-label-weight);
+  color: var(--start-node-text); /* White text on blue gradient */
+  text-shadow: 0 1px 2px rgba(0,0,0,0.2);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  max-width: 100%;
-  padding: 0.25rem 0;
 }
 
-/* Modo ultra rendimiento para la etiqueta */
-.start-node--ultra-performance .start-node__label {
-  font-size: 0.875rem;
-  color: var(--start-node-ultra-text);
-}
-
-/**
- * Input para editar la etiqueta
- */
-.start-node__input {
-  padding: 0.75rem;
-  border-radius: 8px;
-  border: 1px solid rgba(var(--start-node-accent), 0.2);
-  background: white;
-  color: var(--start-node-text);
-  font-size: var(--start-node-text-size);
-  width: 90%;
-  text-align: center;
-  outline: none;
-  transition: all 0.2s ease;
-  font-family: inherit;
-}
-
-/* Focus del input */
-.start-node__input:focus {
-  outline: none;
-  box-shadow: 0 0 0 3px rgba(var(--start-node-accent), 0.15);
-  border-color: rgba(var(--start-node-accent), 0.5);
-}
-
-/* Modo ultra rendimiento para el input */
-.start-node--ultra-performance .start-node__input {
-  padding: 0.5rem;
-  border-radius: 6px;
-  background: rgba(0, 0, 0, 0.1);
-  border-color: var(--start-node-ultra-border);
-  color: var(--start-node-ultra-text);
-}
-
-/**
- * Información adicional
- */
-.start-node__meta {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  font-size: 0.75rem;
-  color: var(--start-node-text-secondary);
-  opacity: 0.8;
-}
-
-/* Timestamp */
+/* Timestamp (Fecha de modificación) */
 .start-node__timestamp {
-  font-style: italic;
-}
-
-/* Usuario */
-.start-node__user {
-  font-weight: 500;
-}
-
-/* Modo ultra rendimiento para meta */
-.start-node--ultra-performance .start-node__meta {
   font-size: 0.7rem;
-  color: var(--start-node-ultra-text-secondary);
+  color: rgba(255,255,255,0.7); /* Lighter white for secondary text */
+  text-align: right;
+  flex-shrink: 0;
 }
 
-/**
- * Mensaje de error
- */
-.start-node__error-fallback {
-  color: #ef4444;
-  font-size: 0.75rem;
-  margin-top: 0.25rem;
-}
-
-/* ======================================================
-   CONTROLES Y BOTONES
-   ====================================================== */
-
-/**
- * Controles del nodo
- */
-.start-node__controls {
-  position: absolute;
-  top: -0.5rem;
-  right: -0.5rem;
-  display: flex;
-  gap: 0.25rem;
-  z-index: 10;
-  opacity: 0;
-  transition: opacity 0.2s ease;
-}
-
-/* Mostrar controles en hover/selección */
-.start-node--hovered .start-node__controls,
-.start-node--selected .start-node__controls {
-  opacity: 1;
-}
-
-/* Modo ultra rendimiento para controles */
-.start-node--ultra-performance .start-node__controls {
-  transition: none;
-}
-
-/**
- * Tooltip
- */
-.start-node__tooltip {
-  position: absolute;
-  top: -2.75rem;
-  left: 50%;
-  transform: translateX(-50%);
-  background: rgba(15, 23, 42, 0.85);
-  color: white;
-  padding: 0.5rem 1rem;
-  border-radius: 6px;
-  font-size: 0.75rem;
-  z-index: 100;
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  min-width: 260px;
-  max-width: 320px;
-  pointer-events: none;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  transition: opacity 0.2s ease, transform 0.2s ease;
-  opacity: 0.95;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.start-node__tooltip:after {
-  content: '';
-  position: absolute;
-  bottom: -4px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 8px;
-  height: 8px;
-  background: rgba(15, 23, 42, 0.85);
-  border-right: 1px solid rgba(255, 255, 255, 0.1);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  transform: translateX(-50%) rotate(45deg);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-}
-
-.start-node__tooltip-content {
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  text-align: center;
+/* Contenido principal del nodo */
+.start-node__content {
   width: 100%;
-}
-
-.start-node__tooltip-header {
   display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  flex-wrap: nowrap;
-  white-space: nowrap;
+  flex-direction: column;
+  gap: var(--start-node-gap);
+  color: var(--start-node-text); /* White text */
 }
 
-.start-node__tooltip-content strong {
-  font-weight: 600;
-  color: rgba(var(--start-node-accent), 1);
-  font-size: 0.75rem;
-  letter-spacing: -0.01em;
-  margin-right: 0.25rem;
+/* Estilos para la visualización del contenido dinámico (cuando no se edita) */
+.start-node__dynamic-content-display {
+  font-size: var(--start-node-text-size);
+  line-height: 1.5;
+  color: rgba(255,255,255,0.9);
+  white-space: pre-wrap; /* Respetar saltos de línea y espacios */
+  word-break: break-word;
+  padding: 0.5rem;
+  background-color: rgba(0,0,0,0.1);
+  border-radius: calc(var(--start-node-border-radius) - 6px);
+  min-height: 40px; /* Para que tenga algo de altura incluso vacío */
 }
 
-.start-node__tooltip-hint {
-  font-size: 0.75rem;
-  color: rgba(255, 255, 255, 0.9);
-  font-weight: 400;
-  margin: 0;
-  font-style: normal;
-  letter-spacing: 0.01em;
-  position: relative;
-  display: inline-block;
-  padding: 0 0.25rem;
-  border-left: 1px solid rgba(255, 255, 255, 0.2);
-  border-right: 1px solid rgba(255, 255, 255, 0.2);
-  margin: 0 0.25rem;
+/* Campos de entrada y textarea */
+.start-node__input,
+.start-node__textarea {
+  width: 100%;
+  padding: 0.6rem 0.8rem;
+  border: 1px solid rgba(var(--start-node-accent-rgb), 0.3);
+  border-radius: calc(var(--start-node-border-radius) - 4px);
+  background-color: rgba(255, 255, 255, 0.1);
+  color: var(--start-node-text);
+  font-family: var(--start-node-font-family);
+  font-size: var(--start-node-text-size);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  box-sizing: border-box; /* Important for width 100% and padding */
 }
 
-.start-node__tooltip-meta {
-  font-size: 0.6875rem;
-  opacity: 0.7;
-  font-style: italic;
-  color: rgba(255, 255, 255, 0.8);
-  border-left: 1px solid rgba(255, 255, 255, 0.2);
-  padding-left: 0.5rem;
-  white-space: nowrap;
+.start-node__input::placeholder,
+.start-node__textarea::placeholder {
+  color: rgba(255,255,255,0.5);
+  opacity: 1; /* Firefox */
+}
+
+.start-node__input:focus,
+.start-node__textarea:focus {
+  outline: none;
+  border-color: var(--start-node-selected-outline-color-jsx);
+  background-color: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 0 0 2px rgba(var(--start-node-accent-rgb),0.2);
+}
+
+.start-node__textarea {
+  min-height: 60px;
+  resize: vertical; /* Permitir redimensionar verticalmente */
+  line-height: 1.5;
 }
 
 /* ======================================================
-   HANDLE DE CONEXIÓN
+   HANDLES (Puntos de conexión)
    ====================================================== */
 
 /**
  * Handle de conexión - Diseño premium azul
  */
 .start-node__handle {
-  background: #3b82f6;
-  width: 12px;
-  height: 12px;
-  border: 2px solid #ffffff;
+  /* Estilo base del handle - emisor de energía */
+  width: 16px;
+  height: 16px;
+  background-color: var(--start-node-handle);
   border-radius: 50%;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 0 5px rgba(var(--start-node-accent), 0.5);
-  z-index: 10;
+  border: 2px solid white; /* Borde blanco para destacar sobre el azul */
+  box-shadow: 0 0 10px rgba(var(--start-node-accent-rgb), 0.7), 0 0 15px rgba(var(--start-node-accent-rgb), 0.5);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease-in-out;
+  z-index: 10; /* Asegurar que esté sobre otros elementos del nodo */
+  position: absolute; /* Posicionamiento absoluto respecto al nodo */
+  top: 50%;
+  transform: translateY(-50%);
 }
 
-/* Estado hover del handle con efecto de brillo */
+/* Handle específico de salida (source) a la derecha */
+.start-node__handle.react-flow__handle-right {
+  right: -10px; /* Ajustar para que sobresalga un poco */
+}
+
+/* Efecto de pulso para el handle */
+.start-node__handle::after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background-color: transparent;
+  border: 2px solid var(--start-node-handle);
+  animation: pulse 2s infinite cubic-bezier(0.66, 0, 0, 1);
+  box-shadow: 0 0 5px rgba(var(--start-node-accent-rgb),0.5);
+  z-index: -1;
+}
+
 .start-node__handle:hover {
-  transform: translateX(-50%) scale(1.4);
-  box-shadow: 0 0 8px rgba(var(--start-node-accent), 0.6);
+  transform: translateY(-50%) scale(1.2); /* Ajustar transform para mantener centrado vertical */
+  background-color: var(--start-node-handle-hover);
+  box-shadow: 0 0 12px rgba(var(--start-node-accent-rgb), 0.9), 0 0 20px rgba(var(--start-node-accent-rgb), 0.7);
 }
 
-/* Posiciones de los handles */
-.start-node__handle--bottom {
-  bottom: -6px;
-  left: 50%;
-  transform: translateX(-50%);
+.start-node__handle:hover::after {
+  animation-duration: 1.5s; /* Acelerar pulso en hover */
 }
 
-/* Conector en modo ultra rendimiento - Optimizado para rendimiento */
-.start-node--ultra-performance .start-node__handle {
-  width: 10px;
-  height: 10px;
-  border-width: 1px;
-  background: #6b7280;
-  box-shadow: none;
-  transition: none;
-}
-
-.start-node--ultra-performance .start-node__handle:hover {
-  transform: translateX(-50%);
-  box-shadow: none;
+/* Animación de pulso - Efecto de energía */
+@keyframes pulse {
+  0% {
+    transform: scale(0.9);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.5);
+    opacity: 0.5;
+  }
+  100% {
+    transform: scale(2.2);
+    opacity: 0;
+  }
 }
 
 /* ======================================================
@@ -576,7 +510,7 @@
 /* Animación para el nodo seleccionado */
 @keyframes selectedPulse {
   0% { box-shadow: var(--start-node-shadow-selected); }
-  50% { box-shadow: 0 0 0 3px rgba(var(--start-node-accent), 0.6), 0 8px 32px rgba(0, 0, 0, 0.15); }
+  50% { box-shadow: 0 0 0 3px rgba(var(--start-node-accent-rgb), 0.6), 0 8px 32px rgba(0, 0, 0, 0.15); }
   100% { box-shadow: var(--start-node-shadow-selected); }
 }
 

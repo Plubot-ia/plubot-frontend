@@ -4,6 +4,7 @@ import customZustandStorage from './customZustandStorage';
 import { applyNodeChanges, applyEdgeChanges, addEdge } from 'reactflow';
 import { preventNodeStacking } from '../components/onboarding/flow-editor/utils/fix-node-positions';
 import { validateNodePositions, sanitizeEdgePaths } from '../components/onboarding/flow-editor/utils/node-position-validator';
+import { ensureEdgesAreVisible } from '../components/onboarding/flow-editor/utils/edgeFixUtil.js';
 import { NODE_TYPES, EDGE_TYPES, EDGE_COLORS, NODE_LABELS } from '@/utils/nodeConfig';
 import { toggleUltraMode as toggleUltraModeManager } from '@/components/onboarding/flow-editor/ui/UltraModeManager';
 
@@ -12,6 +13,9 @@ const NODE_CONFIG = {
   MIN_WIDTH: 150,
   MIN_HEIGHT: 100
 };
+
+const MAX_HISTORY_LENGTH = 50; // Definir la constante para el historial
+
 import useTrainingStore from './useTrainingStore';
 import flowService, { generateId } from '@/services/flowService';
 import { nodePositionCache, flowStateManager } from '@/components/onboarding/flow-editor/utils/flowCacheManager';
@@ -56,7 +60,7 @@ const initialState = {
   history: {
     undoStack: [],
     redoStack: [],
-    maxHistory: 50,
+    maxHistory: MAX_HISTORY_LENGTH,
   }
 };
 
@@ -146,13 +150,31 @@ const useFlowStore = create(
       },
       
       // Acción para manejar cambios en las aristas
-      onEdgesChange: (changes) => {
-        set({
-          edges: applyEdgeChanges(changes, get().edges),
-          isUndoing: false, // Reset undo/redo flags on any change
-          isRedoing: false,
-          hasChanges: true, // Mark that there are changes
-        });
+      onEdgesChange: async (changes) => { // Made async
+        const currentEdges = get().edges;
+        const currentIsUltraMode = get().isUltraMode;
+        const appliedEdges = applyEdgeChanges(changes, currentEdges);
+        
+        try {
+          // Llamar a ensureEdgesAreVisible después de aplicar los cambios de React Flow
+          // y antes de hacer el 'set' final en el store.
+          const visibleEdges = await ensureEdgesAreVisible(appliedEdges, currentIsUltraMode);
+          set({
+            edges: visibleEdges, // Usar las aristas procesadas por ensureEdgesAreVisible
+            isUndoing: false,
+            isRedoing: false,
+            hasChanges: true,
+          });
+        } catch (error) {
+          console.error('[FlowStore onEdgesChange] Error al asegurar la visibilidad de las aristas:', error);
+          // Fallback: si ensureEdgesAreVisible falla, al menos aplicar los cambios básicos.
+          set({
+            edges: appliedEdges, // Usar las aristas solo con applyEdgeChanges
+            isUndoing: false,
+            isRedoing: false,
+            hasChanges: true,
+          });
+        }
       },
       
       addNode: (nodeData, position, userData) => {
@@ -380,13 +402,30 @@ const useFlowStore = create(
         return newNode;
       },
       
-      updateNode: (id, data) => {
+      updateNode: (id, dataToUpdate) => { // Renombrado 'data' a 'dataToUpdate' para claridad
         set(state => ({
           nodes: state.nodes.map(node => {
             if (node.id === id) {
+              // Crear una nueva copia del data existente del nodo
+              const newNodeData = { ...node.data };
+
+              // Iterar sobre las propiedades de dataToUpdate
+              for (const key in dataToUpdate) {
+                if (Object.prototype.hasOwnProperty.call(dataToUpdate, key)) {
+                  if (key === 'variables' && Array.isArray(dataToUpdate[key])) {
+                    // Si la clave es 'variables' y es un array, asegurar una nueva referencia de array
+                    newNodeData[key] = [...dataToUpdate[key]];
+                    console.log(`[FlowStore updateNode ${id}] Update for key '${key}'. New array created:`, JSON.parse(JSON.stringify(newNodeData[key])));
+                  } else {
+                    // Para otras propiedades, simplemente asignar
+                    newNodeData[key] = dataToUpdate[key];
+                  }
+                }
+              }
+              
               return {
                 ...node,
-                data: { ...node.data, ...data },
+                data: newNodeData, // Usar el objeto de datos completamente nuevo
               };
             }
             return node;
@@ -1157,40 +1196,71 @@ const useFlowStore = create(
       },
       
       // Acciones de aristas
-      setEdges: (newEdges) => {
+      setEdges: async (newEdgesInput) => { 
+        let resolvedEdges = newEdgesInput; 
+
         try {
-          console.log('[FlowStore setEdges] Attempting to set edges. Received (raw):', newEdges);
-          if (newEdges !== undefined && newEdges !== null) {
-            console.log('[FlowStore setEdges] Setting edges (stringified):', JSON.stringify(newEdges));
+          console.log('[FlowStore setEdges] Attempting to set edges. Received (raw):', newEdgesInput);
+
+          // Check if newEdgesInput is a Promise and await it
+          if (newEdgesInput && typeof newEdgesInput.then === 'function') {
+            console.log('[FlowStore setEdges] Input is a Promise, awaiting it...');
+            resolvedEdges = await newEdgesInput;
+            console.log('[FlowStore setEdges] Promise resolved to (type, isArray, length):', typeof resolvedEdges, Array.isArray(resolvedEdges), resolvedEdges?.length);
+          }
+
+          if (resolvedEdges !== undefined && resolvedEdges !== null) {
+            // Log solo una porción si es muy largo para evitar sobrecargar la consola
+            const loggableEdges = JSON.stringify(resolvedEdges);
+            console.log('[FlowStore setEdges] Setting edges (stringified, first 200 chars):', loggableEdges.substring(0, 200) + (loggableEdges.length > 200 ? '...' : ''));
           } else {
-            console.log('[FlowStore setEdges] Received undefined or null for newEdges.');
+            console.log('[FlowStore setEdges] Resolved to undefined or null for newEdges.');
           }
         } catch (e) {
-          console.error('[FlowStore setEdges] Error during logging newEdges:', e, 'Raw newEdges:', newEdges);
+          console.error('[FlowStore setEdges] Error during logging or resolving newEdgesInput:', e, '\nRaw newEdgesInput:', newEdgesInput);
+          // If awaiting the promise failed, or logging failed.
+          // Ensure resolvedEdges is an array for the next step, or an empty one if resolution failed badly.
+          if (!(Array.isArray(resolvedEdges))) {
+            console.warn('[FlowStore setEdges] Fallback: resolvedEdges is not an array after potential await/error. Setting to empty array to prevent crashes.');
+            resolvedEdges = [];
+          }
         }
 
         set((state) => {
-          const previousEdges = [...state.edges];
-          // Ensure newEdges is always an array
-          const validatedEdges = Array.isArray(newEdges) ? newEdges : [];
+          // Ensure resolvedEdges is always an array for safety, though it should be by now.
+          const validatedEdges = Array.isArray(resolvedEdges) ? resolvedEdges : [];
           
-          // Optional: Add validation or transformation for each edge if needed
-          // For example, ensuring all edges have a type or necessary properties
           const processedEdges = validatedEdges.map(edge => ({
             ...edge,
             type: edge.type || EDGE_TYPES.ELITE_EDGE, // Default to EliteEdge if type is missing
-            // animated: edge.animated !== undefined ? edge.animated : true, // Default animated state
+            animated: edge.animated !== undefined ? edge.animated : (edge.type !== EDGE_TYPES.PLACEHOLDER), // Default animated unless placeholder
+            style: edge.style || { stroke: EDGE_COLORS.default, strokeWidth: 2 }, // Default style
           }));
+          
+          if (JSON.stringify(state.edges) === JSON.stringify(processedEdges)) {
+            // console.log('[FlowStore setEdges] No actual change in edges, skipping state update to prevent unnecessary re-renders.');
+            return state; // No change, return current state
+          }
 
+          // Push current state to history if edges actually changed
+          const newHistoryPast = state.history.past || [];
+          if (newHistoryPast.length === 0 || 
+              (JSON.stringify(newHistoryPast[newHistoryPast.length - 1].edges) !== JSON.stringify(state.edges) || 
+               JSON.stringify(newHistoryPast[newHistoryPast.length - 1].nodes) !== JSON.stringify(state.nodes))) {
+            newHistoryPast.push({ nodes: [...state.nodes], edges: [...state.edges], viewport: state.viewport });
+          }
+          
           return {
             ...state,
             edges: processedEdges,
-            hasChanges: true,
             history: {
-              past: [...(state.history.past || []), { nodes: [...state.nodes], edges: previousEdges, viewport: { ...state.viewport } }],
-              future: [],
-              maxHistory: state.history.maxHistory,
+              ...state.history,
+              past: newHistoryPast.slice(-MAX_HISTORY_LENGTH), // Limit history size
+              future: [], // Clear future on new change
             },
+            isUndoing: false,
+            isRedoing: false,
+            hasChanges: true, // Mark that there are changes
           };
         });
       },
@@ -1433,7 +1503,7 @@ const useFlowStore = create(
           let loadFlowFn;
           try {
             loadFlowFn = get().loadFlow;
-            console.log(`[FlowStore] resetFlow: get().loadFlow retrieved. Type: ${typeof loadFlowFn}, Value:`, loadFlowFn);
+            console.log(`[FlowStore] resetFlow: get().loadFlow retrieved. Type: ${typeof loadFlowFn}, Exists: ${!!loadFlowFn}`);
           } catch (e) {
             console.error(`[FlowStore] resetFlow: ERROR during get().loadFlow access:`, e);
             set({
@@ -1446,7 +1516,7 @@ const useFlowStore = create(
               selectedNode: null,
               selectedEdge: null,
               hasChanges: false,
-              isLoaded: true, // Nuevo estado de carga
+              isLoaded: true, // Estado de carga completado
             });
             return;
           }
@@ -1687,7 +1757,7 @@ const useFlowStore = create(
 
         try {
           const flowData = await flowService.loadFlow(plubotId);
-          console.log(`[FlowStore] loadFlow: Received flowData from service for plubotId ${plubotId}:`, JSON.stringify(flowData, null, 2));
+          console.log(`[FlowStore] loadFlow: Received flowData for plubotId ${plubotId}. Name: ${flowData?.name || 'N/A'}, Nodes: ${flowData?.nodes?.length || 0}, Edges: ${flowData?.edges?.length || 0}`);
           console.log(`[FlowStore] loadFlow: Data is valid. Setting flowName to: '${flowData.name || `Flujo de ${plubotId}`}'`);
           if (flowData && typeof flowData === 'object') {
             console.log(`[FlowStore] loadFlow: Data is valid. Setting flowName to: '${flowData.name || `Flujo de ${plubotId}`}'`);

@@ -55,6 +55,6 @@
 
 /* Dar un estilo visual que indique que los nodos son arrastrables */
 .react-flow__node:hover {
-  box-shadow: 0 0 10px rgba(0, 120, 255, 0.5) !important;
+  /* La línea de box-shadow que estaba aquí ha sido eliminada */
   cursor: move !important;
 }

@@ -107,7 +107,16 @@ const ContextMenu = React.forwardRef(({ items, position, onClose, options, child
 
   // Si es modo wrapper, renderizar los hijos y el menú si está visible
   return (
-    <div onContextMenu={handleContextMenu}>
+    <div 
+      onContextMenu={handleContextMenu}
+      style={{ 
+        display: 'flex', 
+        flexDirection: 'column', 
+        flexGrow: 1, 
+        width: '100%', 
+        height: '100%' 
+      }}
+    >
       {children}
       {showMenu && renderMenu()}
     </div>

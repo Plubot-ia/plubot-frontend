@@ -37,9 +37,8 @@ const DecisionNodeOptions = memo(({
   onToggleVariables,
   enableVariables = false,
   onToggleLogic,
-  enableLogic = false,
-  onToggleAnimation,
-  enableAnimation = true
+  enableLogic = false
+  // onToggleAnimation y enableAnimation eliminados
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   
@@ -85,7 +84,7 @@ const DecisionNodeOptions = memo(({
       {isExpanded && (
         <div className="decision-node__options-content">
           <div className="decision-node__option-group">
-            <Tooltip content={enableMarkdown ? "Desactivar Markdown" : "Activar Markdown"} position="right">
+            <Tooltip content={enableMarkdown ? "Desactivar formato Markdown" : "Activar formato Markdown. Usa `**negrita**`, `*cursiva*`, etc. (visible fuera de edición)."} position="right">
               <button 
                 onClick={onToggleMarkdown}
                 className={`decision-node__option-button ${enableMarkdown ? 'decision-node__option-button--active' : ''}`}
@@ -97,7 +96,7 @@ const DecisionNodeOptions = memo(({
               </button>
             </Tooltip>
             
-            <Tooltip content={enableVariables ? "Desactivar variables" : "Activar variables"} position="right">
+            <Tooltip content={enableVariables ? "Desactivar uso de variables" : "Activar uso de variables (ej: `{{nombre_cliente}}`). Se reemplazan en ejecución."} position="right">
               <button 
                 onClick={onToggleVariables}
                 className={`decision-node__option-button ${enableVariables ? 'decision-node__option-button--active' : ''}`}
@@ -109,7 +108,7 @@ const DecisionNodeOptions = memo(({
               </button>
             </Tooltip>
             
-            <Tooltip content={enableLogic ? "Desactivar lógica avanzada" : "Activar lógica avanzada"} position="right">
+            <Tooltip content={enableLogic ? "Desactivar lógica de condiciones avanzada" : "Activar lógica de condiciones avanzada (expresiones complejas, scripts). Funcionalidad futura o requiere config. adicional."} position="right">
               <button 
                 onClick={onToggleLogic}
                 className={`decision-node__option-button ${enableLogic ? 'decision-node__option-button--active' : ''}`}
@@ -121,17 +120,6 @@ const DecisionNodeOptions = memo(({
               </button>
             </Tooltip>
             
-            <Tooltip content={enableAnimation ? "Desactivar animaciones" : "Activar animaciones"} position="right">
-              <button 
-                onClick={onToggleAnimation}
-                className={`decision-node__option-button ${enableAnimation ? 'decision-node__option-button--active' : ''}`}
-                aria-label={enableAnimation ? "Desactivar animaciones" : "Activar animaciones"}
-                aria-pressed={enableAnimation}
-              >
-                <Zap size={14} />
-                <span>Animaciones</span>
-              </button>
-            </Tooltip>
           </div>
         </div>
       )}
@@ -148,9 +136,8 @@ DecisionNodeOptions.propTypes = {
   onToggleVariables: PropTypes.func.isRequired,
   enableVariables: PropTypes.bool,
   onToggleLogic: PropTypes.func.isRequired,
-  enableLogic: PropTypes.bool,
-  onToggleAnimation: PropTypes.func.isRequired,
-  enableAnimation: PropTypes.bool
+  enableLogic: PropTypes.bool
+  // onToggleAnimation y enableAnimation eliminados de propTypes
 };
 
 export default DecisionNodeOptions;
