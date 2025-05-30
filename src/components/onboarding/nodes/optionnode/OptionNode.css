@@ -172,6 +172,7 @@
 
 /* Estilos para handles reposicionados */
 .option-node__handle {
+  cursor: pointer !important;
   width: 12px;
   height: 12px;
   background-color: rgba(var(--option-node-accent), 0.9);
@@ -220,6 +221,7 @@
 
 /* Conectores en modo ultra rendimiento */
 .option-node--ultra-performance .option-node__handle {
+  cursor: pointer !important;
   width: 10px;
   height: 10px;
   border-width: 1px;
@@ -538,6 +540,7 @@
 
 /* Conectores en modo ultra rendimiento */
 .option-node--ultra-performance .option-node__handle {
+  cursor: pointer !important;
   width: 10px;
   height: 10px;
   border-width: 1px;

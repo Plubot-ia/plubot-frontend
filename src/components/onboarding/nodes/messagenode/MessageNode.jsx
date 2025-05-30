@@ -118,7 +118,7 @@ const typeToTitle = (type) => {
  * @param {boolean} props.isUltraPerformanceMode - Indica si está en modo ultra rendimiento
  * @returns {JSX.Element} - Ícono del nodo de mensaje
  */
-const MessageNodeIcon = ({ type, isUltraPerformanceMode = false }) => {
+const MessageNodeIcon = memo(({ type, isUltraPerformanceMode = false }) => {
   // Tamaño y grosor optimizados para legibilidad
   const iconProps = { 
     size: 16, 
@@ -160,9 +160,19 @@ const MessageNodeIcon = ({ type, isUltraPerformanceMode = false }) => {
       {getIcon()}
     </div>
   );
-};
+});
 
-MessageNodeIcon.propTypes = {
+const MemoizedMessageNodeIcon = memo(MessageNodeIcon);
+
+// Hook para el menú contextual
+const useContextMenu = () => {
+  const { showContextMenu, hideContextMenu } = useFlowStore(state => ({ 
+    showContextMenu: state.showContextMenu,
+    hideContextMenu: state.hideContextMenu
+  }), shallow);
+  return { showContextMenu, hideContextMenu };
+};
+MemoizedMessageNodeIcon.propTypes = {
   type: PropTypes.oneOf(Object.values(MESSAGE_TYPES)),
   isUltraPerformanceMode: PropTypes.bool
 };
@@ -177,7 +187,7 @@ MessageNodeIcon.propTypes = {
  * @param {boolean} props.isUltraPerformanceMode - Indica si está en modo ultra rendimiento
  * @returns {JSX.Element} - Vista previa del mensaje formateada
  */
-const MessagePreview = ({ message = '', variables = [], isUltraPerformanceMode = false }) => {
+const MessagePreview = memo(({ message = '', variables = [], isUltraPerformanceMode = false }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const messageRef = useRef(null);
   const [isTruncated, setIsTruncated] = useState(false);
@@ -275,9 +285,10 @@ const MessagePreview = ({ message = '', variables = [], isUltraPerformanceMode =
       )}
     </div>
   );
-};
+});
 
-MessagePreview.propTypes = {
+const MemoizedMessagePreview = memo(MessagePreview);
+MemoizedMessagePreview.propTypes = {
   message: PropTypes.string,
   variables: PropTypes.arrayOf(
     PropTypes.shape({
@@ -596,13 +607,12 @@ const MessageNodeContent = memo(({
   variables,
   isEditing,
   isUltraMode,
-  textareaRef,
-  handleMessageChange,
-  handleSave,
-  handleCancel,
   onUpdateNodeData,
   safeData, 
   DEFAULT_MESSAGE,
+  handleMessageChange,
+  handleSave,
+  handleCancel,
   handleAddVariable,
   handleUpdateVariable,
   handleDeleteVariable
@@ -634,7 +644,6 @@ const MessageNodeContent = memo(({
             {isEditing && ( // Conditionally render editor internals
               <>
                 <textarea
-                  ref={textareaRef}
                   className="message-node__textarea nodrag"
                   value={message} // Usa estado local currentMessage
                   onChange={handleMessageChange}
@@ -805,6 +814,8 @@ const MessageNode = memo(({
   const [message, setMessage] = useState(safeData.message);
   const [variables, setVariables] = useState(data.variables || []); // Inicializar desde data.variables
   const [nodeState, setNodeState] = useState({ isSaving: false });
+  const { showContextMenu, hideContextMenu } = useContextMenu();
+  const updateNodeInternals = useUpdateNodeInternals();
 
   // Sincronizar estado local con props actualizadas desde Zustand
   useEffect(() => {
@@ -859,6 +870,53 @@ const MessageNode = memo(({
       setIsEditing(true);
     }
   }, [isEditing, isUltraMode]);
+
+  /**
+   * Opciones del menú contextual
+   * Desactivadas en modo ultra rendimiento
+   */
+  const contextMenuOptions = useMemo(() => [
+    {
+      label: 'Editar',
+      icon: <Edit2 size={14} aria-hidden="true" />,
+      action: () => !isUltraMode && setIsEditing(true),
+      disabled: isUltraMode
+    },
+    {
+      label: 'Duplicar',
+      icon: <Copy size={14} aria-hidden="true" />,
+      action: () => {
+        // Usar la acción de duplicación de Zustand si está disponible
+        if (duplicateNode && !isUltraMode) {
+          duplicateNode(id);
+        }
+        // Desactivada en modo ultra rendimiento
+      },
+      disabled: isUltraMode
+    },
+    {
+      label: 'Eliminar',
+      icon: <Trash2 size={14} aria-hidden="true" />,
+      action: () => {
+        // Usar la acción de eliminación de Zustand si está disponible
+        if (removeNode && !isUltraMode) {
+          removeNode(id);
+        }
+        // Desactivada en modo ultra rendimiento
+      },
+      isDanger: true,
+      disabled: isUltraMode || isEditing // No permitir eliminar si se está editando
+    }
+  ], [isUltraMode, isEditing, id, duplicateNode, removeNode, setIsEditing, hideContextMenu]);
+
+  const handleNodeContextMenu = useCallback((event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    if (nodeRef.current) { // nodeRef is defined below
+      const nodeBounds = nodeRef.current.getBoundingClientRect();
+      showContextMenu(nodeBounds.left + nodeBounds.width / 2, nodeBounds.top + nodeBounds.height / 2, id, contextMenuOptions);
+    }
+  }, [id, contextMenuOptions, showContextMenu, nodeRef]); // Added nodeRef dependency
 
   /**
    * Manejar clic fuera del nodo para guardar cambios
@@ -984,43 +1042,7 @@ const MessageNode = memo(({
     }
   }, [id, isEditing, deleteMessageNodeVariable]);
 
-  /**
-   * Opciones del menú contextual
-   * Desactivadas en modo ultra rendimiento
-   */
-  const contextMenuOptions = useMemo(() => [
-    {
-      label: 'Editar',
-      icon: <Edit2 size={14} aria-hidden="true" />,
-      action: () => !isUltraMode && setIsEditing(true),
-      disabled: isUltraMode
-    },
-    {
-      label: 'Duplicar',
-      icon: <Copy size={14} aria-hidden="true" />,
-      action: () => {
-        // Usar la acción de duplicación de Zustand si está disponible
-        if (duplicateNode && !isUltraMode) {
-          duplicateNode(id);
-        }
-        // Desactivada en modo ultra rendimiento
-      },
-      disabled: isUltraMode
-    },
-    {
-      label: 'Eliminar',
-      icon: <Trash2 size={14} aria-hidden="true" />,
-      action: () => {
-        // Usar la acción de eliminación de Zustand si está disponible
-        if (removeNode && !isUltraMode) {
-          removeNode(id);
-        }
-        // Desactivada en modo ultra rendimiento
-      },
-      isDanger: true,
-      disabled: isUltraMode
-    }
-  ], [isUltraMode]);
+
 
   /**
    * Clases CSS del nodo
@@ -1033,26 +1055,125 @@ const MessageNode = memo(({
     if (isUltraMode) classes.push('ultra-performance');
     return classes.join(' ');
   }, [messageType, selected, isUltraMode]);
+
+  const nodeStyle = useMemo(() => {
+    const styles = {};
+    // Los estilos dinámicos basados en isUltraMode o selected se pueden agregar aquí.
+    // Por ejemplo:
+    // if (isUltraMode) { // isUltraMode aquí se refiere al definido en el alcance del componente
+    //   styles.opacity = 0.8;
+    // }
+    // if (selected) { // selected aquí se refiere al definido en el alcance del componente
+    //   styles.outline = '2px solid var(--message-node-primary, #2563eb)';
+    // }
+    return styles;
+  }, [isUltraMode, selected]); // Dependencias correctas: isUltraMode y selected del alcance del componente
+
+useEffect(() => {
+  if (isUltraMode && nodeRef.current) {
+    const animationFrameId = requestAnimationFrame(() => {
+      const handles = nodeRef.current.querySelectorAll('.react-flow__handle.message-node__handle--ultra');
+      handles.forEach(handle => {
+        handle.style.setProperty('background-color', '#f8fafc', 'important');
+        handle.style.setProperty('border', '1px solid #2563eb', 'important');
+        handle.style.setProperty('border-radius', '50%', 'important');
+        handle.style.setProperty('width', '10px', 'important');
+        handle.style.setProperty('height', '10px', 'important');
+        handle.style.setProperty('box-shadow', '0 0 0 1px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.1)', 'important');
+        handle.style.setProperty('transition', 'none', 'important');
+        handle.style.setProperty('animation', 'none', 'important');
+        handle.style.setProperty('transform', 'none', 'important');
+        handle.style.setProperty('cursor', 'pointer', 'important');
+        handle.style.setProperty('z-index', '120', 'important');
+
+        if (handle.classList.contains('react-flow__handle-top') || handle.classList.contains('message-node__handle--target')) {
+          handle.style.setProperty('top', '-10px', 'important');
+          handle.style.removeProperty('bottom'); // Limpiar por si acaso
+        }
+        if (handle.classList.contains('react-flow__handle-bottom') || handle.classList.contains('message-node__handle--source')) {
+          handle.style.setProperty('bottom', '-10px', 'important');
+          handle.style.removeProperty('top'); // Limpiar por si acaso
+        }
+      });
+    });
+
+    return () => {
+      cancelAnimationFrame(animationFrameId);
+      if (nodeRef.current) {
+        const handlesInNode = nodeRef.current.querySelectorAll('.react-flow__handle.message-node__handle--ultra');
+        handlesInNode.forEach(handle => {
+          const propsToRemove = [
+            'background-color', 'border', 'border-radius', 'width', 'height',
+            'box-shadow', 'transition', 'animation', 'transform', 'cursor',
+            'z-index', 'top', 'bottom'
+          ];
+          propsToRemove.forEach(prop => handle.style.removeProperty(prop));
+        });
+      }
+    };
+  } else if (nodeRef.current) { // No está en modo ultra, pero nodeRef existe, asegurar limpieza
+    const handlesInNode = nodeRef.current.querySelectorAll('.react-flow__handle.message-node__handle--ultra');
+    handlesInNode.forEach(handle => {
+      const propsToRemove = [
+        'background-color', 'border', 'border-radius', 'width', 'height',
+        'box-shadow', 'transition', 'animation', 'transform', 'cursor',
+        'z-index', 'top', 'bottom'
+      ];
+      propsToRemove.forEach(prop => handle.style.removeProperty(prop));
+    });
+  }
+  // No se necesita un return explícito si todas las rutas están cubiertas o devuelven undefined implícitamente
+}, [isUltraMode, id, safeData, nodeRef]); // Dependencias del efecto (zoomLevel removido ya que isUltraMode lo cubre)
   
   /**
    * Optimización para modo ultra rendimiento
    * Reduce la cantidad de elementos renderizados
    */
-  const renderUltraPerformanceContent = () => (
-    <div className="message-node__ultra-content">
+  const renderUltraPerformanceContent = () => {
+    // ultraHandleBaseStyle ya no es necesario, los estilos se manejan por CSS.
+    return (
+
+    <div className="message-node__ultra-content" data-testid={`message-node-ultra-content-${id}`}>
+      <Handle
+        type="target"
+        position={Position.Top} // O la posición que corresponda para modo ultra
+        id="default"
+        isConnectable={isConnectable} // Usar directamente isConnectable
+        className="message-node__handle message-node__handle--target message-node__handle--ultra"
+        aria-label="Conector de entrada (ultra)"
+        title="Conectar desde otro nodo (ultra)"
+        tabIndex={-1} // Generalmente no focuseable en modo ultra
+        role="button"
+        data-testid={`message-node-target-handle-ultra-${id}`}
+        // La prop 'style' se elimina para depender de las clases CSS
+      />
+      <Handle
+        type="source"
+        position={Position.Bottom} // O la posición que corresponda para modo ultra
+        id="default"
+        isConnectable={isConnectable} // Usar directamente isConnectable
+        className="message-node__handle message-node__handle--source message-node__handle--ultra"
+        aria-label="Conector de salida (ultra)"
+        title="Conectar hacia otro nodo (ultra)"
+        tabIndex={-1} // Generalmente no focuseable en modo ultra
+        role="button"
+        data-testid={`message-node-source-handle-ultra-${id}`}
+        // La prop 'style' se elimina para depender de las clases CSS
+      />
       <div className="message-node__ultra-header">
         <MessageNodeIcon type={messageType} isUltraPerformanceMode={true} />
-        <span className="message-node__ultra-title">{messageType}</span>
+        <span className="message-node__ultra-title">{typeToTitle(messageType)}</span>
       </div>
       <div className="message-node__ultra-message">
         {(() => {
-          if (!safeData.message) return DEFAULT_MESSAGE; // O un string vacío si es preferible
+          if (!safeData.message) return DEFAULT_MESSAGE;
           const processed = replaceVariablesInMessage(safeData.message, safeData.variables);
           return processed.length > 50 ? `${processed.substring(0, 50)}...` : processed;
         })()}
       </div>
     </div>
   );
+};
 
   /**
    * Renderizar el componente MessageNode
@@ -1061,11 +1182,23 @@ const MessageNode = memo(({
     <div
       ref={nodeRef}
       className={nodeClasses}
+      style={nodeStyle}
       onDoubleClick={handleDoubleClick}
+      onContextMenu={handleNodeContextMenu} // Add context menu handler
       data-testid="message-node"
+      aria-labelledby={`message-node-title-${id}`} // Add for accessibility
+      aria-describedby={`message-node-content-${id}`} // Add for accessibility
       role="group"
-      aria-label={`Nodo de mensaje: ${messageType}`}
+      // aria-label removed as labelledby/describedby are more specific
       tabIndex={0}
+      onKeyDown={(e) => { // Add keydown handler
+        if (e.key === 'Enter' && !isEditing) {
+          // Optional: handleDoubleClick(); 
+        }
+        if (e.key === 'Escape' && isEditing) {
+          saveChanges();
+        }
+      }}
     >
       <ContextMenu options={contextMenuOptions}>
         {/* Cabecera del nodo */}
@@ -1116,54 +1249,60 @@ const MessageNode = memo(({
           type="target"
           position={Position.Top}
           id="default" // ID estandarizado para el handle de entrada
-          isConnectable={isConnectable && !isUltraMode}
+          isConnectable={isConnectable}
           className={`message-node__handle message-node__handle--target ${isUltraMode ? 'message-node__handle--ultra' : ''}`}
           aria-label="Conector de entrada"
           title="Conectar desde otro nodo"
           tabIndex={isConnectable && !isUltraMode ? 0 : -1}
           role="button"
           data-testid="message-node-target-handle"
-          style={{
-            top: '-10px', // Alejado del borde para mejor visibilidad
-            width: '18px',
-            height: '18px',
-            backgroundColor: '#3b82f6',
-            border: isUltraMode ? '2px solid white' : '3px solid white',
-            boxShadow: '0 0 0 2px rgba(0, 0, 0, 0.15), 0 4px 6px rgba(0, 0, 0, 0.1)',
-            zIndex: 110
-          }}
+          style={isUltraMode ? 
+            { transform: 'none', animation: 'none', opacity: 1, backgroundColor: 'var(--handle-color-ultra, #888)', width: '10px', height: '10px', borderRadius: '3px', border: '1px solid var(--handle-border-ultra, #555)', boxShadow: 'none', zIndex: 111, top: '-5px' } : 
+            {
+              top: '-10px',
+              width: '18px',
+              height: '18px',
+              backgroundColor: '#3b82f6',
+              border: '3px solid white',
+              boxShadow: '0 0 0 2px rgba(0, 0, 0, 0.15), 0 4px 6px rgba(0, 0, 0, 0.1)',
+              zIndex: 110
+            }
+          }
         />
         <Handle
           type="source"
           position={Position.Bottom}
           id="default" // ID estandarizado para el handle de salida
-          isConnectable={isConnectable && !isUltraMode}
+          isConnectable={isConnectable}
           className={`message-node__handle message-node__handle--source ${isUltraMode ? 'message-node__handle--ultra' : ''}`}
           aria-label="Conector de salida"
           title="Conectar hacia otro nodo"
           tabIndex={isConnectable && !isUltraMode ? 0 : -1}
           role="button"
           data-testid="message-node-source-handle"
-          style={{
-            bottom: '-10px', // Alejado del borde para mejor visibilidad
-            width: '18px',
-            height: '18px',
-            backgroundColor: '#3b82f6',
-            border: isUltraMode ? '2px solid white' : '3px solid white',
-            boxShadow: '0 0 0 2px rgba(0, 0, 0, 0.15), 0 4px 6px rgba(0, 0, 0, 0.1)',
-            zIndex: 110
-          }}
+          style={isUltraMode ? 
+            { transform: 'none', animation: 'none', opacity: 1, backgroundColor: 'var(--handle-color-ultra, #888)', width: '10px', height: '10px', borderRadius: '3px', border: '1px solid var(--handle-border-ultra, #555)', boxShadow: 'none', zIndex: 111, bottom: '-5px' } : 
+            {
+              bottom: '-10px',
+              width: '18px',
+              height: '18px',
+              backgroundColor: '#3b82f6',
+              border: '3px solid white',
+              boxShadow: '0 0 0 2px rgba(0, 0, 0, 0.15), 0 4px 6px rgba(0, 0, 0, 0.1)',
+              zIndex: 110
+            }
+          }
         />
-      </ContextMenu>
-      
-      {/* Texto para lectores de pantalla */}
-      <span className="sr-only">
-        Nodo de mensaje tipo {messageType}. {message}
-        {variables && variables.length > 0 && ` Con ${variables.length} variables.`}
-        {safeData.lastUpdated && ` Última actualización: ${formatDateRelative(safeData.lastUpdated)}.`}
-      </span>
-    </div>
-  );
+    </ContextMenu>
+    
+    {/* Texto para lectores de pantalla */}
+    <span className="sr-only">
+      Nodo de mensaje tipo {messageType}. {message}
+      {variables && variables.length > 0 && ` Con ${variables.length} variables.`}
+      {safeData.lastUpdated && ` Última actualización: ${formatDateRelative(safeData.lastUpdated)}.`}
+    </span>
+  </div>
+);
 }); // Corrected closing for: const MessageNode = memo(...) 
 
 MessageNode.displayName = 'MessageNode';

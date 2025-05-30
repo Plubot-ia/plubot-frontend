@@ -41,7 +41,7 @@ import { z } from 'zod';
 import debounce from 'lodash/debounce';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import './MessageNode.css';
-import MessageNodeFixed from './MessageNodeFixed';
+// import MessageNodeFixed from './MessageNodeFixed';
 
 // Importaciones con lazy loading para optimizar el rendimiento
 const Tooltip = lazy(() => import('../../ui/ToolTip'));
@@ -1469,8 +1469,12 @@ const MessageNode: React.FC<MessageNodeProps> = memo(({
    * y mejorar la apariencia estética
    */
   const renderUltraPerformanceContent = () => {
-    // Pasar datos relevantes al componente optimizado
+    // Devolver un placeholder o el contenido simplificado que no dependa de MessageNodeFixed
     return (
+      <div className="message-node__ultra-placeholder">
+        <MessageNodeIcon type={messageType} isUltraPerformanceMode={true} />
+        <span>{safeData.label || t(`messageTypes.${messageType}`)}</span>
+      </div>
       <MessageNodeFixed 
         type={messageType}
         message={message}
@@ -1526,7 +1530,33 @@ const MessageNode: React.FC<MessageNodeProps> = memo(({
         </>
       ) : (
         // Contenido normal para modo estándar
-        <Suspense fallback={<div className="message-node__loading">{t('loading')}</div>}>
+        <>
+          {/* Handles para el modo normal */}
+          <Handle
+            type="target"
+            position={NODE_CONFIG.HANDLE_POSITIONS.INPUT}
+            isConnectable={isConnectable}
+            className="message-node__handle message-node__handle--target"
+            id={`input-handle-${id}`}
+            aria-label={t('inputConnector')}
+            title={t('connectFromNode')}
+            tabIndex={-1}
+            role="button"
+            data-testid={`message-node-target-handle-normal-${id}`}
+          />
+          <Handle
+            type="source"
+            position={NODE_CONFIG.HANDLE_POSITIONS.OUTPUT}
+            isConnectable={isConnectable}
+            className="message-node__handle message-node__handle--source"
+            id={`output-handle-${id}`}
+            aria-label={t('outputConnector')}
+            title={t('connectToNode')}
+            tabIndex={-1}
+            role="button"
+            data-testid={`message-node-source-handle-normal-${id}`}
+          />
+          <Suspense fallback={<div className="message-node__loading">{t('loading')}</div>}>
           <ContextMenu options={contextMenuOptions}>
             {/* Cabecera del nodo */}
             <header className="message-node__header">
@@ -1804,7 +1834,9 @@ const MessageNode: React.FC<MessageNodeProps> = memo(({
             />
           )}
         </ContextMenu>
-      </Suspense>)
+      </Suspense>
+        </>
+      )
       }
       
       {/* Texto para lectores de pantalla */}

@@ -708,6 +708,7 @@
 
 /* Estilos para asegurar compatibilidad con otros componentes */
 .end-node .react-flow__handle {
+  cursor: pointer !important;
   background-color: rgb(var(--end-node-primary));
   border-color: rgba(var(--end-node-bg), 0.8);
   transition: all var(--end-node-transition);

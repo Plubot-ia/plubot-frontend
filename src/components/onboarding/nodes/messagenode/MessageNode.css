@@ -194,7 +194,7 @@
 
 /* Hover - Interacción suave */
 .message-node:hover:not(.message-node--ultra-performance) {
-  transform: translateY(-2px);
+  /* transform: translateY(-2px); */ /* Evita salto del nodo en hover */
   box-shadow: var(--message-node-shadow-lg);
   border-color: var(--message-node-border-hover-color);
 }
@@ -402,7 +402,8 @@
    HANDLE STYLING (Puntos de conexión)
    ====================================================== */
 
-.message-node .react-flow__handle {
+.message-node .react-flow__handle.react-flow__handle {
+  cursor: pointer !important;
   width: 10px;
   height: 10px;
   background-color: var(--message-node-bg-light, #f8fafc);
@@ -417,7 +418,7 @@
   z-index: 10; /* Ensure handles are above node content if overlapping */
 }
 
-.message-node .react-flow__handle:hover {
+.message-node .react-flow__handle.react-flow__handle:hover {
   background-color: var(--message-node-primary, #3b82f6);
   transform: scale(1.25);
   box-shadow: 0 0 0 3px rgba(var(--message-node-primary-rgb, 59, 130, 246), 0.2), /* Ring effect on hover */
@@ -1007,6 +1008,41 @@
   box-shadow: none;
 }
 
+/* Handles de React Flow en modo ultra rendimiento: Estáticos y con apariencia de modo normal */
+/* Handles de React Flow en modo ultra rendimiento: Estáticos y con apariencia de modo normal */
+.message-node--ultra-performance .react-flow__handle.message-node__handle.message-node__handle--ultra {
+  width: 10px !important;
+  height: 10px !important;
+  background-color: #f8fafc !important; /* Hardcoded desired background */
+  border: 1px solid #2563eb !important; /* Hardcoded desired border */
+  border-radius: 50% !important; /* Desired circular shape */
+  box-shadow: 0 0 0 1px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.1) !important; /* Desired shadow */
+  transition: none !important;
+  animation: none !important;
+  cursor: pointer !important;
+  transform: none !important;
+  z-index: 120 !important; /* Desired z-index */
+}
+
+/* Specific positioning for top (target) handle */
+.message-node--ultra-performance .react-flow__handle-top.message-node__handle.message-node__handle--ultra {
+  top: -10px !important; /* Desired position */
+}
+
+/* Specific positioning for bottom (source) handle */
+.message-node--ultra-performance .react-flow__handle-bottom.message-node__handle.message-node__handle--ultra {
+  bottom: -10px !important; /* Desired position */
+}
+
+.message-node--ultra-performance .react-flow__handle.message-node__handle.message-node__handle--ultra:hover {
+  /* Maintain exact same appearance for static behavior */
+  background-color: #f8fafc !important;
+  border: 1px solid #2563eb !important;
+  box-shadow: 0 0 0 1px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.1) !important;
+  transform: none !important;
+}
+
+
 /* ======================================================
    SECCIÓN DE VARIABLES
    ====================================================== */
@@ -1568,6 +1604,76 @@
   border-color: #a855f7; /* Púrpura */
 }
 
+/* ==========================================================================
+   DESACTIVACIÓN ULTRA-PERFORMANCE HANDLES (ESPECIFICIDAD AUMENTADA)
+   ========================================================================== */
+
+/*
+  Asumimos que el nodo tiene ambas clases: .message-node y .message-node--ultra-performance
+  O que .message-node--ultra-performance es un contenedor de .message-node.
+  Para máxima especificidad, combinamos clases del nodo con las del handle.
+*/
+
+/* Regla base para handles en modo ultra: sin animación, transición, transformación ni sombra */
+.message-node.message-node--ultra-performance .react-flow__handle,
+.message-node.message-node--ultra-performance .message-node__handle {
+  animation: none !important;
+  transition: none !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* Override específico para :hover y :focus en .react-flow__handle.react-flow__handle */
+.message-node.message-node--ultra-performance .react-flow__handle.react-flow__handle:hover,
+.message-node.message-node--ultra-performance .react-flow__handle.react-flow__handle:focus {
+  transform: none !important; /* Anula el scale(1.25) */
+  box-shadow: none !important;
+  animation: none !important;
+  transition: none !important;
+  /* Si el background cambia, también resetearlo si es necesario */
+  /* background-color: var(--desired-ultra-handle-bg, #ccc) !important; */
+}
+
+/* Override específico para :hover y :focus en .message-node__handle */
+.message-node.message-node--ultra-performance .message-node__handle:hover,
+.message-node.message-node--ultra-performance .message-node__handle:focus {
+  transform: none !important; /* Anula el scale(1.2) */
+  box-shadow: none !important;
+  animation: none !important;
+  transition: none !important;
+}
+
+/* Override específico para la animación 'handlePulse' en .message-node__handle--target */
+.message-node.message-node--ultra-performance .message-node__handle--target:hover,
+.message-node.message-node--ultra-performance .message-node__handle--target:focus {
+  animation-name: none !important; /* Anula 'handlePulse' */
+  transform: none !important; /* Por si acaso también tiene transform */
+  box-shadow: none !important;
+  transition: none !important;
+}
+
+/* Si la clase .message-node__handle--ultra se usa específicamente en modo ultra */
+.message-node.message-node--ultra-performance .message-node__handle--ultra:hover,
+.message-node.message-node--ultra-performance .message-node__handle--ultra:focus {
+  transform: none !important;
+  box-shadow: none !important;
+  animation: none !important;
+  transition: none !important;
+}
+
+/* Alternativa usando body.ultra-mode si .message-node--ultra-performance no está en .message-node */
+body.ultra-mode .message-node .react-flow__handle.react-flow__handle:hover,
+body.ultra-mode .message-node .react-flow__handle.react-flow__handle:focus,
+body.ultra-mode .message-node .message-node__handle:hover,
+body.ultra-mode .message-node .message-node__handle:focus,
+body.ultra-mode .message-node .message-node__handle--target:hover,
+body.ultra-mode .message-node .message-node__handle--target:focus {
+  transform: none !important;
+  box-shadow: none !important;
+  animation: none !important;
+  transition: none !important;
+}
+
 /* ======================================================
    MODO ULTRA RENDIMIENTO ESPECÍFICO POR TIPO
    ====================================================== */
@@ -1972,6 +2078,8 @@
   flex-grow: 1; /* Permitir que los inputs crezcan */
   /* box-sizing: border-box; ya está aplicado en la regla general .message-node__variable-input */
 }
+
+
 
 /* Estilos base para los botones dentro del editor de variables */
 .message-node__variable-button {

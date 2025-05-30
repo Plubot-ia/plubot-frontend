@@ -482,10 +482,14 @@ const FlowMain = ({
     setSelectedNode(node);
     setMenuOpen(true);
     setMenu('node');
-    setMenuPosition({
-      x: event.clientX,
-      y: event.clientY
-    });
+    if (reactFlowInstance) {
+      const panePosition = reactFlowInstance.project({ x: event.clientX, y: event.clientY });
+      setMenuPosition(panePosition);
+    } else {
+      // Fallback o error si la instancia no está disponible
+      setMenuPosition({ x: event.clientX, y: event.clientY });
+      console.error('React Flow instance not available for context menu positioning');
+    }
   }, []);
   
   /**
@@ -652,10 +656,15 @@ const FlowMain = ({
    * @returns {boolean} - true si la conexión es válida
    */
   const isValidConnection = useCallback((connection) => {
-    if (externalValidConnectionsHandles) {
+    // Siempre delegar a externalValidConnectionsHandles si se proporciona.
+    // Esta función ahora vendrá de useHandleValidator en FlowEditor.jsx y contendrá toda la lógica.
+    if (typeof externalValidConnectionsHandles === 'function') {
+      // Los console.log detallados ahora estarán dentro de la función de useHandleValidator.
       return externalValidConnectionsHandles(connection);
     }
-    // Si no hay validador externo, permitir todas las conexiones
+
+    // Fallback MUY permisivo si no se proporciona un validador externo (no debería ocurrir en este proyecto).
+    console.warn('[isValidConnection FlowMain] No externalValidConnectionsHandles provided. Allowing all connections by default.');
     return true;
   }, [externalValidConnectionsHandles]);
   

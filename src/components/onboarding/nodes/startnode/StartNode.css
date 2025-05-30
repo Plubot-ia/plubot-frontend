@@ -27,6 +27,8 @@
   --start-node-text: #1f2937;
   --start-node-text-secondary: #4b5563;
   --start-node-icon: var(--start-node-accent-hex);
+  --start-node-handle: var(--start-node-accent-hex); /* Estilos para el handle cuando el cursor está encima */
+  --start-node-handle-hover: #00aaff; /* Un azul un poco más claro para hover, o ajusta según preferencia */
   
   /* Tipografía premium */
   --start-node-font-family: 'Inter', system-ui, -apple-system, sans-serif;
@@ -52,9 +54,9 @@
   --start-node-animation-duration: 0.5s;
   
   /* Modo Ultra Rendimiento - Minimalista y eficiente */
-  --start-node-ultra-bg: #1f2937;
+  --start-node-ultra-bg: #2c7be5; /* Azul más claro, similar al acento normal */
   --start-node-ultra-border: #4b5563;
-  --start-node-ultra-text: #e5e7eb;
+  --start-node-ultra-text: #ffffff; /* Texto blanco para mejor contraste con el nuevo fondo azul */
   --start-node-ultra-text-secondary: #9ca3af;
   --start-node-ultra-accent-rgb: 59, 130, 246;
   --start-node-ultra-accent-hex: #3b82f6;
@@ -84,8 +86,9 @@
     --start-node-text-secondary: #9ca3af;
     --start-node-shadow: 0 8px 24px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.05);
     --start-node-shadow-hover: 0 12px 32px rgba(0, 0, 0, 0.25);
-    --start-node-ultra-bg: #111827;
-    --start-node-ultra-icon-color: #64748b; /* Ensure this is used or remove if not */
+    --start-node-ultra-bg: #2c7be5; /* Aplicar el azul claro también en dark mode */
+    --start-node-ultra-icon-color: #ffffff; /* Icono blanco para contraste */
+    --start-node-ultra-text: #ffffff; /* Asegurar texto blanco en dark mode ultra */
 
     /* Dark mode variants for styles from JSX (blue theme) */
     --start-node-bg-base-jsx: linear-gradient(135deg, #0059b3 0%, #004080 100%);
@@ -260,11 +263,18 @@
 }
 
 .start-node--ultra-performance .start-node__handle {
-  background-color: rgba(var(--start-node-ultra-accent-rgb), 0.7);
-  box-shadow: none;
-  border: 1px solid rgba(var(--start-node-ultra-accent-rgb), 1);
-  width: 10px;
-  height: 10px;
+  background-color: var(--start-node-ultra-accent-hex); /* Usar el color de acento ultra */
+  border-color: var(--start-node-ultra-text); /* Borde blanco para contraste */
+  box-shadow: 0 0 4px rgba(var(--start-node-ultra-accent-rgb), 0.4);
+  width: 18px; /* Unificar tamaño con modo normal */
+  height: 18px; /* Unificar tamaño con modo normal */
+  animation: none !important; /* Desactivar animación en modo ultra */
+}
+
+.start-node--ultra-performance .start-node__handle:hover {
+  background-color: var(--start-node-ultra-accent-hex); /* Mantener color en hover */
+  /* transform: scale(1.1); */ /* Eliminado para evitar movimiento */
+  border-color: rgba(255, 255, 255, 0.8);
 }
 
 .start-node--ultra-performance .start-node__handle::after {
@@ -383,75 +393,67 @@
 }
 
 /* ======================================================
-   HANDLES (Puntos de conexión)
+   HANDLE (CONECTOR DE SALIDA)
    ====================================================== */
 
-/**
- * Handle de conexión - Diseño premium azul
- */
-.start-node__handle {
+/* ======================================================
+   HANDLES (PUNTOS DE CONEXIÓN) - MODO NORMAL
+   ====================================================== */
+
+/* Estilo base para los handles, tanto source como target si los hubiera */
+.react-flow__handle.start-node__handle {
   /* Estilo base del handle - emisor de energía */
-  width: 16px;
-  height: 16px;
-  background-color: var(--start-node-handle);
-  border-radius: 50%;
-  border: 2px solid white; /* Borde blanco para destacar sobre el azul */
-  box-shadow: 0 0 10px rgba(var(--start-node-accent-rgb), 0.7), 0 0 15px rgba(var(--start-node-accent-rgb), 0.5);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease-in-out;
-  z-index: 10; /* Asegurar que esté sobre otros elementos del nodo */
-  position: absolute; /* Posicionamiento absoluto respecto al nodo */
-  top: 50%;
-  transform: translateY(-50%);
+  width: 18px !important;
+  height: 18px !important;
+  background-color: var(--start-node-handle) !important;
+  border-radius: 50% !important;
+  border: 3px solid white !important;
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.15), 0 4px 6px rgba(0, 0, 0, 0.1) !important;
+  cursor: pointer !important; /* O cambia a 'crosshair' si prefieres y este funciona */
+  z-index: 10 !important;
+  position: absolute !important;
+  animation: none !important; /* Asegurar que no haya animación por defecto */
 }
 
-/* Handle específico de salida (source) a la derecha */
-.start-node__handle.react-flow__handle-right {
-  right: -10px; /* Ajustar para que sobresalga un poco */
+/* Estilos para el handle cuando el cursor está encima */
+.react-flow__handle.start-node__handle:hover {
+  background-color: var(--start-node-handle-hover) !important; /* Cambia color de fondo en hover */
+  /* No hay animación en hover por defecto, solo al conectar */
 }
 
-/* Efecto de pulso para el handle */
-.start-node__handle::after {
-  content: '';
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  background-color: transparent;
-  border: 2px solid var(--start-node-handle);
-  animation: pulse 2s infinite cubic-bezier(0.66, 0, 0, 1);
-  box-shadow: 0 0 5px rgba(var(--start-node-accent-rgb),0.5);
-  z-index: -1;
+/* Estilos para el handle cuando se está conectando (arrastrando una arista) */
+.react-flow__handle.start-node__handle.connecting {
+  animation: energyPulse 1.5s infinite ease-in-out !important;
+  /* Opcional: aplicar también el background-color de hover si se desea más énfasis */
+  /* background-color: var(--start-node-handle-hover) !important; */
 }
 
-.start-node__handle:hover {
-  transform: translateY(-50%) scale(1.2); /* Ajustar transform para mantener centrado vertical */
-  background-color: var(--start-node-handle-hover);
-  box-shadow: 0 0 12px rgba(var(--start-node-accent-rgb), 0.9), 0 0 20px rgba(var(--start-node-accent-rgb), 0.7);
-}
-
-.start-node__handle:hover::after {
-  animation-duration: 1.5s; /* Acelerar pulso en hover */
-}
-
-/* Animación de pulso - Efecto de energía */
-@keyframes pulse {
+/* Animación de pulso para el handle (usada en .connecting y opcionalmente en hover) */
+@keyframes energyPulse {
   0% {
-    transform: scale(0.9);
-    opacity: 1;
+    box-shadow: 0 0 0 0px rgba(var(--start-node-accent-rgb), 0.7), 0 0 0 2px rgba(0,0,0,0.15), 0 4px 6px rgba(0,0,0,0.1) !important;
   }
   50% {
-    transform: scale(1.5);
-    opacity: 0.5;
+    box-shadow: 0 0 0 6px rgba(var(--start-node-accent-rgb), 0.3), 0 0 0 2px rgba(0,0,0,0.15), 0 4px 6px rgba(0,0,0,0.1) !important;
   }
   100% {
-    transform: scale(2.2);
-    opacity: 0;
+    box-shadow: 0 0 0 0px rgba(var(--start-node-accent-rgb), 0.7), 0 0 0 2px rgba(0,0,0,0.15), 0 4px 6px rgba(0,0,0,0.1) !important;
   }
 }
+
+/* Posicionamiento específico para el handle de tipo 'source' (salida) */
+.react-flow__handle.start-node__handle--source {
+  right: -11px; /* Ajusta esto para que el handle sobresalga del nodo como desees */
+  /* top: 50%; React Flow maneja esto con la posición del handle */
+  /* transform: translateY(-50%); React Flow maneja esto */
+}
+
+/* Si tuvieras handles de tipo 'target' (entrada), podrías definirlos así: */
+/*
+.react-flow__handle.start-node__handle--target {
+  left: -11px;
+}
+*/
 
 /* ======================================================
    ACCESIBILIDAD
@@ -525,9 +527,6 @@
   100% { transform: translateX(-50%) scale(1); }
 }
 
-.start-node__handle:not(.start-node--ultra-performance .start-node__handle) {
-  animation: handlePulse 2s infinite;
-}
 
 /* Desactivar todas las animaciones en modo ultra rendimiento */
 .start-node--ultra-performance,

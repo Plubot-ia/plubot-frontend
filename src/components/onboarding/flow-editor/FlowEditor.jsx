@@ -167,14 +167,14 @@ const useEdgeTypes = () => {
  * @param {Array} nodes - Lista de nodos en el flujo
  * @returns {Object} - Funciones y configuración para validar conexiones
  */
-const useHandleValidator = (nodes) => {
+const useHandleValidator = (nodes, edges) => {
   // Mapa de conexiones válidas por tipo de nodo
   const validConnections = useMemo(() => ({
     // Nodo de inicio solo puede conectarse a nodos de mensaje, decisión o acción
-    start: ['message', 'decision', 'action', 'httpRequest'],
+    start: ['message', 'decision', 'action', 'httpRequest', 'power'], // Permitido conectar StartNode a PowerNode también
     
     // Nodo de mensaje puede conectarse a cualquier tipo excepto a sí mismo
-    message: ['end', 'decision', 'action', 'option', 'httpRequest', 'power'],
+    message: ['message', 'end', 'decision', 'action', 'option', 'httpRequest', 'power'], // Permitir MessageNode -> MessageNode
     
     // Nodo de decisión puede conectarse a cualquier tipo excepto inicio
     decision: ['message', 'end', 'action', 'option', 'httpRequest', 'power'],
@@ -206,8 +206,45 @@ const useHandleValidator = (nodes) => {
     if (!sourceNode || !targetNode) return false;
     
     // Verificar si el tipo de nodo destino está en la lista de conexiones válidas para el tipo de nodo fuente
-    return validConnections[sourceNode.type]?.includes(targetNode.type) || false;
-  }, [nodes, validConnections]);
+    const targetAllowedTypes = validConnections[sourceNode.type];
+    if (!targetAllowedTypes) {
+      console.log('[useHandleValidator] No target types defined for source type:', sourceNode.type);
+      return false; 
+    }
+
+    // Regla: StartNode solo puede ser fuente (no puede ser target).
+    if (targetNode.type === 'start') {
+      console.log('[useHandleValidator] Target is StartNode. Denying.');
+      return false;
+    }
+
+    // Regla: EndNode solo puede ser target (no puede ser fuente).
+    // (Esto ya está cubierto por validConnections['end'] siendo [], pero una verificación explícita es más clara)
+    if (sourceNode.type === 'end') {
+      console.log('[useHandleValidator] Source is EndNode. Denying.');
+      return false;
+    }
+
+    // Regla: Prevenir conexiones duplicadas.
+    const normalizedSourceHandle = connection.sourceHandle || 'default';
+    const normalizedTargetHandle = connection.targetHandle || 'default';
+    const existingEdge = edges.find(edge =>
+      edge.source === connection.source &&
+      edge.target === connection.target &&
+      (edge.sourceHandle || 'default') === normalizedSourceHandle &&
+      (edge.targetHandle || 'default') === normalizedTargetHandle
+    );
+    if (existingEdge) {
+      console.log('[useHandleValidator] Duplicate edge detected. Denying.');
+      return false;
+    }
+
+    const isAllowed = targetAllowedTypes.includes(targetNode.type);
+    if (!isAllowed) {
+      console.log(`[useHandleValidator] Connection ${sourceNode.type} -> ${targetNode.type} not allowed by rules.`);
+    }
+    return isAllowed; 
+  }, [nodes, edges, validConnections]);
   
   return { validConnectionsHandles, validConnections };
 };
@@ -348,7 +385,7 @@ const FlowEditorInner = ({
   const edgeTypes = useEdgeTypes();
   
   // Sistema de validación de conexiones entre nodos
-  const { validConnectionsHandles } = useHandleValidator(nodes);
+  const { validConnectionsHandles } = useHandleValidator(nodes, edges);
   
   // ==============================================
   // SECCIÓN 4: FUNCIONES Y CALLBACKS

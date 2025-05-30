@@ -425,7 +425,7 @@ const StartNode = memo(({ id, data, selected = false, isConnectable = true, isUl
       <Handle
         type="source"
         position={Position.Right} // Fijo
-        id="start-source" // ID único para el handle
+        id="default" // ID único para el handle
         isConnectable={isConnectable}
         className="start-node__handle start-node__handle--source"
       />

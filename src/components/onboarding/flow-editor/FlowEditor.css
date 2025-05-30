@@ -276,13 +276,13 @@
   border-radius: 50%;
 }
 
-.flow-editor-wrapper .react-flow__handle-top {
+/* .flow-editor-wrapper .react-flow__handle-top {
   top: -4px;
-}
+} */ /* Comentado para diagnóstico de DecisionNode handles */
 
-.flow-editor-wrapper .react-flow__handle-bottom {
-  bottom: -4px;
-}
+/* .flow-editor-wrapper .react-flow__handle-bottom {
+  bottom: -4px; 
+} */ /* Comentado para diagnóstico de DecisionNode handles */
 
 .flow-editor-wrapper .react-flow__handle-left {
   left: -4px;

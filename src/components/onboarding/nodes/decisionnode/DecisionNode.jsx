@@ -271,6 +271,7 @@ const DecisionNode = ({
       <Handle
         type="target"
         position={Position.Top}
+        className="decision-node__handle decision-node__handle--target"
       />
 
   <Suspense fallback={<div className="decision-node-loading">Cargando...</div>}>

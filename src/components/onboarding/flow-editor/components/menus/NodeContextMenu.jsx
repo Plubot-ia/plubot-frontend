@@ -10,7 +10,7 @@ import { FiEdit, FiTrash2, FiCopy, FiLink } from 'react-icons/fi';
  */
 const NodeContextMenu = ({ position, onClose }) => {
   const selectedNode = useFlowStore(state => state.nodes.find(n => n.id === state.selectedNode));
-  const { removeNode, duplicateNode } = useFlowStore();
+  const { removeNode, duplicateDecisionNode, updateNode } = useFlowStore(state => ({ removeNode: state.removeNode, duplicateDecisionNode: state.duplicateDecisionNode, updateNode: state.updateNode }));
   
   if (!selectedNode) return null;
   
@@ -20,14 +20,36 @@ const NodeContextMenu = ({ position, onClose }) => {
   };
   
   const handleDuplicate = () => {
-    duplicateNode && duplicateNode(selectedNode.id);
+    if (selectedNode.type === 'decision' && duplicateDecisionNode) {
+      duplicateDecisionNode(selectedNode.id);
+    } else {
+      console.warn(`Duplicate action not implemented for node type: ${selectedNode.type}`);
+      // O, si quieres una duplicación genérica simple (copia superficial de datos y nueva posición):
+      // const { id, type, position, data } = selectedNode;
+      // const newNode = {
+      //   id: `${type}-${generateId()}`,
+      //   type,
+      //   position: { x: position.x + 20, y: position.y + 20 },
+      //   data: { ...data }, // Copia superficial
+      // };
+      // useFlowStore.getState().addNode(newNode);
+    }
     onClose();
   };
   
   const handleEdit = () => {
     // Si esta función no está disponible en tu sistema, puedes implementarla
     // en useFlowStore o manejarla de otra forma
-    // editNode && editNode(selectedNode.id);
+    if (updateNode) {
+      // Asumimos que el estado de edición se maneja a través de una propiedad en 'data'
+      // o directamente en el nodo si la estructura lo permite.
+      // Esto es un ejemplo, la estructura exacta de 'data' puede variar.
+      const currentData = selectedNode.data || {};
+      updateNode(selectedNode.id, { ...selectedNode, data: { ...currentData, isEditing: true } });
+      console.log(`Set node ${selectedNode.id} to editing mode.`);
+    } else {
+      console.warn('updateNode function not available in store for editing.');
+    }
     onClose();
   };
   
