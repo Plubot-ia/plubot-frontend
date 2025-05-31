@@ -97,44 +97,21 @@ const OptionNodeHandle = React.memo(({
     
   const baseStyle = {
     zIndex: 50,
-    width: isUltraPerformanceMode ? '10px' : '16px',
-    height: isUltraPerformanceMode ? '10px' : '16px',
-    border: isUltraPerformanceMode ? '1px solid white' : '2px solid white',
-    boxShadow: isUltraPerformanceMode 
-      ? '0 1px 2px rgba(0, 0, 0, 0.1)' 
-      : '0 0 0 2px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.1)',
-    background: handleColor || '#3b82f6',
-    transition: isUltraPerformanceMode ? 'none' : 'all 0.2s cubic-bezier(0.25, 1, 0.5, 1)',
-    ...style
+    '--option-node-handle-bg-color': handleColor || '#3b82f6',
+    // width, height, border, boxShadow, background, transition serán manejados por CSS
+    ...style // Mantenemos los estilos de posicionamiento que vienen de OptionNode (top, left, etc.)
   };
   
-  // Manejadores de eventos para efectos visuales
-  const handleMouseEnter = useCallback((e) => {
-    if (e.target && !isUltraPerformanceMode) {
-      e.target.style.transform = 'scale(1.15) translateZ(0)';
-      e.target.style.boxShadow = `0 0 8px ${handleColor || '#3b82f6'}`;
-      e.target.style.filter = 'brightness(1.2)';
-    }
-  }, [isUltraPerformanceMode, handleColor]);
-  
-  const handleMouseLeave = useCallback((e) => {
-    if (e.target) {
-      e.target.style.transform = '';
-      e.target.style.filter = '';
-      e.target.style.boxShadow = '0 0 0 2px rgba(0, 0, 0, 0.15), 0 4px 6px rgba(0, 0, 0, 0.1)';
-    }
-  }, []);
+  // Los efectos visuales de hover ahora se manejan puramente con CSS.
   
   return (
-    <Handle
+    <Handle 
       type={type}
       position={positionObj}
       id={handleId}
-      isConnectable={isConnectable && !isEditing}
-      className={`option-node__handle option-node__handle--${type} ${isUltraPerformanceMode ? 'ultra-performance' : ''}`}
+      isConnectable={isConnectable}
+      className={`option-node__handle option-node__handle--${type} ${isUltraPerformanceMode ? 'option-node__handle--ultra' : ''} ${isEditing ? 'option-node__handle--editing' : ''}`}
       style={baseStyle}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
       tabIndex={0}
       aria-label={type === "source" ? "Salida del nodo de opción" : "Entrada del nodo de opción"}
       {...rest}
@@ -208,7 +185,8 @@ const OptionNode = ({
     instruction,
     sourceNode,
     lastUpdated,
-    isUltraPerformanceMode
+    isUltraPerformanceMode,
+    parentHandleColor // Extraer el color del handle padre
   } = nodeData;
   
   // Sincronizar el estado local con los datos del store
@@ -375,16 +353,15 @@ const OptionNode = ({
       aria-describedby={`option-node-description-${id}`}
     >
       {/* Conector de entrada en la parte superior */}
-      <OptionNodeHandle
-        type="target"
-        position={Position.Top}
-        id="target"
+      <OptionNodeHandle 
+        type="target" 
+        position={Position.Top} 
+        id="target" 
         isConnectable={isConnectable}
         isEditing={isEditing}
         isUltraPerformanceMode={isUltraPerformanceMode}
-        handleColor={borderColor}
+        handleColor={parentHandleColor} // Aplicar el color del handle padre
         style={{
-          top: '-12px',
           left: '50%',
           transform: 'translateX(-50%)'
         }}
@@ -478,7 +455,6 @@ const OptionNode = ({
         isUltraPerformanceMode={isUltraPerformanceMode}
         handleColor={borderColor}
         style={{
-          bottom: '-12px',
           left: '50%',
           transform: 'translateX(-50%)'
         }}

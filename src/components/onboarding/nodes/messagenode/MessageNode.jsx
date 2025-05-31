@@ -7,7 +7,7 @@
  */
 
 import React, { useState, useEffect, useRef, useCallback, memo, useMemo } from 'react';
-import { Handle, Position, useUpdateNodeInternals } from 'reactflow';
+import { Handle, Position, NodeResizer, useUpdateNodeInternals, useReactFlow } from 'reactflow';
 import { 
   MessageSquare, 
   User, 
@@ -166,11 +166,16 @@ const MemoizedMessageNodeIcon = memo(MessageNodeIcon);
 
 // Hook para el menú contextual
 const useContextMenu = () => {
-  const { showContextMenu, hideContextMenu } = useFlowStore(state => ({ 
+  const { showContextMenu, hideContextMenu, contextMenuPosition, contextMenuNodeId, contextMenuItems } = useFlowStore(state => ({ 
     showContextMenu: state.showContextMenu,
-    hideContextMenu: state.hideContextMenu
+    hideContextMenu: state.hideContextMenu,
+    contextMenuPosition: state.contextMenuPosition, // Assuming these exist in store for ContextMenu component
+    contextMenuNodeId: state.contextMenuNodeId,
+    contextMenuItems: state.contextMenuItems
   }), shallow);
-  return { showContextMenu, hideContextMenu };
+  // This hook now primarily fetches state for a global ContextMenu component if that's the pattern.
+  // If MessageNode handles its own ContextMenu rendering, then show/hide is enough.
+  return { showContextMenu, hideContextMenu, contextMenuPosition, contextMenuNodeId, contextMenuItems };
 };
 MemoizedMessageNodeIcon.propTypes = {
   type: PropTypes.oneOf(Object.values(MESSAGE_TYPES)),
@@ -809,6 +814,8 @@ const MessageNode = memo(({
   }), shallow);
   
   // Estados locales (preservando exactamente el comportamiento original)
+  const [isResizing, setIsResizing] = useState(false);
+  // screenToFlowPosition se obtiene de useReactFlow, pero no lo usaremos aquí directamente para el menú contextual global.
   const [isEditing, setIsEditing] = useState(false);
   const [showVariables, setShowVariables] = useState(false);
   const [message, setMessage] = useState(safeData.message);
@@ -879,44 +886,44 @@ const MessageNode = memo(({
     {
       label: 'Editar',
       icon: <Edit2 size={14} aria-hidden="true" />,
-      action: () => !isUltraMode && setIsEditing(true),
-      disabled: isUltraMode
+      action: () => setIsEditing(true),
+      disabled: false
     },
     {
       label: 'Duplicar',
       icon: <Copy size={14} aria-hidden="true" />,
       action: () => {
-        // Usar la acción de duplicación de Zustand si está disponible
-        if (duplicateNode && !isUltraMode) {
+        if (duplicateNode) {
           duplicateNode(id);
         }
-        // Desactivada en modo ultra rendimiento
       },
-      disabled: isUltraMode
+      disabled: false
     },
     {
       label: 'Eliminar',
       icon: <Trash2 size={14} aria-hidden="true" />,
       action: () => {
-        // Usar la acción de eliminación de Zustand si está disponible
-        if (removeNode && !isUltraMode) {
+        if (removeNode) {
           removeNode(id);
         }
-        // Desactivada en modo ultra rendimiento
       },
       isDanger: true,
-      disabled: isUltraMode || isEditing // No permitir eliminar si se está editando
+      disabled: isEditing // No permitir eliminar si se está editando
     }
   ], [isUltraMode, isEditing, id, duplicateNode, removeNode, setIsEditing, hideContextMenu]);
 
   const handleNodeContextMenu = useCallback((event) => {
     event.preventDefault();
     event.stopPropagation();
-    if (nodeRef.current) { // nodeRef is defined below
-      const nodeBounds = nodeRef.current.getBoundingClientRect();
-      showContextMenu(nodeBounds.left + nodeBounds.width / 2, nodeBounds.top + nodeBounds.height / 2, id, contextMenuOptions);
-    }
-  }, [id, contextMenuOptions, showContextMenu, nodeRef]); // Added nodeRef dependency
+    
+    // Usar las coordenadas del clic del viewport directamente para el menú contextual global
+    const x = event.clientX;
+    const y = event.clientY;
+    
+    console.log(`[MessageNode] Mostrando menú contextual en (viewport coords): x=${x}, y=${y} para nodo ${id}`);
+    
+    showContextMenu(x, y, id, contextMenuOptions);
+  }, [id, contextMenuOptions, showContextMenu]);
 
   /**
    * Manejar clic fuera del nodo para guardar cambios
@@ -1196,41 +1203,38 @@ useEffect(() => {
           // Optional: handleDoubleClick(); 
         }
         if (e.key === 'Escape' && isEditing) {
-          saveChanges();
+          cancelEdit(); // Escape should cancel edits
         }
       }}
     >
-      <ContextMenu options={contextMenuOptions}>
-        {/* Cabecera del nodo */}
-        <MessageNodeHeader
-          id={id}
-          titleFromData={safeData.title} 
-          messageType={safeData.type} // Usar safeData.type que es el tipo procesado
-          isUltraMode={isUltraMode}
-          isSaving={nodeState.isSaving} // Usar el estado local isSaving
-          isSelected={selected}
-          onDoubleClickHeader={handleDoubleClick}
-          lastUpdatedTimestamp={safeData.lastUpdated}
-          disableAnimations={disableAnimations} // Pasar la prop disableAnimations
-        />
-        
-        {/* Contenido principal del nodo */}
-        <MessageNodeContent
-          id={id}
-          message={message} 
-          variables={variables} 
-          isEditing={isEditing}
-          isUltraMode={isUltraMode}
-          onUpdateNodeData={updateMessageNodeData}
-          safeData={safeData}
-          handleMessageChange={handleMessageChange}
-          handleSave={saveChanges}
-          handleCancel={cancelEdit}
-          DEFAULT_MESSAGE={DEFAULT_MESSAGE}
-          handleAddVariable={handleAddVariable}
-          handleUpdateVariable={handleUpdateVariable}
-          handleDeleteVariable={handleDeleteVariable}
-        />
+      <MessageNodeHeader
+        id={id}
+        titleFromData={safeData.title} 
+        messageType={safeData.type} // Usar safeData.type que es el tipo procesado
+        isUltraMode={isUltraMode}
+        isSaving={nodeState.isSaving} // Usar el estado local isSaving
+        isSelected={selected}
+        onDoubleClickHeader={handleDoubleClick}
+        lastUpdatedTimestamp={safeData.lastUpdated}
+        disableAnimations={disableAnimations} // Pasar la prop disableAnimations
+      />
+      
+      <MessageNodeContent
+        id={id}
+        message={message} 
+        variables={variables} 
+        isEditing={isEditing}
+        isUltraMode={isUltraMode}
+        onUpdateNodeData={updateMessageNodeData}
+        safeData={safeData}
+        handleMessageChange={handleMessageChange}
+        handleSave={saveChanges}
+        handleCancel={cancelEdit}
+        DEFAULT_MESSAGE={DEFAULT_MESSAGE}
+        handleAddVariable={handleAddVariable}
+        handleUpdateVariable={handleUpdateVariable}
+        handleDeleteVariable={handleDeleteVariable}
+      />
 
         {/* Pie del nodo con información de última actualización */}
         {!isEditing && safeData.lastUpdated && !isUltraMode && (
@@ -1256,18 +1260,7 @@ useEffect(() => {
           tabIndex={isConnectable && !isUltraMode ? 0 : -1}
           role="button"
           data-testid="message-node-target-handle"
-          style={isUltraMode ? 
-            { transform: 'none', animation: 'none', opacity: 1, backgroundColor: 'var(--handle-color-ultra, #888)', width: '10px', height: '10px', borderRadius: '3px', border: '1px solid var(--handle-border-ultra, #555)', boxShadow: 'none', zIndex: 111, top: '-5px' } : 
-            {
-              top: '-10px',
-              width: '18px',
-              height: '18px',
-              backgroundColor: '#3b82f6',
-              border: '3px solid white',
-              boxShadow: '0 0 0 2px rgba(0, 0, 0, 0.15), 0 4px 6px rgba(0, 0, 0, 0.1)',
-              zIndex: 110
-            }
-          }
+          
         />
         <Handle
           type="source"
@@ -1280,20 +1273,8 @@ useEffect(() => {
           tabIndex={isConnectable && !isUltraMode ? 0 : -1}
           role="button"
           data-testid="message-node-source-handle"
-          style={isUltraMode ? 
-            { transform: 'none', animation: 'none', opacity: 1, backgroundColor: 'var(--handle-color-ultra, #888)', width: '10px', height: '10px', borderRadius: '3px', border: '1px solid var(--handle-border-ultra, #555)', boxShadow: 'none', zIndex: 111, bottom: '-5px' } : 
-            {
-              bottom: '-10px',
-              width: '18px',
-              height: '18px',
-              backgroundColor: '#3b82f6',
-              border: '3px solid white',
-              boxShadow: '0 0 0 2px rgba(0, 0, 0, 0.15), 0 4px 6px rgba(0, 0, 0, 0.1)',
-              zIndex: 110
-            }
-          }
+          
         />
-    </ContextMenu>
     
     {/* Texto para lectores de pantalla */}
     <span className="sr-only">

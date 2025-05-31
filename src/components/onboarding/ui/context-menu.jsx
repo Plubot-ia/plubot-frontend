@@ -31,20 +31,33 @@ const ContextMenu = React.forwardRef(({ items, position, onClose, options, child
   // Determinar el modo de uso del componente
   const isContextMenuMode = !!position;
 
-  // Cerrar el menú al hacer clic fuera
+  // Cerrar el menú al hacer clic fuera - implementación mejorada
   useEffect(() => {
     if (isContextMenuMode && onClose) {
+      // Cerrar el menú al hacer clic fuera o con la tecla Escape
       const handleClickOutside = (event) => {
+        // Si el menú existe y el clic fue fuera del menú
         if (localMenuRef.current && !localMenuRef.current.contains(event.target)) {
           onClose();
         }
       };
+      
+      const handleKeyDown = (event) => {
+        if (event.key === 'Escape') {
+          onClose();
+        }
+      };
+      
+      // Usar mousedown para capturar cualquier clic en cualquier parte del documento
       document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener('keydown', handleKeyDown);
+      
       return () => {
         document.removeEventListener('mousedown', handleClickOutside);
+        document.removeEventListener('keydown', handleKeyDown);
       };
     }
-  }, [isContextMenuMode, onClose]); // localMenuRef.current is used, but localMenuRef itself is stable
+  }, [isContextMenuMode, onClose]);
 
   // Manejador para el menú contextual en modo wrapper
   const handleContextMenu = (e) => {
@@ -66,6 +79,10 @@ const ContextMenu = React.forwardRef(({ items, position, onClose, options, child
     const pos = isContextMenuMode ? position : menuPosition;
     
     if (!menuItems || menuItems.length === 0 || !pos) return null;
+
+    // Añadir un offset pequeño para que el menú aparezca cerca del cursor pero no justo debajo
+    // Esto mejora la experiencia de usuario al evitar clics accidentales
+    const menuOffset = { x: 0, y: 0 };
     
     return (
       <div
@@ -73,10 +90,15 @@ const ContextMenu = React.forwardRef(({ items, position, onClose, options, child
         className="context-menu"
         style={{
           position: 'fixed',
-          top: pos.y,
-          left: pos.x,
+          top: pos.y + menuOffset.y,
+          left: pos.x + menuOffset.x,
           zIndex: 1000,
+          boxShadow: '0 2px 10px rgba(0, 0, 0, 0.2)',
+          borderRadius: '4px',
+          backgroundColor: 'white',
+          padding: '5px 0',
         }}
+        onClick={(e) => e.stopPropagation()} // Evitar que clics dentro del menú lo cierren
       >
         {menuItems.map((item, index) => (
           <button

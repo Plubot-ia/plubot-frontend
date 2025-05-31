@@ -11,6 +11,8 @@ import { ReactFlowProvider, applyNodeChanges, applyEdgeChanges, addEdge } from '
 // Hooks del core de la aplicación
 import useFlowStore from '@/stores/useFlowStore';
 import useAPI from '@/hooks/useAPI';
+import ContextMenu from '@/components/onboarding/ui/context-menu';
+import { shallow } from 'zustand/shallow';
 
 // Hooks especializados del editor de flujos
 import useNodeStyles from './hooks/useNodeStyles';
@@ -197,13 +199,26 @@ const useHandleValidator = (nodes, edges) => {
   
   // Función para validar si una conexión entre handles es válida
   const validConnectionsHandles = useCallback((connection) => {
+    console.log('[useHandleValidator] Validating connection:', JSON.stringify(connection, null, 2));
+    console.log('[useHandleValidator] Current nodes available to validator:', JSON.stringify(nodes.map(n => ({id: n.id, type: n.type})), null, 2));
+
+    if (!connection.source || !connection.target) {
+      console.log('[useHandleValidator] Denied: Missing source or target in connection object.');
+      return false;
+    }
     if (!connection.source || !connection.target) return false;
     
     // Encontrar los nodos fuente y destino
     const sourceNode = nodes.find(node => node.id === connection.source);
     const targetNode = nodes.find(node => node.id === connection.target);
+
+    console.log('[useHandleValidator] Found sourceNode:', sourceNode ? {id: sourceNode.id, type: sourceNode.type} : null);
+    console.log('[useHandleValidator] Found targetNode:', targetNode ? {id: targetNode.id, type: targetNode.type} : null);
     
-    if (!sourceNode || !targetNode) return false;
+    if (!sourceNode || !targetNode) {
+      console.log('[useHandleValidator] Denied: sourceNode or targetNode not found in current nodes array.');
+      return false;
+    }
     
     // Verificar si el tipo de nodo destino está en la lista de conexiones válidas para el tipo de nodo fuente
     const targetAllowedTypes = validConnections[sourceNode.type];
@@ -622,6 +637,10 @@ const FlowEditorInner = ({
         break;
       case 'decision':
         nodeData.question = '¿Qué decisión quieres tomar?';
+        nodeData.conditions = [
+          { id: `cond-${nodeId}-default-yes`, text: 'Sí' },
+          { id: `cond-${nodeId}-default-no`, text: 'No' }
+        ];
         nodeData.handleIds = ['output-0', 'output-1'];
         break;
       case 'option':
@@ -1096,6 +1115,21 @@ const FlowEditor = ({
   saveFlowData,
   hideHeader = false
 }) => {
+  const {
+    contextMenuVisible,
+    contextMenuPosition,
+    contextMenuItems,
+    hideContextMenu
+  } = useFlowStore(
+    (state) => ({
+      contextMenuVisible: state.contextMenuVisible,
+      contextMenuPosition: state.contextMenuPosition,
+      contextMenuItems: state.contextMenuItems,
+      hideContextMenu: state.hideContextMenu,
+    }),
+    shallow
+  );
+
   try {
     return (
       <ReactFlowProvider>
@@ -1115,6 +1149,14 @@ const FlowEditor = ({
           saveFlowData={saveFlowData}
           hideHeader={hideHeader}
         />
+        {/* Global Context Menu Renderer */}
+        {contextMenuVisible && contextMenuPosition && contextMenuItems && contextMenuItems.length > 0 && (
+          <ContextMenu
+            position={contextMenuPosition}
+            items={contextMenuItems}
+            onClose={hideContextMenu}
+          />
+        )}
       </ReactFlowProvider>
     );
   } catch (error) {

@@ -400,10 +400,10 @@ const _ensureEdgesAreVisibleImpl = (edges, isUltraMode, maxAttempts = 5, delay =
       if (visibleEdgesCount >= totalExpectedEdges * 0.9) {
         return repairedEdges;
       } else {
-        // Si no son suficientemente visibles, devolvemos undefined para que el fallback en ensureEdgesAreVisible se active.
-        // Esto es mejor que devolver un 'false' que luego nuestro parche convertiría en currentEdges.
-        // El objetivo es que setEdges reciba un array de aristas o undefined.
-        return undefined;
+        // Si no son suficientemente visibles, en lugar de devolver undefined (lo que causaría que se usen las aristas originales potencialmente desactualizadas),
+        // devolvemos las repairedEdges. Esto asume que las repairedEdges son el estado más correcto y que el DOM se actualizará.
+        console.warn(`[edgeFixUtil|_ensureEdgesAreVisibleImpl] No todas las aristas esperadas (${totalExpectedEdges}) están visibles en el DOM (${visibleEdgesCount}). Devolviendo repairedEdges (${repairedEdges?.length}) de todas formas para evitar posible pérdida visual.`);
+        return repairedEdges;
       }
 
     } catch (error) {

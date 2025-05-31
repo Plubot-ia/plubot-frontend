@@ -19,12 +19,15 @@ import { NODE_CONFIG, getConnectorColor } from '../DecisionNode.types';
  * @returns {JSX.Element} - Conectores del nodo
  */
 const DecisionNodeHandles = memo(({ 
+  nodeId, // Añadida la prop nodeId
   outputs, 
   isConnectable, 
   isUltraPerformanceMode,
   isEditing,
   activeOutputs = []
 }) => {
+  console.log(`[DecisionNodeHandles FUNCTION_BODY] Re-evaluando para nodeId: ${nodeId}. Outputs recibidos:`, JSON.stringify(outputs, null, 2));
+  console.log(`[DecisionNodeHandles RENDER nodeId: ${nodeId}] outputs:`, JSON.stringify(outputs));
   
   const renderSourceHandles = useMemo(() => {
     if (!Array.isArray(outputs) || outputs.length === 0) {
@@ -48,7 +51,7 @@ const DecisionNodeHandles = memo(({
         positionPercent = (100 / (totalHandles + 1)) * (index + 1);
       }
       
-      const handleColor = getConnectorColor(output.text); // Usar la función de types.js
+      const handleColor = getConnectorColor(output.text, index); // Usar la función de types.js y pasar el índice
       
       return (
         // El div contenedor por handle podría no ser necesario si el Handle se estiliza directamente
@@ -63,13 +66,14 @@ const DecisionNodeHandles = memo(({
           style={{
             left: `${positionPercent}%`,
             backgroundColor: handleColor,
-            width: isUltraPerformanceMode ? '10px' : '14px',
-            height: isUltraPerformanceMode ? '10px' : '14px',
-            border: isUltraPerformanceMode ? '2px solid var(--handle-ultra-border-color, #555)' : `3px solid ${handleColor === '#ffffff' || handleColor === 'white' ? '#cccccc' : 'white'}`, // Borde blanco, o gris si el handle es blanco
-            boxShadow: isUltraPerformanceMode ? 'none' : '0 1px 3px rgba(0,0,0,0.2)',
+            width: 'var(--handle-default-size)',
+            height: 'var(--handle-default-size)',
+            border: 'none',
             borderRadius: '50%',
-            zIndex: 100, // Asegurar que esté por encima de otros elementos del nodo
-            transition: isUltraPerformanceMode ? 'none' : 'all 0.2s ease',
+            boxShadow: '0 0 0 var(--handle-default-border-width) var(--handle-default-border-color)',
+            transform: 'translateX(-50%)', // Centrar el handle horizontalmente
+            // visibility, pointerEvents, opacity are typically managed by React Flow or default styles
+            // but we ensure our critical styles are applied
           }}
           data-testid={`handle-source-${output.id}`}
         />

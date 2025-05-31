@@ -489,7 +489,9 @@
   text-align: right;
 }
 
-/* Conectores reposicionados */
+/* --- OLD HANDLE STYLES (Commented out for reference) --- */
+/*
+Conectores reposicionados
 .option-node__handle {
   width: 12px;
   height: 12px;
@@ -501,29 +503,29 @@
   position: absolute;
 }
 
-/* Conector de entrada (superior) */
+Conector de entrada (superior)
 .option-node__handle--target {
   top: -6px;
   left: 50%;
   transform: translateX(-50%);
-  background-color: #3b82f6; /* Azul para entrada */
+  background-color: #3b82f6; 
 }
 
-/* Conector de salida (inferior) */
+Conector de salida (inferior)
 .option-node__handle--source {
   bottom: -6px;
   left: 50%;
   transform: translateX(-50%);
-  background-color: #10b981; /* Verde para salida */
+  background-color: #10b981; 
 }
 
-/* Efectos hover en conectores */
+Efectos hover en conectores
 .option-node__handle:hover {
   transform: translateX(-50%) scale(1.4);
   box-shadow: 0 0 8px rgba(var(--option-node-accent), 0.6);
 }
 
-/* Animación de pulso para handles cuando se conectan */
+Animación de pulso para handles cuando se conectan
 @keyframes handlePulse {
   0%, 100% {
     transform: translateX(-50%) scale(1);
@@ -538,13 +540,13 @@
   animation: handlePulse 1.5s ease-in-out;
 }
 
-/* Conectores en modo ultra rendimiento */
+Conectores en modo ultra rendimiento
 .option-node--ultra-performance .option-node__handle {
   cursor: pointer !important;
   width: 10px;
   height: 10px;
   border-width: 1px;
-  background-color: #6b7280; /* Gris neutro */
+  background-color: #6b7280; 
   box-shadow: none;
   transition: none;
   animation: none;
@@ -554,6 +556,95 @@
   transform: translateX(-50%);
   box-shadow: none;
 }
+*/
+
+/* --- New Standardized Handle Styles for OptionNode --- */
+
+/* Base styles for all OptionNode handles */
+.option-node .option-node__handle {
+  position: absolute !important;
+  border-radius: 50% !important;
+  box-sizing: border-box !important;
+  cursor: pointer !important;
+  z-index: 10; /* Ensure handles are above node content */
+  background-color: var(--option-node-handle-bg-color) !important; /* Dynamic color from JSX */
+  /* The transform: translateX(-50%) is applied inline in OptionNode.jsx for left: 50% centering */
+}
+
+/* Target Handle - Normal Mode (border via box-shadow) */
+div.react-flow__node-option .react-flow__handle.react-flow__handle-top.option-node__handle.option-node__handle--target:not(.option-node__handle--ultra) {
+  width: var(--handle-default-size) !important;
+  height: var(--handle-default-size) !important;
+  background-color: var(--option-node-handle-bg-color) !important; /* Dynamic color from JSX */
+  border: none !important; /* Remove actual border */
+  border-radius: 50% !important;
+  box-shadow: 0 0 0 var(--handle-default-border-width) #FFFFFF, 
+              inset 0 0 0 1px rgba(0,0,0,0.05),
+              0 1px 2px rgba(0, 0, 0, 0.1) !important;
+  top: var(--handle-default-offset) !important;
+  /* transform: translateX(-50%) is applied inline in OptionNode.jsx */
+  transition: background-color 0.2s ease-out, box-shadow 0.2s ease-out, transform 0.2s ease-out !important;
+}
+
+div.react-flow__node-option .react-flow__handle.react-flow__handle-top.option-node__handle.option-node__handle--target:not(.option-node__handle--ultra):hover {
+  transform: translateX(-50%) scale(var(--handle-default-hover-scale)) !important;
+  box-shadow: 0 0 0 var(--handle-default-border-width) #FFFFFF, 
+              inset 0 0 0 1px rgba(0,0,0,0.05),
+              var(--handle-default-hover-shadow) !important;
+}
+
+/* Source Handle - Normal Mode (border via box-shadow) */
+div.react-flow__node-option .react-flow__handle.react-flow__handle-bottom.option-node__handle.option-node__handle--source:not(.option-node__handle--ultra) {
+  width: var(--handle-default-size) !important;
+  height: var(--handle-default-size) !important;
+  background-color: var(--option-node-handle-bg-color) !important; /* Dynamic color from JSX */
+  border: none !important; /* Remove actual border */
+  border-radius: 50% !important;
+  box-shadow: 0 0 0 var(--handle-default-border-width) #FFFFFF, 
+              inset 0 0 0 1px rgba(0,0,0,0.05),
+              0 1px 2px rgba(0, 0, 0, 0.1) !important;
+  bottom: var(--handle-default-offset) !important;
+  /* transform: translateX(-50%) is applied inline in OptionNode.jsx */
+  transition: background-color 0.2s ease-out, box-shadow 0.2s ease-out, transform 0.2s ease-out !important;
+}
+
+div.react-flow__node-option .react-flow__handle.react-flow__handle-bottom.option-node__handle.option-node__handle--source:not(.option-node__handle--ultra):hover {
+  transform: translateX(-50%) scale(var(--handle-default-hover-scale)) !important;
+  box-shadow: 0 0 0 var(--handle-default-border-width) #FFFFFF, 
+              inset 0 0 0 1px rgba(0,0,0,0.05),
+              var(--handle-default-hover-shadow) !important;
+}
+
+/* Target Handle - Ultra Mode */
+.option-node .option-node__handle--target.option-node__handle--ultra {
+  width: var(--handle-ultra-size) !important;
+  height: var(--handle-ultra-size) !important;
+  border-width: var(--handle-ultra-border-width) !important;
+  border-style: var(--handle-ultra-border-style) !important;
+  border-color: var(--handle-ultra-border-color) !important;
+  top: var(--handle-ultra-offset) !important;
+  box-shadow: none !important;
+  transition: none !important;
+}
+
+/* Source Handle - Ultra Mode */
+.option-node .option-node__handle--source.option-node__handle--ultra {
+  width: var(--handle-ultra-size) !important;
+  height: var(--handle-ultra-size) !important;
+  border-width: var(--handle-ultra-border-width) !important;
+  border-style: var(--handle-ultra-border-style) !important;
+  border-color: var(--handle-ultra-border-color) !important;
+  bottom: var(--handle-ultra-offset) !important;
+  box-shadow: none !important;
+  transition: none !important;
+}
+
+/* Ensure no hover effects for ultra mode (applies if .option-node__handle--ultra is present) */
+.option-node .option-node__handle.option-node__handle--ultra:hover {
+    transform: translateX(-50%) !important; /* Reset any scaling, maintain centering */
+    box-shadow: none !important;
+}
+
 
 /* Accesibilidad */
 .sr-only {

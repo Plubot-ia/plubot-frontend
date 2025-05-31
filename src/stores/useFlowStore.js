@@ -18,6 +18,7 @@ const MAX_HISTORY_LENGTH = 50; // Definir la constante para el historial
 
 import useTrainingStore from './useTrainingStore';
 import flowService, { generateId } from '@/services/flowService';
+import { getConnectorColor, CONDITION_TYPES, getConditionType } from '../components/onboarding/nodes/decisionnode/DecisionNode.types.js';
 import { nodePositionCache, flowStateManager } from '@/components/onboarding/flow-editor/utils/flowCacheManager';
 // Importar el sistema de persistencia para respaldo adicional
 import { saveLocalBackup } from '@/components/onboarding/flow-editor/utils/persistenceManager';
@@ -61,7 +62,12 @@ const initialState = {
     undoStack: [],
     redoStack: [],
     maxHistory: MAX_HISTORY_LENGTH,
-  }
+  },
+  // Estado para el menú contextual global
+  contextMenuVisible: false,
+  contextMenuPosition: { x: 0, y: 0 },
+  contextMenuNodeId: null,
+  contextMenuItems: [],
 };
 
 const useFlowStore = create(
@@ -71,6 +77,34 @@ const useFlowStore = create(
 
       // Action to set the React Flow instance
       setReactFlowInstance: (instance) => set({ reactFlowInstance: instance }),
+
+      // Acciones para el menú contextual global - implementación mejorada
+      showContextMenu: (x, y, nodeId, items) => {
+        console.log('[FlowStore] showContextMenu:', { x, y, nodeId, items });
+        
+        // Usar setTimeout para asegurar que el estado se actualice correctamente
+        // Esto evita problemas de timing con ReactFlow
+        setTimeout(() => {
+          // La lógica de añadir/quitar listeners de clic global ahora se delega
+          // al componente ContextMenu.jsx a través de su prop onClose, que llamará a hideContextMenu.
+          set({
+            contextMenuVisible: true,
+            contextMenuPosition: { x, y },
+            contextMenuNodeId: nodeId,
+            contextMenuItems: items,
+            selectedNode: nodeId, // Seleccionar el nodo al abrir el menú contextual
+          });
+        }, 0);
+      },
+      hideContextMenu: () => {
+        console.log('[FlowStore] hideContextMenu');
+        set({ 
+          contextMenuVisible: false,
+          contextMenuPosition: { x: 0, y: 0 }, // Resetear a valores iniciales consistentes
+          contextMenuItems: [],    // Resetear a valores iniciales consistentes
+          contextMenuNodeId: null, // Resetear el nodeId
+        });
+      },
       
       // Acciones de nodos
       // Sistema avanzado para manejo de nodos con optimización de rendimiento
@@ -433,7 +467,7 @@ const useFlowStore = create(
         }));
       },
       
-      // Ação para atualizar posiciones y tamaños de nodos
+      // Acción para actualizar posiciones y tamaños de nodos
       updateNodeLayout: (id, layout) => {
         set(state => ({
           nodes: state.nodes.map(node => {
@@ -450,10 +484,104 @@ const useFlowStore = create(
               };
             }
             return node;
-          }),
+          })
         }));
       },
+      duplicateNode: (nodeIdToDuplicate) => {
+        const { nodes } = get();
+        const originalNode = nodes.find(node => node.id === nodeIdToDuplicate);
+
+        if (!originalNode) {
+          console.error(`[FlowStore] Nodo original no encontrado para duplicar: ${nodeIdToDuplicate}`);
+          return;
+        }
+
+        const position = {
+          x: (originalNode.position?.x || 0) + 20,
+          y: (originalNode.position?.y || 0) + 20,
+        };
+        
+        const generateShortId = () => Math.random().toString(36).substring(2, 9);
+
+        const newNodeId = `${originalNode.type || 'node'}-${generateShortId()}`;
+        
+        const originalLabel = originalNode.data && originalNode.data.label ? originalNode.data.label : (originalNode.type || 'Nodo');
+
+        const baseNodeProperties = { ...originalNode };
+        delete baseNodeProperties.id;
+        delete baseNodeProperties.selected;
+        delete baseNodeProperties.dragging;
+        delete baseNodeProperties.position;
+        delete baseNodeProperties.data;
+        
+        const newNode = {
+          ...baseNodeProperties,
+          id: newNodeId,
+          position,
+          data: {
+            ...(originalNode.data || {}),
+            label: `${originalLabel} (Copia)`
+          },
+          selected: false,
+          dragging: false,
+        };
+
+        set(state => ({
+          nodes: [...state.nodes, newNode],
+        }));
+        console.log(`[FlowStore] Nodo duplicado: ${originalNode.id} -> ${newNode.id}`, newNode);
+      },
+
+deleteNode: (nodeIdToDelete) => {
+        console.log(`[FlowStore] Attempting to delete node: ${nodeIdToDelete}`);
+        set((state) => {
+          const nodeExists = state.nodes.some(node => node.id === nodeIdToDelete);
+          if (!nodeExists) {
+            console.warn(`[FlowStore] Node ${nodeIdToDelete} not found for deletion.`);
+            return state; // No cambiar el estado si el nodo no existe
+          }
       
+          const nodes = state.nodes.filter((node) => node.id !== nodeIdToDelete);
+          const edges = state.edges.filter(
+            (edge) => edge.source !== nodeIdToDelete && edge.target !== nodeIdToDelete
+          );
+      
+          let newSelectedNode = state.selectedNode;
+          if (state.selectedNode === nodeIdToDelete) {
+            newSelectedNode = null;
+          }
+      
+          // Si el menú contextual está visible para el nodo que se elimina, ocultarlo.
+          let newContextMenuVisible = state.contextMenuVisible;
+          let newContextMenuNodeId = state.contextMenuNodeId;
+          let newContextMenuItems = state.contextMenuItems;
+          let newContextMenuPosition = state.contextMenuPosition;
+      
+          if (state.contextMenuNodeId === nodeIdToDelete) {
+            newContextMenuVisible = false;
+            newContextMenuNodeId = null;
+            newContextMenuItems = []; // Limpiar items
+            newContextMenuPosition = { x: 0, y: 0 }; // Resetear posición
+          }
+          
+          // TODO: Considerar la integración con el sistema de historial (undo/redo)
+          // Ejemplo: get().addHistoryChange({ nodes: state.nodes, edges: state.edges, viewport: state.viewport });
+      
+          console.log(`[FlowStore] Node ${nodeIdToDelete} and its edges deleted. New node count: ${nodes.length}, New edge count: ${edges.length}`);
+          return {
+            ...state, 
+            nodes,
+            edges,
+            selectedNode: newSelectedNode,
+            contextMenuVisible: newContextMenuVisible,
+            contextMenuNodeId: newContextMenuNodeId,
+            contextMenuItems: newContextMenuItems,
+            contextMenuPosition: newContextMenuPosition,
+            hasChanges: true,
+          };
+        });
+      },
+
       /**
        * Elimina un nodo asegurando que no reaparezca y mantiene la integridad del estado
        * @param {string} nodeId - ID del nodo a eliminar
@@ -461,6 +589,7 @@ const useFlowStore = create(
        */
       removeNode: (nodeId) => {
         // Capturar y guardar el estado previo para historia e integridad de datos
+
         const { nodes, edges, plubotId } = get();
         
         console.log(`[FlowStore] Eliminando nodo: ${nodeId}`);
@@ -550,16 +679,21 @@ const useFlowStore = create(
       },
 
       addDecisionNodeCondition: (nodeId, newConditionText) => {
+        console.log(`[FlowStore addDecisionNodeCondition ENTER] nodeId: ${nodeId}, newConditionText: ${newConditionText}`);
         set((state) => {
           const newNodes = state.nodes.map((node) => {
             if (node.id === nodeId && node.type === NODE_TYPES.decision) {
+              console.log(`[FlowStore addDecisionNodeCondition MID-UPDATE node: ${node.id}] node.data.conditions:`, JSON.stringify(node.data.conditions));
               const newCondition = { id: generateNodeId('condition'), text: newConditionText };
               const currentConditions = Array.isArray(node.data.conditions) ? node.data.conditions : [];
+              console.log(`[FlowStore addDecisionNodeCondition MID-UPDATE node: ${node.id}] newCondition:`, JSON.stringify(newCondition), `currentConditions array:`, JSON.stringify(currentConditions));
+              const updatedConditions = [...currentConditions, newCondition];
+              console.log(`[FlowStore addDecisionNodeCondition POST-UPDATE node: ${node.id}] final node.data.conditions to be set:`, JSON.stringify(updatedConditions));
               return {
                 ...node,
                 data: {
                   ...node.data,
-                  conditions: [...currentConditions, newCondition],
+                  conditions: updatedConditions,
                 },
               };
             }
@@ -887,134 +1021,251 @@ const useFlowStore = create(
       },
       
       generateOptionNodes: (nodeId) => {
-        // Esta acción se encarga de crear/actualizar los nodos de opción basados en las condiciones
-        set((state) => {
-          const decisionNode = state.nodes.find(node => node.id === nodeId && node.type === NODE_TYPES.decision);
-          if (!decisionNode) return state;
-          
-          const conditions = decisionNode.data.conditions || [];
-          if (conditions.length === 0) return state;
-          
-          // Encontrar nodos de opción existentes conectados a este nodo
-          const existingOptionNodes = state.nodes.filter(node => 
-            node.type === NODE_TYPES.option && 
-            node.data && 
-            node.data.sourceNode === nodeId
-          );
-          
-          const parentPosition = {
-            x: Math.round(decisionNode.position.x),
-            y: Math.round(decisionNode.position.y)
-          };
-          const parentWidth = decisionNode.width || 250;
-          
-          let updatedNodes = [...state.nodes];
-          
-          // Actualizar o crear nodos de opción para cada condición
-          conditions.forEach((conditionObj, index) => {
-            // Calcular posición para el nodo de opción
-            const angle = (index / conditions.length) * Math.PI + Math.PI / 2;
-            const distance = 150;
-            const xOffset = Math.round(Math.cos(angle) * distance);
-            const yOffset = Math.round(Math.sin(angle) * distance);
-            
-            const optionPosition = {
-              x: parentPosition.x + parentWidth / 2 + xOffset,
-              y: parentPosition.y + 120 + yOffset,
-            };
-            
-            // Buscar si ya existe un nodo de opción para esta condición
-            const existingNode = existingOptionNodes.find(
-              node => node.data.sourceConditionId === conditionObj.id
-            );
-            
-            if (existingNode) {
-              // Verificar si realmente necesitamos actualizar este nodo
-              const needsUpdate = 
-                existingNode.data.label !== conditionObj.text ||
-                existingNode.position.x !== optionPosition.x ||
-                existingNode.position.y !== optionPosition.y;
-              
-              if (needsUpdate) {
-                // Actualizar nodo existente
-                updatedNodes = updatedNodes.map(node => 
-                  node.id === existingNode.id
-                    ? {
-                        ...node,
-                        data: {
-                          ...node.data,
-                          label: conditionObj.text,
-                          sourceNode: nodeId,
-                          sourceConditionId: conditionObj.id,
-                          conditionIndex: index,
-                        },
-                        position: optionPosition,
-                      }
-                    : node
-                );
-              }
-            } else {
-              // Crear nuevo nodo de opción
-              const optionNodeId = generateNodeId('option');
-              
-              const newOptionNode = {
-                id: optionNodeId,
-                type: 'option',
-                position: optionPosition,
-                data: {
-                  label: conditionObj.text,
-                  sourceNode: nodeId,
-                  sourceConditionId: conditionObj.id,
-                  conditionIndex: index,
-                  isUltraPerformanceMode: decisionNode.data.isUltraPerformanceMode || false,
-                },
-                draggable: true,
-                selectable: true,
-                connectable: true,
-              };
-              
-              updatedNodes.push(newOptionNode);
-            }
-          });
-          
-          // Eliminar nodos de opción que ya no tienen una condición correspondiente
-          existingOptionNodes.forEach(optionNode => {
-            if (!conditions.some(cond => cond.id === optionNode.data.sourceConditionId)) {
-              updatedNodes = updatedNodes.filter(n => n.id !== optionNode.id);
-            }
-          });
-          
-          return { ...state, nodes: updatedNodes, hasChanges: true };
-        });
-      },
+    console.log(`[generateOptionNodes ENTERED] for DecisionNode ID: ${nodeId}`);
+    // Esta acción se encarga de crear/actualizar los nodos de opción Y SUS ARISTAS correspondientes,
+    // basados en las condiciones del DecisionNode.
+    set((state) => {
+      const decisionNode = state.nodes.find(node => node.id === nodeId && node.type === NODE_TYPES.decision);
+      console.log(`[generateOptionNodes] DecisionNode (${nodeId}) found in state:`, decisionNode ? decisionNode.id : 'NOT FOUND', 'Conditions:', decisionNode ? decisionNode.data.conditions : 'N/A');
+      if (!decisionNode) return state;
       
-      duplicateDecisionNode: (nodeId) => {
-        const { nodes, onNodesChange } = get();
-        const node = nodes.find(n => n.id === nodeId);
-        if (!node) return;
-        
-        const newNodeId = generateNodeId('decision');
-        const newNode = {
-          ...node,
-          id: newNodeId,
-          position: {
-            x: node.position.x + 50,
-            y: node.position.y + 50,
-          },
-          data: {
-            ...node.data,
-            conditions: node.data.conditions ? [...node.data.conditions.map(c => ({
-              ...c,
-              id: generateNodeId('condition')
-            }))] : [],
-            lastModified: new Date().toISOString(),
-          }
+      const conditions = decisionNode.data.conditions || [];
+      // Si no hay condiciones, no hay nada que generar o actualizar para los OptionNodes.
+      if (conditions.length === 0) {
+        // La lógica para eliminar OptionNodes huérfanos está más abajo,
+        // por lo que este return es suficiente si no hay condiciones.
+        return state; 
+      }
+      
+      const parentPosition = {
+        x: Math.round(decisionNode.position.x),
+        y: Math.round(decisionNode.position.y)
+      };
+      const parentWidth = decisionNode.width || 250; 
+      const parentHeight = decisionNode.height || 50; 
+      
+      let updatedNodes = [...state.nodes];
+      let updatedEdges = [...state.edges];
+      
+      const OPTION_NODE_WIDTH = 150;
+      const OPTION_NODE_HEIGHT = 70; // Estimación, ajustar si es necesario
+      const HORIZONTAL_SPACING_FROM_PARENT_EDGE = 30;
+      const HORIZONTAL_SPACING_BETWEEN_DEFAULTS = 20;
+      const VERTICAL_SPACING_FROM_PARENT_BOTTOM = 120;
+      const VERTICAL_OFFSET_FOR_NO = 40; // Para que "No" esté más abajo
+
+      let defaultConditionXStart = parentPosition.x + parentWidth + HORIZONTAL_SPACING_FROM_PARENT_EDGE;
+      let defaultConditionCount = 0;
+
+      // Primero contamos los default para un posible centrado si solo hay defaults
+      conditions.forEach(cond => {
+        if (getConditionType(cond.text) === CONDITION_TYPES.DEFAULT) {
+          defaultConditionCount++;
+        }
+      });
+
+      conditions.forEach((conditionObj, index) => {
+        console.log(`[generateOptionNodes ${nodeId}] Processing condition (idx ${index}):`, conditionObj, 'Searching for OptionNode ID:', conditionObj.optionNodeId);
+        const conditionType = getConditionType(conditionObj.text);
+
+        let xPos, yPos;
+        const decisionNodeBottomY = parentPosition.y + parentHeight;
+        const decisionNodeCenterX = parentPosition.x + parentWidth / 2;
+
+        if (conditionType === CONDITION_TYPES.TRUE) {
+          xPos = parentPosition.x - OPTION_NODE_WIDTH - HORIZONTAL_SPACING_FROM_PARENT_EDGE;
+          yPos = decisionNodeBottomY + VERTICAL_SPACING_FROM_PARENT_BOTTOM;
+        } else if (conditionType === CONDITION_TYPES.FALSE) {
+          xPos = decisionNodeCenterX - (OPTION_NODE_WIDTH / 2);
+          yPos = decisionNodeBottomY + VERTICAL_SPACING_FROM_PARENT_BOTTOM + VERTICAL_OFFSET_FOR_NO;
+        } else { // CONDITION_TYPES.DEFAULT
+          xPos = defaultConditionXStart;
+          yPos = decisionNodeBottomY + VERTICAL_SPACING_FROM_PARENT_BOTTOM;
+          defaultConditionXStart += OPTION_NODE_WIDTH + HORIZONTAL_SPACING_BETWEEN_DEFAULTS;
+        }
+
+        const optionPosition = {
+          x: Math.round(xPos),
+          y: Math.round(yPos),
         };
         
-        onNodesChange([{ type: 'add', item: newNode }]);
-        return newNodeId;
-      },
+        let existingNode = null;
+        if (conditionObj.optionNodeId) {
+          existingNode = updatedNodes.find(
+            node => node.id === conditionObj.optionNodeId && node.type === NODE_TYPES.option
+          );
+        }
+        console.log(`[generateOptionNodes ${nodeId}] Found existing OptionNode by ID ${conditionObj.optionNodeId}:`, existingNode ? existingNode.id : 'NOT FOUND');
+        
+        const sourceHandleId = `output-${conditionObj.id}`; 
 
+        if (existingNode) {
+          const nodeNeedsUpdate =
+            existingNode.data.label !== conditionObj.text ||
+            Math.round(existingNode.position.x) !== Math.round(optionPosition.x) ||
+            Math.round(existingNode.position.y) !== Math.round(optionPosition.y) ||
+            existingNode.data.conditionIndex !== index ||
+            existingNode.data.sourceNode !== nodeId ||
+            existingNode.data.sourceConditionId !== conditionObj.id ||
+            existingNode.data.parentHandleColor !== getConnectorColor(conditionObj.text, index); // Comparar también el color
+
+          if (nodeNeedsUpdate) {
+            updatedNodes = updatedNodes.map(node =>
+              node.id === existingNode.id
+              ? {
+                  ...node,
+                  data: {
+                      ...node.data,
+                      label: conditionObj.text,
+                      sourceNode: nodeId,
+                      sourceConditionId: conditionObj.id,
+                      conditionIndex: index,
+                      parentHandleColor: getConnectorColor(conditionObj.text, index),
+                      isUltraPerformanceMode: decisionNode.data.isUltraPerformanceMode || false,
+                      sourceDecisionNode: nodeId,
+                      conditionId: conditionObj.id
+                  },
+                  position: optionPosition,
+                }
+              : node
+            );
+          }
+
+          const edgeId = `edge-${nodeId}-${sourceHandleId}-to-${existingNode.id}`;
+          let existingEdge = updatedEdges.find(e => e.id === edgeId);
+          if (!existingEdge) { // Fallback por si el ID de la arista cambió o no se encontró
+            existingEdge = updatedEdges.find(e => e.source === nodeId && e.target === existingNode.id && e.sourceHandle === sourceHandleId);
+          }
+          
+          if (existingEdge) {
+            const edgeNeedsUpdate = existingEdge.animated !== !(decisionNode.data.isUltraPerformanceMode || state.isUltraPerformanceModeGlobal || false);
+            if (edgeNeedsUpdate) {
+              updatedEdges = updatedEdges.map(e => e.id === existingEdge.id ? { ...e, animated: !(decisionNode.data.isUltraPerformanceMode || state.isUltraPerformanceModeGlobal || false) } : e);
+            }
+          } else {
+            const newEdge = {
+              id: edgeId,
+              source: nodeId,
+              target: existingNode.id,
+              sourceHandle: sourceHandleId,
+              targetHandle: 'target',
+              type: 'elite-edge',
+              animated: !(decisionNode.data.isUltraPerformanceMode || state.isUltraPerformanceModeGlobal || false),
+            };
+            updatedEdges.push(newEdge);
+          }
+
+        } else { // Crear nuevo OptionNode
+          const newOptionNodeId = conditionObj.optionNodeId || generateNodeId('option');
+
+          const newOptionNode = {
+            id: newOptionNodeId,
+            type: NODE_TYPES.option,
+            position: optionPosition,
+            data: {
+                label: conditionObj.text,
+                sourceNode: nodeId,
+                sourceConditionId: conditionObj.id,
+                conditionIndex: index,
+                parentHandleColor: getConnectorColor(conditionObj.text, index),
+                isUltraPerformanceMode: decisionNode.data.isUltraPerformanceMode || false,
+                sourceDecisionNode: nodeId,
+                conditionId: conditionObj.id
+            },
+            draggable: true,
+            selectable: true,
+            connectable: true,
+          };
+          updatedNodes.push(newOptionNode);
+
+          const newEdge = {
+            id: `edge-${nodeId}-${sourceHandleId}-to-${newOptionNodeId}`,
+            source: nodeId,
+            target: newOptionNodeId,
+            sourceHandle: sourceHandleId,
+            type: 'elite-edge',
+            animated: true, // Simplified for testing
+            targetHandle: 'target',
+            // data: { plubotId: state.plubotId }, // Removed for testing
+          };
+          console.log(`[generateOptionNodes ${nodeId}] Creating NEW edge for new OptionNode ${newOptionNodeId}:`, JSON.stringify(newEdge));
+          console.log(`[generateOptionNodes ${nodeId}] updatedEdges length BEFORE push (for new OptionNode): ${updatedEdges.length}`);
+          updatedEdges.push(newEdge);
+          console.log(`[generateOptionNodes ${nodeId}] updatedEdges length AFTER push (for new OptionNode): ${updatedEdges.length}`);
+          
+          // Si se generó un nuevo ID para el OptionNode (porque no venía en conditionObj o era diferente),
+          // actualizar la condición en el DecisionNode para que apunte a este nuevo OptionNode.
+          if (!conditionObj.optionNodeId || conditionObj.optionNodeId !== newOptionNodeId) {
+            const decisionNodeInUpdatedArray = updatedNodes.find(n => n.id === nodeId); // Buscar en el array que estamos modificando
+            if (decisionNodeInUpdatedArray) {
+                const updatedNodeConditions = decisionNodeInUpdatedArray.data.conditions.map(cond => 
+                  cond.id === conditionObj.id ? { ...cond, optionNodeId: newOptionNodeId } : cond
+                );
+                // Actualizar el nodo DecisionNode dentro de updatedNodes
+                updatedNodes = updatedNodes.map(n => 
+                  n.id === nodeId ? { ...n, data: { ...n.data, conditions: updatedNodeConditions } } : n
+                );
+            }
+          }
+        }
+      });
+
+      const currentConditionOptionNodeIds = conditions.map(c => c.optionNodeId).filter(Boolean);
+      
+      const optionNodesToRemove = state.nodes.filter(n =>
+        n.type === NODE_TYPES.option && 
+        n.data && 
+        n.data.sourceNode === nodeId && 
+        !currentConditionOptionNodeIds.includes(n.id) 
+      );
+
+      if (optionNodesToRemove.length > 0) {
+        const optionNodeIdsToRemove = optionNodesToRemove.map(n => n.id);
+        updatedNodes = updatedNodes.filter(n => !optionNodeIdsToRemove.includes(n.id));
+        updatedEdges = updatedEdges.filter(e => 
+          !(optionNodeIdsToRemove.includes(e.target) && e.source === nodeId) && 
+          !(optionNodeIdsToRemove.includes(e.source)) 
+        );
+      }
+      
+      // Comprobación de cambios más robusta
+      let hasNodesChanged = updatedNodes.length !== state.nodes.length;
+      if (!hasNodesChanged) {
+        for (const newNode of updatedNodes) {
+          const oldNode = state.nodes.find(n => n.id === newNode.id);
+          if (!oldNode || 
+              JSON.stringify(newNode.data) !== JSON.stringify(oldNode.data) || 
+              JSON.stringify(newNode.position) !== JSON.stringify(oldNode.position) ||
+              newNode.selected !== oldNode.selected ) { // Añadir otras propiedades relevantes si es necesario
+            hasNodesChanged = true;
+            break;
+          }
+        }
+      }
+
+      let hasEdgesChanged = updatedEdges.length !== state.edges.length;
+      if (!hasEdgesChanged) {
+         for (const newEdge of updatedEdges) {
+          const oldEdge = state.edges.find(e => e.id === newEdge.id);
+          if (!oldEdge || JSON.stringify(newEdge) !== JSON.stringify(oldEdge)) {
+            hasEdgesChanged = true;
+            break;
+          }
+        }
+      }
+
+      console.log(`[generateOptionNodes ${nodeId}] FINAL CHECK before commit: state.nodes.length=${state.nodes.length}, updatedNodes.length=${updatedNodes.length}`);
+      console.log(`[generateOptionNodes ${nodeId}] FINAL CHECK before commit: state.edges.length=${state.edges.length}, updatedEdges.length=${updatedEdges.length}`);
+      console.log(`[generateOptionNodes ${nodeId}] FINAL updatedEdges to commit:`, JSON.stringify(updatedEdges.map(e => ({id: e.id, source: e.source, target: e.target, sourceHandle: e.sourceHandle}))));
+
+      if (hasNodesChanged || hasEdgesChanged) {
+        return { ...state, nodes: updatedNodes, edges: updatedEdges, lastNodeIdUpdated: nodeId, timestamp: Date.now() };
+      }
+      
+      console.log(`[generateOptionNodes EXIT ${nodeId}] Final counts - Nodes:`, updatedNodes.length, 'Edges:', updatedEdges.length);
+      return state; 
+    });
+  },
       updateStartNodeHandlePosition: (nodeId, position) => {
         const { updateNode } = get();
         updateNode(nodeId, { handlePosition: position });
@@ -1139,19 +1390,72 @@ const useFlowStore = create(
           console.error('[FlowStore onConnect] No se encontró sourceNode o targetNode. Source:', connection.source, 'Target:', connection.target); // LOG 2
           return;
         }
+
+        // --- INICIO LÓGICA MEJORADA PARA CONEXIONES DECISIONNODE-OPTIONNODE ---
+        let isAutoManagedConnectionAttempt = false;
+        let useCanonicalId = null;
+
+        if (
+          sourceNode.type === NODE_TYPES.decision &&
+          targetNode.type === NODE_TYPES.option &&
+          targetNode.data?.sourceNode === sourceNode.id &&
+          connection.sourceHandle &&
+          targetNode.data?.sourceConditionId &&
+          connection.sourceHandle === `output-${targetNode.data.sourceConditionId}`
+        ) {
+          isAutoManagedConnectionAttempt = true;
+          const canonicalEdgeId = `edge-${sourceNode.id}-${connection.sourceHandle}-to-${targetNode.id}`;
+          const existingCanonicalEdge = edges.find(e => e.id === canonicalEdgeId);
+
+          if (existingCanonicalEdge) {
+            console.log(`[FlowStore onConnect] Intento de conexión manual para una arista ya gestionada automáticamente (ID: ${canonicalEdgeId}). Conexión ignorada.`);
+            return; // Prevenir la adición de una nueva arista
+          } else {
+            console.warn(`[FlowStore onConnect] La arista gestionada automáticamente (ID: ${canonicalEdgeId}) faltaba. Se creará ahora mediante conexión manual usando el ID canónico.`);
+            useCanonicalId = canonicalEdgeId;
+            // Pre-configurar propiedades en el objeto 'connection' para que 'customConnection' las herede
+            connection.id = canonicalEdgeId;
+            connection.type = 'elite-edge'; // Asegurar tipo elite-edge
+            connection.animated = !(sourceNode.data.isUltraPerformanceMode || get().isUltraPerformanceModeGlobal || false);
+            connection.targetHandle = null; // Asegurar targetHandle null para consistencia con generateOptionNodes
+            connection.data = {
+              ...(connection.data || {}),
+              plubotId: get().plubotId,
+              sourceType: sourceNode.type,
+              targetType: targetNode.type,
+            };
+          }
+        }
+        // --- FIN LÓGICA MEJORADA ---
         
-        // Crear conexión personalizada
-        // El objeto 'connection' ya debería tener source, target, sourceHandle, targetHandle
+        // Evitar conexiones duplicadas o auto-conexiones (lógica original, útil para otros casos)
+        const isDuplicateAfterCheck = !useCanonicalId && edges.some(
+          e => e.source === connection.source && e.target === connection.target && e.sourceHandle === connection.sourceHandle && e.targetHandle === (useCanonicalId ? null : connection.targetHandle) // Considerar targetHandle null para canónicas
+        );
+        
+        const isSelfConnectionAfterCheck = connection.source === connection.target;
+        
+        if (isDuplicateAfterCheck || isSelfConnectionAfterCheck) {
+          console.warn('[FlowStore onConnect] Conexión no permitida:', 
+            isDuplicateAfterCheck ? 'Duplicada' : 'Auto-conexión',
+            'Conexión problemática:', JSON.stringify(connection, null, 2)
+          );
+          return;
+        }
+        
+        // Personalizar la arista según el tipo de nodos conectados
         const customConnection = {
-          ...connection, 
-          id: `e-${connection.source}${connection.sourceHandle || ''}-${connection.target}${connection.targetHandle || ''}-${Math.random().toString(36).substring(2, 9)}`, // ID más único
-          type: 'elite-edge', 
-          animated: true, 
-          style: { stroke: EDGE_COLORS.default, strokeWidth: 2 }, 
+          ...connection, // Hereda ID, type, animated, data, targetHandle si fueron pre-configurados
+          id: useCanonicalId || connection.id || `e-${connection.source}${connection.sourceHandle || ''}-${connection.target}${connection.targetHandle || ''}-${Math.random().toString(36).substring(2, 9)}`,
+          type: 'elite-edge', // Forzar siempre elite-edge aquí
+          animated: typeof connection.animated !== 'undefined' ? connection.animated : !(sourceNode.data.isUltraPerformanceMode || get().isUltraPerformanceModeGlobal || false),
+          style: { stroke: EDGE_COLORS.default, strokeWidth: 2 }, // Estilo base, ajustar si EDGE_COLORS.defaultStyle existe
+          targetHandle: useCanonicalId ? null : connection.targetHandle, // Asegurar targetHandle si es canónica
           data: {
-            ...(connection.data || {}), // Preservar cualquier data existente en la conexión
+            ...(connection.data || {}),
             sourceType: sourceNode.type,
             targetType: targetNode.type,
+            plubotId: get().plubotId, // Asegurar plubotId
           },
         };
         
@@ -1785,11 +2089,32 @@ const useFlowStore = create(
               isLoaded: true, // Estado de carga completado
             });
             
-            // Sanear paths de aristas después de cargar y actualizar nodos
-            // Usar un pequeño timeout para asegurar que los nodos estén renderizados
-            setTimeout(() => sanitizeEdgePaths(), 0);
+            // Después de cargar los nodos y aristas base, generar/actualizar
+            // los OptionNodes y sus aristas para cada DecisionNode.
+            const currentNodes = get().nodes; 
+            currentNodes.forEach(node => {
+              if (node.type === NODE_TYPES.decision) {
+                console.log(`[FlowStore loadFlow] Llamando a generateOptionNodes para DecisionNode ID: ${node.id} después de la carga.`);
+                get().generateOptionNodes(node.id);
+              }
+            });
 
-            console.log(`[FlowStore] Flujo ${plubotId} cargado y estado actualizado.`);
+            const finalEdgesAfterOptionGeneration = get().edges;
+            console.log(`[FlowStore loadFlow] Estado final de ARISTAS después de generateOptionNodes. Total: ${finalEdgesAfterOptionGeneration.length}`);
+            finalEdgesAfterOptionGeneration.forEach(edge => {
+              if (edge.source.startsWith('decision-') || edge.target.startsWith('option-')) {
+                console.log(`[FlowStore loadFlow] Arista Decision/Option: ID=${edge.id}, Source=${edge.source}, Target=${edge.target}, Type=${edge.type}, Animated=${edge.animated}`);
+              }
+            });
+
+            // Opcional: Llamar a cleanUpEdges o sanitizeEdgePaths si es necesario después de generar las aristas de OptionNode
+            // Ejemplo: setTimeout(() => get().cleanUpEdges(), 0);
+            // Por ahora, nos enfocamos en la generación de las aristas de OptionNode.
+            // Si sanitizeEdgePaths sigue siendo relevante, puede reincorporarse.
+            // Considera que generateOptionNodes ya añade/actualiza aristas.
+            // setTimeout(() => sanitizeEdgePaths(), 0); // Comentado temporalmente para aislar el efecto de generateOptionNodes
+
+            console.log(`[FlowStore] Flujo ${plubotId} cargado y estado actualizado, OptionNodes y sus aristas generados/actualizados.`);
           } else {
             console.warn(`[FlowStore] No se encontraron datos válidos o estructura incorrecta para Plubot ID ${plubotId}. Datos recibidos:`, flowData, `Reseteando a un flujo vacío con ese ID.`);
             set({
@@ -1818,18 +2143,17 @@ const useFlowStore = create(
             viewport: initialState.viewport,
             lastSaved: null,
             hasChanges: false,
-            history: { undoStack: [], redoStack: [], maxHistory: 50 },
+            history: { undoStack: [], redoStack: [], maxHistory: MAX_HISTORY_LENGTH },
             selectedNode: null,
             selectedEdge: null,
-            isLoaded: true, // Estado de carga completado
+            isLoaded: true, 
           });
         }
-      },
-    }),
-    {
+      }, // Fin de loadFlow
+
+    }), // Fin del objeto de acciones (set, get) => ({...})
+    { // Inicio del objeto de configuración de persist
       name: 'flow-editor-store',
-      // CAMBIO CRÍTICO: Usar localStorage en lugar de sessionStorage para persistencia entre sesiones
-      // Usar nuestro almacenamiento personalizado para evitar errores de cuota excedida
       storage: createJSONStorage(() => customZustandStorage),
       partialize: (state) => ({
         nodes: state.nodes,
@@ -1839,11 +2163,11 @@ const useFlowStore = create(
         flowName: state.flowName,
         plubotId: state.plubotId,
         lastSaved: state.lastSaved,
-        isLoaded: state.isLoaded, // Nuevo estado de carga
-      })
-    }
-  )
-);
+        isLoaded: state.isLoaded,
+      }),
+    } // Fin del objeto de configuración de persist
+  ) // Fin de persist()
+); // Fin de create()
 
 // Selectores optimizados para el store
 export const useNode = (id) => 

@@ -596,6 +596,16 @@ const EliteEdge = ({
   }
 
   // Modo normal: renderizado completo con efectos visuales
+
+  // Si edgePath es null (porque las coordenadas aún no son válidas) y no estamos en modo ultra,
+  // no renderizamos nada. React Flow lo intentará de nuevo en el siguiente ciclo.
+  if (!edgePath) {
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`[EliteEdge] ID: ${id}. edgePath es null. No se renderizará la arista (modo normal).`);
+    }
+    return null;
+  }
+
   return (
     <>
       {/* Definición SVG para efectos especiales */}

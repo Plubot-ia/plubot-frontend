@@ -442,7 +442,13 @@ const FlowMain = ({
    * Manejador para clic en el panel
    * @param {Event} event - Evento del clic
    */
+  // Importar hideContextMenu del store
+  const hideContextMenu = useFlowStore(state => state.hideContextMenu);
+
   const handlePaneClick = useCallback((event) => {
+    // Ocultar el menú contextual al hacer clic en el panel
+    hideContextMenu();
+    
     if (externalOnPaneClick) {
       externalOnPaneClick(event);
     } else {
@@ -450,7 +456,7 @@ const FlowMain = ({
       setSelectedEdge(null);
       setMenuOpen(false);
     }
-  }, [externalOnPaneClick]);
+  }, [externalOnPaneClick, hideContextMenu]);
   
   /**
    * Manejador para clic en arista
@@ -809,7 +815,7 @@ const FlowMain = ({
           // Llamamos a ensureEdgesAreVisible con los parámetros que espera.
           // Si isUltraMode, maxAttempts, delay no están disponibles aquí, tomarán sus defaults.
           // Por ahora, solo pasamos 'edges' como en el código original.
-          const resolvedVisibleEdges = await ensureEdgesAreVisible(edges);
+          const resolvedVisibleEdges = await ensureEdgesAreVisible(edges, isUltraMode);
           
           // Comparamos las aristas resueltas con las actuales
           if (JSON.stringify(resolvedVisibleEdges) !== JSON.stringify(edges)) {

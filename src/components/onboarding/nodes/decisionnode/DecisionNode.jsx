@@ -6,9 +6,9 @@
 
 import React, { useState, useCallback, useMemo, useEffect, useRef, Suspense } from 'react'; 
 import PropTypes from 'prop-types';
-import { Position, Handle } from 'reactflow'; 
+import { Position, Handle, useReactFlow, useUpdateNodeInternals } from 'reactflow'; 
 import { debounce } from 'lodash';
-import ContextMenu from "../../ui/context-menu";
+
 import './DecisionNode.css';
 import useFlowStore from '@/stores/useFlowStore';
 
@@ -17,7 +17,7 @@ const DecisionNodeHeader = React.lazy(() => import('./components/DecisionNodeHea
 const DecisionNodeQuestion = React.lazy(() => import('./components/DecisionNodeQuestion'));
 const DecisionNodeConditions = React.lazy(() => import('./components/DecisionNodeConditions'));
 const DecisionNodeOptions = React.lazy(() => import('./components/DecisionNodeOptions'));
-const DecisionNodeHandles = React.lazy(() => import('./components/DecisionNodeHandles')); 
+import DecisionNodeHandles from './components/DecisionNodeHandles'; // Importación síncrona para prueba 
 
 // Número máximo de condiciones permitidas
 const MAX_CONDITIONS = 8; 
@@ -38,8 +38,7 @@ const DecisionNode = ({
   // Estado local para UI
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const [showContextMenu, setShowContextMenu] = useState(false);
-  const [contextMenuPosition, setContextMenuPosition] = useState({ x: 0, y: 0 });
+  // showContextMenu y contextMenuPosition eliminados, se usa el store global
   const [activeConditionId, setActiveConditionId] = useState(null);
 
   useEffect(() => {
@@ -49,6 +48,8 @@ const DecisionNode = ({
   // Referencias
   const nodeRef = useRef(null);
   const prevConditionsRef = useRef([]);
+  const updateNodeInternals = useUpdateNodeInternals();
+  const reactFlowInstance = useReactFlow();
   
   // Selectores de Zustand
   const nodeData = useFlowStore(state => {
@@ -127,15 +128,62 @@ const DecisionNode = ({
   }, [selected, isEditing, isUltraPerformanceMode]);
   
   useEffect(() => {
-    if (JSON.stringify(prevConditionsRef.current) !== JSON.stringify(currentConditions)) {
-      generateOptionNodes(id);
-      prevConditionsRef.current = currentConditions;
+    let firstTimerId;
+    let secondTimerId;
+    let thirdTimerId;
+
+    if (currentConditions && currentConditions.length > 0) {
+      if (JSON.stringify(currentConditions) !== JSON.stringify(prevConditionsRef.current)) {
+        console.log(`[DecisionNode ${id} EFFECT] Conditions changed. Prev: ${prevConditionsRef.current?.length}, Curr: ${currentConditions.length}`);
+        console.log(`[DecisionNode ${id} EFFECT] typeof updateNodeInternals: ${typeof updateNodeInternals}`);
+
+        if (typeof updateNodeInternals === 'function' && reactFlowInstance) {
+          console.log(`[DecisionNode ${id} EFFECT] 1. Calling updateNodeInternals(${id}) PRE-generation.`);
+          updateNodeInternals(id); // Primera llamada: notificar que los handles van a cambiar
+
+          console.log(`[DecisionNode ${id} EFFECT] Scheduling generateOptionNodes with setTimeout 0.`);
+          firstTimerId = setTimeout(() => {
+            console.log(`[DecisionNode ${id} EFFECT] 2. Executing delayed generateOptionNodes.`);
+            generateOptionNodes(id, currentConditions); // Generar nodos y aristas
+
+            console.log(`[DecisionNode ${id} EFFECT] Scheduling SECOND updateNodeInternals call with setTimeout 0.`);
+            secondTimerId = setTimeout(() => {
+              console.log(`[DecisionNode ${id} EFFECT] 3. Calling updateNodeInternals(${id}) POST-generation.`);
+              updateNodeInternals(id); // Segunda llamada: ayudar a React Flow a asentar el layout
+
+              console.log(`[DecisionNode ${id} EFFECT] Scheduling fitView call with setTimeout 0.`);
+              thirdTimerId = setTimeout(() => {
+                console.log(`[DecisionNode ${id} EFFECT] 4. Calling fitView for node ${id}.`);
+                reactFlowInstance.fitView({ nodes: [{ id }], duration: 200, padding: 0.2 });
+              }, 0); // Delay para fitView
+
+            }, 0); // Delay para la segunda llamada a updateNodeInternals
+
+          }, 0); // Delay para generateOptionNodes
+
+          prevConditionsRef.current = [...currentConditions];
+        } else {
+          console.error('[DecisionNode ${id} EFFECT] updateNodeInternals is not a function or reactFlowInstance is not available', { updateNodeInternals, reactFlowInstance });
+        }
+      }
     }
-  }, [id, currentConditions, generateOptionNodes]);
+
+    return () => {
+      if (firstTimerId) {
+        clearTimeout(firstTimerId);
+      }
+      if (secondTimerId) {
+        clearTimeout(secondTimerId);
+      }
+      if (thirdTimerId) {
+        clearTimeout(thirdTimerId);
+      }
+    };
+  }, [currentConditions, id, generateOptionNodes, updateNodeInternals, reactFlowInstance]);
 
   const saveChanges = useCallback(() => {
     setIsEditing(false);
-    setIsSaving(false); 
+    setIsSaving(false);
   }, []);
 
   const cancelEditing = useCallback(() => {
@@ -156,18 +204,7 @@ const DecisionNode = ({
     startEditing();
   }, [startEditing]);
   
-  const handleContextMenu = useCallback((e) => {
-    e.preventDefault();
-    if (!isUltraPerformanceMode) {
-      setContextMenuPosition({ x: e.clientX, y: e.clientY });
-      setShowContextMenu(true);
-      // TODO: Considerar si el menú contextual debe funcionar en modo ultra.
-    }
-  }, [isUltraPerformanceMode]);
-  
-  const closeContextMenu = useCallback(() => {
-    setShowContextMenu(false);
-  }, []);
+
   
   const handleQuestionChange = useCallback((newQuestionText) => {
     if (isValidQuestion(newQuestionText)) {
@@ -194,6 +231,33 @@ const DecisionNode = ({
     console.log(`Toggling Markdown for node ${id}. Current: ${nodeData.enableMarkdown}`);
     toggleDecisionNodeFeature(id, 'enableMarkdown');
   }, [id, toggleDecisionNodeFeature, nodeData.enableMarkdown]);
+
+  const getNodeContextMenuItems = () => {
+    const items = [];
+    if (isEditing) {
+      items.push({ label: 'Guardar Cambios', action: saveChanges, closeMenuOnClick: true });
+      items.push({ label: 'Cancelar Edición', action: cancelEditing, closeMenuOnClick: true });
+    } else {
+      items.push({ label: 'Editar Nodo', action: startEditing, closeMenuOnClick: true });
+    }
+    items.push({ label: 'Añadir Condición', action: () => handleAddCondition('Nueva Condición'), closeMenuOnClick: true });
+    items.push({ label: 'Duplicar Nodo', action: () => duplicateDecisionNode(id), closeMenuOnClick: true });
+    items.push({ 
+      label: 'Eliminar Nodo', 
+      action: () => useFlowStore.getState().deleteNode(id), 
+      closeMenuOnClick: true 
+    });
+    
+    return items;
+  };
+
+  const handleNodeContextMenu = useCallback((event) => {
+    event.preventDefault();
+    // Opcional: Añadir condición para !isUltraPerformanceMode si se desea
+    const items = getNodeContextMenuItems();
+    console.log('[DecisionNode] handleNodeContextMenu attempting to show. Event:', event, 'clientX:', event.clientX, 'clientY:', event.clientY, 'items:', items, 'nodeId:', id);
+    useFlowStore.getState().showContextMenu(event.clientX, event.clientY, id, items);
+  }, [id, isEditing, saveChanges, cancelEditing, startEditing, handleAddCondition, duplicateDecisionNode, isUltraPerformanceMode]);
 
   const handleToggleVariables = useCallback(() => {
     console.log(`Toggling Variables for node ${id}. Current: ${nodeData.enableVariables}`);
@@ -246,24 +310,14 @@ const DecisionNode = ({
     };
     window.addEventListener('keydown', handleGlobalKeyDown);
     return () => window.removeEventListener('keydown', handleGlobalKeyDown);
-  }, [selected, startEditing]);
-
-  const contextMenuOptions = useMemo(() => [
-    { label: 'Editar Nodo', action: startEditing, shortcut: 'Ctrl+E' },
-    { label: 'Duplicar Nodo', action: () => duplicateDecisionNode(id) },
-    { label: 'Eliminar Nodo', action: () => useFlowStore.getState().deleteNode(id), shortcut: 'Supr' },
-    { label: 'Añadir Condición', action: () => handleAddCondition('Nueva Condición') },
-    { label: 'Guardar Cambios', action: saveChanges, shortcut: 'Ctrl+S', disabled: !isEditing },
-    { label: 'Cancelar Edición', action: cancelEditing, shortcut: 'Esc', disabled: !isEditing },
-  ], [id, startEditing, duplicateDecisionNode, handleAddCondition, saveChanges, cancelEditing, isEditing]);
+  }, [selected, startEditing, cancelEditing, isEditing]);
 
   return (
     <div 
       ref={nodeRef} 
       className={nodeClasses} 
       onDoubleClick={handleDoubleClick}
-      onContextMenu={handleContextMenu}
-      onKeyDown={handleKeyDown} 
+      onContextMenu={handleNodeContextMenu}
       tabIndex={0} 
       aria-label={`Nodo de decisión: ${question}`}
     >
@@ -335,23 +389,15 @@ const DecisionNode = ({
         {/* Asumimos que DecisionNodeHandles toma 'conditions', 'isConnectable', 'nodeId' y 'isUltraMode' */}
         <DecisionNodeHandles 
           nodeId={id}
-          outputs={currentConditions} 
+          outputs={[...currentConditions]} 
           isConnectable={isConnectable} 
-          isUltraMode={isUltraMode}
+          isUltraPerformanceMode={isUltraPerformanceMode}
           data-tooltip-base-id={`tooltip-${id}-condition`}
           // TODO: DecisionNodeHandles internamente debería añadir tooltips a cada handle de salida
         />
       </Suspense>
       
-      {showContextMenu && (
-        <Suspense fallback={<div />}>
-          <ContextMenu
-            items={contextMenuOptions}
-            position={contextMenuPosition}
-            onClose={closeContextMenu}
-          />
-        </Suspense>
-      )}
+
     </div>
   );
 };

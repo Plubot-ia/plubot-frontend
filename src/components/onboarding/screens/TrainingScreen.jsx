@@ -8,6 +8,7 @@ import { useGamification } from '@/context/GamificationContext';
 import useAPI from '@/hooks/useAPI';
 import { analyzeFlowRoutes, generateNodeSuggestions } from '@/utils/flowValidation';
 import useDebounce from '@/hooks/useDebounce';
+import { NODE_TYPES } from '@/utils/nodeConfig'; // Importación añadida para identificar DecisionNodes
 
 // Zustand stores
 import useFlowStore from '@/stores/useFlowStore';
@@ -290,7 +291,27 @@ const TrainingScreen = () => {
     else if (plubotIdFromUrl === currentPlubotIdInStore && currentIsLoadedInStore && (!currentNodesInStore || currentNodesInStore.length === 0)) {
       console.log(`[TrainingScreen] Case 2: Loaded, correct Plubot, but empty. URL ID: ${plubotIdFromUrl}. Initializing with default nodes/edges.`);
       setNodes(initialNodes); 
-      setEdges(initialEdges); 
+      setEdges(initialEdges); // initialEdges ahora tiene 11 aristas base
+
+      // Después de establecer los nodos iniciales y las aristas base,
+      // llamar a generateOptionNodes para cada DecisionNode por defecto.
+      // Esto poblará DecisionNode.data.conditions, creará OptionNodes si es necesario,
+      // y generará las aristas entre DecisionNode y OptionNode (4 aristas adicionales).
+      const decisionNodesInDefault = initialNodes.filter(
+        node => node.type === NODE_TYPES.decision
+      );
+
+      if (decisionNodesInDefault.length > 0) {
+        console.log(`[TrainingScreen] Case 2: Found ${decisionNodesInDefault.length} DecisionNode(s) in default set. Calling generateOptionNodes for each.`);
+        decisionNodesInDefault.forEach(decisionNode => {
+          console.log(`[TrainingScreen] Case 2: Calling generateOptionNodes for DecisionNode ID: ${decisionNode.id}`);
+          useFlowStore.getState().generateOptionNodes(decisionNode.id);
+        });
+        console.log(`[TrainingScreen] Case 2: Finished calling generateOptionNodes for default DecisionNodes. Total edges should now be 15.`);
+      } else {
+        console.log(`[TrainingScreen] Case 2: No DecisionNodes found in the default set. Skipping generateOptionNodes.`);
+      }
+      
       // Actualizar el nombre si el actual no es descriptivo para un flujo vacío inicializado.
       const currentStoreFlowName = useFlowStore.getState().flowName;
       const genericEmptyNamePattern = `Nuevo Flujo para ${plubotIdFromUrl}`;
@@ -370,6 +391,9 @@ const TrainingScreen = () => {
   const defaultRouteAnalysis = { routes: [], errors: [] };
 
   // Nodos iniciales para el editor de flujo
+  // Helper para generar IDs únicos simples para condiciones, en un contexto real se usaría algo más robusto como UUID
+  const generateLocalId = (prefix) => `${prefix}-${Math.random().toString(36).substr(2, 9)}`;
+
   const initialNodes = [
     {
       id: 'start-1',
@@ -387,19 +411,26 @@ const TrainingScreen = () => {
       id: 'decision-1',
       type: 'decision',
       position: { x: 250, y: 200 },
-      data: { label: 'Decisión 1', question: '¿Qué quieres hacer?' },
+      data: {
+        label: 'Decisión 1',
+        question: '¿Qué quieres hacer?',
+        conditions: [
+          { id: 'd1-cond-0', text: 'Información', optionNodeId: 'option-1' },
+          { id: 'd1-cond-1', text: 'Ayuda', optionNodeId: 'option-2' }
+        ]
+      },
     },
     {
       id: 'option-1',
       type: 'option',
       position: { x: 100, y: 300 },
-      data: { label: 'Opción 1', condition: 'Información' },
+      data: { label: 'Opción 1', condition: 'Información', sourceDecisionNode: 'decision-1', conditionId: 'd1-cond-0' },
     },
     {
       id: 'option-2',
       type: 'option',
       position: { x: 400, y: 300 },
-      data: { label: 'Opción 2', condition: 'Ayuda' },
+      data: { label: 'Opción 2', condition: 'Ayuda', sourceDecisionNode: 'decision-1', conditionId: 'd1-cond-1' },
     },
     {
       id: 'action-1',
@@ -429,19 +460,26 @@ const TrainingScreen = () => {
       id: 'decision-2',
       type: 'decision',
       position: { x: 250, y: 600 },
-      data: { label: 'Decisión 2', question: '¿Necesitas algo más?' },
+      data: {
+        label: 'Decisión 2',
+        question: '¿Necesitas algo más?',
+        conditions: [
+          { id: 'd2-cond-0', text: 'Sí', optionNodeId: 'option-3' },
+          { id: 'd2-cond-1', text: 'No', optionNodeId: 'option-4' }
+        ]
+      },
     },
     {
       id: 'option-3',
       type: 'option',
       position: { x: 100, y: 700 },
-      data: { label: 'Opción 3', condition: 'Sí' },
+      data: { label: 'Opción 3', condition: 'Sí', sourceDecisionNode: 'decision-2', conditionId: 'd2-cond-0' },
     },
     {
       id: 'option-4',
       type: 'option',
       position: { x: 400, y: 700 },
-      data: { label: 'Opción 4', condition: 'No' },
+      data: { label: 'Opción 4', condition: 'No', sourceDecisionNode: 'decision-2', conditionId: 'd2-cond-1' },
     },
     {
       id: 'message-4',
@@ -467,16 +505,16 @@ const TrainingScreen = () => {
   const initialEdges = [
     { id: 'e1', source: 'start-1', target: 'message-1', type: 'elite-edge', animated: true, style: { stroke: EDGE_COLORS.default } },
     { id: 'e2', source: 'message-1', target: 'decision-1', type: 'elite-edge', animated: true, style: { stroke: EDGE_COLORS.default } },
-    { id: 'e3', source: 'decision-1', sourceHandle: 'output-0', target: 'option-1', type: 'elite-edge', animated: true, style: { stroke: EDGE_COLORS.default } },
-    { id: 'e4', source: 'decision-1', sourceHandle: 'output-1', target: 'option-2', type: 'elite-edge', animated: true, style: { stroke: EDGE_COLORS.default } },
+    // e3 (decision-1 to option-1) será generado por generateOptionNodes
+    // e4 (decision-1 to option-2) será generado por generateOptionNodes
     { id: 'e5', source: 'option-1', target: 'action-1', type: 'elite-edge', animated: true, style: { stroke: EDGE_COLORS.default } },
     { id: 'e6', source: 'option-2', target: 'action-2', type: 'elite-edge', animated: true, style: { stroke: EDGE_COLORS.default } },
     { id: 'e7', source: 'action-1', target: 'message-2', type: 'elite-edge', animated: true, style: { stroke: EDGE_COLORS.default } },
     { id: 'e8', source: 'action-2', target: 'message-3', type: 'elite-edge', animated: true, style: { stroke: EDGE_COLORS.default } },
     { id: 'e9', source: 'message-2', target: 'decision-2', type: 'elite-edge', animated: true, style: { stroke: EDGE_COLORS.default } },
     { id: 'e10', source: 'message-3', target: 'decision-2', type: 'elite-edge', animated: true, style: { stroke: EDGE_COLORS.default } },
-    { id: 'e11', source: 'decision-2', sourceHandle: 'output-0', target: 'option-3', type: 'elite-edge', animated: true, style: { stroke: EDGE_COLORS.default } },
-    { id: 'e12', source: 'decision-2', sourceHandle: 'output-1', target: 'option-4', type: 'elite-edge', animated: true, style: { stroke: EDGE_COLORS.default } },
+    // e11 (decision-2 to option-3) será generado por generateOptionNodes
+    // e12 (decision-2 to option-4) será generado por generateOptionNodes
     { id: 'e13', source: 'option-3', target: 'message-4', type: 'elite-edge', animated: true, style: { stroke: EDGE_COLORS.default } },
     { id: 'e14', source: 'message-4', target: 'end-1', type: 'elite-edge', animated: true, style: { stroke: EDGE_COLORS.default } },
     { id: 'e15', source: 'option-4', target: 'end-2', type: 'elite-edge', animated: true, style: { stroke: EDGE_COLORS.default } },

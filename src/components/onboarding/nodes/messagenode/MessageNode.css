@@ -373,22 +373,24 @@
 }
 
 /* Conectores en modo ultra rendimiento */
-.message-node__handle--ultra {
-  width: 12px;
-  height: 12px;
-  background-color: rgba(var(--message-node-primary-rgb), 0.8);
-  border: 1px solid rgba(var(--message-node-primary-rgb), 0.9);
-  opacity: 0.9;
-  transition: none;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+.message-node .message-node__handle--ultra {
+  width: var(--handle-ultra-size) !important;
+  height: var(--handle-ultra-size) !important;
+  background-color: var(--handle-ultra-bg-color) !important;
+  border: var(--handle-ultra-border-width) solid var(--handle-ultra-border-color) !important;
+  border-radius: 3px !important; /* Consistente con StartNode ultra */
+  box-shadow: none !important;
+  opacity: 1 !important;
+  transition: none !important;
+  z-index: 10 !important; /* Asegurar que los handles estén por encima */
 }
 
-.message-node--ultra-performance .message-node__handle {
-  width: 8px;
-  height: 8px;
-  border-width: 1px;
-  box-shadow: none;
-  transition: none;
+.message-node .message-node__handle--target.message-node__handle--ultra {
+  top: var(--handle-ultra-offset) !important;
+}
+
+.message-node .message-node__handle--source.message-node__handle--ultra {
+  bottom: var(--handle-ultra-offset) !important;
 }
 
 .message-node--ultra-performance .message-node__handle:hover,
@@ -402,27 +404,34 @@
    HANDLE STYLING (Puntos de conexión)
    ====================================================== */
 
-.message-node .react-flow__handle.react-flow__handle {
+.message-node .message-node__handle:not(.message-node__handle--ultra) {
+  width: var(--handle-default-size) !important;
+  height: var(--handle-default-size) !important;
+  background-color: var(--handle-default-bg-color) !important;
+  border: var(--handle-default-border-width) solid var(--handle-default-border-color) !important;
+  border-radius: 50% !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   cursor: pointer !important;
-  width: 10px;
-  height: 10px;
-  background-color: var(--message-node-bg-light, #f8fafc);
-  border: 2px solid var(--message-node-primary, #3b82f6);
-  border-radius: 50%;
-  box-shadow: 0 0 0 2px rgba(var(--message-node-primary-rgb, 59, 130, 246), 0), /* Initial transparent ring for transition */
-              0 0 6px 0px rgba(var(--message-node-primary-rgb, 59, 130, 246), 0.3); /* Subtle glow */
+  z-index: 10 !important;
   transition: background-color var(--message-node-transition-duration) var(--message-node-transition-timing),
+              filter var(--message-node-transition-duration) var(--message-node-transition-timing),
               transform var(--message-node-transition-duration) var(--message-node-transition-timing),
               box-shadow var(--message-node-transition-duration) var(--message-node-transition-timing);
-  cursor: pointer;
-  z-index: 10; /* Ensure handles are above node content if overlapping */
 }
 
-.message-node .react-flow__handle.react-flow__handle:hover {
-  background-color: var(--message-node-primary, #3b82f6);
-  transform: scale(1.25);
-  box-shadow: 0 0 0 3px rgba(var(--message-node-primary-rgb, 59, 130, 246), 0.2), /* Ring effect on hover */
-              0 0 10px 2px rgba(var(--message-node-primary-rgb, 59, 130, 246), 0.5); /* Enhanced glow */
+.message-node .message-node__handle--target:not(.message-node__handle--ultra) {
+  top: var(--handle-default-offset) !important;
+}
+
+.message-node .message-node__handle--source:not(.message-node__handle--ultra) {
+  bottom: var(--handle-default-offset) !important;
+}
+
+.message-node .message-node__handle:not(.message-node__handle--ultra):hover {
+  background-color: var(--handle-default-bg-color) !important;
+  filter: brightness(120%);
+  /* transform: scale(1.1); /* Optional: keep a slight scale if desired */
+  /* box-shadow: none; /* Or a very subtle one if needed */
 }
 
 /* Specific positioning to make handles sit slightly outside the node bounds */

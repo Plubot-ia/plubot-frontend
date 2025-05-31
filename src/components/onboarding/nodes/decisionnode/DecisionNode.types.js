@@ -72,8 +72,20 @@ export const DISPLAY_MODES = {
 export const CONNECTOR_COLORS = {
   [CONDITION_TYPES.TRUE]: '#22c55e', // Verde para "Sí"
   [CONDITION_TYPES.FALSE]: '#ef4444', // Rojo para "No"
-  [CONDITION_TYPES.DEFAULT]: '#3b82f6', // Azul para otros
+  // El color por defecto ahora se manejará con la paleta
 };
+
+// Paleta de colores para condiciones "default" (no Sí/No)
+export const DEFAULT_CONDITION_PALETTE = [
+  '#3b82f6', // Azul (original por defecto, puede ser el primero)
+  '#FF69B4', // HotPink
+  '#FFA500', // Orange
+  '#ADFF2F', // GreenYellow
+  '#00CED1', // DarkTurquoise
+  '#DA70D6', // Orchid
+  '#FFD700', // Gold
+  '#8A2BE2', // BlueViolet
+];
 
 /**
  * Determina el tipo de condición basado en su texto
@@ -96,9 +108,12 @@ export const getConditionType = (condition) => {
  * @param {string} condition - Texto de la condición
  * @returns {string} - Color CSS para el conector
  */
-export const getConnectorColor = (condition) => {
-  const type = getConditionType(condition);
-  return CONNECTOR_COLORS[type];
+export const getConnectorColor = (conditionText, index = 0) => {
+  const type = getConditionType(conditionText);
+  if (type === CONDITION_TYPES.DEFAULT) {
+    return DEFAULT_CONDITION_PALETTE[index % DEFAULT_CONDITION_PALETTE.length];
+  }
+  return CONNECTOR_COLORS[type]; // Para TRUE y FALSE
 };
 
 /**
