@@ -137,7 +137,7 @@
 .flow-editor-container .react-flow__handle,
 .flow-editor-wrapper .react-flow__handle {
   z-index: 15;
-  background: transparent;
+  /* background: transparent; */ /* Comentado para permitir colores de handle específicos del nodo */
 }
 
 /* Mejoras de rendimiento global */

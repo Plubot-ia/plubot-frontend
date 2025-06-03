@@ -116,48 +116,68 @@ const hasEdgeChanged = (oldEdge, newEdge) => {
  */
 const flowService = {
   /**
-   * Carga el flujo de un plubot.
-   * @param {number} plubotId - ID del plubot
-   * @returns {Promise<Object>} Datos del flujo {nodes: [], edges: [], name: string}
-   */
-  async loadFlow(plubotId) {
-    try {
-      const response = await instance.get(`/api/flow/${plubotId}`);
-      
-      if (response.data.status === 'success') {
-        const flowData = response.data.data;
-        
-        // Adaptar los nodos para usar metadata en lugar de node_metadata (para compatibilidad con el frontend)
-        if (flowData.nodes) {
-          flowData.nodes = flowData.nodes.map(node => {
-            if (node.node_metadata) {
-              node.metadata = node.node_metadata;
-              // No eliminamos node_metadata para mantener compatibilidad con el backend
-            }
-            return node;
-          });
-        }
-        
-        // Adaptar las aristas para usar metadata en lugar de edge_metadata (para compatibilidad con el frontend)
-        if (flowData.edges) {
-          flowData.edges = flowData.edges.map(edge => {
-            if (edge.edge_metadata) {
-              edge.metadata = edge.edge_metadata;
-              // No eliminamos edge_metadata para mantener compatibilidad con el backend
-            }
-            return edge;
-          });
-        }
-        
-        return flowData;
+ * Carga el flujo de un plubot.
+ * @param {number} plubotId - ID del plubot
+ * @returns {Promise<Object>} Datos del flujo {nodes: [], edges: [], name: string}
+ */
+async loadFlow(plubotId) {
+  console.log(`[flowService] Iniciando carga de flujo para plubotId: ${plubotId}`);
+  try {
+    const response = await instance.get(`/api/flow/${plubotId}`);
+    
+    // Log detallado de la respuesta para diagnóstico
+    console.log(`[flowService] Respuesta de /api/flow/${plubotId} - Status HTTP: ${response.status}`);
+    console.log(`[flowService] Respuesta de /api/flow/${plubotId} - Data:`, response.data); // Log data object directamente
+
+    if (response && response.data && response.data.status === 'success' && response.data.data) {
+      const flowData = response.data.data;
+      console.log(`[flowService] Flujo cargado exitosamente para plubotId: ${plubotId}. Nombre: ${flowData.name}, Nodos: ${flowData.nodes?.length}, Aristas: ${flowData.edges?.length}`);
+
+      // Adaptaciones (manteniendo las originales)
+      if (flowData.nodes) {
+        flowData.nodes = flowData.nodes.map(node => {
+          if (node.node_metadata) {
+            node.metadata = node.node_metadata;
+          }
+          return node;
+        });
       }
-      
-      throw new Error(response.data.message || 'Error al cargar el flujo');
-    } catch (error) {
-      console.error('Error al cargar el flujo:', error);
-      throw error;
+      if (flowData.edges) {
+        flowData.edges = flowData.edges.map(edge => {
+          if (edge.edge_metadata) {
+            edge.metadata = edge.edge_metadata;
+          }
+          return edge;
+        });
+      }
+      return flowData;
+    } else {
+      let errorMessage = 'Error al cargar el flujo: Respuesta inesperada del servidor.';
+      if (response && response.data && typeof response.data.message === 'string' && response.data.message.trim() !== '') {
+        errorMessage = response.data.message;
+      } else if (response && response.data && response.data.status) {
+        errorMessage = `Error al cargar el flujo: status backend '${response.data.status}'.`;
+      } else if (response && response.status && response.status !== 200) {
+        errorMessage = `Error del servidor: HTTP ${response.status}.`;
+      } else if (!response || !response.data) {
+        errorMessage = 'Error al cargar el flujo: No se recibió data en la respuesta.';
+      }
+      console.error(`[flowService] Error procesando respuesta para plubotId ${plubotId}: ${errorMessage}. Respuesta data:`, response.data);
+      throw new Error(errorMessage);
     }
-  },
+  } catch (error) {
+    console.error(`[flowService] Excepción en loadFlow para plubotId ${plubotId}:`, error.message);
+    if (error.response) {
+      console.error('[flowService] Error response status:', error.response.status);
+      console.error('[flowService] Error response data:', error.response.data);
+    } else if (error.request) {
+      console.error('[flowService] Error request:', error.request);
+    } else {
+      console.error('[flowService] Error genérico:', error.message);
+    }
+    throw error; 
+  }
+},
   
   /**
    * Guarda el flujo de un plubot utilizando actualizaciones incrementales y optimización.
@@ -201,37 +221,6 @@ const flowService = {
         validation: validationResult
       }));
       
-      // Calcular diferencias para optimizar la carga
-      const diff = computeFlowDiff(
-        previousState || { nodes: [], edges: [] },
-        optimizedState
-      );
-      
-      // Verificar si hay cambios que guardar
-      const hasChanges = 
-        diff.nodes_to_create.length > 0 || 
-        diff.nodes_to_update.length > 0 || 
-        diff.nodes_to_delete.length > 0 || 
-        diff.edges_to_create.length > 0 || 
-        diff.edges_to_update.length > 0 || 
-        diff.edges_to_delete.length > 0;
-      
-      // Mostrar estadísticas de cambios si los hay
-      if (hasChanges) {
-        console.log(`[FlowService] Guardando cambios: ${diff.stats.changes.nodesCreated} nodos creados, ${diff.stats.changes.nodesUpdated} actualizados, ${diff.stats.changes.nodesDeleted} eliminados`);
-      }
-      
-      // Si no hay cambios, retornar éxito sin hacer petición al servidor
-      if (!hasChanges && previousState) {
-        console.log('[FlowService] No hay cambios que guardar');
-        return {
-          success: true,
-          message: 'No hay cambios que guardar',
-          timestamp: new Date().toISOString(),
-          backupId
-        };
-      }
-
       // Adaptar los nodos para usar node_metadata en lugar de metadata
       const adaptNodes = (nodes) => {
         return nodes.map(node => {
@@ -256,29 +245,19 @@ const flowService = {
         });
       };
 
-      // Aplicar adaptaciones a todos los nodos y aristas
-      if (diff.nodes_to_create.length > 0) {
-        diff.nodes_to_create = adaptNodes(diff.nodes_to_create);
-      }
+      console.log('[FlowService] Preparando para guardar el estado completo del flujo. Nodos:', optimizedState.nodes.length, 'Aristas:', optimizedState.edges.length);
 
-      if (diff.nodes_to_update.length > 0) {
-        diff.nodes_to_update = adaptNodes(diff.nodes_to_update);
-      }
-
-      if (diff.edges_to_create.length > 0) {
-        diff.edges_to_create = adaptEdges(diff.edges_to_create);
-      }
-
-      if (diff.edges_to_update.length > 0) {
-        diff.edges_to_update = adaptEdges(diff.edges_to_update);
-      }
+      // Adaptar los nodos y aristas del estado optimizado completo
+      const adaptedNodes = adaptNodes(optimizedState.nodes);
+      const adaptedEdges = adaptEdges(optimizedState.edges);
       
-      // Preparar el payload para la API
+      // Preparar el payload para la API con el estado completo
       const payload = {
-        diff,
-        name: currentState.name
+        nodes: adaptedNodes,
+        edges: adaptedEdges,
+        name: currentState.name // O optimizedState.name si es más apropiado y está disponible en optimizedState
       };
-      
+
       // Implementar reintentos con backoff exponencial
       const MAX_RETRIES = 3;
       let retryCount = 0;
@@ -300,7 +279,7 @@ const flowService = {
           return {
             ...response.data,
             backupId,
-            optimizationStats: diff.stats,
+            optimizationStats: optimizedState.stats,
             validationResult: validationResult,
             timestamp: new Date().toISOString()
           };

@@ -4,13 +4,14 @@
  * @version 2.1.0 - Refactorizado para usar DecisionNodeHandles y añadir handle de entrada
  */
 
-import React, { useState, useCallback, useMemo, useEffect, useRef, Suspense } from 'react'; 
+import React, { useState, useEffect, useLayoutEffect, useMemo, useCallback, useRef, Suspense } from 'react'; 
 import PropTypes from 'prop-types';
 import { Position, Handle, useReactFlow, useUpdateNodeInternals } from 'reactflow'; 
 import { debounce } from 'lodash';
 
 import './DecisionNode.css';
 import useFlowStore from '@/stores/useFlowStore';
+import { generateId } from '@/services/flowService'; // Importar generateId
 
 // Carga diferida de componentes para mejorar el rendimiento inicial
 const DecisionNodeHeader = React.lazy(() => import('./components/DecisionNodeHeader'));
@@ -20,7 +21,7 @@ const DecisionNodeOptions = React.lazy(() => import('./components/DecisionNodeOp
 import DecisionNodeHandles from './components/DecisionNodeHandles'; // Importación síncrona para prueba 
 
 // Número máximo de condiciones permitidas
-const MAX_CONDITIONS = 8; 
+const MAX_CONDITIONS = 3; // Límite de condiciones actualizado a 5 
 
 // Validación simple de pregunta
 const isValidQuestion = (question) => {
@@ -40,6 +41,7 @@ const DecisionNode = ({
   const [isSaving, setIsSaving] = useState(false);
   // showContextMenu y contextMenuPosition eliminados, se usa el store global
   const [activeConditionId, setActiveConditionId] = useState(null);
+  const [showMaxConditionsWarning, setShowMaxConditionsWarning] = useState(false);
 
   useEffect(() => {
     console.log(`DecisionNode ${id}: isEditing cambió a: ${isEditing}`);
@@ -57,8 +59,8 @@ const DecisionNode = ({
     return node?.data || {
       question: '¿Cuál es tu pregunta?',
       conditions: [
-        { id: `cond-${id}-yes`, text: 'Sí' }, 
-        { id: `cond-${id}-no`, text: 'No' }
+        { id: generateId('condition'), text: 'Sí' }, 
+        { id: generateId('condition'), text: 'No' }
       ],
       enableMarkdown: false,
       enableVariables: false,
@@ -105,6 +107,17 @@ const DecisionNode = ({
     isUltraPerformanceMode = false
   } = nodeData;
 
+  // Efecto para actualizar los internos del nodo cuando las condiciones cambian o el modo de edición se alterna
+  useLayoutEffect(() => {
+    console.log(`[DecisionNode ${id}] LayoutEffect: State changed (conditions len: ${nodeConditions?.length}, isEditing: ${isEditing}). Scheduling updateNodeInternals via rAF.`);
+    const animationFrameId = requestAnimationFrame(() => {
+      console.log(`[DecisionNode ${id}] Executing updateNodeInternals via rAF.`);
+      updateNodeInternals(id);
+    });
+    // Limpieza del requestAnimationFrame si el efecto se vuelve a ejecutar antes
+    return () => cancelAnimationFrame(animationFrameId);
+  }, [nodeConditions, id, updateNodeInternals, isEditing]);
+
   const defaultConditions = useMemo(() => [
     { id: `cond-${id}-default-yes`, text: 'Sí' }, 
     { id: `cond-${id}-default-no`, text: 'No' }
@@ -113,11 +126,39 @@ const DecisionNode = ({
   const currentConditions = useMemo(() => 
     nodeConditions && nodeConditions.length > 0 ? nodeConditions : defaultConditions,
   [nodeConditions, defaultConditions]);
-  
-    // Determinar si estamos en modo ultra rendimiento
+
+  // Efecto para llamar a updateNodeInternals cuando el nodo sale del modo edición o la pregunta cambia externamente
+  useEffect(() => {
+    if (!isEditing) {
+      // Retrasar updateNodeInternals ligeramente para permitir que el DOM se asiente después de que isEditing cambie
+      const timerId = setTimeout(() => {
+        console.log(`DecisionNode ${id}: No está en modo edición o la pregunta cambió, llamando a updateNodeInternals (con delay).`);
+        updateNodeInternals(id);
+      }, 50); // Retardo de 50ms, se puede ajustar
+
+      return () => clearTimeout(timerId); // Limpiar el temporizador
+    }
+  }, [isEditing, id, question, updateNodeInternals]); // 'question' asegura que se actualice si cambia externamente
+
+  // useEffect to initialize conditions in the store if they are empty
+  useEffect(() => {
+    if (id && (!nodeData.conditions || nodeData.conditions.length === 0) && defaultConditions.length > 0) {
+      // Check if the current store conditions are already the default ones to avoid loops
+      const storeConditionsString = JSON.stringify(nodeData.conditions);
+      const defaultConditionsString = JSON.stringify(defaultConditions);
+
+      if (storeConditionsString !== defaultConditionsString) {
+        console.log(`[DecisionNode ${id}] Initializing conditions in store with defaults because store is empty or different.`);
+        updateDecisionNodeData(id, { conditions: defaultConditions });
+      }
+    }
+  }, [id, nodeData.conditions, defaultConditions, updateDecisionNodeData]);
+
+  // Determinar si estamos en modo ultra rendimiento
   const isUltraMode = useMemo(() => 
     nodeData?.isUltraPerformanceMode || useFlowStore.getState().isUltraPerformanceModeGlobal || false,
   [nodeData?.isUltraPerformanceMode]);
+  
 
   const nodeClasses = useMemo(() => {
     const classes = ['decision-node'];
@@ -138,9 +179,6 @@ const DecisionNode = ({
         console.log(`[DecisionNode ${id} EFFECT] typeof updateNodeInternals: ${typeof updateNodeInternals}`);
 
         if (typeof updateNodeInternals === 'function' && reactFlowInstance) {
-          console.log(`[DecisionNode ${id} EFFECT] 1. Calling updateNodeInternals(${id}) PRE-generation.`);
-          updateNodeInternals(id); // Primera llamada: notificar que los handles van a cambiar
-
           console.log(`[DecisionNode ${id} EFFECT] Scheduling generateOptionNodes with setTimeout 0.`);
           firstTimerId = setTimeout(() => {
             console.log(`[DecisionNode ${id} EFFECT] 2. Executing delayed generateOptionNodes.`);
@@ -148,16 +186,9 @@ const DecisionNode = ({
 
             console.log(`[DecisionNode ${id} EFFECT] Scheduling SECOND updateNodeInternals call with setTimeout 0.`);
             secondTimerId = setTimeout(() => {
-              console.log(`[DecisionNode ${id} EFFECT] 3. Calling updateNodeInternals(${id}) POST-generation.`);
-              updateNodeInternals(id); // Segunda llamada: ayudar a React Flow a asentar el layout
-
-              console.log(`[DecisionNode ${id} EFFECT] Scheduling fitView call with setTimeout 0.`);
-              thirdTimerId = setTimeout(() => {
-                console.log(`[DecisionNode ${id} EFFECT] 4. Calling fitView for node ${id}.`);
-                reactFlowInstance.fitView({ nodes: [{ id }], duration: 200, padding: 0.2 });
-              }, 0); // Delay para fitView
-
-            }, 0); // Delay para la segunda llamada a updateNodeInternals
+              console.log(`[DecisionNode ${id} EFFECT] 3. fitView call commented out for node ${id}.`);
+              // reactFlowInstance.fitView({ nodes: [{ id }], duration: 200, padding: 0.2 });
+            }, 0); // Delay para fitView
 
           }, 0); // Delay para generateOptionNodes
 
@@ -179,7 +210,7 @@ const DecisionNode = ({
         clearTimeout(thirdTimerId);
       }
     };
-  }, [currentConditions, id, generateOptionNodes, updateNodeInternals, reactFlowInstance]);
+  }, [currentConditions, id, generateOptionNodes, reactFlowInstance]);
 
   const saveChanges = useCallback(() => {
     setIsEditing(false);
@@ -214,14 +245,25 @@ const DecisionNode = ({
     }
   }, [id, updateDecisionNodeQuestion]);
   
-  const handleAddCondition = useCallback((newConditionText) => {
-    if (currentConditions.length < MAX_CONDITIONS) {
-      const newConditionId = `cond-${id}-${Date.now()}`;
-      addDecisionNodeCondition(id, newConditionText);
-    } else {
-      console.warn(`No se pueden añadir más de ${MAX_CONDITIONS} condiciones.`);
+  const handleAddCondition = useCallback((text) => {
+    if (currentConditions.length >= MAX_CONDITIONS) {
+      console.warn(`No se pueden agregar más de ${MAX_CONDITIONS} condiciones`);
+      return;
     }
-  }, [id, addDecisionNodeCondition, currentConditions.length]);
+    
+    // Llamar a la función del store con los parámetros correctos (nodeId, text)
+    addDecisionNodeCondition(id, text);
+    
+    // Forzar actualización de los handles después de un breve retraso
+    setTimeout(() => {
+      updateNodeInternals(id);
+    }, 50);
+    
+    // Y otra vez después de la animación
+    setTimeout(() => {
+      updateNodeInternals(id);
+    }, 300);
+  }, [id, currentConditions.length, addDecisionNodeCondition, updateNodeInternals]);
   
   const handleConditionChange = useCallback((conditionId, newText) => {
     updateDecisionNodeConditionText(id, conditionId, newText);
@@ -240,7 +282,7 @@ const DecisionNode = ({
     } else {
       items.push({ label: 'Editar Nodo', action: startEditing, closeMenuOnClick: true });
     }
-    items.push({ label: 'Añadir Condición', action: () => handleAddCondition('Nueva Condición'), closeMenuOnClick: true });
+    items.push({ label: 'Agregar Opción', action: () => handleAttemptAddCondition('Nueva Opción'), disabled: currentConditions.length >= MAX_CONDITIONS, closeMenuOnClick: true });
     items.push({ label: 'Duplicar Nodo', action: () => duplicateDecisionNode(id), closeMenuOnClick: true });
     items.push({ 
       label: 'Eliminar Nodo', 
@@ -280,6 +322,17 @@ const DecisionNode = ({
       console.warn(`handleMoveCondition llamado con dirección inválida: ${direction}. Se espera 'up' o 'down'.`);
     }
   }, [id, moveDecisionNodeCondition]);
+
+  const handleAttemptAddCondition = useCallback((defaultText = 'Nueva Opción') => {
+    if (currentConditions.length >= MAX_CONDITIONS) {
+      setShowMaxConditionsWarning(true);
+      setTimeout(() => {
+        setShowMaxConditionsWarning(false);
+      }, 3000); // Ocultar después de 3 segundos
+    } else {
+      addDecisionNodeCondition(id, defaultText); // Llama a la acción del store
+    }
+  }, [id, currentConditions, addDecisionNodeCondition, MAX_CONDITIONS]);
   
   const toggleMarkdown = useCallback(() => toggleDecisionNodeFeature(id, 'enableMarkdown', !enableMarkdown), [id, toggleDecisionNodeFeature, enableMarkdown]);
   const toggleVariables = useCallback(() => toggleDecisionNodeFeature(id, 'enableVariables', !enableVariables), [id, toggleDecisionNodeFeature, enableVariables]);
@@ -352,7 +405,8 @@ const DecisionNode = ({
             />
             <DecisionNodeConditions
               conditions={currentConditions}
-              onAddCondition={handleAddCondition}
+              onAddCondition={handleAttemptAddCondition} // Usar el nuevo manejador
+              disableAdd={currentConditions.length >= MAX_CONDITIONS} // Pasar estado de deshabilitación
               onConditionChange={handleConditionChange}
               onDeleteCondition={handleDeleteCondition}
               onMoveCondition={handleMoveCondition}
@@ -360,7 +414,13 @@ const DecisionNode = ({
               maxConditions={MAX_CONDITIONS}
               activeConditionId={activeConditionId} 
               setActiveConditionId={setActiveConditionId} 
+              isEditing={isEditing} // Pasar el estado de edición
             />
+            {showMaxConditionsWarning && (
+              <div className="decision-node__max-conditions-warning">
+                Máximo {MAX_CONDITIONS} condiciones permitidas.
+              </div>
+            )}
           </Suspense>
         ) : (
           <div className="decision-node__question-preview" onClick={startEditing} role="button" tabIndex={0} aria-label="Editar pregunta">
@@ -389,7 +449,7 @@ const DecisionNode = ({
         {/* Asumimos que DecisionNodeHandles toma 'conditions', 'isConnectable', 'nodeId' y 'isUltraMode' */}
         <DecisionNodeHandles 
           nodeId={id}
-          outputs={[...currentConditions]} 
+          outputs={currentConditions} 
           isConnectable={isConnectable} 
           isUltraPerformanceMode={isUltraPerformanceMode}
           data-tooltip-base-id={`tooltip-${id}-condition`}

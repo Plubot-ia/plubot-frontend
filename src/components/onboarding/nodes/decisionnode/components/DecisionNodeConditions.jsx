@@ -12,55 +12,42 @@ import {
   Circle, 
   Plus, 
   Pencil, 
-  Move,
-  ChevronUp,
-  ChevronDown
+  // Move, ChevronUp, ChevronDown removed as move functionality UI is being removed
 } from 'lucide-react';
 import Tooltip from '../../../ui/ToolTip';
-import { NODE_CONFIG, CONDITION_TYPES, getConditionType } from '../DecisionNode.types';
+import { NODE_CONFIG, CONDITION_TYPES, getConditionType, getConnectorColor as getGlobalConnectorColor } from '../DecisionNode.types';
+
+
 
 /**
- * Obtiene el color del handle basado en el tipo de condición
- * @param {string} condition - Texto de la condición
- * @param {number} index - Índice de la condición para colores alternativos
- * @returns {string} - Color en formato hexadecimal
- */
-const getConditionColor = (conditionText, index = 0) => {
-  const normalized = conditionText.toLowerCase();
-  if (normalized === 'sí' || normalized === 'si') {
-    return '#22c55e'; // Verde para "sí"
-  } else if (normalized === 'no') {
-    return '#ef4444'; // Rojo para "no"
-  } else {
-    // Colores para otras condiciones - variedad de colores
-    const otherColors = ['#3b82f6', '#8b5cf6', '#ec4899', '#f59e0b', '#06b6d4', '#10b981'];
-    return otherColors[index % otherColors.length];
-  }
-};
-
-/**
- * Componente para renderizar una condición individual
+ * Componente para renderizar una condición individual.
+ * La edición se maneja localmente. La funcionalidad de mover se ha eliminado.
  * @param {Object} props - Propiedades del componente
- * @param {string} props.condition - Texto de la condición
- * @param {number} props.index - Índice de la condición
- * @param {Function} props.onEdit - Función para editar la condición
- * @param {Function} props.onDelete - Función para eliminar la condición
- * @param {Function} props.onMove - Función para mover la condición (reordenar)
- * @param {boolean} props.isUltraPerformanceMode - Indica si está en modo ultra rendimiento
- * @param {boolean} props.isActive - Indica si la condición está activa
- * @returns {JSX.Element} - Componente de condición
+ * @param {Object} props.condition - Objeto de condición con id y texto.
+ * @param {string} props.condition.id - ID único de la condición.
+ * @param {string} props.condition.text - Texto de la condición.
+ * @param {number} props.index - Índice de la condición.
+ * @param {Function} props.onConditionChange - Función para notificar el cambio de texto de la condición (id, newText).
+ * @param {Function} props.onDelete - Función para eliminar la condición (conditionId).
+ * @param {boolean} [props.isUltraPerformanceMode=false] - Indica si está en modo ultra rendimiento.
+ * @param {boolean} [props.isActive=false] - Indica si la condición está activa.
+ * @returns {JSX.Element} - Componente de condición.
  */
 const ConditionItem = memo(({ 
   condition, // Ahora es { id: string, text: string }
-  index, // Sigue siendo útil para la lógica de movimiento visual (arriba/abajo)
-  onEdit, // Espera (conditionId)
+  index,
+  onConditionChange, // Prop para notificar cambio de texto
   onDelete, // Espera (conditionId)
-  onMove, // Espera (conditionId, targetIndex)
+  // onMove no longer needed as UI is removed
   isUltraPerformanceMode,
   isActive = false
+  // onEdit prop is removed, editing is handled locally
 }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [isEditingThisItem, setIsEditingThisItem] = useState(false);
+  const [editedText, setEditedText] = useState(condition.text);
+  const inputRef = useRef(null);
   
   // Determinar si la condición es verdadera o falsa para aplicar estilos
   const conditionType = getConditionType(condition.text);
@@ -82,43 +69,61 @@ const ConditionItem = memo(({
     }
   }, [showDeleteConfirm, onDelete, condition.id]);
   
-  // Manejar movimiento de condición
-  const handleMoveUp = useCallback(() => {
-    onMove(condition.id, 'up');
-  }, [onMove, condition.id]);
+  // Move handlers removed
   
-  const handleMoveDown = useCallback(() => {
-    onMove(condition.id, 'down');
-  }, [onMove, condition.id]);
-  
-  // Manejar teclas para accesibilidad
-  const handleKeyDown = useCallback((e) => {
+  const handleStartEditing = () => {
+    setEditedText(condition.text);
+    setIsEditingThisItem(true);
+  };
+
+  const handleSaveEdit = () => {
+    if (editedText.trim() !== condition.text) {
+      onConditionChange(condition.id, editedText.trim());
+    }
+    setIsEditingThisItem(false);
+  };
+
+  const handleCancelEdit = () => {
+    setEditedText(condition.text); // Revert to original text
+    setIsEditingThisItem(false);
+  };
+
+  const handleInputKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleSaveEdit();
+    } else if (e.key === 'Escape') {
+      e.preventDefault();
+      handleCancelEdit();
+    }
+  };
+
+  // Effect to focus input when editing starts
+  useEffect(() => {
+    if (isEditingThisItem && inputRef.current) {
+      inputRef.current.focus();
+      inputRef.current.select(); // Select all text
+    }
+  }, [isEditingThisItem]);
+
+  // Manejar teclas para accesibilidad del ítem (no del input)
+  const handleItemKeyDown = useCallback((e) => {
+    if (isEditingThisItem) return; // Don't interfere with input keydown
+
     switch (e.key) {
       case 'Enter':
       case ' ':
         e.preventDefault();
-        onEdit(condition.id);
+        handleStartEditing();
         break;
       case 'Delete':
         e.preventDefault();
         handleDelete();
         break;
-      case 'ArrowUp':
-        if (e.ctrlKey) {
-          e.preventDefault();
-          handleMoveUp();
-        }
-        break;
-      case 'ArrowDown':
-        if (e.ctrlKey) {
-          e.preventDefault();
-          handleMoveDown();
-        }
-        break;
       default:
         break;
     }
-  }, [onEdit, condition.id, handleDelete, handleMoveUp, handleMoveDown]);
+  }, [isEditingThisItem, handleDelete, handleStartEditing, condition.id]);
   
   return (
     <div 
@@ -131,13 +136,14 @@ const ConditionItem = memo(({
       tabIndex={0}
       role="button"
       aria-label={`Condición: ${condition.text}`}
-      onKeyDown={handleKeyDown}
+      onKeyDown={handleItemKeyDown}
+      onDoubleClick={!isEditingThisItem ? handleStartEditing : undefined}
     >
       {/* Marca de color para la condición */}
       <div 
         className="decision-node__condition-color-mark"
         style={{
-          backgroundColor: getConditionColor(condition.text, index),
+          backgroundColor: getGlobalConnectorColor(condition.text, index),
           width: '12px',
           height: '12px',
           borderRadius: '50%',
@@ -148,52 +154,30 @@ const ConditionItem = memo(({
         }}
       />
       
-      <span className="decision-node__condition-text">{condition.text}</span>
+      {isEditingThisItem ? (
+        <input
+          ref={inputRef}
+          type="text"
+          value={editedText}
+          onChange={(e) => setEditedText(e.target.value)}
+          onBlur={handleSaveEdit}
+          onKeyDown={handleInputKeyDown}
+          className="decision-node__condition-input decision-node__condition-input--inline"
+          aria-label={`Editar texto de la condición: ${condition.text}`}
+          onClick={(e) => e.stopPropagation()} // Prevent double click from bubbling if input is clicked
+          onMouseDown={(e) => e.stopPropagation()} // Evitar que el drag del nodo interfiera
+        />
+      ) : (
+        <span className="decision-node__condition-text" onClick={handleStartEditing}>{condition.text}</span>
+      )}
       
-      {!isUltraPerformanceMode && (isHovered || window.matchMedia('(hover: none)').matches) && (
+      {!isUltraPerformanceMode && !isEditingThisItem && (isHovered || window.matchMedia('(hover: none)').matches) && (
         <div className="decision-node__condition-actions">
-          {!isUltraPerformanceMode && (
-            <Tooltip content="Mover condición" position="top">
-              <div 
-                className="decision-node__condition-button decision-node__condition-button--move"
-                aria-label={NODE_CONFIG.ARIA_LABELS.moveCondition}
-                role="group"
-              >
-                <div className="decision-node__condition-button-inner">
-                  <Move size={14} />
-                  <div className="decision-node__condition-move-controls">
-                    <div 
-                      className="decision-node__condition-move-button decision-node__condition-move-button--up"
-                      onClick={handleMoveUp}
-                      role="button"
-                      tabIndex={0}
-                      style={{ cursor: index === 0 ? 'not-allowed' : 'pointer', opacity: index === 0 ? 0.5 : 1 }}
-                      aria-disabled={index === 0}
-                      aria-label="Mover arriba"
-                    >
-                      <ChevronUp size={12} />
-                    </div>
-                    <div 
-                      className="decision-node__condition-move-button decision-node__condition-move-button--down"
-                      onClick={handleMoveDown}
-                      role="button"
-                      tabIndex={0}
-                      aria-label="Mover abajo"
-                    >
-                      <ChevronDown size={12} />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </Tooltip>
-          )}
-          
           <Tooltip content="Editar condición" position="top">
             <button 
               className="decision-node__condition-button decision-node__condition-button--edit"
-              onClick={() => onEdit(condition.id)}
+              onClick={handleStartEditing} // Now triggers in-place editing
               aria-label={NODE_CONFIG.ARIA_LABELS.editCondition}
-              aria-keyshortcuts="Enter"
             >
               <Pencil size={14} />
             </button>
@@ -222,9 +206,8 @@ ConditionItem.propTypes = {
     text: PropTypes.string.isRequired,
   }).isRequired,
   index: PropTypes.number.isRequired,
-  onEdit: PropTypes.func.isRequired,
+  onConditionChange: PropTypes.func.isRequired,
   onDelete: PropTypes.func.isRequired,
-  onMove: PropTypes.func.isRequired,
   isUltraPerformanceMode: PropTypes.bool,
   isActive: PropTypes.bool
 };
@@ -252,7 +235,9 @@ const DecisionNodeConditions = memo(({
   isUltraPerformanceMode,
   activeConditionId,
   setActiveConditionId,
-  isEditing
+  isEditing,
+  disableAdd = false, // Default to false if not provided
+  maxConditions = Infinity // Default if not provided
 }) => {
   const [isAddingCondition, setIsAddingCondition] = useState(false);
   const [editingConditionId, setEditingConditionId] = useState(null);
@@ -272,12 +257,21 @@ const DecisionNodeConditions = memo(({
       if (animationId) cancelAnimationFrame(animationId);
     };
   }, [isAddingCondition, editingConditionId]);
+
+  // Actualizar el estado de `disableAdd` internamente si es necesario, aunque se prefiere que venga de props
+  // const internalDisableAdd = disableAdd || (conditions && conditions.length >= maxConditions);
+
   
   // Iniciar adición de condición
   const startAddingCondition = useCallback(() => {
+    if (disableAdd || conditions.length >= maxConditions) {
+      // Optionally, show a message or log, but the button should be disabled visually
+      console.warn('Attempted to add condition when limit reached or disabled.');
+      return;
+    }
     setIsAddingCondition(true);
     setEditingText('');
-  }, []);
+  }, [disableAdd, conditions, maxConditions]);
   
   // Añadir condición
   const addCondition = useCallback(() => {
@@ -354,11 +348,11 @@ const DecisionNodeConditions = memo(({
             key={condition.id}
             condition={condition}
             index={index}
-            onEdit={handleStartEdit} // Pasa (conditionId, currentText)
+            onConditionChange={onConditionChange} // Passthrough from parent
             onDelete={() => onDeleteCondition(condition.id)} // Pasa (conditionId)
-            onMove={(movedConditionId, targetVisualIndex) => onMoveCondition(movedConditionId, targetVisualIndex)} // Pasa (conditionId, targetIndex)
+            // onMove prop removed
             isUltraPerformanceMode={isUltraPerformanceMode}
-            isActive={condition.id === activeConditionId} // Asume que activeConditionId podría ser un ID o se resolverá
+            isActive={condition.id === activeConditionId}
           />
         ))}
       </div>
@@ -404,8 +398,9 @@ const DecisionNodeConditions = memo(({
           ) : (
             <Tooltip content="Añadir nueva condición (Ctrl+A)" position="top">
               <button
-                onClick={startAddingCondition}
-                className="decision-node__add-condition"
+                onClick={startAddingCondition} 
+                className="decision-node__add-condition-button"
+                disabled={disableAdd || conditions.length >= maxConditions}
                 aria-label={NODE_CONFIG.ARIA_LABELS.addCondition}
                 aria-keyshortcuts="Ctrl+A"
               >
@@ -428,13 +423,15 @@ DecisionNodeConditions.propTypes = {
     text: PropTypes.string.isRequired,
   })).isRequired,
   onAddCondition: PropTypes.func.isRequired,
-  onConditionChange: PropTypes.func.isRequired,
+  onConditionChange: PropTypes.func.isRequired, // This prop is now used by ConditionItem
   onDeleteCondition: PropTypes.func.isRequired,
-  onMoveCondition: PropTypes.func.isRequired,
+  // onMoveCondition: PropTypes.func.isRequired, // Prop removed
   isUltraPerformanceMode: PropTypes.bool,
   activeConditionId: PropTypes.string,
   setActiveConditionId: PropTypes.func.isRequired,
-  isEditing: PropTypes.bool
+  isEditing: PropTypes.bool,
+  disableAdd: PropTypes.bool,
+  maxConditions: PropTypes.number
 };
 
 export default DecisionNodeConditions;

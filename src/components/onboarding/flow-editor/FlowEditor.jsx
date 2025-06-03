@@ -185,7 +185,7 @@ const useHandleValidator = (nodes, edges) => {
     action: ['message', 'end', 'decision', 'option', 'httpRequest', 'power'],
     
     // Nodo de opción puede conectarse a nodos de mensaje, decisión o acción
-    option: ['message', 'decision', 'action', 'httpRequest'],
+    option: ['message', 'decision', 'action', 'httpRequest', 'end'],
     
     // Nodo HTTP puede conectarse a nodos de mensaje, decisión o acción
     httpRequest: ['message', 'decision', 'action', 'end', 'option', 'power'],

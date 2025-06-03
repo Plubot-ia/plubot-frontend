@@ -142,6 +142,11 @@
   transition: none !important;
 }
 
+.decision-node .react-flow__handle,
+.decision-node__handle {
+  cursor: pointer !important;
+}
+
 .decision-node.ultra-performance .react-flow__handle {
   cursor: pointer !important;
   background-color: var(--node-decision-ultra-text-color) !important;
@@ -361,110 +366,99 @@
 /* La regla anterior para .react-flow__handle[data-handlepos="top"].nodrag ha sido eliminada 
    ya que el posicionamiento ahora está integrado en las reglas específicas para 
    .decision-node__handle--target y su versión ultra. */
-
-/* --- Source Handles --- */
-/* Contenedor principal de los handles de salida */
-.decision-node .decision-node__source-handles-wrapper {
-  display: flex;
-  justify-content: center; /* Centra los handles si hay espacio */
-  position: absolute;
-  bottom: 0 !important; /* Alineado con la parte inferior del nodo, FORZADO */
-  left: 0;
-  width: 100%;
-  padding: 0 20px; /* Aumentar más padding horizontal interno al wrapper */
-  height: auto; /* Permite que la altura se ajuste al contenido */
-  transform: translateY(0px) !important; /* Asegurar que no haya transformaciones verticales indeseadas */
-  pointer-events: none; /* El wrapper no debe capturar eventos */
-  box-sizing: border-box; /* Asegurar que el padding/border no afecten el ancho calculado */
-}
-
-/* Estilos específicos para los handles de salida individuales dentro del wrapper */
-div.decision-node div.decision-node__source-handles-wrapper > div.react-flow__handle.decision-node__handle {
-  cursor: pointer !important;
-  position: absolute; /* Necesario para el posicionamiento preciso */
-
 /* === Standardized Source Handle Styles === */
 /* --- Source Handles (Salida) --- */
-/* DecisionNode Source Handles - Normal Mode (border via box-shadow) */
-div.react-flow__node-decision.selectable .react-flow__handle.react-flow__handle-bottom.decision-node__handle.decision-node__handle--source:not(.decision-node__handle--ultra) {
-  /* Attempt to force size */
-  width: var(--handle-default-size) !important; /* Expected: 15px */
-  height: var(--handle-default-size) !important; /* Expected: 15px */
-  min-width: var(--handle-default-size) !important;
-  min-height: var(--handle-default-size) !important;
-  max-width: var(--handle-default-size) !important;
-  max-height: var(--handle-default-size) !important;
-  box-sizing: border-box !important; /* Ensure padding/border are included if any were to exist */
-
-  /* Explicitly reset all border properties to ensure no interference */
-  border-top-width: 0px !important;
-  border-right-width: 0px !important;
-  border-bottom-width: 0px !important;
-  border-left-width: 0px !important;
-
-  border-top-style: none !important;
-  border-right-style: none !important;
-  border-bottom-style: none !important;
-  border-left-style: none !important;
-
-  border-top-color: transparent !important;
-  border-right-color: transparent !important;
-  border-bottom-color: transparent !important;
-  border-left-color: transparent !important;
-
-  border-image-source: none !important;
-  border-image-slice: initial !important;
-  border-image-width: initial !important;
-  border-image-outset: initial !important;
-  border-image-repeat: initial !important;
-
-  border-radius: 50% !important; /* Make it circular */
-  background-clip: padding-box !important; /* Background shouldn't go under border area */
-
-  /* Simulate border with box-shadow */
-  box-shadow: 0 0 0 var(--handle-default-border-width) var(--handle-default-border-color) !important;
-  /* var(--handle-default-border-width) is 2px, var(--handle-default-border-color) is white */
-
-  /* Positioning and other properties */
-  position: absolute;
-  bottom: 0px !important; /* Alineado con el borde inferior del wrapper */
-  top: auto !important; /* Override React Flow's possible top positioning */
-  /* 'left' is set by inline style in DecisionNodeHandles.jsx */
-  cursor: pointer !important;
-  z-index: 10 !important; /* Ensure handles are above node content */
-  margin-left: 2px !important; /* Aumentado intento para evitar clipping izquierdo */
-
-  /* Transitions */
-  transition:
-    box-shadow var(--node-decision-transition-duration) var(--node-decision-transition-timing),
-    filter var(--node-decision-transition-duration) var(--node-decision-transition-timing) !important;
+/* Posición de los handles al borde del nodo */
+:root {
+  --handle-bottom-offset: -7.5px; /* Ajustado para centrar handles de 15px en el borde */
 }
 
-div.react-flow__node-decision.selectable .react-flow__handle.react-flow__handle-bottom.decision-node__handle.decision-node__handle--source:not(.decision-node__handle--ultra):hover {
-  filter: brightness(120%) !important;
-  /* Keep existing box-shadow for hover, or enhance if needed based on var(--handle-default-hover-shadow) */
-  box-shadow: 0 0 0 var(--handle-default-border-width) #FFFFFF, 
-              inset 0 0 0 1px rgba(0,0,0,0.05),
-              var(--handle-default-hover-shadow) !important; 
-  /* transform: translateX(-50%) scale(var(--handle-default-hover-scale)) !important; */
+/* Contenedor de los handles de salida */
+.decision-node__handles-container {
+  /* Estilos base por si acaso, aunque principalmente se controlan por JSX */
+  position: absolute !important;
+  width: 100%;
+  left: 0;
+  right: 0;
+  height: 0;
+  overflow: visible;
+  bottom: 0 !important;
+  z-index: 50;
+  transform: none !important;
+  transform-origin: center center !important;
+  transition: none !important;
 }
 
-/* Estilos para los handles de DecisionNode CUANDO el nodo se está ARRASTRANDO */
+/* DecisionNode Source Handles - Ahora controlados por estilos inline */
+div.react-flow__node-decision.selectable .decision-node__handles-container > .react-flow__handle.react-flow__handle-bottom.decision-node__handle:not(.decision-node__handle--ultra) {
+  /* Estilos mínimos de respaldo */
+  position: absolute !important;
+  z-index: 50 !important;
+  transform: translateX(-50%) !important;
+  transform-origin: center center !important;
+  top: auto !important;
+  bottom: -7.5px !important;
+  transition: none !important;
+}
+
+/* Static position for 1st source handle */
+div.react-flow__node-decision.selectable .decision-node__handles-container > .react-flow__handle.react-flow__handle-bottom.decision-node__handle.decision-node__handle--source:not(.decision-node__handle--ultra):nth-of-type(1) {
+  left: 35% !important;
+  /* Inherits bottom, transform, etc., from the base rule */
+}
+
 /* Intentamos sobreescribir los estilos que React Flow pueda aplicar durante el drag. */
-div.react-flow__node-decision.dragging .react-flow__handle.react-flow__handle-bottom.decision-node__handle.decision-node__handle--source:not(.decision-node__handle--ultra) {
-  bottom: 0px !important; /* Forzar alineación inferior */
-  top: auto !important; /* Anular 'top' de React Flow */
-  box-shadow: 0 0 0 var(--handle-default-border-width) var(--handle-default-border-color) !important; /* Forzar borde blanco */
-  
-  /* Reafirmamos otros estilos visuales y de posicionamiento por si acaso */
+/* Regla para .decision-node__source-handles-wrapper en estado dragging eliminada para enfocar en los handles individuales. */
+
+/* BASE: Regla para TODOS los handles de salida durante el arrastre */
+div.react-flow__node-decision.dragging .decision-node__handles-container > .react-flow__handle.react-flow__handle-bottom.decision-node__handle.decision-node__handle--source:not(.decision-node__handle--ultra) {
+  /* Todos los estilos se aplican directamente en el JSX */
+  z-index: 999 !important; /* Mantener z-index más alto durante el drag */
+  /* Anular cualquier transformación que React Flow pueda aplicar */
+  transform: translateX(-50%) !important;
+  /* Anular cualquier posición top que React Flow pueda aplicar */
+  top: auto !important;
+  bottom: -7.5px !important;
+  /* Anular cualquier transición que React Flow pueda aplicar */
+  transition: none !important;
+  position: absolute !important;
+  transform-origin: center center !important;
+}
+
+/* ESPECÍFICO: Regla para segundo handle y siguientes que reciben desplazamiento adicional de React Flow */
+/* REGLAS ESPECIALES PARA EL SEGUNDO HANDLE (ROSADO) */
+/* Forzar posicionamiento correcto para todos los handles */
+div.react-flow__node-decision .decision-node__handles-container > .react-flow__handle.react-flow__handle-bottom.decision-node__handle.decision-node__handle--source {
+  /* Anular cualquier transformación que React Flow pueda aplicar */
+  transform: translateX(-50%) !important;
+  /* Anular cualquier posición top que React Flow pueda aplicar */
+  top: auto !important;
+  /* Anular cualquier transición que React Flow pueda aplicar */
+  transition: none !important;
+  /* Asegurar que bottom sea respetado */
+  bottom: -7.5px !important;
+}
+
+/* REGLAS ESPECIALES PARA CUANDO SE ARRASTRA - REGLA PARA EL PRIMER HANDLE */
+
+/* Regla específica para el primer handle (azul) durante el arrastre */
+div.react-flow__node-decision.dragging .decision-node__handles-container > .react-flow__handle.react-flow__handle-bottom.decision-node__handle.decision-node__handle--source:nth-of-type(1) {
+  /* Asegurar que el primer handle permanezca visible y con estilos correctos */
+  position: absolute !important;
+  /* background-color es manejado por DecisionNodeHandles.jsx */
+  z-index: 1000 !important;
   width: var(--handle-default-size) !important;
   height: var(--handle-default-size) !important;
-  border: none !important;
+  bottom: -7.5px !important;
+  top: auto !important;
+  border: 2px solid #ffffff !important; /* Alineado con MessageNode */
+  box-shadow: 0 1px 3px 0 rgba(0,0,0,.2), 0 1px 1px 0 rgba(0,0,0,.14), 0 2px 1px -1px rgba(0,0,0,.12) !important; /* Actualizado para coincidir con MessageNode y anular mega-drag-fix */
   border-radius: 50% !important;
-  transform: translateX(-50%) !important; /* Aseguramos el centrado horizontal */
-  margin-left: 2px !important; /* Mantenemos el ajuste para el clipping izquierdo que ya teníamos */
-  z-index: 11 !important; /* Un z-index ligeramente superior al normal por si hay conflicto */
-  background-clip: padding-box !important; /* Asegurar que el fondo no interfiera con el box-shadow */
+  opacity: 1 !important;
+  left: 35% !important;
+  transform: translateX(-50%) !important;
+  transform-origin: center center !important;
+  transition: none !important;
 }
 
 /* Modo Ultra Rendimiento para Handles de Salida */
@@ -490,40 +484,69 @@ div.react-flow__node-decision.dragging .react-flow__handle.react-flow__handle-bo
   box-shadow: none !important;
 }
 /* === End of Standardized Source Handle Styles === */
-  /* Ajuste inicial para el primer handle (o único handle) */
-  bottom: -12px !important; /* Ajustado para subir un poco los handles */
-  top: auto !important; /* Volver a auto para que bottom controle */
-  transform: translateX(-50%) !important; /* Compensación horizontal */
-  z-index: 10 !important; /* Asegurar que estén por encima de otros elementos del nodo */
-  pointer-events: all !important; /* Los handles individuales sí deben capturar eventos */
-}
+/* Las propiedades flotantes que estaban aquí (bottom, top, transform, z-index, pointer-events) han sido eliminadas para corregir error de sintaxis. */
+/* Los estilos base de los handles se definen en otros lugares. */
+/* La llave extra que estaba aquí ha sido eliminada. */
 
 /* Ajuste específico para el SEGUNDO handle de salida (rojo/false) */
 /* Asume que el handle "true" es el primero en el DOM y "false" el segundo. */
-div.decision-node div.decision-node__source-handles-wrapper > div.react-flow__handle.decision-node__handle:nth-of-type(2) {
+/* Se cambia decision-node__source-handles-wrapper a decision-node__handles-container */
+div.decision-node div.decision-node__handles-container > div.react-flow__handle.decision-node__handle--source:nth-of-type(2) {
   /* Mueve el segundo handle más arriba para evitar solapamiento */
-  top: auto !important; /* Volver a auto para que bottom controle */
-  transform: translateX(-50%) !important; /* Compensación horizontal */
+  /* Nota: El posicionamiento vertical (bottom/top) ya está definido en los estilos inline del Handle y en las reglas generales. */
+  /* Este selector podría necesitar ajustes si la lógica de :nth-of-type se ve afectada por otros elementos dentro de __handles-container */
+  transform: translateX(-50%) translateY(-50%) !important; /* Compensación horizontal */
 }
 
 /* Si solo hay un handle, asegurar que mantenga la posición base. */
 /* :only-child es más robusto que depender de la no aplicación de :nth-of-type(2). */
-.decision-node .decision-node__source-handles-wrapper > .react-flow__handle:only-child {
+/* Se cambia decision-node__source-handles-wrapper a decision-node__handles-container */
+.decision-node div.decision-node__handles-container > .react-flow__handle.decision-node__handle--source:only-child {
   transform: translateX(-50%) !important;
 }
 
 /* Estilos para el handle de condición verdadera (verde) */
-.decision-node .decision-node__source-handles-wrapper > .react-flow__handle.custom-handle-true, /* Para posible clase específica desde JSX */
-.decision-node .decision-node__handle--condition-true .react-flow__handle { /* Selector existente */
-  background-color: rgba(var(--node-decision-true-rgb), 1) !important;
-  box-shadow: 0 0 6px rgba(var(--node-decision-true-rgb), 0.7) !important;
+/* Handles para condiciones TRUE */
+.decision-node div.decision-node__handles-container > .react-flow__handle.custom-handle-true,
+.decision-node div.decision-node__handles-container > .react-flow__handle[data-id="true"],
+.decision-node div.decision-node__handles-container > .react-flow__handle.decision-node__handle--source.custom-handle-true,
+.decision-node div.decision-node__handles-container > .react-flow__handle.decision-node__handle--source[data-id="true"] {
+  background-color: rgb(var(--node-decision-true-rgb)) !important;
+  border-color: rgb(var(--node-decision-true-rgb)) !important;
+  box-shadow: 0 0 0 2px rgba(var(--node-decision-true-rgb), 0.3) !important;
+}
+
+/* Estilos para el input de añadir/editar condición global */
+
+/* Estilo para el input inline dentro de ConditionItem */
+.decision-node__condition-input--inline {
+  flex-grow: 1;
+  background-color: rgba(255, 255, 255, 0.9);
+  color: var(--node-decision-input-text-color, #222222);
+  border: 1px solid var(--node-decision-input-border-focus-color, #4F46E5);
+  border-radius: var(--node-decision-input-radius, 6px);
+  padding: 4px 8px;
+  font-size: inherit; /* Usar el tamaño de fuente del contexto */
+  font-family: inherit;
+  box-shadow: 0 0 0 2px rgba(var(--node-decision-primary-accent-rgb, 60, 80, 220), 0.1);
+  margin-right: 8px; /* Espacio antes de los botones de acción */
+  min-width: 0; /* Permite que el input se encoja adecuadamente */
+}
+
+.decision-node__condition-input--inline:focus {
+  outline: none;
+  border-color: var(--node-decision-input-border-focus-color, #4F46E5);
+  box-shadow: 0 0 0 3px rgba(var(--node-decision-primary-accent-rgb, 60, 80, 220), 0.25);
 }
 
 /* Estilos para el handle de condición falsa (rojo) */
-.decision-node .decision-node__source-handles-wrapper > .react-flow__handle.custom-handle-false, /* Para posible clase específica desde JSX */
-.decision-node .decision-node__handle--condition-false .react-flow__handle { /* Selector existente */
-  background-color: rgba(var(--node-decision-false-rgb), 1) !important;
-  box-shadow: 0 0 6px rgba(var(--node-decision-false-rgb), 0.7) !important;
+.decision-node div.decision-node__handles-container > .react-flow__handle.custom-handle-false,
+.decision-node div.decision-node__handles-container > .react-flow__handle[data-id="false"],
+.decision-node div.decision-node__handles-container > .react-flow__handle.decision-node__handle--source.custom-handle-false,
+.decision-node div.decision-node__handles-container > .react-flow__handle.decision-node__handle--source[data-id="false"] {
+  background-color: rgb(var(--node-decision-false-rgb)) !important;
+  border-color: rgb(var(--node-decision-false-rgb)) !important;
+  box-shadow: 0 0 0 2px rgba(var(--node-decision-false-rgb), 0.3) !important;
 }
 
 .decision-node-loading {
@@ -603,6 +626,20 @@ div.decision-node div.decision-node__source-handles-wrapper > div.react-flow__ha
 .decision-node--ultra:hover {
   transform: none;
   box-shadow: var(--node-decision-ultra-blue-shadow); /* Ensure hover doesn't change ultra style */
+}
+
+.decision-node__max-conditions-warning {
+  background-color: var(--warning-bg-color, #fff3cd);
+  color: var(--warning-text-color, #664d03);
+  padding: 8px 12px;
+  border: 1px solid var(--warning-border-color, #ffc107);
+  border-radius: var(--border-radius-medium, 6px);
+  margin-top: 10px;
+  margin-bottom: 10px;
+  text-align: center;
+  font-size: 0.85rem;
+  position: relative; /* Para asegurar que esté dentro del flujo del nodo */
+  z-index: 10; /* Para que aparezca sobre otros elementos del contenido si es necesario */
 }
 
 /* Cabecera del nodo - diseño premium */
@@ -990,6 +1027,7 @@ div.decision-node div.decision-node__source-handles-wrapper > div.react-flow__ha
 }
 
 .decision-node__condition-text {
+  color: var(--node-decision-input-text-color, #333333); /* Texto oscuro para contraste */
   flex: 1;
   overflow: hidden;
   text-overflow: ellipsis;

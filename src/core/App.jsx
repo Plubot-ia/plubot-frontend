@@ -75,7 +75,7 @@ const LoadingFallback = () => (
     <div>
       <div style={{ textAlign: 'center', marginBottom: '20px' }}>
         <img 
-          src="/logo.png" 
+          src="/logo.svg" 
           alt="Plubot Logo" 
           style={{ width: '120px', height: 'auto' }} 
         />

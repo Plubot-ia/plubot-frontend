@@ -694,6 +694,7 @@ deleteNode: (nodeIdToDelete) => {
                 data: {
                   ...node.data,
                   conditions: updatedConditions,
+                  handleIds: updatedConditions.map(cond => `output-${cond.id}`),
                 },
               };
             }
@@ -744,6 +745,7 @@ deleteNode: (nodeIdToDelete) => {
               data: {
                 ...node.data,
                 conditions: newConditions,
+                handleIds: newConditions.map(cond => `output-${cond.id}`),
               }
             };
           }
@@ -1022,19 +1024,31 @@ deleteNode: (nodeIdToDelete) => {
       
       generateOptionNodes: (nodeId) => {
     console.log(`[generateOptionNodes ENTERED] for DecisionNode ID: ${nodeId}`);
-    // Esta acción se encarga de crear/actualizar los nodos de opción Y SUS ARISTAS correspondientes,
-    // basados en las condiciones del DecisionNode.
     set((state) => {
       const decisionNode = state.nodes.find(node => node.id === nodeId && node.type === NODE_TYPES.decision);
-      console.log(`[generateOptionNodes] DecisionNode (${nodeId}) found in state:`, decisionNode ? decisionNode.id : 'NOT FOUND', 'Conditions:', decisionNode ? decisionNode.data.conditions : 'N/A');
+      console.log(`[generateOptionNodes] DecisionNode (${nodeId}) found in state:`, decisionNode ? decisionNode.id : 'NOT FOUND', 'Conditions:', decisionNode ? JSON.stringify(decisionNode.data.conditions) : 'N/A');
       if (!decisionNode) return state;
       
       const conditions = decisionNode.data.conditions || [];
-      // Si no hay condiciones, no hay nada que generar o actualizar para los OptionNodes.
+      // Si no hay condiciones, aún podríamos necesitar limpiar OptionNodes huérfanos.
       if (conditions.length === 0) {
-        // La lógica para eliminar OptionNodes huérfanos está más abajo,
-        // por lo que este return es suficiente si no hay condiciones.
-        return state; 
+        const optionNodesToRemove = state.nodes.filter(n =>
+          n.type === NODE_TYPES.option && 
+          n.data && 
+          n.data.sourceNode === nodeId
+        );
+        if (optionNodesToRemove.length > 0) {
+          const optionNodeIdsToRemove = optionNodesToRemove.map(n => n.id);
+          const remainingNodes = state.nodes.filter(n => !optionNodeIdsToRemove.includes(n.id));
+          const remainingEdges = state.edges.filter(e => 
+            !(optionNodeIdsToRemove.includes(e.target) && e.source === nodeId) && 
+            !(optionNodeIdsToRemove.includes(e.source)) 
+          );
+          console.log(`[generateOptionNodes ${nodeId}] No conditions, removing ${optionNodesToRemove.length} orphan OptionNodes.`);
+          return { nodes: remainingNodes, edges: remainingEdges, hasChanges: true };
+        }
+        console.log(`[generateOptionNodes ${nodeId}] No conditions and no orphan OptionNodes to remove.`);
+        return state; // No conditions and no orphans to remove
       }
       
       const parentPosition = {
@@ -1055,14 +1069,6 @@ deleteNode: (nodeIdToDelete) => {
       const VERTICAL_OFFSET_FOR_NO = 40; // Para que "No" esté más abajo
 
       let defaultConditionXStart = parentPosition.x + parentWidth + HORIZONTAL_SPACING_FROM_PARENT_EDGE;
-      let defaultConditionCount = 0;
-
-      // Primero contamos los default para un posible centrado si solo hay defaults
-      conditions.forEach(cond => {
-        if (getConditionType(cond.text) === CONDITION_TYPES.DEFAULT) {
-          defaultConditionCount++;
-        }
-      });
 
       conditions.forEach((conditionObj, index) => {
         console.log(`[generateOptionNodes ${nodeId}] Processing condition (idx ${index}):`, conditionObj, 'Searching for OptionNode ID:', conditionObj.optionNodeId);
@@ -1109,7 +1115,7 @@ deleteNode: (nodeIdToDelete) => {
             existingNode.data.sourceConditionId !== conditionObj.id ||
             existingNode.data.parentHandleColor !== getConnectorColor(conditionObj.text, index); // Comparar también el color
 
-          if (nodeNeedsUpdate) {
+              if (nodeNeedsUpdate) {
             updatedNodes = updatedNodes.map(node =>
               node.id === existingNode.id
               ? {
@@ -1122,40 +1128,43 @@ deleteNode: (nodeIdToDelete) => {
                       conditionIndex: index,
                       parentHandleColor: getConnectorColor(conditionObj.text, index),
                       isUltraPerformanceMode: decisionNode.data.isUltraPerformanceMode || false,
-                      sourceDecisionNode: nodeId,
-                      conditionId: conditionObj.id
-                  },
-                  position: optionPosition,
+                      sourceDecisionNode: nodeId, // Asegurar que estos también estén
+                      conditionId: conditionObj.id // Asegurar que estos también estén
+                      },
+                      position: optionPosition,
+                    }
+                  : node
+                );
+              }
+
+              const edgeId = `edge-${nodeId}-${sourceHandleId}-to-${existingNode.id}`;
+              let existingEdge = updatedEdges.find(e => e.id === edgeId);
+              if (!existingEdge) { 
+                existingEdge = updatedEdges.find(e => e.source === nodeId && e.target === existingNode.id && e.sourceHandle === sourceHandleId);
+              }
+              
+              if (existingEdge) {
+                const edgeNeedsUpdate = existingEdge.animated !== !(decisionNode.data.isUltraPerformanceMode || state.isUltraMode || false); // state.isUltraModeGlobal no existe, usar state.isUltraMode
+                if (edgeNeedsUpdate) {
+                  updatedEdges = updatedEdges.map(e => e.id === existingEdge.id ? { ...e, animated: !(decisionNode.data.isUltraPerformanceMode || state.isUltraMode || false) } : e);
                 }
-              : node
-            );
-          }
+              } else {
+                console.log(`[generateOptionNodes ${nodeId}] Edge for existing OptionNode ${existingNode.id} not found. Attempting to create.`);
+                const newEdgeParams = {
+                  id: edgeId,
+                  source: nodeId,
+                  target: existingNode.id,
+                  sourceHandle: sourceHandleId,
+                  targetHandle: 'target', // Asumimos 'target' como ID del handle de destino del OptionNode
+                  type: 'elite-edge',
+                  animated: !(decisionNode.data.isUltraPerformanceMode || state.isUltraMode || false),
+                };
+                const previousEdgesLength = updatedEdges.length;
+                updatedEdges = addEdge(newEdgeParams, updatedEdges);
+                console.log(`[generateOptionNodes ${nodeId}] Edge for existing OptionNode ${existingNode.id}. Prev Edges: ${previousEdgesLength}, New Edges: ${updatedEdges.length}. Edge Added: ${updatedEdges.length > previousEdgesLength}`, newEdgeParams);
+              }
 
-          const edgeId = `edge-${nodeId}-${sourceHandleId}-to-${existingNode.id}`;
-          let existingEdge = updatedEdges.find(e => e.id === edgeId);
-          if (!existingEdge) { // Fallback por si el ID de la arista cambió o no se encontró
-            existingEdge = updatedEdges.find(e => e.source === nodeId && e.target === existingNode.id && e.sourceHandle === sourceHandleId);
-          }
-          
-          if (existingEdge) {
-            const edgeNeedsUpdate = existingEdge.animated !== !(decisionNode.data.isUltraPerformanceMode || state.isUltraPerformanceModeGlobal || false);
-            if (edgeNeedsUpdate) {
-              updatedEdges = updatedEdges.map(e => e.id === existingEdge.id ? { ...e, animated: !(decisionNode.data.isUltraPerformanceMode || state.isUltraPerformanceModeGlobal || false) } : e);
-            }
-          } else {
-            const newEdge = {
-              id: edgeId,
-              source: nodeId,
-              target: existingNode.id,
-              sourceHandle: sourceHandleId,
-              targetHandle: 'target',
-              type: 'elite-edge',
-              animated: !(decisionNode.data.isUltraPerformanceMode || state.isUltraPerformanceModeGlobal || false),
-            };
-            updatedEdges.push(newEdge);
-          }
-
-        } else { // Crear nuevo OptionNode
+            } else { // Crear nuevo OptionNode
           const newOptionNodeId = conditionObj.optionNodeId || generateNodeId('option');
 
           const newOptionNode = {
@@ -1169,33 +1178,33 @@ deleteNode: (nodeIdToDelete) => {
                 conditionIndex: index,
                 parentHandleColor: getConnectorColor(conditionObj.text, index),
                 isUltraPerformanceMode: decisionNode.data.isUltraPerformanceMode || false,
-                sourceDecisionNode: nodeId,
-                conditionId: conditionObj.id
-            },
-            draggable: true,
-            selectable: true,
-            connectable: true,
-          };
-          updatedNodes.push(newOptionNode);
+                    sourceDecisionNode: nodeId,
+                    conditionId: conditionObj.id
+                },
+                draggable: true,
+                selectable: true,
+                connectable: true,
+              };
+              updatedNodes.push(newOptionNode);
+              console.log(`[generateOptionNodes ${nodeId}] Created NEW OptionNode ${newOptionNodeId}:`, JSON.stringify(newOptionNode.data));
 
-          const newEdge = {
-            id: `edge-${nodeId}-${sourceHandleId}-to-${newOptionNodeId}`,
-            source: nodeId,
-            target: newOptionNodeId,
-            sourceHandle: sourceHandleId,
-            type: 'elite-edge',
-            animated: true, // Simplified for testing
-            targetHandle: 'target',
-            // data: { plubotId: state.plubotId }, // Removed for testing
-          };
-          console.log(`[generateOptionNodes ${nodeId}] Creating NEW edge for new OptionNode ${newOptionNodeId}:`, JSON.stringify(newEdge));
-          console.log(`[generateOptionNodes ${nodeId}] updatedEdges length BEFORE push (for new OptionNode): ${updatedEdges.length}`);
-          updatedEdges.push(newEdge);
-          console.log(`[generateOptionNodes ${nodeId}] updatedEdges length AFTER push (for new OptionNode): ${updatedEdges.length}`);
-          
-          // Si se generó un nuevo ID para el OptionNode (porque no venía en conditionObj o era diferente),
-          // actualizar la condición en el DecisionNode para que apunte a este nuevo OptionNode.
-          if (!conditionObj.optionNodeId || conditionObj.optionNodeId !== newOptionNodeId) {
+              const newEdgeParams = {
+                id: `edge-${nodeId}-${sourceHandleId}-to-${newOptionNodeId}`,
+                source: nodeId,
+                target: newOptionNodeId,
+                sourceHandle: sourceHandleId,
+                targetHandle: 'target', // Asumimos 'target'
+                type: 'elite-edge',
+                animated: !(decisionNode.data.isUltraPerformanceMode || state.isUltraMode || false), // Consistencia con otras aristas
+              };
+              console.log(`[generateOptionNodes ${nodeId}] Attempting to create NEW edge for new OptionNode ${newOptionNodeId}:`, JSON.stringify(newEdgeParams));
+              const previousEdgesLength = updatedEdges.length;
+              updatedEdges = addEdge(newEdgeParams, updatedEdges);
+              console.log(`[generateOptionNodes ${nodeId}] NEW edge for new OptionNode ${newOptionNodeId}. Prev Edges: ${previousEdgesLength}, New Edges: ${updatedEdges.length}. Edge Added: ${updatedEdges.length > previousEdgesLength}`);
+              
+              // Actualizar la condición en el DecisionNode para que apunte a este nuevo OptionNode.
+              // Esta lógica ya estaba y es correcta.
+              if (!conditionObj.optionNodeId || conditionObj.optionNodeId !== newOptionNodeId) {
             const decisionNodeInUpdatedArray = updatedNodes.find(n => n.id === nodeId); // Buscar en el array que estamos modificando
             if (decisionNodeInUpdatedArray) {
                 const updatedNodeConditions = decisionNodeInUpdatedArray.data.conditions.map(cond => 
@@ -1210,61 +1219,55 @@ deleteNode: (nodeIdToDelete) => {
         }
       });
 
-      const currentConditionOptionNodeIds = conditions.map(c => c.optionNodeId).filter(Boolean);
-      
-      const optionNodesToRemove = state.nodes.filter(n =>
-        n.type === NODE_TYPES.option && 
-        n.data && 
-        n.data.sourceNode === nodeId && 
-        !currentConditionOptionNodeIds.includes(n.id) 
-      );
+          const currentConditionOptionNodeIds = conditions.map(c => c.optionNodeId).filter(Boolean);
+          
+          const optionNodesToRemove = state.nodes.filter(n =>
+            n.type === NODE_TYPES.option && 
+            n.data && 
+            n.data.sourceNode === nodeId && 
+            !currentConditionOptionNodeIds.includes(n.id) 
+          );
 
-      if (optionNodesToRemove.length > 0) {
-        const optionNodeIdsToRemove = optionNodesToRemove.map(n => n.id);
-        updatedNodes = updatedNodes.filter(n => !optionNodeIdsToRemove.includes(n.id));
-        updatedEdges = updatedEdges.filter(e => 
-          !(optionNodeIdsToRemove.includes(e.target) && e.source === nodeId) && 
-          !(optionNodeIdsToRemove.includes(e.source)) 
-        );
-      }
-      
-      // Comprobación de cambios más robusta
-      let hasNodesChanged = updatedNodes.length !== state.nodes.length;
-      if (!hasNodesChanged) {
-        for (const newNode of updatedNodes) {
-          const oldNode = state.nodes.find(n => n.id === newNode.id);
-          if (!oldNode || 
-              JSON.stringify(newNode.data) !== JSON.stringify(oldNode.data) || 
-              JSON.stringify(newNode.position) !== JSON.stringify(oldNode.position) ||
-              newNode.selected !== oldNode.selected ) { // Añadir otras propiedades relevantes si es necesario
-            hasNodesChanged = true;
-            break;
+          if (optionNodesToRemove.length > 0) {
+            const optionNodeIdsToRemove = optionNodesToRemove.map(n => n.id);
+            console.log(`[generateOptionNodes ${nodeId}] Removing ${optionNodesToRemove.length} orphan OptionNodes:`, optionNodeIdsToRemove);
+            updatedNodes = updatedNodes.filter(n => !optionNodeIdsToRemove.includes(n.id));
+            updatedEdges = updatedEdges.filter(e => 
+              !(optionNodeIdsToRemove.includes(e.target) && e.source === nodeId) && 
+              !(optionNodeIdsToRemove.includes(e.source)) 
+            );
           }
-        }
-      }
+          
+          // Comprobación de cambios más robusta para evitar re-renders innecesarios
+          const nodesChanged = state.nodes.length !== updatedNodes.length || 
+                             !state.nodes.every((node, index) => {
+                               if (index >= updatedNodes.length) return false; // Longitudes diferentes
+                               // Comparación más profunda si es necesario, por ahora JSON.stringify es un proxy
+                               return JSON.stringify(node) === JSON.stringify(updatedNodes[index]);
+                             });
+          const edgesChanged = state.edges.length !== updatedEdges.length ||
+                             !state.edges.every((edge, index) => {
+                               if (index >= updatedEdges.length) return false;
+                               return JSON.stringify(edge) === JSON.stringify(updatedEdges[index]);
+                             });
 
-      let hasEdgesChanged = updatedEdges.length !== state.edges.length;
-      if (!hasEdgesChanged) {
-         for (const newEdge of updatedEdges) {
-          const oldEdge = state.edges.find(e => e.id === newEdge.id);
-          if (!oldEdge || JSON.stringify(newEdge) !== JSON.stringify(oldEdge)) {
-            hasEdgesChanged = true;
-            break;
+
+          // console.log(`[generateOptionNodes ${nodeId}] FINAL CHECK before commit: state.nodes.length=${state.nodes.length}, updatedNodes.length=${updatedNodes.length}`);
+          // console.log(`[generateOptionNodes ${nodeId}] FINAL CHECK before commit: state.edges.length=${state.edges.length}, updatedEdges.length=${updatedEdges.length}`);
+          // console.log(`[generateOptionNodes ${nodeId}] FINAL updatedEdges to commit:`, JSON.stringify(updatedEdges.map(e => ({id: e.id, source: e.source, target: e.target, sourceHandle: e.sourceHandle}))));
+
+          if (nodesChanged || edgesChanged) {
+            console.log(`[generateOptionNodes ${nodeId}] Committing changes. Nodes count: ${updatedNodes.length}, Edges count: ${updatedEdges.length}`);
+            return { ...state, nodes: updatedNodes, edges: updatedEdges, lastNodeIdUpdated: nodeId, timestamp: Date.now() };
+          } else {
+            console.log(`[generateOptionNodes ${nodeId}] No effective changes to commit to state.`);
+            return state; // Explicitly return current state if no changes
           }
-        }
-      }
-
-      console.log(`[generateOptionNodes ${nodeId}] FINAL CHECK before commit: state.nodes.length=${state.nodes.length}, updatedNodes.length=${updatedNodes.length}`);
-      console.log(`[generateOptionNodes ${nodeId}] FINAL CHECK before commit: state.edges.length=${state.edges.length}, updatedEdges.length=${updatedEdges.length}`);
-      console.log(`[generateOptionNodes ${nodeId}] FINAL updatedEdges to commit:`, JSON.stringify(updatedEdges.map(e => ({id: e.id, source: e.source, target: e.target, sourceHandle: e.sourceHandle}))));
-
-      if (hasNodesChanged || hasEdgesChanged) {
-        return { ...state, nodes: updatedNodes, edges: updatedEdges, lastNodeIdUpdated: nodeId, timestamp: Date.now() };
-      }
       
       console.log(`[generateOptionNodes EXIT ${nodeId}] Final counts - Nodes:`, updatedNodes.length, 'Edges:', updatedEdges.length);
       return state; 
     });
+
   },
       updateStartNodeHandlePosition: (nodeId, position) => {
         const { updateNode } = get();
@@ -2017,7 +2020,7 @@ deleteNode: (nodeIdToDelete) => {
           });
           
           // Actualizar estado después de guardado exitoso
-          if (result.success) {
+          if (result.status === 'success') {
             set({ 
               isSaving: false, 
               lastSaved: new Date().toISOString(),

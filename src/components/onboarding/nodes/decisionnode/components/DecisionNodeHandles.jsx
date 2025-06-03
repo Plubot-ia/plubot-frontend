@@ -3,106 +3,174 @@
  * @description Componente para los conectores del nodo de decisión
  */
 
-import React, { memo, useMemo } from 'react';
+import React, { useMemo, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
-import { Handle, Position } from 'reactflow';
+import { Handle, Position, useUpdateNodeInternals } from 'reactflow';
 import { NODE_CONFIG, getConnectorColor } from '../DecisionNode.types';
+
+// Constantes para el posicionamiento de los handles
+const HANDLE_SIZE = 15; // tamaño del handle en px
+const NODE_PADDING = 20; // padding del nodo en px
 
 /**
  * Componente para los conectores del nodo de decisión
- * @param {Object} props - Propiedades del componente
- * @param {Array<Object>} props.outputs - Lista de condiciones/salidas
- * @param {boolean} props.isConnectable - Indica si los conectores pueden conectarse
- * @param {boolean} props.isUltraPerformanceMode - Indica si está en modo ultra rendimiento
- * @param {boolean} props.isEditing - Indica si está en modo edición
- * @param {Array<string>} props.activeOutputs - IDs de las salidas activas
- * @returns {JSX.Element} - Conectores del nodo
  */
-const DecisionNodeHandles = memo(({ 
-  nodeId, // Añadida la prop nodeId
-  outputs, 
-  isConnectable, 
-  isUltraPerformanceMode,
-  isEditing,
+const DecisionNodeHandles = ({ 
+  nodeId, 
+  outputs = [], 
+  isConnectable = true, 
+  isUltraPerformanceMode = false,
+  isEditing = false,
   activeOutputs = []
 }) => {
-  console.log(`[DecisionNodeHandles FUNCTION_BODY] Re-evaluando para nodeId: ${nodeId}. Outputs recibidos:`, JSON.stringify(outputs, null, 2));
-  console.log(`[DecisionNodeHandles RENDER nodeId: ${nodeId}] outputs:`, JSON.stringify(outputs));
-  
-  const renderSourceHandles = useMemo(() => {
-    if (!Array.isArray(outputs) || outputs.length === 0) {
-      console.warn('DecisionNodeHandles: outputs prop no es un array válido o está vacío.');
-      return null;
+  const updateNodeInternals = useUpdateNodeInternals();
+  const containerRef = useRef(null);
+
+  useEffect(() => {
+    if (nodeId) {
+      // A small delay can sometimes help ensure React Flow
+      // has processed other pending updates before re-calculating internals.
+      // It also helps batch multiple rapid changes.
+      const timer = setTimeout(() => {
+        updateNodeInternals(nodeId);
+      }, 50); // 50ms delay, can be adjusted or removed if not needed
+      return () => clearTimeout(timer);
     }
-    
+  }, [nodeId, outputs.length, updateNodeInternals]);
+
+  // useEffect(() => {
+  //   const updateTimer = setTimeout(() => {
+  //     if (nodeId) {
+  //       updateNodeInternals(nodeId);
+  //     }
+  //   }, 150);
+  //   return () => {
+  //     clearTimeout(updateTimer);
+  //   };
+  // }, [nodeId, outputs.length, updateNodeInternals]);
+
+  // useEffect(() => {
+  //   updateNodeInternals(nodeId);
+  //   if (containerRef.current) {
+  //     const observer = new MutationObserver(() => {
+  //       updateNodeInternals(nodeId);
+  //     });
+  //     observer.observe(containerRef.current.parentNode, {
+  //       attributes: true,
+  //       childList: true,
+  //       subtree: true
+  //     });
+  //     return () => observer.disconnect();
+  //   }
+  // }, [nodeId, updateNodeInternals]);
+
+  // useEffect(() => {
+  //   updateNodeInternals(nodeId);
+  //   const timer = setTimeout(() => {
+  //     updateNodeInternals(nodeId);
+  //   }, 100);
+  //   return () => clearTimeout(timer);
+  // }, [nodeId, activeOutputs, updateNodeInternals]);
+
+  // Renderizar los handles
+  const renderSourceHandles = useMemo(() => {
     return outputs.map((output, index) => {
-      if (!output || typeof output.id !== 'string' || typeof output.text !== 'string') {
-        console.warn('DecisionNodeHandles: output item inválido en el array outputs:', output);
-        return null; // Omitir handle si el output no tiene la estructura esperada
+      // Calcular posición horizontal para una distribución uniforme
+      const numHandles = outputs.length;
+      const positionPercent = (index + 1) * (100 / (numHandles + 1));
+      
+      // Determinar color del handle basado en el tipo de condición
+      // Para las condiciones true/false, usamos el ID directamente
+      // Para otras condiciones, usamos el índice para seleccionar de la paleta
+      const finalColor = getConnectorColor(output.text, index);
+      
+      // Determinar la clase CSS basada en el tipo de condición
+      let handleClass = 'decision-node__handle--source';
+      if (output.id === 'true') {
+        handleClass += ' custom-handle-true';
+      } else if (output.id === 'false') {
+        handleClass += ' custom-handle-false';
+      }
+      
+      const handleStyle = {
+        // Posicionamiento exacto
+        left: `${positionPercent}%`,
+        bottom: `-${HANDLE_SIZE/2}px`,
+        top: 'auto !important',
+        position: 'absolute !important',
+        transition: 'none !important', // Evitar animaciones durante el drag
+        transform: 'translateX(-50%) !important',
+        transformOrigin: 'center center !important',
+        width: `${HANDLE_SIZE}px`,
+        height: `${HANDLE_SIZE}px`,
+        backgroundColor: finalColor,
+        border: '2px solid #ffffff',
+        borderRadius: '50%',
+        zIndex: 50,
+        pointerEvents: 'all',
+        margin: 0,
+        padding: 0
+      };
+
+      if (numHandles > 2) {
+        handleStyle.left = `${positionPercent}% !important`;
+        handleStyle.right = 'auto !important';
       }
 
-      const totalHandles = outputs.length;
-      // Ajustar espaciado para que los handles no se superpongan y estén bien distribuidos
-      // Si hay 1 handle, centrado. Si hay 2, 25% y 75%. Si hay 3, 20%, 50%, 80% etc.
-      let positionPercent;
-      if (totalHandles === 1) {
-        positionPercent = 50;
-      } else {
-        positionPercent = (100 / (totalHandles + 1)) * (index + 1);
-      }
-      
-      const handleColor = getConnectorColor(output.text, index); // Usar la función de types.js y pasar el índice
-      
       return (
-        // El div contenedor por handle podría no ser necesario si el Handle se estiliza directamente
-        // Pero lo mantenemos por ahora si se necesitan elementos adicionales por handle (como texto)
         <Handle
-          key={`handle-source-${output.id}`}
+          key={output.id} // Key can remain simple output.id for React's rendering
           type="source"
           position={Position.Bottom}
-          id={`output-${output.id}`} // ID único y estable basado en el id de la condición/opción
+          id={`output-${output.id}`} // This ID must match the edge's sourceHandle
+          className={`decision-node__handle ${handleClass}`}
           isConnectable={isConnectable && !isEditing}
-          className={`decision-node__handle decision-node__handle--source ${isUltraPerformanceMode ? 'decision-node__handle--ultra' : ''}`}
-          style={{
-            left: `${positionPercent}%`,
-            backgroundColor: handleColor,
-            width: 'var(--handle-default-size)',
-            height: 'var(--handle-default-size)',
-            border: 'none',
-            borderRadius: '50%',
-            boxShadow: '0 0 0 var(--handle-default-border-width) var(--handle-default-border-color)',
-            transform: 'translateX(-50%)', // Centrar el handle horizontalmente
-            // visibility, pointerEvents, opacity are typically managed by React Flow or default styles
-            // but we ensure our critical styles are applied
-          }}
+          style={handleStyle}
+          data-color={finalColor}
           data-testid={`handle-source-${output.id}`}
         />
       );
     });
-  }, [outputs, isConnectable, isEditing, isUltraPerformanceMode]);
+  }, [outputs, isConnectable, isEditing, isUltraPerformanceMode, activeOutputs]);
   
   return (
-    <div className="decision-node__handles-container"> {/* Cambiado de decision-node__handles para evitar confusión con la clase del handle individual */}
-      {/* El handle de entrada (target) se renderizará en DecisionNode.jsx */}
-      <div className="decision-node__source-handles-wrapper"> {/* Wrapper específico para los source handles */}
-        {renderSourceHandles}
-      </div>
+    <div 
+      ref={containerRef}
+      className="decision-node__handles-container" 
+      data-testid="decision-node-source-handles"
+      style={{
+        position: 'absolute !important',
+        width: '100%',
+        left: 0,
+        right: 0,
+        height: 0,
+        overflow: 'visible',
+        bottom: 0, // Posicionar en el borde inferior exacto del nodo
+        zIndex: 50,
+        pointerEvents: 'none', // Permitir que los eventos pasen a través del contenedor a los handles
+        transform: 'none !important', // Propiedad crítica para evitar que React Flow modifique la posición
+        transformOrigin: 'center center !important',
+        alignItems: 'center',
+        margin: 0,
+        padding: 0
+      }}
+    >
+      {renderSourceHandles}
     </div>
   );
-});
-
-DecisionNodeHandles.displayName = 'DecisionNodeHandles';
+};
 
 DecisionNodeHandles.propTypes = {
+  nodeId: PropTypes.string.isRequired,
   outputs: PropTypes.arrayOf(PropTypes.shape({
     id: PropTypes.string.isRequired,
     text: PropTypes.string.isRequired,
-    // Podrían incluirse más propiedades si fueran necesarias para el handle
-  })).isRequired,
+  })),
   isConnectable: PropTypes.bool,
   isUltraPerformanceMode: PropTypes.bool,
   isEditing: PropTypes.bool,
-  activeOutputs: PropTypes.arrayOf(PropTypes.string) // Cambiado a array de strings (IDs de output)
+  activeOutputs: PropTypes.arrayOf(PropTypes.string),
 };
 
-export default DecisionNodeHandles;
+// Memorizar el componente completo al exportarlo
+export default React.memo(DecisionNodeHandles);

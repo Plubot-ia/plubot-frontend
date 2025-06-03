@@ -9,6 +9,68 @@
 
 // Mensajes específicos que queremos suprimir completamente
 const SUPPRESSED_MESSAGES = [
+  // Logs de ciclo de vida y render de MessageNode (cuando no hay variables)
+  '[MessageNode message-', // Captura RENDER, useEffect SYNC START, Variables are the same, useEffect SYNC END
+  // Logs detallados del efecto de DecisionNode
+  'DecisionNode', // Captura 'isEditing cambió a false'
+  '[DecisionNode', // Captura logs de EFFECT como 'typeof updateNodeInternals', 'Calling updateNodeInternals', 'Scheduling generateOptionNodes', 'Executing delayed generateOptionNodes', 'Scheduling fitView call', 'fitView call commented out'
+  // Logs muy detallados de generateOptionNodes
+  '[generateOptionNodes ENTERED]',
+  '[generateOptionNodes] DecisionNode (', // Captura 'found in state'
+  '[generateOptionNodes', // Captura 'Processing condition', 'Found existing OptionNode', 'Creating NEW edge', 'updatedEdges length', 'FINAL CHECK', 'FINAL updatedEdges', 'EXIT'
+  // Logs de Drag and Drop y creación de nodos en FlowEditor
+  '[FlowMain] onNodeDragStart: setting window.__dragInProgress',
+  '[NodePalette] Iniciando drag para nodo:',
+  '[NodePalette] Usando SOLO tipo simple para transferencia:',
+  '[FlowEditor] Recibido nodo de tipo:',
+  '[FlowEditor] Viewport coordinates are valid.',
+  '[DropPositionFix]', // Suprime todos los logs de DropPositionFix
+  '[FlowEditor] Creando nodo de tipo "',
+  '[FlowEditor] Iniciando addNodeToFlow',
+  '[FlowEditor] Creando nodo con estructura:',
+  '[FlowEditor] Nodo "', // Captura 'añadido al store con ID'
+  // Logs de estado y store (muchos son informativos pero pueden ser ruidosos)
+  '[preventFlowReset] Attempting to save emergency backup.', // Se puede comentar si se necesita depurar backups
+  '[ZustandStorage] Ejecutando guardado debounced',
+  '[EliteEdge] Modo Ultra Rendimiento: – "Desactivado"',
+  // Logs de TrainingScreen (muy verbosos durante la carga inicial y cambios)
+  '[TrainingScreen] useEffect TRIGGERED.',
+  '[TrainingScreen] Case',
+  // Logs detallados de FlowStore durante resetFlow y loadFlow
+  '[FlowStore] resetFlow ENTERED.',
+  '[FlowStore] resetFlow: currentPlubotId =',
+  '[FlowStore] resetFlow: shouldAttemptLoad =',
+  '[FlowStore] resetFlow: INSIDE shouldAttemptLoad block.',
+  '[FlowStore] resetFlow: get().loadFlow retrieved.',
+  '[FlowStore] resetFlow: loadFlowFn IS a function.',
+  '[FlowStore] Iniciando carga de flujo para Plubot ID:',
+  '[FlowStore] resetFlow: Final check - Current name',
+  '[FlowStore] resetFlow EXITED',
+  '[FlowStore] loadFlow: Received flowData for plubotId',
+  '[FlowStore] loadFlow: Data is valid. Setting flowName to:',
+  '[FlowStore loadFlow] Estado final de ARISTAS después de generateOptionNodes.',
+  '[FlowStore] Flujo', // Captura 'Flujo X cargado y estado actualizado'
+  '[FlowStore] Carga de datos completada para',
+  '[FlowStore] resetFlow: loadFlowFn(', // Captura '.then() reached'
+  '[position-validator-patch] Validando posiciones de nodos en inicialización...',
+  '[FlowStore setEdges] Attempting to set edges.',
+  '[FlowStore setEdges] Setting edges (stringified',
+  // Logs de inicialización (generalmente solo se necesitan una vez)
+  '[axiosConfig] Modo desarrollo, usando baseURL: /api',
+  '[position-validator-patch] Aplicando parche de validación de posiciones...',
+  '[position-validator-patch] Parche aplicado con éxito',
+  '[PerformancePatch] Inicializado',
+  // '[Console Optimizer] Activado - Se han suprimido mensajes repetitivos', // Meta-log, quizás quieras mantenerlo
+  '[initPerformanceMonitor] No estamos en el editor, no se inicializa el monitor',
+  '[preventFlowReset] Protección para resetFlow instalada',
+  '[preventFlowReset] Protección para setNodes instalada',
+  '[preventFlowReset] Sistema de protección completo instalado',
+  '[EpicHeader] Renderizado. PropsFlowName:',
+  '[StorageQuotaManager] Realizando limpieza inicial de localStorage',
+  'Inicializando BackgroundScene en modo: normal',
+  'Iniciando animación en modo normal',
+  'Modo final al completar setup: normal, isUltraMode: false',
+  // Originales:
   "Couldn't create edge for source handle id",
   "[BackgroundScene] Modo actual:",
   "[HideControls] Controles de ReactFlow eliminados",
