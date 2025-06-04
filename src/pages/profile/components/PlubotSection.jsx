@@ -118,7 +118,7 @@ const PlubotSection = memo(({
 
     try {
       console.log(`[PlubotSection] Intentando eliminar Plubot con ID: ${plubotId} vía API.`);
-      const response = await axiosInstance.delete('/api/auth/profile/plubots', {
+      const response = await axiosInstance.delete('/auth/profile/plubots', {
         data: { plubotId },
       });
 
@@ -130,7 +130,7 @@ const PlubotSection = memo(({
         try {
           console.log('[PlubotSection] Forzando recarga de perfil después de eliminar Plubot...');
           // Usar axiosInstance directamente ya que está disponible y configurado
-          const profileResponse = await axiosInstance.get('/api/auth/profile');
+          const profileResponse = await axiosInstance.get('/auth/profile');
           
           // La respuesta de /api/auth/profile usualmente tiene el usuario en profileResponse.data.user
           if (profileResponse.data?.user) { 

@@ -123,11 +123,11 @@ const flowService = {
 async loadFlow(plubotId) {
   console.log(`[flowService] Iniciando carga de flujo para plubotId: ${plubotId}`);
   try {
-    const response = await instance.get(`/api/flow/${plubotId}`);
+    const response = await instance.get(`/flow/${plubotId}`);
     
     // Log detallado de la respuesta para diagnóstico
-    console.log(`[flowService] Respuesta de /api/flow/${plubotId} - Status HTTP: ${response.status}`);
-    console.log(`[flowService] Respuesta de /api/flow/${plubotId} - Data:`, response.data); // Log data object directamente
+    console.log(`[flowService] Respuesta de /flow/${plubotId} - Status HTTP: ${response.status}`);
+    console.log(`[flowService] Respuesta de /flow/${plubotId} - Data:`, response.data); // Log data object directamente
 
     if (response && response.data && response.data.status === 'success' && response.data.data) {
       const flowData = response.data.data;
@@ -266,7 +266,7 @@ async loadFlow(plubotId) {
       while (retryCount < MAX_RETRIES) {
         try {
           // Enviar solo las diferencias
-          const response = await instance.patch(`/api/flow/${plubotId}`, payload);
+          const response = await instance.patch(`/flow/${plubotId}`, payload);
 
           // Eliminar respaldo local después de guardar exitosamente
           try {
@@ -374,7 +374,7 @@ async loadFlow(plubotId) {
         });
       }
       
-      const response = await instance.patch(`/api/flow/${plubotId}`, adaptedFlowData);
+      const response = await instance.patch(`/flow/${plubotId}`, adaptedFlowData);
       return response.data;
     } catch (error) {
       console.error('Error al guardar el flujo completo:', error);
@@ -389,7 +389,7 @@ async loadFlow(plubotId) {
    */
   async listBackups(plubotId) {
     try {
-      const response = await instance.get(`/api/flow/${plubotId}/backup`);
+      const response = await instance.get(`/flow/${plubotId}/backup`);
       
       if (response.data.status === 'success') {
         return response.data.backups;
@@ -410,7 +410,7 @@ async loadFlow(plubotId) {
    */
   async restoreBackup(plubotId, backupId) {
     try {
-      const response = await instance.post(`/api/flow/${plubotId}/backup/${backupId}`);
+      const response = await instance.post(`/flow/${plubotId}/backup/${backupId}`);
       return response.data;
     } catch (error) {
       console.error('Error al restaurar la copia de seguridad:', error);

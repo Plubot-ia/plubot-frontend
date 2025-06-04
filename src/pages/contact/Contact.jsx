@@ -255,7 +255,7 @@ const Contact = () => {
     data.append('message', formData.mensaje);
 
     try {
-      const response = await axiosInstance.post('/api/contact', data, {
+      const response = await axiosInstance.post('/contact', data, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -430,50 +430,34 @@ const Contact = () => {
                   <div className="btn-glow"></div>
                 </motion.button>
               </motion.form>
-            </motion.div>
-          )}
-        </AnimatePresence>
 
-        <AnimatePresence>
-          {formMessage.text && (
-            <motion.div
-              className={`form-message ${formMessage.status}`}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{
-                opacity: 1,
-                y: 0,
-                transition: { type: 'spring', stiffness: 150, damping: 15 },
-              }}
-              exit={{
-                opacity: 0,
-                y: 20,
-                transition: { duration: 0.4 },
-              }}
-            >
-              <div className="message-background">
-                <div className="message-circle"></div>
-              </div>
-              <div className="message-content">
-                <p id="form-message-text">{formMessage.text}</p>
-                <motion.div
-                  className="message-icon"
-                  animate={{
-                    scale: [1, 1.1, 1],
-                  }}
-                  transition={{
-                    duration: 1.5,
-                    repeat: Infinity,
-                  }}
-                >
-                  {formMessage.status === 'success' ? '✓' : '!'}
-                </motion.div>
-              </div>
+              <AnimatePresence>
+                {formMessage.text && (
+                  <motion.div
+                    className={`form-message ${formMessage.status}`}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{
+                      opacity: 1,
+                      y: 0,
+                      transition: { type: 'spring', stiffness: 150, damping: 15 },
+                    }}
+                    exit={{
+                      opacity: 0,
+                      y: 20,
+                      transition: { duration: 0.4 },
+                    }}
+                  >
+                    <span className="message-icon">
+                      {formMessage.status === 'success' ? '✓' : '⚠'}
+                    </span>
+                    {formMessage.text}
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </motion.div>
           )}
         </AnimatePresence>
       </div>
-
-      {/* Luces ambientales */}
       <div className="ambient-light light-1" />
       <div className="ambient-light light-2" />
     </section>

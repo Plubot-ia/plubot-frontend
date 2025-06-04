@@ -686,6 +686,11 @@ deleteNode: (nodeIdToDelete) => {
               console.log(`[FlowStore addDecisionNodeCondition MID-UPDATE node: ${node.id}] node.data.conditions:`, JSON.stringify(node.data.conditions));
               const newCondition = { id: generateNodeId('condition'), text: newConditionText };
               const currentConditions = Array.isArray(node.data.conditions) ? node.data.conditions : [];
+              const MAX_CONDITIONS_ALLOWED = 3; // Hardcoded for now, ideally imported
+              if (currentConditions.length >= MAX_CONDITIONS_ALLOWED) {
+                console.warn(`[FlowStore addDecisionNodeCondition] Node ${node.id} already has ${currentConditions.length} conditions (max ${MAX_CONDITIONS_ALLOWED}). Cannot add new condition: ${newConditionText}`);
+                return node; // Return node unchanged
+              }
               console.log(`[FlowStore addDecisionNodeCondition MID-UPDATE node: ${node.id}] newCondition:`, JSON.stringify(newCondition), `currentConditions array:`, JSON.stringify(currentConditions));
               const updatedConditions = [...currentConditions, newCondition];
               console.log(`[FlowStore addDecisionNodeCondition POST-UPDATE node: ${node.id}] final node.data.conditions to be set:`, JSON.stringify(updatedConditions));
@@ -1129,7 +1134,8 @@ deleteNode: (nodeIdToDelete) => {
                       parentHandleColor: getConnectorColor(conditionObj.text, index),
                       isUltraPerformanceMode: decisionNode.data.isUltraPerformanceMode || false,
                       sourceDecisionNode: nodeId, // Asegurar que estos también estén
-                      conditionId: conditionObj.id // Asegurar que estos también estén
+                      conditionId: conditionObj.id, // Asegurar que estos también estén
+                      parentDecisionNodeId: nodeId // *** ADDED FOR SIMULATION FIX ***
                       },
                       position: optionPosition,
                     }
@@ -1179,7 +1185,8 @@ deleteNode: (nodeIdToDelete) => {
                 parentHandleColor: getConnectorColor(conditionObj.text, index),
                 isUltraPerformanceMode: decisionNode.data.isUltraPerformanceMode || false,
                     sourceDecisionNode: nodeId,
-                    conditionId: conditionObj.id
+                    conditionId: conditionObj.id,
+                    parentDecisionNodeId: nodeId // *** ADDED FOR SIMULATION FIX ***
                 },
                 draggable: true,
                 selectable: true,
@@ -1219,24 +1226,65 @@ deleteNode: (nodeIdToDelete) => {
         }
       });
 
-          const currentConditionOptionNodeIds = conditions.map(c => c.optionNodeId).filter(Boolean);
-          
-          const optionNodesToRemove = state.nodes.filter(n =>
-            n.type === NODE_TYPES.option && 
-            n.data && 
-            n.data.sourceNode === nodeId && 
-            !currentConditionOptionNodeIds.includes(n.id) 
-          );
+      // --- START REFINED CLEANUP LOGIC ---
+      const finalDecisionNodeAfterUpdates = updatedNodes.find(n => n.id === nodeId);
+      const finalConditionsCurrent = finalDecisionNodeAfterUpdates?.data?.conditions || [];
+      const validOptionNodeIdsFromFinalConditions = new Set(finalConditionsCurrent.map(c => c.optionNodeId).filter(Boolean));
 
-          if (optionNodesToRemove.length > 0) {
-            const optionNodeIdsToRemove = optionNodesToRemove.map(n => n.id);
-            console.log(`[generateOptionNodes ${nodeId}] Removing ${optionNodesToRemove.length} orphan OptionNodes:`, optionNodeIdsToRemove);
-            updatedNodes = updatedNodes.filter(n => !optionNodeIdsToRemove.includes(n.id));
-            updatedEdges = updatedEdges.filter(e => 
-              !(optionNodeIdsToRemove.includes(e.target) && e.source === nodeId) && 
-              !(optionNodeIdsToRemove.includes(e.source)) 
-            );
+      // Iterate over a snapshot of option nodes that *might* be linked to this decision node *before* this specific cleanup pass.
+      // We use `updatedNodes` as it reflects changes made earlier in this function call (e.g. new option nodes created).
+      const potentiallyLinkedOptionNodesInUpdatedArray = updatedNodes.filter(n =>
+        n.type === NODE_TYPES.option &&
+        n.data &&
+        (n.data.sourceNode === nodeId || n.data.parentDecisionNodeId === nodeId)
+      );
+
+      const optionNodeIdsToActuallyRemove = [];
+      potentiallyLinkedOptionNodesInUpdatedArray.forEach(linkedOptionNode => {
+        // An OptionNode is stale if its ID is not present in the set of validOptionNodeIdsFromFinalConditions.
+        // This means no *current, final* condition in the DecisionNode legitimately points to it.
+        if (!validOptionNodeIdsFromFinalConditions.has(linkedOptionNode.id)) {
+          optionNodeIdsToActuallyRemove.push(linkedOptionNode.id);
+          console.log(`[generateOptionNodes ${nodeId}] Marking stale OptionNode ${linkedOptionNode.id} (label: '${linkedOptionNode.data.label}') for removal because it's not linked by any final condition.`);
+        }
+      });
+
+      if (optionNodeIdsToActuallyRemove.length > 0) {
+        console.log(`[generateOptionNodes ${nodeId}] Identified ${optionNodeIdsToActuallyRemove.length} OptionNodes to definitively remove:`, optionNodeIdsToActuallyRemove);
+        const preCleanupNodeCount = updatedNodes.length;
+        const preCleanupEdgeCount = updatedEdges.length;
+
+        updatedNodes = updatedNodes.filter(n => !optionNodeIdsToActuallyRemove.includes(n.id));
+        
+        updatedEdges = updatedEdges.filter(edge => {
+          const sourceIsDecisionNode = edge.source === nodeId;
+          const targetIsRemovedOption = optionNodeIdsToActuallyRemove.includes(edge.target);
+          const sourceIsRemovedOption = optionNodeIdsToActuallyRemove.includes(edge.source);
+
+          if (sourceIsRemovedOption) return false; // Edge originates FROM a removed OptionNode
+          if (targetIsRemovedOption && sourceIsDecisionNode) return false; // Edge from DecisionNode TO a removed OptionNode
+          if (targetIsRemovedOption && !sourceIsDecisionNode) return false; // Edge from something else TO a removed OptionNode
+          return true;
+        });
+        
+        console.log(`[generateOptionNodes ${nodeId}] Post-cleanup: Nodes ${preCleanupNodeCount} -> ${updatedNodes.length}. Edges ${preCleanupEdgeCount} -> ${updatedEdges.length}.`);
+      }
+      // --- END REFINED CLEANUP LOGIC ---
+
+      // Ensure all edges connected to *remaining valid* option nodes (those in finalConditionsCurrent) are correctly animated.
+      // This loop should use `finalConditionsCurrent` which reflects the state of the decision node *after* all its conditions have been processed and optionNodeIds potentially updated.
+      finalConditionsCurrent.forEach(condition => {
+        if (condition.optionNodeId) {
+          // Ensure the OptionNode still exists in `updatedNodes` after the cleanup pass.
+          const optionNode = updatedNodes.find(n => n.id === condition.optionNodeId);
+          if (optionNode) { 
+            const edge = updatedEdges.find(e => e.target === optionNode.id && e.source === nodeId && e.sourceHandle === `output-${condition.id}`);
+            if (edge && edge.animated !== !(decisionNode.data.isUltraPerformanceMode || state.isUltraMode)) {
+              updatedEdges = updatedEdges.map(e => e.id === edge.id ? { ...e, animated: !(decisionNode.data.isUltraPerformanceMode || state.isUltraMode) } : e);
+            }
           }
+        }
+      });
           
           // Comprobación de cambios más robusta para evitar re-renders innecesarios
           const nodesChanged = state.nodes.length !== updatedNodes.length || 

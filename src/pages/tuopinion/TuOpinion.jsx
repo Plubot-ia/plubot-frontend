@@ -282,7 +282,7 @@ const TuOpinion = () => {
     data.append('opinion', formData.opinion);
 
     try {
-      await axiosInstance.post('/api/opinion', data, {
+      await axiosInstance.post('/opinion', data, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },

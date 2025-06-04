@@ -24,7 +24,7 @@ const Footer = () => {
     data.append('email', formData.builderEmail);
 
     try {
-      const response = await axiosInstance.post('/api/subscribe', data, {
+      const response = await axiosInstance.post('/subscribe', data, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },

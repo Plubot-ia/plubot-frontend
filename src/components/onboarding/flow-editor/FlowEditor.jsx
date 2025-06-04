@@ -62,6 +62,7 @@ const OptionNode = lazy(() => import('../nodes/optionnode/OptionNode.jsx'));
 
 const HttpRequestNode = lazy(() => import('../nodes/httprequestnode/HttpRequestNode.jsx'));
 const PowerNode = lazy(() => import('../nodes/powernode/PowerNode.jsx'));
+const DiscordNode = lazy(() => import('../nodes/discordnode/DiscordNode.tsx'));
 
 // Estilos
 import './FlowEditor.css';
@@ -138,6 +139,7 @@ const useNodeTypes = (isUltraPerformanceMode = false) => {
       option: createNodeRenderer(OptionNode),
       httpRequest: createNodeRenderer(HttpRequestNode),
       power: createNodeRenderer(PowerNode),
+      discord: createNodeRenderer(DiscordNode), // Registered DiscordNode
     };
   }, [nodeStyles]);
 };
@@ -173,26 +175,29 @@ const useHandleValidator = (nodes, edges) => {
   // Mapa de conexiones válidas por tipo de nodo
   const validConnections = useMemo(() => ({
     // Nodo de inicio solo puede conectarse a nodos de mensaje, decisión o acción
-    start: ['message', 'decision', 'action', 'httpRequest', 'power'], // Permitido conectar StartNode a PowerNode también
+    start: ['message', 'decision', 'action', 'httpRequest', 'power', 'discord'], // Permitido conectar StartNode a PowerNode y DiscordNode también
     
     // Nodo de mensaje puede conectarse a cualquier tipo excepto a sí mismo
-    message: ['message', 'end', 'decision', 'action', 'option', 'httpRequest', 'power'], // Permitir MessageNode -> MessageNode
+    message: ['message', 'end', 'decision', 'action', 'option', 'httpRequest', 'power', 'discord'], // Permitir MessageNode -> PowerNode y DiscordNode
     
     // Nodo de decisión puede conectarse a cualquier tipo excepto inicio
-    decision: ['message', 'end', 'action', 'option', 'httpRequest', 'power'],
+    decision: ['message', 'end', 'action', 'option', 'httpRequest', 'power', 'discord'],
     
     // Nodo de acción puede conectarse a cualquier tipo excepto inicio
-    action: ['message', 'end', 'decision', 'option', 'httpRequest', 'power'],
+    action: ['message', 'end', 'decision', 'option', 'httpRequest', 'power', 'discord'],
     
     // Nodo de opción puede conectarse a nodos de mensaje, decisión o acción
     option: ['message', 'decision', 'action', 'httpRequest', 'end'],
     
     // Nodo HTTP puede conectarse a nodos de mensaje, decisión o acción
-    httpRequest: ['message', 'decision', 'action', 'end', 'option', 'power'],
+    httpRequest: ['message', 'decision', 'action', 'end', 'option', 'power', 'discord'],
     
     // Nodo especial puede conectarse a cualquier tipo excepto inicio
-    power: ['message', 'end', 'decision', 'action', 'option', 'httpRequest'],
+    power: ['message', 'end', 'decision', 'action', 'option', 'httpRequest', 'discord'], // PowerNode puede conectar a DiscordNode
     
+    // Nodo Discord: Puede conectarse a la mayoría y recibir de la mayoría
+    discord: ['message', 'end', 'decision', 'action', 'option', 'httpRequest', 'power', 'discord'],
+
     // Nodo final no puede conectarse a ningún otro nodo
     end: []
   }), []);

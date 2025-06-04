@@ -114,7 +114,7 @@ const Register = () => {
       console.log('Attempting to register with:', { name, email });
       const response = await register(name, email, password);
       console.log('Register response:', response);
-      if (response.status === 'success') {
+      if (response?.success === true) {
         showMessage('¡Registro exitoso! Revisa tu correo para verificar.', 'success');
         console.log('Registration successful, setting registrationSuccess to true');
         setRegistrationSuccess(true);

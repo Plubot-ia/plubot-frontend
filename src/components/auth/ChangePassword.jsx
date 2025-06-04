@@ -16,14 +16,15 @@ const ChangePassword = () => {
   const [message, setMessage] = useState({ text: '', type: '' });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
-  const { updateProfile, error: authError } = useAuthStore();
+  const { changePassword, error: authError, loading } = useAuthStore(); // Se importa changePassword y loading
 
   // Efecto para manejar errores del store
   useEffect(() => {
-    if (authError) {
+    // Este efecto se mantiene para errores generales del store, aunque changePassword ahora devuelve el error directamente.
+    if (authError && !message.text) { // Solo muestra si no hay un mensaje ya de la respuesta directa
       showMessage(authError, 'error');
     }
-  }, [authError]);
+  }, [authError, message.text]);
 
   const showMessage = (text, type) => {
     setMessage({ text, type });
@@ -60,14 +61,15 @@ const ChangePassword = () => {
     }
 
     try {
-      const response = await updateProfile({
-        current_password: formData.current_password,
-        password: formData.new_password,
-        password_confirmation: formData.confirm_password
-      });
+      // Llamar a la nueva función changePassword del store
+      const response = await changePassword(
+        formData.current_password,
+        formData.new_password,
+        formData.confirm_password
+      );
 
-      if (response) {
-        showMessage('Contraseña actualizada exitosamente', 'success');
+      if (response.success) {
+        showMessage(response.message || 'Contraseña actualizada exitosamente', 'success');
         const card = document.querySelector('.change-password-card');
         if (card) {
           card.style.boxShadow =
@@ -83,12 +85,15 @@ const ChangePassword = () => {
           window.scrollTo(0, 0);
         }, 2000);
       } else {
-        showMessage('Error al actualizar la contraseña', 'error');
+        // La función changePassword ahora devuelve success: false y un mensaje en caso de error esperado
+        showMessage(response.message || 'Error al actualizar la contraseña', 'error');
         setIsSubmitting(false);
       }
     } catch (error) {
-      console.error('Change password error:', error);
-      const errorMessage = error.response?.data?.message || 'Error de conexión. Verifica tu conexión a internet.';
+      console.error('Change password error (catch block):', error);
+      // El error ya debería estar formateado por la función del store si es un error de la API
+      // Si es un error inesperado (ej. de red no capturado por Axios), usamos un mensaje genérico.
+      const errorMessage = error.message || 'Error de conexión. Verifica tu conexión a internet.'; 
       showMessage(errorMessage, 'error');
       setIsSubmitting(false);
     }
@@ -207,8 +212,8 @@ const ChangePassword = () => {
               </span>
             </div>
           </div>
-          <button type="submit" className="change-password-btn" disabled={isSubmitting}>
-            {isSubmitting ? 'Actualizando...' : 'Cambiar Contraseña'}
+          <button type="submit" className="change-password-btn" disabled={isSubmitting || loading}>
+            {isSubmitting || loading ? 'Actualizando...' : 'Cambiar Contraseña'}
           </button>
         </form>
       </div>

@@ -40,7 +40,7 @@ const useAuthStore = create(
           console.log('Enviando datos de login:', { email: email.trim() });
           
           // Aumentar el timeout para esta solicitud específica y configurar para FormData
-          const loginResponse = await instance.post('/api/auth/login', formData, {
+          const loginResponse = await instance.post('/auth/login', formData, {
             timeout: 30000, // 30 segundos para dar más tiempo en producción
             headers: {
               'Content-Type': 'multipart/form-data'
@@ -49,12 +49,12 @@ const useAuthStore = create(
           
           const data = loginResponse.data;
           
-          if (data?.status === 'success') {
+          if (data?.success === true) {
             // Guardar el token
             localStorage.setItem('access_token', data.access_token);
             
             // Obtener el perfil del usuario
-            const profileResponse = await instance.get('/api/auth/profile', {
+            const profileResponse = await instance.get('/auth/profile', {
               headers: {
                 'Authorization': `Bearer ${data.access_token}`
               },
@@ -115,7 +115,7 @@ const useAuthStore = create(
           formData.append('password', password);
           
           // Configuración especial para enviar FormData
-          const response = await instance.post('/api/auth/register', formData, {
+          const response = await instance.post('/auth/register', formData, {
             headers: {
               'Content-Type': 'multipart/form-data'
             }
@@ -123,7 +123,7 @@ const useAuthStore = create(
           
           const data = response.data;
           
-          if (data?.status === 'success') {
+          if (data?.success === true) {
             set({ loading: false });
             return { success: true };
           }
@@ -235,7 +235,7 @@ const useAuthStore = create(
         
         try {
           // Verificar token con el servidor
-          const response = await instance.get('/api/auth/profile', {
+          const response = await instance.get('/auth/profile', {
             headers: { 'Authorization': `Bearer ${token}` },
             // Evitar caché del navegador
             params: { _: Date.now() }
@@ -446,7 +446,7 @@ const useAuthStore = create(
           
           while (retryCount < maxRetries) {
             try {
-              response = await instance.get('/api/auth/profile', {
+              response = await instance.get('/auth/profile', {
                 headers: { 'Authorization': `Bearer ${token}` },
                 params: { _t: Date.now() }, // Evitar caché del navegador
                 timeout: 15000 // 15 segundos de timeout
@@ -597,13 +597,13 @@ const useAuthStore = create(
           const formData = new FormData();
           formData.append('email', email.trim());
           
-          const response = await instance.post('/api/auth/forgot_password', formData, {
+          const response = await instance.post('/auth/forgot_password', formData, {
             headers: {
               'Content-Type': 'multipart/form-data'
             }
           });
           
-          if (response.data?.status === 'success') {
+          if (response.data?.success === true) {
             set({ loading: false });
             return { success: true };
           }
@@ -628,13 +628,13 @@ const useAuthStore = create(
           formData.append('password', newPassword);
           formData.append('password_confirmation', newPassword);
           
-          const response = await instance.post('/api/auth/reset_password', formData, {
+          const response = await instance.post('/auth/reset_password', formData, {
             headers: {
               'Content-Type': 'multipart/form-data'
             }
           });
           
-          if (response.data?.status === 'success') {
+          if (response.data?.success === true) {
             set({ loading: false });
             return { success: true };
           }
@@ -648,6 +648,31 @@ const useAuthStore = create(
         }
       },
       
+      // Cambiar contraseña
+      changePassword: async (currentPassword, newPassword, confirmPassword) => {
+        set({ loading: true, error: null });
+        try {
+          const response = await instance.post('/auth/change_password', {
+            current_password: currentPassword,
+            new_password: newPassword,
+            confirm_password: confirmPassword,
+          });
+
+          if (response.data?.success === true) {
+            set({ loading: false });
+            // Opcionalmente, se podría actualizar el estado del usuario o forzar un logout
+            // por seguridad, pero por ahora solo devolvemos éxito.
+            return { success: true, message: response.data.message };
+          }
+          throw new Error(response.data?.message || 'Error al cambiar la contraseña');
+        } catch (error) {
+          const errorMessage = error.response?.data?.message || error.message || 'Error de conexión';
+          set({ loading: false, error: errorMessage });
+          // Devolvemos success: false para que el componente pueda manejarlo
+          return { success: false, message: errorMessage }; 
+        }
+      },
+
       // Verificar email con token
       verifyEmail: async (token) => {
         set({ loading: true, error: null });
@@ -657,7 +682,7 @@ const useAuthStore = create(
           const formData = new FormData();
           formData.append('token', token);
           
-          const response = await instance.post('/api/auth/verify_email', formData, {
+          const response = await instance.post('/auth/verify_email', formData, {
             headers: {
               'Content-Type': 'multipart/form-data'
             }
@@ -686,7 +711,7 @@ const useAuthStore = create(
           const formData = new FormData();
           formData.append('email', email.trim());
           
-          const response = await instance.post('/api/auth/resend_verification', formData, {
+          const response = await instance.post('/auth/resend_verification', formData, {
             headers: {
               'Content-Type': 'multipart/form-data'
             }
@@ -727,7 +752,7 @@ const useAuthStore = create(
           const response = await instance.get(url);
           console.log('Respuesta del backend:', response.data);
           
-          if (response.data?.status === 'success' && response.data?.authUrl) {
+          if (response.data?.success === true && response.data?.authUrl) {
             set({ loading: false });
             return { success: true, authUrl: response.data.authUrl };
           }
@@ -750,15 +775,15 @@ const useAuthStore = create(
           console.log('Procesando token de autenticación de Google:', token);
           
           // Enviar el token al backend para verificarlo
-          const response = await instance.post('/api/auth/google/success', { token });
+          const response = await instance.post('/auth/google/success', { token });
           console.log('Respuesta del backend al procesar token:', response.data);
           
-          if (response.data?.status === 'success') {
+          if (response.data?.success === true) {
             // Guardar el token
             localStorage.setItem('access_token', response.data.access_token);
             
             // Obtener el perfil del usuario
-            const profileResponse = await instance.get('/api/auth/profile', {
+            const profileResponse = await instance.get('/auth/profile', {
               headers: {
                 'Authorization': `Bearer ${response.data.access_token}`
               }
@@ -851,13 +876,13 @@ const useAuthStore = create(
             console.log('[Auth] Actualizando perfil...', updates);
           }
           
-          const response = await instance.put('/api/auth/profile', formData, {
+          const response = await instance.put('/auth/profile', formData, {
             headers: {
               'Content-Type': 'multipart/form-data',
             },
           });
           
-          if (response.data?.status === 'success' && response.data.user) {
+          if (response.data?.success === true && response.data.user) {
             const updatedUser = { ...currentState.user, ...response.data.user };
             
             // Actualizar la caché

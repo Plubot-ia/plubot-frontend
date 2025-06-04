@@ -1,106 +1,71 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import ReactMarkdown from 'react-markdown';
 import './SimulationInterface.css';
 
-// Función para recorrer el flujo (sin cambios)
-const traverseFlow = (nodes = [], edges = [], startNodeId, userResponses = {}, userMessages = []) => {
-  // Verificar que los parámetros sean válidos
-  if (!Array.isArray(nodes) || !Array.isArray(edges) || !startNodeId) {
-    console.warn('[SimulationInterface] traverseFlow: Parámetros inválidos', { 
-      nodesIsArray: Array.isArray(nodes), 
-      edgesIsArray: Array.isArray(edges), 
-      startNodeId 
-    });
-    return [];
+// Helper para obtener el token JWT (DEBES IMPLEMENTAR ESTO SEGÚN TU APP)
+const getAuthToken = () => {
+  // Ejemplo: leer de localStorage, Auth Context, etc.
+  // Asegúrate de que este token sea el JWT válido para tu backend.
+  const token = localStorage.getItem('access_token'); // O el nombre que uses para tu token JWT
+  if (!token) {
+    console.error("SimulationInterface: No se encontró el token JWT. Las acciones de nodo fallarán.");
   }
-
-  const messages = [];
-  let currentNodeId = startNodeId;
-  const visitedNodes = new Set();
-  let userMessageIndex = 0;
-
-  while (currentNodeId && !visitedNodes.has(currentNodeId)) {
-    visitedNodes.add(currentNodeId);
-    const currentNode = nodes.find((node) => node.id === currentNodeId);
-    if (!currentNode) break;
-
-    if (currentNode.type === 'message') {
-      messages.push({
-        id: currentNode.id,
-        type: currentNode.data.sender || 'bot',
-        content: currentNode.data.message || 'Mensaje no definido',
-        timestamp: new Date().toISOString(),
-      });
-
-      if (userMessages[userMessageIndex]) {
-        messages.push({
-          id: `user-${currentNode.id}-${userMessageIndex}`,
-          type: 'user',
-          content: userMessages[userMessageIndex],
-          timestamp: new Date().toISOString(),
-        });
-        userMessageIndex++;
-      } else {
-        break;
-      }
-    } else if (currentNode.type === 'decision') {
-      messages.push({
-        id: currentNode.id,
-        type: 'bot',
-        content: currentNode.data.question || '¿Qué opción deseas tomar?',
-        timestamp: new Date().toISOString(),
-      });
-
-      const userResponse = userResponses[currentNode.id];
-      if (!userResponse) break;
-
-      const optionNode = nodes.find(
-        (node) =>
-          node.type === 'option' &&
-          node.data.parentDecisionId === currentNode.id &&
-          node.data.label.toLowerCase() === userResponse.toLowerCase()
-      );
-      if (!optionNode) break;
-
-      messages.push({
-        id: `user-${currentNode.id}`,
-        type: 'user',
-        content: userResponse,
-        timestamp: new Date().toISOString(),
-      });
-
-      currentNodeId = optionNode.id;
-      continue;
-    } else if (currentNode.type === 'end' && currentNode.data.label) {
-      messages.push({
-        id: currentNode.id,
-        type: 'system',
-        content: currentNode.data.label,
-        timestamp: new Date().toISOString(),
-      });
-      break;
-    }
-
-    // Verificar que edges sea un array válido antes de usar find
-    const nextEdge = Array.isArray(edges) 
-      ? edges.find((edge) => edge && edge.source === currentNodeId)
-      : null;
-    
-    if (!nextEdge) break;
-    currentNodeId = nextEdge.target;
-  }
-
-  return messages;
+  return token;
 };
 
-// Componente de mensaje (sin cambios)
-const MessageItem = React.memo(({ message }) => {
-  const { type, content, timestamp } = message;
+// Nueva función para llamar a la API de acción de Discord
+const executeDiscordAction = async (nodeData) => {
+  const jwtToken = getAuthToken();
+  if (!jwtToken) {
+    return { success: false, message: 'Error de autenticación: No se encontró el token JWT.' };
+  }
 
+  // Extraer los datos necesarios del nodo. Asegúrate que estos nombres coincidan
+  // con cómo los guardas en node.data en tu DiscordNode.tsx
+  const { discordToken, channelId, messageContent } = nodeData;
+
+  if (!discordToken || !channelId || !messageContent) {
+    let missing = [];
+    if (!discordToken) missing.push(t('simulation.missingBotToken', 'Token del Bot'));
+    if (!channelId) missing.push('ID del Canal');
+    if (!messageContent) missing.push('Mensaje a Enviar');
+    return { success: false, message: `Configuración del nodo Discord incompleta. Faltan: ${missing.join(', ')}` };
+  }
+
+  try {
+    const response = await fetch('/api/actions/discord/send_message', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${jwtToken}`,
+      },
+      body: JSON.stringify({
+        token: discordToken,      // Token del Bot de Discord
+        channel_id: channelId,    // ID del Canal de Discord
+        message: messageContent,   // Mensaje a enviar
+      }),
+    });
+
+    const responseData = await response.json();
+
+    if (response.ok) {
+      return { success: true, message: responseData.message || 'Acción de Discord ejecutada con éxito.' };
+    } else {
+      return { success: false, message: responseData.message || responseData.error || `Error del servidor: ${response.status}` };
+    }
+  } catch (error) {
+    console.error('Error al ejecutar acción de Discord:', error);
+    return { success: false, message: `Error de red o conexión: ${error.message}` };
+  }
+};
+
+const MessageItem = React.memo(({ message }) => {
+  const { type, content, timestamp, isActionStatus } = message;
+  const itemClass = `ts-message ts-${type} ${isActionStatus ? 'ts-action-status' : ''}`;
   return (
-    <div className={`ts-message ts-${type}`}>
-      {type === 'bot' && <div className="ts-bot-avatar"></div>}
+    <div className={itemClass}>
+      {type === 'bot' && !isActionStatus && <div className="ts-bot-avatar"></div>}
       <div className="ts-message-content">
         <ReactMarkdown>{content}</ReactMarkdown>
         {timestamp && (
@@ -119,217 +84,323 @@ const SimulationInterface = ({
   onClose = () => {},
   analyticsTracker = null,
 }) => {
-  // Verificar que los parámetros sean válidos
+  const { t } = useTranslation();
   const safeNodes = Array.isArray(nodes) ? nodes : [];
   const safeEdges = Array.isArray(edges) ? edges : [];
-  const { t } = useTranslation();
+
   const [simulationHistory, setSimulationHistory] = useState([]);
-  const [userResponses, setUserResponses] = useState({});
-  const [userMessages, setUserMessages] = useState([]);
   const [userInput, setUserInput] = useState('');
-  const [isTyping, setIsTyping] = useState(false);
   const scrollRef = useRef(null);
   const inputRef = useRef(null);
   const [scrollToBottom, setScrollToBottom] = useState(true);
   const [viewportHeight, setViewportHeight] = useState(window.innerHeight);
 
-  // Referencia al nodo de inicio - buscamos cualquier tipo de nodo que parezca un inicio
-  const startNode = safeNodes.find(
-    (node) => node && 
-    (node.type === 'startNode' || 
-     node.type === 'start' || 
-     (typeof node.type === 'string' && node.type.toLowerCase().includes('start')))
-  );
-  
-  // ID del nodo de inicio - necesario para toda la simulación
-  const startNodeId = startNode?.id;
+  const [currentNodeId, setCurrentNodeId] = useState(null);
+  const [flowStatus, setFlowStatus] = useState('idle'); // idle, processing, waiting_input, executing_action, ended, error
+  const [userResponses, setUserResponses] = useState({}); // Para nodos de decisión
+  const [userMessageForNode, setUserMessageForNode] = useState(null); // Para nodos de mensaje
 
-  // Inicializar la simulación cuando cambian los nodos o aristas
-  useEffect(() => {
-    // Validar que tenemos los datos necesarios
-    if (!Array.isArray(safeNodes) || safeNodes.length === 0) {
-      console.warn('[SimulationInterface] No hay nodos para simular');
-      return;
-    }
-    
-    if (!startNodeId) {
-      console.warn('[SimulationInterface] No se encontró nodo de inicio');
+  const startNode = safeNodes.find(n => n.type === 'start' || n.type === 'startNode' || (typeof n.type === 'string' && n.type.toLowerCase().includes('start')));
+  const initialStartNodeId = startNode?.id;
+
+  const addMessageToHistory = useCallback((message) => {
+    setSimulationHistory(prev => [...prev, message]);
+  }, []);
+
+  const processNode = useCallback(async (nodeId, currentResponses, currentMessageForNode) => {
+    if (!nodeId) {
+      setFlowStatus('ended');
+      addMessageToHistory({ id: 'flow-end-no-node', type: 'system', content: t('simulation.flowEndedNoNode', 'Flujo finalizado: no hay más nodos.'), timestamp: new Date().toISOString() });
       return;
     }
 
-    // Inicializar con los mensajes del flujo
-    const initialMessages = traverseFlow(safeNodes, safeEdges, startNodeId);
-    setSimulationHistory(initialMessages);
-    
-    // Registrar analítica si está disponible
+    const node = safeNodes.find(n => n.id === nodeId);
+    if (!node) {
+      setFlowStatus('error');
+      addMessageToHistory({ id: `error-node-not-found-${nodeId}`, type: 'system', content: t('simulation.errorNodeNotFound', `Error: Nodo ${nodeId} no encontrado.`), timestamp: new Date().toISOString() });
+      return;
+    }
+
+    setCurrentNodeId(node.id);
+    setFlowStatus('processing');
+
+    // Para analítica
     if (analyticsTracker) {
-      try {
-        analyticsTracker('simulation_started', { nodeCount: safeNodes.length });
-      } catch (e) {}
+      try { analyticsTracker('simulation_node_processing', { nodeId: node.id, nodeType: node.type }); } catch(e) {}
     }
-  }, [safeNodes, safeEdges, startNodeId, analyticsTracker]);
 
-  // Actualizar historial según el flujo cuando cambian las respuestas del usuario
-  useEffect(() => {
-    // Solo actualizar si hay nodos, un nodo de inicio y se han proporcionado respuestas
-    if (startNodeId && (Object.keys(userResponses).length > 0 || userMessages.length > 0)) {
-      console.log('[SimulationInterface] Actualizando mensajes con respuestas de usuario', {
-        userResponses,
-        userMessages,
-        startNodeId
-      });
-      const newMessages = traverseFlow(safeNodes, safeEdges, startNodeId, userResponses, userMessages);
-      setSimulationHistory(newMessages);
+    switch (node.type) {
+      case 'start':
+      case 'startNode':
+        const firstEdge = safeEdges.find(edge => edge.source === node.id);
+        if (firstEdge) {
+          await processNode(firstEdge.target, currentResponses, currentMessageForNode);
+        } else {
+          setFlowStatus('ended');
+          addMessageToHistory({ id: 'flow-end-no-edge', type: 'system', content: t('simulation.flowEndedNoEdge', 'Flujo finalizado: nodo de inicio sin salida.'), timestamp: new Date().toISOString() });
+        }
+        break;
+
+      case 'message':
+        addMessageToHistory({
+          id: node.id,
+          type: node.data.sender || 'bot',
+          content: node.data.message || t('simulation.undefinedMessage', 'Mensaje no definido'), // Modificado para leer de node.data.message
+          timestamp: new Date().toISOString(),
+        });
+        setFlowStatus('waiting_input'); // Espera entrada del usuario
+        break;
+
+      case 'decision':
+        addMessageToHistory({
+          id: node.id,
+          type: 'bot',
+          content: node.data.question || t('simulation.undefinedQuestion', '¿Qué opción deseas tomar?'),
+          timestamp: new Date().toISOString(),
+        });
+        setFlowStatus('waiting_input'); // Espera selección de opción
+        break;
+
+      case 'discord': // NUEVO CASO PARA NODO DISCORD
+        addMessageToHistory({
+          id: `action-status-${node.id}`,
+          type: 'system',
+          content: t('simulation.executingDiscord', 'Ejecutando acción de Discord...'),
+          timestamp: new Date().toISOString(),
+          isActionStatus: true,
+        });
+        setFlowStatus('executing_action');
+        console.log('[Simulation] Processing Discord Node ID:', node.id, 'Data:', JSON.parse(JSON.stringify(node.data || {})));
+        
+        // Asegúrate que node.data contiene: discordToken, channelId, messageContent
+        const actionData = {
+            discordToken: node.data.discordToken, 
+            channelId: node.data.channelId, 
+            messageContent: node.data.messageContent || "Mensaje desde Plubot",
+        };
+
+        const result = await executeDiscordAction(actionData);
+        
+        addMessageToHistory({
+          id: `action-result-${node.id}`,
+          type: result.success ? 'system' : 'error',
+          content: result.message,
+          timestamp: new Date().toISOString(),
+          isActionStatus: true,
+        });
+
+        if (result.success) {
+          setFlowStatus('processing'); // Continuar al siguiente nodo
+          const nextEdge = safeEdges.find(edge => edge.source === node.id);
+          if (nextEdge) {
+            await processNode(nextEdge.target, currentResponses, currentMessageForNode);
+          } else {
+            setFlowStatus('ended');
+            addMessageToHistory({ id: 'flow-end-after-action', type: 'system', content: t('simulation.flowEndedAfterAction', 'Flujo finalizado después de la acción.'), timestamp: new Date().toISOString() });
+          }
+        } else {
+          setFlowStatus('error'); // Detener en caso de error de la acción
+           addMessageToHistory({ id: `action-error-detail-${node.id}`, type: 'error', content: t('simulation.actionErrorDetail', 'La simulación no puede continuar debido a un error en la acción.'), timestamp: new Date().toISOString() });
+        }
+        break;
+
+      case 'end':
+        if (node.data.label) {
+          addMessageToHistory({
+            id: node.id,
+            type: 'system',
+            content: node.data.label,
+            timestamp: new Date().toISOString(),
+          });
+        }
+        setFlowStatus('ended');
+        break;
+
+      default: // Nodos desconocidos o que no requieren interacción
+        console.warn(t('simulation.unknownNodeType', `Nodo de tipo desconocido o no interactivo: ${node.type}. Buscando siguiente nodo.`));
+        const defaultNextEdge = safeEdges.find(edge => edge.source === node.id);
+        if (defaultNextEdge) {
+          await processNode(defaultNextEdge.target, currentResponses, currentMessageForNode);
+        } else {
+          setFlowStatus('ended');
+          addMessageToHistory({ id: 'flow-end-unknown-type', type: 'system', content: t('simulation.flowEndedUnknownType', 'Flujo finalizado: nodo sin salida o tipo no manejado.'), timestamp: new Date().toISOString() });
+        }
+        break;
     }
-  }, [safeNodes, safeEdges, startNodeId, userResponses, userMessages]);
+  }, [safeNodes, safeEdges, addMessageToHistory, t, analyticsTracker]);
 
-  // Manejar cambios de altura del viewport (para teclado virtual)
+  const startSimulation = useCallback(() => {
+    setSimulationHistory([]);
+    setUserResponses({});
+    setUserMessageForNode(null);
+    setCurrentNodeId(initialStartNodeId);
+    setFlowStatus('idle');
+    if (analyticsTracker) {
+      try { analyticsTracker('simulation_started', { nodeCount: safeNodes.length }); } catch(e) {}
+    }
+    if (initialStartNodeId) {
+      processNode(initialStartNodeId, {}, null);
+    }
+  }, [initialStartNodeId, processNode, safeNodes.length, analyticsTracker]);
+
   useEffect(() => {
-    const handleResize = () => {
-      setViewportHeight(window.innerHeight);
-    };
+    if (initialStartNodeId && safeNodes.length > 0) {
+      startSimulation();
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialStartNodeId, safeNodes, safeEdges]); // No incluir startSimulation para evitar bucles
 
+  useEffect(() => {
+    const handleResize = () => setViewportHeight(window.innerHeight);
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Manejar scroll automático
   useEffect(() => {
     if (scrollRef.current && scrollToBottom) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
-  }, [simulationHistory, scrollToBottom, isTyping]);
+  }, [simulationHistory, scrollToBottom, flowStatus]);
 
-  // Controlar el enfoque del input
-  useEffect(() => {
-    if (inputRef.current && simulationHistory.length > 0) {
-      const lastMessage = simulationHistory[simulationHistory.length - 1];
-      const lastNodeId = lastMessage.id;
-      const lastNode = nodes.find((n) => n.id === lastNodeId);
-      if (lastNode?.type === 'message') {
-        inputRef.current.focus();
-      }
+  const handleUserInputSubmit = async (e) => {
+    e.preventDefault();
+    if (!userInput.trim() || flowStatus !== 'waiting_input') return;
+
+    const userMsgContent = userInput;
+    setUserInput('');
+    addMessageToHistory({
+      id: `user-${currentNodeId}-${Date.now()}`,
+      type: 'user',
+      content: userMsgContent,
+      timestamp: new Date().toISOString(),
+    });
+    setUserMessageForNode(userMsgContent);
+
+    if (analyticsTracker) {
+      try { analyticsTracker('simulation_user_message_sent', { nodeId: currentNodeId, messageLength: userMsgContent.length }); } catch(e) {}
     }
-  }, [simulationHistory, nodes]);
 
-  // Obtener el nodo actual
-  const currentNodeId = simulationHistory.length > 0 ? simulationHistory[simulationHistory.length - 1].id : startNodeId;
-  const currentNode = nodes.find((n) => n.id === currentNodeId);
-  const isDecisionNode = currentNode?.type === 'decision';
-  const isMessageNode = currentNode?.type === 'message';
-  const isEndNode = currentNode?.type === 'end';
-  const options = isDecisionNode ? currentNode.data.outputs || [] : [];
+    const currentNodeObject = safeNodes.find(n => n.id === currentNodeId);
+    if (currentNodeObject && currentNodeObject.type === 'message') {
+        const nextEdge = safeEdges.find(edge => edge.source === currentNodeId);
+        if (nextEdge) {
+            await processNode(nextEdge.target, userResponses, userMsgContent);
+        } else {
+            setFlowStatus('ended');
+            addMessageToHistory({ id: 'flow-end-after-user-message', type: 'system', content: t('simulation.flowEndedAfterUserMessage', 'Flujo finalizado después de tu mensaje.'), timestamp: new Date().toISOString() });
+        }
+    }
+  };
 
-  const handleUserInput = useCallback(
-    (e) => {
-      e.preventDefault();
-      
-      if (!userInput.trim() || isTyping) {
-        return;
+  const handleOptionClick = async (optionLabel) => {
+    if (flowStatus !== 'waiting_input') return;
+
+    addMessageToHistory({
+      id: `user-option-${currentNodeId}-${Date.now()}`,
+      type: 'user',
+      content: optionLabel,
+      timestamp: new Date().toISOString(),
+    });
+    
+    const newResponses = { ...userResponses, [currentNodeId]: optionLabel };
+    setUserResponses(newResponses);
+
+    if (analyticsTracker) {
+      try { analyticsTracker('simulation_decision_option_selected', { nodeId: currentNodeId, option: optionLabel }); } catch(e) {}
+    }
+
+    const decisionNode = safeNodes.find(n => n.id === currentNodeId);
+    const optionNode = safeNodes.find(
+      node =>
+        node.type === 'option' &&
+        node.data.parentDecisionNodeId === decisionNode.id &&
+        node.data.label.toLowerCase() === optionLabel.toLowerCase()
+    );
+
+    if (optionNode) {
+      const nextEdge = safeEdges.find(edge => edge.source === optionNode.id); // El flujo continúa desde el nodo 'option'
+      if (nextEdge) {
+        await processNode(nextEdge.target, newResponses, userMessageForNode);
+      } else {
+        setFlowStatus('ended');
+        addMessageToHistory({ id: 'flow-end-after-option', type: 'system', content: t('simulation.flowEndedAfterOption', 'Flujo finalizado después de tu selección.'), timestamp: new Date().toISOString() });
       }
+    } else {
+        setFlowStatus('error');
+        addMessageToHistory({ id: `error-option-not-found-${currentNodeId}`, type: 'system', content: t('simulation.errorOptionNotFound', 'Error: Opción no encontrada o flujo mal configurado.'), timestamp: new Date().toISOString() });
+    }
+  };
+  
+  const currentProcessingNode = useMemo(() => {
+    return safeNodes.find(n => n.id === currentNodeId);
+  }, [safeNodes, currentNodeId]);
 
-      setUserInput('');
-      setIsTyping(true);
-      setScrollToBottom(true);
-      setUserMessages((prev) => [...prev, userInput]);
+  const isWaitingForUserInput = useMemo(() => {
+    return flowStatus === 'waiting_input';
+  }, [flowStatus]);
 
-      setTimeout(() => setIsTyping(false), 800);
+  const currentDecisionOptions = useMemo(() => {
+    if (isWaitingForUserInput && currentProcessingNode?.type === 'decision') {
+      return safeNodes
+        .filter(node => node.type === 'option' && node.data.parentDecisionNodeId === currentProcessingNode.id)
+        .map(optionNode => optionNode.data.label);
+    }
+    return [];
+  }, [isWaitingForUserInput, currentProcessingNode, safeNodes]);
 
-      if (analyticsTracker) {
-        analyticsTracker('user_message_sent', {
-          nodeId: currentNodeId,
-          messageLength: userInput.length,
-        });
-      }
-    },
-    [userInput, currentNodeId, isTyping, analyticsTracker]
-  );
+  useEffect(() => {
+    if (inputRef.current && flowStatus === 'waiting_input' && !currentDecisionOptions.length) {
+      inputRef.current.focus();
+    }
+  }, [flowStatus, currentDecisionOptions]);
 
-  const handleOptionClick = useCallback(
-    (option) => {
-      setIsTyping(true);
-      setScrollToBottom(true);
-      setUserResponses((prev) => ({ ...prev, [currentNodeId]: option }));
+  const mainStyle = { height: `${viewportHeight}px` };
+  const isExecuting = flowStatus === 'executing_action';
+  const isEnded = flowStatus === 'ended';
+  const isError = flowStatus === 'error';
 
-      setTimeout(() => setIsTyping(false), 800);
-
-      if (analyticsTracker) {
-        analyticsTracker('option_selected', {
-          nodeId: currentNodeId,
-          option,
-        });
-      }
-    },
-    [currentNodeId, analyticsTracker]
-  );
 
   return (
-    <div
-      className="ts-simulation-interface"
-      style={{
-        // Ajustar dinámicamente la altura según el teclado
-        maxHeight: `calc(${viewportHeight}px - 2rem)`,
-      }}
-    >
-      <div className="ts-simulation-header">
+    <div className="ts-simulation-interface" style={mainStyle}>
+      <div className="ts-header">
         <h3>{t('simulation.title', 'Simulación de Conversación')}</h3>
         <div className="ts-header-controls">
           <button
             className="ts-btn-reset"
             onClick={() => {
               if (window.confirm(t('simulation.confirmReset', '¿Reiniciar simulación?'))) {
-                setSimulationHistory([]);
-                setUserResponses({});
-                setUserMessages([]);
-                setScrollToBottom(true);
+                startSimulation();
               }
             }}
             aria-label={t('simulation.reset', 'Reiniciar')}
           >
             <i className="fas fa-undo"></i>
           </button>
-          <button
-            className="ts-btn-close"
-            onClick={onClose}
-            aria-label={t('simulation.close', 'Cerrar')}
-          >
-            ✕
-          </button>
+          <button className="ts-btn-close" onClick={onClose} aria-label={t('simulation.close', 'Cerrar')}> ✕ </button>
         </div>
       </div>
 
       <div className="ts-conversation-wrapper">
-        <div
-          className="ts-conversation-container"
-          ref={scrollRef}
-          onScroll={() => {
-            if (scrollRef.current) {
-              const { scrollTop, scrollHeight, clientHeight } = scrollRef.current;
-              const isAtBottom = scrollHeight - scrollTop - clientHeight < 20;
-              setScrollToBottom(isAtBottom);
-            }
-          }}
-        >
+        <div className="ts-conversation-container" ref={scrollRef} onScroll={() => {
+          if (scrollRef.current) {
+            const { scrollTop, scrollHeight, clientHeight } = scrollRef.current;
+            setScrollToBottom(scrollHeight - scrollTop - clientHeight < 20);
+          }
+        }}>
           {simulationHistory.length > 0 ? (
             simulationHistory.map((message, index) => (
-              <MessageItem key={`msg-${index}`} message={message} />
+              <MessageItem key={`msg-${index}-${message.id}`} message={message} />
             ))
           ) : (
             <div className="ts-message ts-system">
-              <div className="ts-message-content">
-                {t('simulation.startPrompt', 'Comienza la conversación...')}
-              </div>
+              <div className="ts-message-content">{t('simulation.startPrompt', 'Comienza la conversación...')}</div>
             </div>
           )}
-          {isTyping && (
-            <div className="ts-message ts-bot ts-typing">
-              <div className="ts-bot-avatar"></div>
+          {isExecuting && (
+            <div className="ts-message ts-system ts-action-status ts-typing">
               <div className="ts-message-content ts-typing-content">
-                <div className="ts-typing-indicator">
-                  <span></span>
-                  <span></span>
-                  <span></span>
-                </div>
+                <div className="ts-typing-indicator"><span></span><span></span><span></span></div>
+                 {t('simulation.executingAction', 'Procesando acción...')}
               </div>
             </div>
           )}
@@ -337,53 +408,53 @@ const SimulationInterface = ({
         </div>
       </div>
 
-      {isDecisionNode && options.length > 0 ? (
+      {isWaitingForUserInput && currentDecisionOptions.length > 0 ? (
         <div className="ts-decision-options">
-          {options.map((option, index) => (
+          {currentDecisionOptions.map((option, index) => (
             <button
               key={`option-${index}`}
               onClick={() => handleOptionClick(option)}
               className="ts-decision-option-btn"
-              disabled={userResponses[currentNodeId]}
+              disabled={isExecuting}
             >
               {option}
             </button>
           ))}
         </div>
-      ) : !isEndNode ? (
-        <form onSubmit={handleUserInput} className="ts-user-input-container">
+      ) : isWaitingForUserInput && currentProcessingNode?.type === 'message' ? (
+        <form onSubmit={handleUserInputSubmit} className="ts-user-input-container">
           <input
             ref={inputRef}
             type="text"
             value={userInput}
             onChange={(e) => setUserInput(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                handleUserInput(e);
-              }
-            }}
+            onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleUserInputSubmit(e); }}}
             placeholder={t('simulation.inputPlaceholder', 'Escribe tu respuesta...')}
-            disabled={isTyping}
+            disabled={isExecuting}
             aria-label={t('simulation.inputLabel', 'Tu respuesta')}
           />
-          <button
-            type="submit"
-            disabled={isTyping || !userInput.trim()}
-            aria-label={t('simulation.send', 'Enviar')}
-          >
+          <button type="submit" disabled={isExecuting || !userInput.trim()} aria-label={t('simulation.send', 'Enviar')}>
             <i className="fas fa-paper-plane"></i>
           </button>
         </form>
       ) : null}
+      
+      {(isEnded || isError) && (
+         <div className="ts-message ts-system">
+            <div className="ts-message-content">
+                {isEnded && t('simulation.conversationEnded', 'La conversación ha finalizado.')}
+                {isError && t('simulation.conversationError', 'La conversación ha finalizado debido a un error.')}
+            </div>
+        </div>
+      )}
 
       <div className="ts-simulation-info">
         <div className="ts-current-node">
           <span>{t('simulation.currentNode', 'Nodo actual')}: </span>
-          {currentNodeId ? (
-            <strong>{currentNode?.data?.label || currentNode?.data?.question || currentNodeId}</strong>
+          {currentProcessingNode ? (
+            <strong>{currentProcessingNode.data?.label || currentProcessingNode.data?.question || currentProcessingNode.id}</strong>
           ) : (
-            <em>{t('simulation.noNode', 'Ninguno seleccionado')}</em>
+            <em>{flowStatus === 'ended' ? t('simulation.flowEndedState', 'Finalizado') : t('simulation.noNode', 'Ninguno')}</em>
           )}
         </div>
       </div>

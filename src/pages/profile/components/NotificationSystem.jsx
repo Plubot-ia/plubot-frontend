@@ -10,7 +10,7 @@ const NotificationSystem = ({ notification }) => {
   
   return (
     <div className={`notification notification-${notification.type} notification-position`}>
-      {notification.message}
+      {typeof notification.message === 'string' ? notification.message : 'Notification message is not a string.'}
     </div>
   );
 };

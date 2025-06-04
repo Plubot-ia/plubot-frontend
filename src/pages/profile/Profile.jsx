@@ -11,6 +11,7 @@ import PlubotSection from './components/PlubotSection';
 import PowersSection from './components/PowersSection';
 import ActivitySection from './components/ActivitySection';
 import BackupSection from './components/BackupSection';
+import IntegrationsSection from './components/IntegrationsSection'; // Nueva sección
 import NotificationSystem from './components/NotificationSystem';
 import AchievementPopup from './components/AchievementPopup';
 import VisualEffects from './components/VisualEffects';
@@ -301,6 +302,14 @@ const Profile = () => {
           
           {activeTab === 'backup' && (
             <BackupSection />
+          )}
+
+          {activeTab === 'integrations' && (
+            <IntegrationsSection 
+              user={user}
+              showNotification={showNotification}
+              // Pasa otras props necesarias, como navigate si es necesario para modales de creación/edición
+            />
           )}
         </div>
 

@@ -157,7 +157,7 @@ const useAPI = () => {
       
       while (retryCount < maxRetries) {
         try {
-          response = await request('POST', '/api/plubots/create', plubotData);
+          response = await request('POST', '/plubots/create', plubotData);
           
           // Si la petición es exitosa, actualizar el estado de sincronización
           if (response && response.status === 'success') {

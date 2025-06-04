@@ -342,37 +342,33 @@ const NodePalette = () => {
   };
 
   const NodeListItem = useCallback(({ item, isPower = false }) => {
-    const identifier = isPower ? item.id : item.type; 
+    const identifier = isPower ? item.id : item.type;
     const label = isPower ? item.title : item.label;
-    const icon = isPower ? item.icon : getNodeIcon(item.icon || item.type);
+    const icon = isPower ? item.icon : getNodeIcon(item.icon || item.type); // getNodeIcon is a helper
     const isFavorite = favoriteNodes.includes(isPower ? `power-${item.id}` : item.type);
-    const nodeType = isPower ? 'power' : item.type;
     
-    // Referencia al elemento del nodo para acceder en eventos
+    // Determine the correct nodeType for React Flow
+    // For power nodes, use their specific ID (e.g., 'discord')
+    // For other nodes, use their defined type (e.g., 'message')
+    const nodeType = isPower ? item.id : item.type;
+    
     const nodeRef = useRef(null);
     
-    // Manejar el evento de arrastre
     const handleDragStart = useCallback((e) => {
-      // Asegurar que el elemento tenga un estilo visual durante el arrastre
       if (nodeRef.current) {
         nodeRef.current.classList.add('dragging');
       }
-      
-      // Iniciar el proceso de arrastre con los datos correctos
+      // Pass the corrected nodeType to the onDragStart handler from NodePalette props
       onDragStart(e, nodeType, label, item.category || 'basic', isPower ? item : null);
-    }, [nodeType, label, item, isPower]);
-    
-    // Manejar el fin del arrastre
+    }, [nodeType, label, item, isPower, onDragStart]); // Added onDragStart to dependencies
+
     const handleDragEnd = useCallback((e) => {
-      // Restaurar el estilo visual
       if (nodeRef.current) {
         nodeRef.current.classList.remove('dragging');
       }
-      
-      // Procesar el fin del arrastre
-      onDragEndNode(e);
-    }, []);
-    
+      onDragEndNode(e); // onDragEndNode is from NodePalette props
+    }, [onDragEndNode]); // Added onDragEndNode to dependencies
+
     return (
       <div
         ref={nodeRef}
@@ -380,7 +376,7 @@ const NodePalette = () => {
         draggable={true}
         onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
-        data-node-type={nodeType}
+        data-node-type={nodeType} // This data attribute now holds the correct type
         data-node-label={label}
       >
         <div className="ts-node-icon">{icon}</div>
@@ -390,10 +386,11 @@ const NodePalette = () => {
           onClick={(e) => {
             e.stopPropagation();
             const nodeId = isPower ? `power-${item.id}` : item.type;
+            // Use functional updates for setting state based on previous state
             if (isFavorite) {
-              setFavoriteNodes(favoriteNodes.filter(id => id !== nodeId));
+              setFavoriteNodes(prevFavoriteNodes => prevFavoriteNodes.filter(id => id !== nodeId));
             } else {
-              setFavoriteNodes([...favoriteNodes, nodeId]);
+              setFavoriteNodes(prevFavoriteNodes => [...prevFavoriteNodes, nodeId]);
             }
           }}
         >
@@ -401,7 +398,7 @@ const NodePalette = () => {
         </button>
       </div>
     );
-  }, [onDragStart, onDragEndNode, setFavoriteNodes, favoriteNodes]);
+  }, [onDragStart, onDragEndNode, favoriteNodes, setFavoriteNodes, getNodeIcon]); // Added getNodeIcon to dependencies, ensure it's stable or memoized if from props
 
   return (
     <div className={`ts-node-palette ${isPaletteExpanded ? 'ts-expanded' : 'ts-collapsed'}`}>

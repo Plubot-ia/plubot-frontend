@@ -47,7 +47,7 @@ const syncPlubot = async (plubot) => {
       const token = localStorage.getItem('access_token');
       if (!token) throw new Error('No hay token de autenticación');
       
-      const response = await instance.post('/api/plubots/create', syncData, {
+      const response = await instance.post('/plubots/create', syncData, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       

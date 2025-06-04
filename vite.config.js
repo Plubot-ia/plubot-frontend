@@ -38,7 +38,6 @@ export default defineConfig({
         changeOrigin: true,
         secure: false,
         ws: false,
-        rewrite: (path) => path.replace(/^\/api/, ''),
         configure: (proxy, _options) => {
           proxy.on('error', (err, _req, _res) => {
             console.log('[PROXY ERROR]', err);

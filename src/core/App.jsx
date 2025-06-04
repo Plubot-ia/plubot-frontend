@@ -19,6 +19,8 @@ const TutorialesAutomatizacion = lazy(() => import('../pages/tutoriales/Tutorial
 const TutorialesAprendizaje = lazy(() => import('../pages/tutoriales/TutorialesAprendizaje.jsx'));
 const TutorialesFlujos = lazy(() => import('../pages/tutoriales/TutorialesFlujos.jsx'));
 const TutorialesExpansion = lazy(() => import('../pages/tutoriales/TutorialesExpansion.jsx'));
+const TutorialDiscord = lazy(() => import('../pages/tutoriales/tutorialesdiscord/TutorialDiscord.jsx')); // Nueva importación
+const TutorialDiscordChannelId = lazy(() => import('../pages/tutoriales/tutorialesdiscord/TutorialDiscordChannelId.jsx')); // Tutorial para ID de Canal Discord
 const Profile = lazy(() => import('../pages/profile/Profile.jsx'));
 const Services = lazy(() => import('../pages/zquantum/Services.jsx'));
 const CaseStudies = lazy(() => import('../pages/zquantum/CaseStudies.jsx'));
@@ -255,7 +257,7 @@ const AppWrapper = () => {
   const { pathname } = location;
   
   // Páginas de autenticación que no usan el Layout
-  const isAuthPage = ['/login', '/register', '/forgot-password', '/reset-password', '/change-password', '/email-verification-notice'].includes(pathname);
+  const isAuthPage = ['/login', '/register', '/forgot-password', '/reset-password', '/change-password', '/email-verification-notice', '/auth/verify-email'].includes(pathname);
   
   // Rutas donde queremos ocultar el encabezado y pie de página
   const isHideHeaderFooter = [
@@ -311,6 +313,7 @@ const AppWrapper = () => {
                     <Route path="/tutoriales/aprendizaje" element={<TutorialesAprendizaje />} />
                     <Route path="/tutoriales/flujos" element={<TutorialesFlujos />} />
                     <Route path="/tutoriales/expansion" element={<TutorialesExpansion />} />
+                    <Route path="/tutoriales/tutorialesdiscord" element={<TutorialDiscord />} />
                     <Route path="/services" element={<Services />} />
                     <Route path="/case-studies" element={<CaseStudies />} />
                     <Route path="/chatbot" element={<Chatbot />} />
@@ -414,6 +417,8 @@ const AppWrapper = () => {
                         <ChangePassword />
                       </PrivateRoute>
                     } />
+                    <Route path="/tutoriales/discord" element={<TutorialDiscord />} />
+                    <Route path="/tutoriales/discord-id-canal" element={<TutorialDiscordChannelId />} />
                     <Route path="/logout" element={
                       <PrivateRoute>
                         <Logout />

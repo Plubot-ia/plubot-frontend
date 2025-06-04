@@ -361,7 +361,7 @@ const PersonalizationForm = () => {
       updateProfile({ plubots: newPlubots });
       
       // Forzar recarga de datos del perfil para asegurar consistencia
-      const profileResponse = await request('GET', '/api/auth/profile');
+      const profileResponse = await request('GET', '/auth/profile');
       if (profileResponse?.status === 'success') {
         updateProfile({
           ...profileResponse.user,
@@ -447,15 +447,25 @@ const PersonalizationForm = () => {
       // Actualizar el perfil del usuario CON DATOS FRESCOS DEL BACKEND
       try {
         console.log('[PersonalizationForm] Forzando recarga de perfil después de crear Plubot...');
-        const profileResponse = await request('GET', '/api/auth/profile');
-        if (profileResponse?.status === 'success' && profileResponse?.user) {
-          console.log('[PersonalizationForm] Perfil recargado exitosamente:', profileResponse.user);
+        const profileResponse = await request('GET', '/auth/profile');
+        if (profileResponse?.success === true && profileResponse?.user) {
+          console.log('[PersonalizationForm] Perfil recargado OK. Respuesta del backend (profileResponse directo):', JSON.stringify(profileResponse, null, 2));
+          console.log('[PersonalizationForm] Datos del usuario en perfil recargado (profileResponse.user):', JSON.stringify(profileResponse.user, null, 2));
           setUser(profileResponse.user); // Actualizar directamente el estado del usuario
         } else {
-          console.warn('[PersonalizationForm] No se pudo recargar el perfil, usando datos locales para PlubotSection.');
+          console.warn('[PersonalizationForm] Condición de recarga de perfil (profileResponse.success && profileResponse.user) fallida. Revisando detalles...');
+          if (profileResponse) {
+            console.log('[PersonalizationForm] Objeto profileResponse recibido:', JSON.stringify(profileResponse, null, 2));
+            console.log('[PersonalizationForm] Valor de profileResponse.success:', profileResponse.success);
+            console.log('[PersonalizationForm] Existencia de profileResponse.user:', profileResponse.user ? 'Presente' : 'Ausente o nulo');
+          } else {
+            console.log('[PersonalizationForm] profileResponse es nulo o undefined.');
+          }
+          console.warn('[PersonalizationForm] No se pudo recargar el perfil con la nueva data, usando datos locales para PlubotSection (fallback).');
           // Fallback a la lógica anterior si la recarga del perfil falla
           const authStore = useAuthStore.getState();
-          const updatedPlubots = [...(authStore.user?.plubots || []), newPlubot];
+          // newPlubot debería estar definido en este scope desde la creación del Plubot
+          const updatedPlubots = [...(authStore.user?.plubots || []), newPlubot]; 
           updateProfile({ plubots: updatedPlubots });
         }
       } catch (profileError) {

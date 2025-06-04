@@ -2,27 +2,27 @@ import React, { useState, useRef, useEffect } from 'react';
 import ReactDOM from 'react-dom';
 import './ToolTip.css'; // Asegúrate de que los estilos de ToolTip.css sean compatibles
 
-const Tooltip = ({ content, children, position = 'top' }) => {
+const Tooltip = ({ content, children, position = 'top', delay = 500 }) => {
   const [isVisible, setIsVisible] = useState(false);
   const [tooltipPosition, setTooltipPosition] = useState({ top: 0, left: 0 });
   const triggerRef = useRef(null);
+  const hideTimeoutRef = useRef(null); // Ref para el temporizador de ocultación
 
   const portalRoot = document.getElementById('tooltip-portal-root') || document.body;
 
   useEffect(() => {
     if (isVisible && triggerRef.current) {
       const triggerRect = triggerRef.current.getBoundingClientRect();
-      const tooltipNode = document.querySelector('.tooltip-portal-content'); // Asume que solo hay uno visible a la vez o usa un ID único
+      const tooltipNode = document.querySelector('.tooltip-portal-content');
       let top = 0;
       let left = 0;
 
-      // Estimación básica del tamaño del tooltip, idealmente se mediría
-      const tooltipHeight = tooltipNode ? tooltipNode.offsetHeight : 40; 
+      const tooltipHeight = tooltipNode ? tooltipNode.offsetHeight : 40;
       const tooltipWidth = tooltipNode ? tooltipNode.offsetWidth : 100;
 
       switch (position) {
         case 'top':
-          top = triggerRect.top - tooltipHeight - 5; // 5px de espacio
+          top = triggerRect.top - tooltipHeight - 5;
           left = triggerRect.left + (triggerRect.width / 2) - (tooltipWidth / 2);
           break;
         case 'bottom':
@@ -42,42 +42,67 @@ const Tooltip = ({ content, children, position = 'top' }) => {
           left = triggerRect.left + (triggerRect.width / 2) - (tooltipWidth / 2);
       }
 
-      // Ajustar para scroll y asegurar que no se salga de la pantalla (simplificado)
       top += window.scrollY;
       left += window.scrollX;
 
-      // Asegurar que no se salga de los bordes (muy básico)
       if (left < 0) left = 5;
       if (top < 0) top = 5;
-      // Podrías añadir lógica para que no se salga por la derecha/abajo también
 
       setTooltipPosition({ top, left });
     }
   }, [isVisible, position]);
 
-  const showTooltip = () => setIsVisible(true);
-  const hideTooltip = () => setIsVisible(false);
+  // Limpiar el temporizador al desmontar el componente
+  useEffect(() => {
+    return () => {
+      clearTimeout(hideTimeoutRef.current);
+    };
+  }, []);
+
+  const handleMouseEnterTrigger = () => {
+    clearTimeout(hideTimeoutRef.current); // Cancelar cualquier intento de ocultar
+    setIsVisible(true);
+  };
+
+  const handleMouseLeaveTrigger = () => {
+    // Iniciar temporizador para ocultar el tooltip
+    hideTimeoutRef.current = setTimeout(() => {
+      setIsVisible(false);
+    }, delay);
+  };
+
+  const handleMouseEnterTooltipContent = () => {
+    clearTimeout(hideTimeoutRef.current); // Mantener visible si el mouse entra al contenido
+  };
+
+  const handleMouseLeaveTooltipContent = () => {
+    // Iniciar temporizador para ocultar el tooltip si el mouse sale de su contenido
+    hideTimeoutRef.current = setTimeout(() => {
+      setIsVisible(false);
+    }, delay);
+  };
 
   const tooltipJsx = isVisible ? (
     ReactDOM.createPortal(
-      <div // Cambiado de span a div para mejor manejo de layout si es necesario
+      <div
         className={`tooltip-portal-content tooltip-content tooltip-content--${position}`}
         style={{
           position: 'absolute',
           top: `${tooltipPosition.top}px`,
           left: `${tooltipPosition.left}px`,
-          // Los estilos de ToolTip.css (background, color, padding, etc.) se aplicarán aquí
-          // zIndex es importante para que esté sobre otros elementos
-          zIndex: 10000, // Un z-index alto para asegurar visibilidad
+          zIndex: 99999, // Aumentado drásticamente para superar otros elementos
+          pointerEvents: 'all', // Asegurar que el tooltip capture eventos del mouse
         }}
+        onMouseEnter={handleMouseEnterTooltipContent}
+        onMouseLeave={handleMouseLeaveTooltipContent}
       >
-        {typeof content === 'string' ? 
-          content.split('\\n').map((line, index, arr) => (
+        {typeof content === 'string' ?
+          content.split('\n').map((line, index, arr) => (
             <React.Fragment key={index}>
               {line}
               {index < arr.length - 1 && <br />}
             </React.Fragment>
-          )) 
+          ))
           : content
         }
       </div>,
@@ -87,13 +112,13 @@ const Tooltip = ({ content, children, position = 'top' }) => {
 
   return (
     <div
-      className="tooltip-trigger-wrapper" // Renombrado de tooltip-wrapper para claridad
+      className="tooltip-trigger-wrapper"
       ref={triggerRef}
-      onMouseEnter={showTooltip}
-      onMouseLeave={hideTooltip}
-      onFocus={showTooltip} // Para accesibilidad
-      onBlur={hideTooltip}    // Para accesibilidad
-      tabIndex={0} // Para que sea enfocable si no lo es ya
+      onMouseEnter={handleMouseEnterTrigger}
+      onMouseLeave={handleMouseLeaveTrigger}
+      onFocus={handleMouseEnterTrigger} // Reutilizar lógica para mostrar en foco
+      onBlur={() => { /* console.log('Trigger blurred, doing nothing for now'); */ }} // Diagnóstico: onBlur no cierra el tooltip temporalmente
+      tabIndex={0}
     >
       {children}
       {tooltipJsx}
