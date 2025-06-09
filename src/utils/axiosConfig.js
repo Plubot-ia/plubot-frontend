@@ -98,7 +98,8 @@ instance.interceptors.response.use(
       try {
         const refreshToken = localStorage.getItem('refresh_token') || sessionStorage.getItem('refresh_token');
         if (refreshToken) {
-          const response = await axios.post(`${baseURL}/auth/refresh`, { 
+          const refreshUrl = isDevelopment ? `${baseURL}/auth/refresh` : `${baseURL}/api/auth/refresh`;
+          const response = await axios.post(refreshUrl, { 
             refresh_token: refreshToken 
           }, {
             _retry: true // Marcar como reintento para evitar bucles
