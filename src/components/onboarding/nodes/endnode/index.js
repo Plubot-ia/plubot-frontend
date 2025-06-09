@@ -1,4 +1,4 @@
-import EndNode from './EndNode.jsx';
+import EndNode from './EndNode';
 
 export { EndNode };
 export default EndNode;

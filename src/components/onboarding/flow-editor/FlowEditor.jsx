@@ -18,7 +18,7 @@ import { shallow } from 'zustand/shallow';
 import useNodeStyles from './hooks/useNodeStyles';
 
 // Utilidades y configuración
-import { NODE_TYPES } from '@/utils/nodeConfig';
+import { NODE_TYPES, NODE_LABELS } from '@/utils/nodeConfig';
 import { onEvent } from '@/utils/eventBus';
 import { applyNodeVisibilityFix } from './utils/optimized-flow-fixes';
 import { 
@@ -50,11 +50,11 @@ const ImportExportModal = lazy(() => import('../modals/ImportExportModal'));
 const TemplateSelector = lazy(() => import('../modals/TemplateSelector'));
 
 // Nodos - StartNode se importa directamente por ser crítico para el renderizado inicial
-import StartNode from '../nodes/startnode/StartNode.jsx';
+import StartNode from '../nodes/startnode';
 import EliteEdge from './ui/EliteEdge.jsx'; // Added import for EliteEdge
 
 // Nodos - El resto se carga bajo demanda para optimizar el tiempo de carga
-const EndNode = lazy(() => import('../nodes/endnode/EndNode.jsx'));
+const EndNode = lazy(() => import('../nodes/endnode/EndNode'));
 const MessageNode = lazy(() => import('../nodes/messagenode/MessageNode.jsx'));
 const DecisionNode = lazy(() => import('../nodes/decisionnode/DecisionNode.jsx'));
 const ActionNode = lazy(() => import('../nodes/actionnode/ActionNode.jsx'));
@@ -63,6 +63,7 @@ const OptionNode = lazy(() => import('../nodes/optionnode/OptionNode.jsx'));
 const HttpRequestNode = lazy(() => import('../nodes/httprequestnode/HttpRequestNode.jsx'));
 const PowerNode = lazy(() => import('../nodes/powernode/PowerNode.jsx'));
 const DiscordNode = lazy(() => import('../nodes/discordnode/DiscordNode.tsx'));
+const AiNode = lazy(() => import('../nodes/ainode/AiNode')); // Import for the new AI Node
 
 // Estilos
 import './FlowEditor.css';
@@ -140,6 +141,7 @@ const useNodeTypes = (isUltraPerformanceMode = false) => {
       httpRequest: createNodeRenderer(HttpRequestNode),
       power: createNodeRenderer(PowerNode),
       discord: createNodeRenderer(DiscordNode), // Registered DiscordNode
+      ai: createNodeRenderer(AiNode), // Registered AiNode
     };
   }, [nodeStyles]);
 };
@@ -175,28 +177,31 @@ const useHandleValidator = (nodes, edges) => {
   // Mapa de conexiones válidas por tipo de nodo
   const validConnections = useMemo(() => ({
     // Nodo de inicio solo puede conectarse a nodos de mensaje, decisión o acción
-    start: ['message', 'decision', 'action', 'httpRequest', 'power', 'discord'], // Permitido conectar StartNode a PowerNode y DiscordNode también
+    start: ['message', 'decision', 'action', 'httpRequest', 'power', 'discord', 'ai'], 
     
     // Nodo de mensaje puede conectarse a cualquier tipo excepto a sí mismo
-    message: ['message', 'end', 'decision', 'action', 'option', 'httpRequest', 'power', 'discord'], // Permitir MessageNode -> PowerNode y DiscordNode
+    message: ['message', 'end', 'decision', 'action', 'option', 'httpRequest', 'power', 'discord', 'ai'], 
     
     // Nodo de decisión puede conectarse a cualquier tipo excepto inicio
-    decision: ['message', 'end', 'action', 'option', 'httpRequest', 'power', 'discord'],
+    decision: ['message', 'end', 'action', 'option', 'httpRequest', 'power', 'discord', 'ai'],
     
     // Nodo de acción puede conectarse a cualquier tipo excepto inicio
-    action: ['message', 'end', 'decision', 'option', 'httpRequest', 'power', 'discord'],
+    action: ['message', 'end', 'decision', 'option', 'httpRequest', 'power', 'discord', 'ai'],
     
     // Nodo de opción puede conectarse a nodos de mensaje, decisión o acción
-    option: ['message', 'decision', 'action', 'httpRequest', 'end'],
+    option: ['message', 'decision', 'action', 'httpRequest', 'end', 'ai'],
     
     // Nodo HTTP puede conectarse a nodos de mensaje, decisión o acción
-    httpRequest: ['message', 'decision', 'action', 'end', 'option', 'power', 'discord'],
+    httpRequest: ['message', 'decision', 'action', 'end', 'option', 'power', 'discord', 'ai'],
     
     // Nodo especial puede conectarse a cualquier tipo excepto inicio
-    power: ['message', 'end', 'decision', 'action', 'option', 'httpRequest', 'discord'], // PowerNode puede conectar a DiscordNode
+    power: ['message', 'end', 'decision', 'action', 'option', 'httpRequest', 'discord', 'ai'],
     
     // Nodo Discord: Puede conectarse a la mayoría y recibir de la mayoría
-    discord: ['message', 'end', 'decision', 'action', 'option', 'httpRequest', 'power', 'discord'],
+    discord: ['message', 'end', 'decision', 'action', 'option', 'httpRequest', 'power', 'discord', 'ai'],
+
+    // Nodo AI: Puede conectarse a la mayoría y recibir de la mayoría (excepto start)
+    ai: ['message', 'decision', 'action', 'end', 'httpRequest', 'power', 'discord', 'ai'],
 
     // Nodo final no puede conectarse a ningún otro nodo
     end: []
@@ -630,9 +635,13 @@ const FlowEditorInner = ({
     const nodeId = `${nodeType}-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
     
     // Crear datos específicos según el tipo de nodo
+    console.log('[FlowEditor DEBUG] addNodeToFlow - nodeType:', nodeType);
+    console.log('[FlowEditor DEBUG] addNodeToFlow - NODE_LABELS:', NODE_LABELS);
+    console.log('[FlowEditor DEBUG] addNodeToFlow - NODE_LABELS[nodeType]:', NODE_LABELS ? NODE_LABELS[nodeType] : 'NODE_LABELS is undefined');
+
     let nodeData = { 
       id: nodeId,
-      label: `Nuevo ${nodeType}`,
+      label: NODE_LABELS && NODE_LABELS[nodeType] ? NODE_LABELS[nodeType] : `Nuevo ${nodeType}`,
     };
     
     // Añadir datos específicos por tipo de nodo
@@ -787,72 +796,76 @@ const FlowEditorInner = ({
     event.preventDefault();
     event.dataTransfer.dropEffect = 'move';
   }, []);
-  
+
   const onDrop = useCallback((event) => {
     event.preventDefault();
     
-    // Obtener el tipo de nodo del dataTransfer
-    const nodeType = event.dataTransfer.getData('application/reactflow');
-    if (!nodeType || !reactFlowInstance) {
-      console.warn('[FlowEditor] Datos de arrastre inválidos');
+    const nodeInfoString = event.dataTransfer.getData('application/reactflow');
+    
+    if (typeof nodeInfoString === 'undefined' || !nodeInfoString) {
+      console.error('[FlowEditor] Datos del nodo no definidos al soltar');
       return;
     }
-    
-    console.log(`[FlowEditor] Recibido nodo de tipo: ${nodeType}`);
-    
-    try {
-      let position;
-      const viewport = reactFlowInstance.getViewport();
 
-      if (isNaN(viewport.x) || isNaN(viewport.y)) {
-        console.warn('[FlowEditor] Viewport (panX/panY) has NaN coordinates. Using getViewportCenterPosition as fallback for onDrop.');
-        position = getViewportCenterPosition();
-      } else {
-        console.log('[FlowEditor] Viewport coordinates are valid. Proceeding with calculateCorrectDropPosition.');
-        // SOLUCIÓN DEFINITIVA: Usar el método correcto para calcular la posición
-        // Esta función maneja correctamente las transformaciones del viewport
-        position = calculateCorrectDropPosition(event);
-      }
-      
-      // Agregar un offset aleatorio mínimo para evitar superposición exacta
-      const randomOffsetX = (Math.random() * 20) - 10; // Offset: -10 a +10 pixels
-      const randomOffsetY = (Math.random() * 20) - 10; // Offset: -10 a +10 pixels
-      
-      // Posición final con offset aleatorio
-      const adjustedPosition = {
-        x: Math.round(position.x + randomOffsetX),
-        y: Math.round(position.y + randomOffsetY)
-      };
-      
-      console.log(`[FlowEditor] Creando nodo de tipo "${nodeType}" en posición correcta:`, adjustedPosition);
-      
-      // Guardar posición en localStorage como respaldo de emergencia (usando el almacenamiento seguro)
-      // Limpiar primero el almacenamiento para evitar errores de cuota excedida
-      cleanupStorage(30);
-      
-      // Usar safeSetItem en lugar de localStorage.setItem directo
-      const emergencyBackupKey = `node-position-backup-${Date.now()}`;
-      safeSetItem(emergencyBackupKey, {
-        type: nodeType,
-        position: adjustedPosition,
-        timestamp: Date.now()
-      });
-      
-      // Añadir el nodo con la posición correctamente calculada
-      addNodeToFlow(nodeType, adjustedPosition);
-      
-      // Proteger contra reseteos accidentales
-      window.__preventFlowReset = true;
-      
-      // Forzar visibilidad del nodo recién creado
-    } catch (error) {
-      console.error('[FlowEditor] Error al procesar onDrop:', error);
-      // Intentar usar la posición central como fallback
-      const centerPosition = getViewportCenterPosition(reactFlowInstance);
-      console.log('[FlowEditor] Usando posición central como fallback:', centerPosition);
-      addNodeToFlow(nodeType, centerPosition);
+    let nodeInfo;
+    try {
+      nodeInfo = JSON.parse(nodeInfoString);
+    } catch (e) {
+      console.error('[FlowEditor] Error al parsear datos del nodo:', e, 'String recibido:', nodeInfoString);
+      return;
     }
-  }, [reactFlowInstance, addNodeToFlow]);
+
+    if (!nodeInfo || !nodeInfo.type || !nodeInfo.id || !nodeInfo.data || typeof nodeInfo.data.label === 'undefined') {
+        console.error('[FlowEditor] Datos del nodo incompletos o malformados después de parsear:', nodeInfo);
+        return;
+    }
+    
+    // reactFlowWrapperRef, reactFlowInstance, y calculateCorrectDropPosition deben estar disponibles en este scope.
+    const position = calculateCorrectDropPosition(event, reactFlowWrapperRef.current, reactFlowInstance);
+    
+    const newNode = {
+      id: nodeInfo.id, // Usar el ID generado en NodePalette
+      type: nodeInfo.type, // Usar el TIPO determinado en NodePalette
+      position,
+      data: { 
+        ...nodeInfo.data, // Usar los DATOS (incluyendo label) de NodePalette
+        id: nodeInfo.id, // Asegurar que el id en data también sea el correcto
+      },
+      draggable: true,
+      selectable: true,
+      connectable: true,
+      style: { opacity: 1, visibility: 'visible', ...(nodeInfo.style || {}) }, // Asegurar visibilidad y aplicar estilos de nodeInfo
+      hidden: false, // Asegurar que no esté oculto
+    };
+    
+    console.log('[FlowEditor] Nodo creado desde onDrop:', JSON.stringify(newNode));
+    
+    setNodes((nds) => nds.concat(newNode));
+    // setHasChanges debe estar disponible en el scope de FlowEditorInner (viene de props o se define localmente)
+    if (typeof setHasChanges === 'function') {
+        setHasChanges(true);
+    }
+    
+    // Aplicar correcciones de visibilidad (similar a como estaba en addNodeToFlow o el onDrop original)
+    setTimeout(() => {
+        try {
+          // applyNodeVisibilityFix debe ser una función importada o definida en el scope.
+          if (typeof applyNodeVisibilityFix === 'function') {
+            applyNodeVisibilityFix();
+          }
+          console.log('[FlowEditor] Visibilidad forzada después de añadir nodo vía onDrop');
+          // Como respaldo adicional, intentar aplicar estilos directamente a los elementos DOM
+          document.querySelectorAll('.react-flow__node').forEach(nodeEl => {
+            nodeEl.style.opacity = '1';
+            nodeEl.style.visibility = 'visible';
+            nodeEl.style.display = 'block';
+          });
+        } catch (e) {
+          console.error('[FlowEditor] Error al forzar visibilidad en onDrop:', e);
+        }
+      }, 100);
+
+  }, [reactFlowInstance, setNodes, setHasChanges, reactFlowWrapperRef]); // Dependencias para onDrop
   
   const onNodeDragStop = useCallback((event, node) => {
     const positionChange = {

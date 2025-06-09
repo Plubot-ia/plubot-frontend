@@ -374,23 +374,23 @@
 
 /* Conectores en modo ultra rendimiento */
 .message-node .message-node__handle--ultra {
-  width: var(--handle-ultra-size) !important;
-  height: var(--handle-ultra-size) !important;
-  background-color: var(--handle-ultra-bg-color) !important;
-  border: var(--handle-ultra-border-width) solid var(--handle-ultra-border-color) !important;
-  border-radius: 3px !important; /* Consistente con StartNode ultra */
-  box-shadow: none !important;
+  width: var(--handle-default-size) !important;
+  height: var(--handle-default-size) !important;
+  background-color: var(--handle-default-bg-color) !important;
+  border: var(--handle-default-border-width) solid var(--handle-default-border-color) !important;
+  border-radius: 50% !important; /* Circular like normal mode */
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important; /* Default shadow */
   opacity: 1 !important;
-  transition: none !important;
+  transition: none !important; /* No animations/transitions */
   z-index: 10 !important; /* Asegurar que los handles estén por encima */
 }
 
 .message-node .message-node__handle--target.message-node__handle--ultra {
-  top: var(--handle-ultra-offset) !important;
+  top: var(--handle-default-offset) !important;
 }
 
 .message-node .message-node__handle--source.message-node__handle--ultra {
-  bottom: var(--handle-ultra-offset) !important;
+  bottom: var(--handle-default-offset) !important;
 }
 
 .message-node--ultra-performance .message-node__handle:hover,
@@ -1677,10 +1677,12 @@ body.ultra-mode .message-node .message-node__handle:hover,
 body.ultra-mode .message-node .message-node__handle:focus,
 body.ultra-mode .message-node .message-node__handle--target:hover,
 body.ultra-mode .message-node .message-node__handle--target:focus {
-  transform: none !important;
-  box-shadow: none !important;
-  animation: none !important;
-  transition: none !important;
+  background-color: var(--handle-default-bg-color) !important; /* Fondo consistente */
+  filter: brightness(120%) !important; /* Brillo consistente en hover */
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important; /* Sombra consistente */
+  transform: translateX(-50%) !important; /* Asegurar/restaurar centrado */
+  animation: none !important; /* Mantener animaciones desactivadas */
+  transition: none !important; /* Mantener transiciones desactivadas */
 }
 
 /* ======================================================

@@ -55,18 +55,35 @@
 }
 
 .discord-node .discord-node__handle {
-  width: 12px;
-  height: 12px;
-  background-color: var(--node-shared-accent-hex, #2563eb); /* Color azul de acento compartido */
-  border: 2px solid #ffffff; /* Borde blanco más prominente */
-  border-radius: 50%;
-  z-index: 10 !important; /* Asegura que los handles estén sobre otros elementos del nodo */
-  cursor: pointer !important; /* Manito al pasar el cursor */
+  width: var(--handle-default-size) !important; /* 15px */
+  height: var(--handle-default-size) !important; /* 15px */
+  background-color: var(--handle-default-bg-color) !important;
+  border: var(--handle-default-border-width) solid var(--handle-default-border-color) !important;
+  border-radius: 50% !important;
+  cursor: pointer !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+  z-index: 10 !important;
+  box-sizing: content-box !important;
+  position: absolute; /* Necesario para top/bottom/left/right y transform */
 }
 
-.discord-node__handle:hover {
-  background-color: var(--discord-node-gold-secondary); /* Resaltar handle con dorado al pasar el mouse */
-  transform: scale(1.1);
+.discord-node .discord-node__handle--target {
+  top: var(--handle-default-offset) !important; /* -8px */
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+}
+
+.discord-node .discord-node__handle--source {
+  bottom: var(--handle-default-offset) !important; /* -8px */
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+}
+
+.discord-node .discord-node__handle:hover {
+  background-color: var(--handle-default-bg-color) !important;
+  filter: brightness(120%) !important;
+  box-shadow: 0 0 0 3px rgba(0, 173, 255, 0.5) !important;
+  /* transform: none !important; Ya no se escala */
 }
 
 /* Modo Ultra Rendimiento */
@@ -84,8 +101,16 @@
 /* En modo ultra, los handles también pueden simplificarse si es necesario, */
 /* pero por ahora mantenemos su color de acento para identificación. */
 .ultra-performance-mode .discord-node .discord-node__handle:hover {
-  background-color: var(--node-shared-accent-hex, #2563eb); /* Sin cambio de color en hover */
-  transform: none; /* Sin escalado */
+  background-color: var(--handle-default-bg-color) !important; /* Mantener consistencia */
+  filter: brightness(110%) !important; /* Un leve brillo, menos intenso que el normal */
+  box-shadow: 0 0 0 2px rgba(0, 173, 255, 0.3) !important; /* Sombra más sutil */
+  transform: none !important;
+}
+
+/* Asegurar que en modo ultra los handles base no tengan sombra si no se desea */
+.ultra-performance-mode .discord-node .discord-node__handle {
+  box-shadow: none !important; /* O una sombra muy mínima si se prefiere */
+  /* Las demás propiedades (tamaño, color, borde) se heredan y deberían estar bien */
 }
 
 /* Estilos para el modo edición */

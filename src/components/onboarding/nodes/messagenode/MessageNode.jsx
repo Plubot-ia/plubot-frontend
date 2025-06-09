@@ -1081,26 +1081,27 @@ useEffect(() => {
     const animationFrameId = requestAnimationFrame(() => {
       const handles = nodeRef.current.querySelectorAll('.react-flow__handle.message-node__handle--ultra');
       handles.forEach(handle => {
-        handle.style.setProperty('background-color', '#f8fafc', 'important');
-        handle.style.setProperty('border', '1px solid #2563eb', 'important');
-        handle.style.setProperty('border-radius', '50%', 'important');
-        handle.style.setProperty('width', '10px', 'important');
-        handle.style.setProperty('height', '10px', 'important');
-        handle.style.setProperty('box-shadow', '0 0 0 1px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.1)', 'important');
-        handle.style.setProperty('transition', 'none', 'important');
-        handle.style.setProperty('animation', 'none', 'important');
-        handle.style.setProperty('transform', 'none', 'important');
-        handle.style.setProperty('cursor', 'pointer', 'important');
-        handle.style.setProperty('z-index', '120', 'important');
+        // Estilos en línea eliminados/comentados para permitir que CSS maneje la apariencia en modo ultra
+        // handle.style.setProperty('background-color', '#f8fafc', 'important');
+        // handle.style.setProperty('border', '1px solid #2563eb', 'important');
+        // handle.style.setProperty('border-radius', '50%', 'important');
+        // handle.style.setProperty('width', '10px', 'important');
+        // handle.style.setProperty('height', '10px', 'important');
+        // handle.style.setProperty('box-shadow', '0 0 0 1px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.1)', 'important');
+        // handle.style.setProperty('transition', 'none', 'important');
+        // handle.style.setProperty('animation', 'none', 'important');
+        // handle.style.setProperty('transform', 'none', 'important');
+        // handle.style.setProperty('cursor', 'pointer', 'important');
+        // handle.style.setProperty('z-index', '120', 'important');
 
-        if (handle.classList.contains('react-flow__handle-top') || handle.classList.contains('message-node__handle--target')) {
-          handle.style.setProperty('top', '-10px', 'important');
-          handle.style.removeProperty('bottom'); // Limpiar por si acaso
-        }
-        if (handle.classList.contains('react-flow__handle-bottom') || handle.classList.contains('message-node__handle--source')) {
-          handle.style.setProperty('bottom', '-10px', 'important');
-          handle.style.removeProperty('top'); // Limpiar por si acaso
-        }
+        // if (handle.classList.contains('react-flow__handle-top') || handle.classList.contains('message-node__handle--target')) {
+        //   handle.style.setProperty('top', '-10px', 'important');
+        //   handle.style.removeProperty('bottom'); // Limpiar por si acaso
+        // }
+        // if (handle.classList.contains('react-flow__handle-bottom') || handle.classList.contains('message-node__handle--source')) {
+        //   handle.style.setProperty('bottom', '-10px', 'important');
+        //   handle.style.removeProperty('top'); // Limpiar por si acaso
+        // }
       });
     });
 

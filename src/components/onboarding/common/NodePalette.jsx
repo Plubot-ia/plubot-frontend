@@ -173,22 +173,30 @@ const NodePalette = () => {
   const onDragStart = useCallback((event, nodeType, nodeLabel, category, powerItemData = null) => {
     event.stopPropagation(); // Evitar propagación para evitar conflictos
     
+    console.log(`[NodePalette DEBUG] Iniciando drag para nodo. nodeType: ${nodeType}, nodeLabel (de basicNodeDefinitions): ${nodeLabel}, NODE_LABELS[nodeType]: ${NODE_LABELS[nodeType]}`);
     console.log(`[NodePalette] Iniciando drag para nodo: ${nodeLabel} (${nodeType})`);
     
     // Generar un ID único para el nodo
     const nodeId = `${nodeType}-${uuidv4().slice(0, 8)}`;
     
+    // Determinar el tipo y la etiqueta correctos para el nodo
+    const isAdvancedAiPowerNode = powerItemData && powerItemData.id === 'advancedAiPower';
+    const finalNodeType = isAdvancedAiPowerNode ? NODE_TYPES.ADVANCED_AI_NODE : nodeType;
+    const finalNodeLabel = isAdvancedAiPowerNode 
+                             ? (powerItemData.title || NODE_LABELS.ADVANCED_AI_NODE) 
+                             : (nodeLabel || NODE_LABELS[nodeType] || 'Nuevo Nodo');
+
     // Crear objeto completo con la información del nodo
     const nodeInfo = {
       id: nodeId,
-      type: nodeType,
-      nodeType,
-      label: nodeLabel || NODE_LABELS[nodeType] || 'Nuevo Nodo',
+      type: finalNodeType, // Usar el tipo determinado
+      // nodeType: finalNodeType, // Opcional: mantener si se usa en otro lugar, sino eliminar por redundancia
+      label: finalNodeLabel, // Usar la etiqueta determinada
       category: category || 'basic',
       // Propiedades específicas para el renderizado correcto
       data: {
         id: nodeId,
-        label: nodeLabel || NODE_LABELS[nodeType] || 'Nuevo Nodo',
+        label: finalNodeLabel, // Asegurar que data.label también tenga la etiqueta correcta
         // Asegurar que tengamos handle IDs si son nodos que necesitan aristas
         ...(nodeType === 'decision' ? {
           handleIds: ['output-0', 'output-1']
@@ -202,54 +210,59 @@ const NodePalette = () => {
       selectable: true,
     };
 
-    // SOLUCIÓN: Usar SOLO el string simple del tipo para ReactFlow
-    // ReactFlow espera un string como tipo, no un objeto JSON
+    // Asegurar que los nodos 'ai' tengan los datos iniciales correctos según AiNodeData
+    if (finalNodeType === 'ai') { // 'ai' es el tipo registrado en FlowEditor para AiNode
+      nodeInfo.data = {
+        ...nodeInfo.data, // Preserva id, label y cualquier otra cosa preexistente en data
+        // Valores por defecto para AiNodeData, usando ?? para permitir overrides si ya existen
+        promptTemplate: nodeInfo.data.promptTemplate ?? '',
+        temperature: nodeInfo.data.temperature ?? 0.7,
+        maxTokens: nodeInfo.data.maxTokens ?? 512,
+        systemMessage: nodeInfo.data.systemMessage ?? '',
+        responseVariable: nodeInfo.data.responseVariable ?? 'ai_response',
+        streaming: nodeInfo.data.streaming ?? false,
+        ultraMode: nodeInfo.data.ultraMode ?? false,
+        // Estados de runtime siempre se inicializan así para un nodo nuevo:
+        isLoading: false,
+        error: null,
+        lastResponse: null,
+        interpolatedPromptPreview: '',
+      };
+    }
+
     try {
-      console.log(`[NodePalette] Usando SOLO tipo simple para transferencia: ${nodeType}`);
+      const serializedNodeInfo = JSON.stringify(nodeInfo);
+      event.dataTransfer.setData('application/reactflow', serializedNodeInfo);
+      event.dataTransfer.effectAllowed = 'move';
       
-      // Guardar también el objeto completo para usar en otro formato si se necesita
-      const nodeData = JSON.stringify({
-        nodeInfo,
-        reactflow: true
-      });
-      
-      // IMPORTANTE: Para ReactFlow usar SOLO el string del tipo
-      event.dataTransfer.setData('application/reactflow', nodeType);
-      
-      // Estos otros formatos pueden llevar los datos completos
-      event.dataTransfer.setData('application/json', nodeData);
-      event.dataTransfer.setData('text/plain', nodeType);
-      
-      // Importante: permitir copiar como efecto
-      event.dataTransfer.effectAllowed = 'copy';
-      
-      // Crear vista previa del arrastre para mejor experiencia
-      const dragPreview = document.createElement('div');
-      dragPreview.className = 'node-drag-preview';
-      dragPreview.textContent = nodeLabel;
-      dragPreview.style.position = 'absolute';
-      dragPreview.style.top = '-1000px';
-      dragPreview.style.backgroundColor = 'rgba(0, 224, 255, 0.2)';
-      dragPreview.style.border = '1px solid rgba(0, 224, 255, 0.6)';
-      dragPreview.style.borderRadius = '8px';
-      dragPreview.style.padding = '8px 12px';
-      dragPreview.style.color = '#e0f7ff';
-      dragPreview.style.zIndex = '9999';
-      document.body.appendChild(dragPreview);
-      
-      // Configurar la imagen de arrastre
-      try {
-        event.dataTransfer.setDragImage(dragPreview, 25, 25);
-      } catch (e) {
-        console.warn('[NodePalette] Error al configurar imagen de arrastre:', e);
+      // Drag image logic for visual feedback during drag
+      const targetElement = event.target.closest('.node-palette-item');
+      if (targetElement) {
+        const dragImage = document.createElement('div');
+        dragImage.style.position = 'absolute';
+        dragImage.style.top = '-9999px';
+        dragImage.style.left = '-9999px';
+        dragImage.style.width = '100px';
+        dragImage.style.height = '40px';
+        dragImage.style.backgroundColor = '#4a90e2';
+        dragImage.style.color = 'white';
+        dragImage.style.display = 'flex';
+        dragImage.style.alignItems = 'center';
+        dragImage.style.justifyContent = 'center';
+        dragImage.style.borderRadius = '5px';
+        dragImage.style.fontSize = '14px';
+        dragImage.style.pointerEvents = 'none';
+        dragImage.textContent = nodeLabel || 'Nodo';
+        document.body.appendChild(dragImage);
+
+        event.dataTransfer.setDragImage(dragImage, 50, 20);
+
+        requestAnimationFrame(() => {
+          if (document.body.contains(dragImage)) {
+            document.body.removeChild(dragImage);
+          }
+        });
       }
-      
-      // Eliminar el elemento temporal después de un breve retraso
-      setTimeout(() => {
-        if (dragPreview.parentNode) {
-          document.body.removeChild(dragPreview);
-        }
-      }, 100);
       
       // Mostrar mensaje de ayuda
       setByteMessage('🔄 Arrastra el nodo al editor');
@@ -257,55 +270,25 @@ const NodePalette = () => {
       // Método alternativo: crear el nodo directamente en el store
       // Guardamos la referencia para poder acceder en el método onDragEnd
       window._lastDraggedNodeInfo = nodeInfo;
-      
     } catch (error) {
-      console.error('[NodePalette] Error al iniciar drag:', error);
-      setByteMessage('❌ Error al iniciar arrastre');
-    }
-
-    // --- Lógica de setDragImage (restaurada y mejorada) ---
-    if (event.currentTarget instanceof HTMLElement) {
-      const originalNode = event.currentTarget;
-      const rect = originalNode.getBoundingClientRect();
-      const clone = originalNode.cloneNode(true);
-
-      clone.style.position = 'absolute';
-      clone.style.left = `${rect.left}px`;
-      clone.style.top = `${rect.top}px`;
-      clone.style.width = `${rect.width}px`;
-      clone.style.height = `${rect.height}px`;
-      clone.style.opacity = '0.75'; 
-      clone.style.zIndex = '10000';
-      clone.style.pointerEvents = 'none';
-      clone.style.display = window.getComputedStyle(originalNode).display;
-      clone.style.visibility = 'visible';
-      document.body.appendChild(clone);
-
-      const xOffset = rect.width / 2;
-      const yOffset = rect.height / 2;
-
+      console.error('[NodePalette] Error al serializar o establecer datos JSON para ReactFlow:', error, 'NodeInfo:', nodeInfo);
+      // Fallback MUY improbable: si nodeInfo es tan corrupto que no se puede serializar,
+      // intentamos con un objeto mínimo. FlowEditor aún podría fallar si esto sucede.
       try {
-        event.dataTransfer.setDragImage(clone, xOffset, yOffset);
-      } catch (e) {
-        console.error("Error al establecer la imagen de arrastre:", e);
-      }
-
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => { 
-          if (clone.parentNode === document.body) {
-            document.body.removeChild(clone);
-          }
+        const minimalNodeData = JSON.stringify({ 
+          id: nodeId, 
+          type: finalNodeType, 
+          label: finalNodeLabel, 
+          data: { id: nodeId, label: finalNodeLabel, ...(powerItemData || {}) } 
         });
-      });
-      // --- Fin de la lógica de setDragImage ---
-
-      // Aplicar clase al nodo original en la paleta
-      if (event.currentTarget && event.currentTarget.classList) {
-        event.currentTarget.classList.add('dragging-source-item');
-      } else {
-        console.warn('event.currentTarget no está disponible o no tiene classList en onDragStart');
+        event.dataTransfer.setData('application/reactflow', minimalNodeData);
+        console.warn('[NodePalette] Fallback: Usando datos JSON mínimos para ReactFlow debido a error de serialización.');
+      } catch (fallbackSerializeError) {
+        // Si incluso esto falla, es un problema grave con los datos base.
+        console.error('[NodePalette] Error crítico en fallback de serialización:', fallbackSerializeError);
+        // Como último recurso absoluto, y sabiendo que causará problemas en onDrop:
+        event.dataTransfer.setData('application/reactflow', finalNodeType); // Esto llevará al error JSON.parse en FlowEditor
       }
-      // setIsDragging(true); // Comentado para evitar efecto de opacidad global
     }
   }, [setByteMessage]);
 
@@ -401,7 +384,7 @@ const NodePalette = () => {
   }, [onDragStart, onDragEndNode, favoriteNodes, setFavoriteNodes, getNodeIcon]); // Added getNodeIcon to dependencies, ensure it's stable or memoized if from props
 
   return (
-    <div className={`ts-node-palette ${isPaletteExpanded ? 'ts-expanded' : 'ts-collapsed'}`}>
+    <div className={`ts-node-palette ${isPaletteExpanded ? 'ts-expanded' : 'ts-collapsed'}`} draggable="false">
       <div className="ts-palette-header" onClick={() => setIsPaletteExpanded(!isPaletteExpanded)}>
         <h4>Biblioteca de Nodos</h4>
         <span className="ts-toggle-icon">{isPaletteExpanded ? '◀' : '▶'}</span>

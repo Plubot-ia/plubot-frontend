@@ -17,6 +17,7 @@ export const NODE_TYPES = {
     COMPLEX_CONDITION_NODE: 'complexConditionNode',
     POWER_NODE: 'powerNode',
     ULTRA_OPTIMIZED_NODE: 'ultraOptimizedNode', // Nodo optimizado para el modo Ultra Rendimiento
+    ADVANCED_AI_NODE: 'ai', // Nuevo nodo IA Avanzada
 };
 
 export const EDGE_TYPES = {
@@ -92,6 +93,7 @@ export const NODE_LABELS = {
     NLP_NODE: 'Procesamiento NLP',
     COMPLEX_CONDITION_NODE: 'Condición Compleja',
     POWER_NODE: 'Poder',
+    ADVANCED_AI_NODE: 'IA Avanzada',
 };
 
 export const NODE_DESCRIPTIONS = {
@@ -108,6 +110,7 @@ export const NODE_DESCRIPTIONS = {
     NLP_NODE: 'Procesa lenguaje natural para extraer significado, entidades o intenciones.',
     COMPLEX_CONDITION_NODE: 'Evalúa múltiples condiciones con operaciones lógicas AND/OR/NOT.',
     POWER_NODE: 'Integra tu Plubot con aplicaciones y servicios externos.',
+    ADVANCED_AI_NODE: 'Nodo IA configurable con prompts dinámicos, múltiples modelos y parámetros.',
 };
 
 // Obtener categorías únicas de los poderes
@@ -150,16 +153,7 @@ export const NODE_CATEGORIES = [
             { type: NODE_TYPES.POWER_NODE, label: NODE_LABELS.POWER_NODE, icon: 'fas fa-plug' },
         ]
     },
-    {
-        id: 'ai',
-        name: 'Inteligencia Artificial',
-        description: 'Nodos que utilizan IA para mejorar la interacción',
-        nodes: [
-            { type: NODE_TYPES.AI_NODE, label: NODE_LABELS.AI_NODE, icon: 'fas fa-brain' },
-            { type: NODE_TYPES.NLP_NODE, label: NODE_LABELS.NLP_NODE, icon: 'fas fa-language' },
-        ]
-    }
-];
+]; // End of NODE_CATEGORIES. The 'ai' category is removed as AI nodes will be under 'Powers'.
 
 // Función para obtener los datos iniciales de un nodo
 export const getNodeInitialData = (nodeType, nodeLabel, powerItemData = null) => {
@@ -196,6 +190,24 @@ export const getNodeInitialData = (nodeType, nodeLabel, powerItemData = null) =>
                 status: { state: 'idle', message: '' }
             };
             
+        case NODE_TYPES.ADVANCED_AI_NODE:
+            return {
+                ...baseData, // Includes label: NODE_LABELS.ADVANCED_AI_NODE
+                type: NODE_TYPES.ADVANCED_AI_NODE,
+                promptTemplate: 'Escribe tu prompt aquí. Usa {{variable}} para variables dinámicas.',
+                temperature: 0.7,
+                model: 'gpt-4',
+                maxTokens: 512,
+                systemMessage: 'Eres un asistente de IA útil y creativo.',
+                responseVariable: 'respuestaDelAI',
+                streaming: false,
+                isLoading: false,
+                error: null,
+                lastResponse: null,
+                interpolatedPromptPreview: '',
+                ultraMode: false,
+            };
+
         case NODE_TYPES.DATABASE_NODE:
             return {
                 ...baseData,
@@ -244,26 +256,29 @@ export const getNodeInitialData = (nodeType, nodeLabel, powerItemData = null) =>
             };
             
         case NODE_TYPES.POWER_NODE:
-            if (powerItemData) {
+            if (powerItemData && powerItemData.id === 'advancedAiPower') {
                 return {
-                    label: powerItemData.title || 'Nodo de Poder',
-                    powerId: powerItemData.id,
-                    powerTitle: powerItemData.title,
-                    powerIcon: powerItemData.icon,
-                    powerDescription: powerItemData.description,
-                    powerCategory: powerItemData.category,
-                    config: {},
-                    status: { state: 'idle', message: '' }
+                    label: powerItemData.title || NODE_LABELS.ADVANCED_AI_NODE,
+                    type: NODE_TYPES.ADVANCED_AI_NODE, // 'ai'
+                    promptTemplate: 'Escribe tu prompt aquí. Usa {{variable}} para variables dinámicas.',
+                    temperature: 0.7,
+                    model: 'gpt-4',
+                    maxTokens: 512,
+                    systemMessage: 'Eres un asistente de IA útil y creativo.',
+                    responseVariable: 'respuestaDelAI',
+                    streaming: false, isLoading: false, error: null, lastResponse: null, interpolatedPromptPreview: '', ultraMode: false,
+                    powerId: powerItemData.id
                 };
             }
+            // Lógica para otros Power Nodes no-AI (que no sean el advancedAiPower)
             return {
-                ...baseData,
-                label: 'Nodo de Poder (Error)',
-                powerId: null,
-                config: {},
-                status: { state: 'idle', message: 'Error: Datos del poder no encontrados' }
-            };
-
+                ...baseData, // Esto usará el label del powerItemData si no es nuestro AI Power
+                powerId: powerItemData?.id || '',
+                inputs: powerItemData?.inputs || [],
+                outputs: powerItemData?.outputs || [],
+                config: powerItemData?.config || {},
+            };    
+            
         default:
             return baseData;
     }

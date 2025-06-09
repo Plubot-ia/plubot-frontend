@@ -1,4 +1,13 @@
 export const powers = [
+  {
+    id: 'advancedAiPower',
+    title: 'IA Avanzada Configurable',
+    description: 'IA con prompts dinámicos, modelos y parámetros ajustables.',
+    icon: '🧠',
+    image: '/marketplace/extension-openai.webp', // Placeholder image
+    category: 'inteligencia', // Or 'automatizacion'
+    nodeTypeToCreate: 'ai' // This helps map to the actual node type if needed elsewhere, matches ADVANCED_AI_NODE
+  },
   { id: 'notion', title: 'Notion', description: 'Organiza datos y notas con tu Plubot.', icon: '📚', image: '/marketplace/extension-notion.webp', category: 'productividad' },
   { id: 'slack', title: 'Slack', description: 'Automatiza notificaciones y tareas en Slack.', icon: '💬', image: '/marketplace/extension-slack.webp', category: 'comunicacion' },
   { id: 'trello', title: 'Trello', description: 'Crea y gestiona tareas en Trello desde Plubot.', icon: '📋', image: '/marketplace/extension-trello.webp', category: 'productividad' },

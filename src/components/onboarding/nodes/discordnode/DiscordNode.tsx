@@ -132,7 +132,7 @@ const DiscordNode: React.FC<NodeProps<DiscordNodeData>> = ({ id, data, selected,
         position={Position.Top}
         id={`${id}-target`}
         isConnectable={isConnectable}
-        className="discord-node__handle"
+        className="discord-node__handle discord-node__handle--target"
       />
       <div className="discord-node__header">
         <span className="discord-node__icon">{icon}</span>
@@ -201,7 +201,7 @@ const DiscordNode: React.FC<NodeProps<DiscordNodeData>> = ({ id, data, selected,
         position={Position.Bottom}
         id={`${id}-source`}
         isConnectable={isConnectable}
-        className="discord-node__handle"
+        className="discord-node__handle discord-node__handle--source"
       />
     </div>
   );

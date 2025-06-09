@@ -49,6 +49,7 @@ instance.interceptors.request.use(
     
     if (!isPublicEndpoint) {
       const token = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
+      console.log('[axiosConfig] Token de acceso:', token ? 'Presente' : 'No encontrado');
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
         if (isDevelopment && !config.url?.includes('/api/auth/profile')) {

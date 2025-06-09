@@ -9,5 +9,10 @@ export const useAnalytics = () => {
       // Aquí iría la integración con tu herramienta de analítica
     };
   
-    return { trackNodeEdit, trackNodeConnected };
+    const trackEvent = (eventName, eventData) => {
+    console.log(`Tracking event: ${eventName}`, eventData);
+    // Aquí iría la integración con tu herramienta de analítica
+  };
+
+  return { trackNodeEdit, trackNodeConnected, trackEvent };
   };

@@ -60,6 +60,86 @@ const executeDiscordAction = async (nodeData) => {
   }
 };
 
+// Helper function for prompt interpolation
+const interpolatePrompt = (template, variables, lastUserMessage) => {
+  if (!template) return '';
+  let interpolated = template;
+  if (variables && typeof variables === 'object') {
+    for (const key in variables) {
+      if (Object.prototype.hasOwnProperty.call(variables, key)) {
+        const regex = new RegExp(`\\{\\{\\s*${key}\\s*\\}\\}`, 'g');
+        interpolated = interpolated.replace(regex, variables[key] || '');
+      }
+    }
+  }
+  // Optional: remove unreplaced placeholders, or leave them
+  // interpolated = interpolated.replace(/\{\{.*?\}\}/g, '');
+
+  // Interpolate the last user message if provided
+  if (lastUserMessage && typeof lastUserMessage === 'string') {
+    const userMessageRegex = new RegExp(`\\{\\{\s*mensaje_usuario_anterior\s*\\}\\}`, 'g');
+    interpolated = interpolated.replace(userMessageRegex, lastUserMessage);
+  }
+
+  return interpolated;
+};
+
+// Function to execute AI Node logic
+const executeAiNodeAction = async (nodeData, currentVariables, lastUserMessage, t) => {
+  const jwtToken = getAuthToken();
+  if (!jwtToken) {
+    return { success: false, error: t('simulation.errorAuthGeneric', 'Error de autenticación: Token no encontrado.') };
+  }
+
+  const {
+    promptTemplate,
+    temperature,
+    maxTokens,
+    systemMessage,
+    responseVariable
+  } = nodeData;
+
+  if (!responseVariable) {
+    return { success: false, error: t('simulation.errorAiNodeNoResponseVar', 'Error de configuración del Nodo IA: La "Variable de Respuesta" no está definida en los datos del nodo.') };
+  }
+
+  const interpolatedPrompt = interpolatePrompt(promptTemplate, currentVariables, lastUserMessage);
+
+  if (!interpolatedPrompt && !systemMessage) {
+    return { success: false, error: t('simulation.errorAiNodeNoPrompt', 'Error del Nodo IA: El prompt (plantilla) y el mensaje de sistema están vacíos, incluso después de intentar interpolar variables.') };
+  }
+
+  const apiUrlFromEnv = import.meta.env.VITE_API_URL || '';
+  const endpoint = `${apiUrlFromEnv}/api/ai-node`;
+
+  try {
+    const response = await fetch(endpoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${jwtToken}`,
+      },
+      body: JSON.stringify({
+        prompt: interpolatedPrompt,
+        temperature,
+        maxTokens,
+        systemMessage,
+      }),
+    });
+
+    const responseData = await response.json();
+
+    if (response.ok) {
+      return { success: true, data: responseData.response || t('simulation.aiEmptyResponse', '(Respuesta vacía del IA)') };
+    } else {
+      return { success: false, error: responseData.message || responseData.error || `${t('simulation.errorServerGeneric', 'Error del servidor')}: ${response.status}` };
+    }
+  } catch (error) {
+    console.error('Error al ejecutar acción de Nodo IA:', error);
+    return { success: false, error: `${t('simulation.errorNetworkGeneric', 'Error de red o conexión')}: ${error.message}` };
+  }
+};
+
 const MessageItem = React.memo(({ message }) => {
   const { type, content, timestamp, isActionStatus } = message;
   const itemClass = `ts-message ts-${type} ${isActionStatus ? 'ts-action-status' : ''}`;
@@ -199,8 +279,53 @@ const SimulationInterface = ({
             addMessageToHistory({ id: 'flow-end-after-action', type: 'system', content: t('simulation.flowEndedAfterAction', 'Flujo finalizado después de la acción.'), timestamp: new Date().toISOString() });
           }
         } else {
-          setFlowStatus('error'); // Detener en caso de error de la acción
-           addMessageToHistory({ id: `action-error-detail-${node.id}`, type: 'error', content: t('simulation.actionErrorDetail', 'La simulación no puede continuar debido a un error en la acción.'), timestamp: new Date().toISOString() });
+          setFlowStatus('error');
+        }
+        break;
+
+      case 'ai':
+        addMessageToHistory({
+          id: `action-status-${node.id}`,
+          type: 'system',
+          content: t('simulation.executingAiNode', 'Ejecutando Nodo IA...'),
+          timestamp: new Date().toISOString(),
+          isActionStatus: true,
+        });
+        setFlowStatus('executing_action');
+        console.log('[Simulation] Processing AI Node ID:', node.id, 'Data:', JSON.parse(JSON.stringify(node.data || {})), 'Variables:', JSON.parse(JSON.stringify(currentResponses || {})));
+
+        const aiResult = await executeAiNodeAction(node.data, currentResponses, currentMessageForNode, t);
+        
+        if (aiResult.success) {
+          addMessageToHistory({
+            id: `ai-response-${node.id}`,
+            type: 'bot',
+            content: aiResult.data,
+            timestamp: new Date().toISOString(),
+          });
+
+          const updatedResponses = { 
+            ...currentResponses, 
+            [node.data.responseVariable]: aiResult.data 
+          };
+          
+          setFlowStatus('processing');
+          const nextEdge = safeEdges.find(edge => edge.source === node.id);
+          if (nextEdge) {
+            await processNode(nextEdge.target, updatedResponses, currentMessageForNode);
+          } else {
+            setFlowStatus('ended');
+            addMessageToHistory({ id: 'flow-end-after-ai', type: 'system', content: t('simulation.flowEndedAfterAi', 'Flujo finalizado después del Nodo IA.'), timestamp: new Date().toISOString() });
+          }
+        } else {
+          addMessageToHistory({
+            id: `ai-error-${node.id}`,
+            type: 'error',
+            content: aiResult.error,
+            timestamp: new Date().toISOString(),
+            isActionStatus: true,
+          });
+          setFlowStatus('error');
         }
         break;
 

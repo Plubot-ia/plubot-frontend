@@ -220,6 +220,7 @@ const useFlowStore = create(
           
           // El tipo viene como primer argumento
           const nodeType = nodeData;
+          console.log(`[FlowStore DEBUG] addNode (from Palette). nodeType: ${nodeType}, NODE_LABELS[nodeType] as seen by FlowStore: ${NODE_LABELS[nodeType]}, received userData:`, userData);
           
           // Validar que sea un tipo válido según NODE_TYPES
           if (Object.values(NODE_TYPES).includes(nodeType)) {
@@ -254,6 +255,8 @@ const useFlowStore = create(
               data: {
                 id: nodeId,
                 label: (userData && userData.label) || defaultLabel,
+                // Log para ver qué etiqueta se está asignando finalmente
+                _debug_final_label_components: { userLabel: (userData && userData.label), defaultLabelFromStore: defaultLabel },
                 nodeType: nodeType,  // Guardamos también el tipo para compatibilidad
                 ...(userData || {})
               }

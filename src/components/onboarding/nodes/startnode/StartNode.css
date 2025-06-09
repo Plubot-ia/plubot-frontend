@@ -149,7 +149,7 @@
   /* Optimizaciones de rendimiento */
   user-select: none;
   will-change: transform, box-shadow;
-  transform: translateY(0) scale(1);
+  transform: translateY(-5px) scale(1);
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -171,7 +171,7 @@
   }
   100% {
     opacity: 1;
-    transform: translateY(0) scale(1);
+    transform: translateY(-5px) scale(1);
     box-shadow: var(--start-node-shadow);
   }
 }
@@ -184,7 +184,7 @@
 .start-node--hovered {
   background: var(--start-node-bg-hover-jsx);
   box-shadow: var(--start-node-shadow-hover-jsx);
-  transform: scale(var(--start-node-scale-hover-jsx));
+  transform: translateY(-5px) scale(var(--start-node-scale-hover-jsx));
 }
 
 /* Seleccionado - Destacado con borde claro */
