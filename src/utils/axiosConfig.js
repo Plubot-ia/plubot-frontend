@@ -131,7 +131,7 @@ instance.interceptors.response.use(
         }
         
         // Redirigir al login si no se puede renovar el token
-        if (window.location.pathname !== '/auth/login') {
+        if (window.location.pathname !== '/login') {
           if (isDevelopment) {
             console.log('[axiosConfig] Redirigiendo a login por sesión expirada');
           }
@@ -143,7 +143,7 @@ instance.interceptors.response.use(
           sessionStorage.removeItem('refresh_token');
           
           // Redirigir con parámetro de sesión expirada
-          window.location.href = '/auth/login?session_expired=true';
+          window.location.href = '/login?session_expired=true';
         }
         
         return Promise.reject(refreshError);

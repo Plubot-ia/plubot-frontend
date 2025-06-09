@@ -40,7 +40,7 @@ const useAuthStore = create(
           console.log('Enviando datos de login:', { email: email.trim() });
           
           // Aumentar el timeout para esta solicitud específica y configurar para FormData
-          const loginResponse = await instance.post('/auth/login', formData, {
+          const loginResponse = await instance.post('/api/auth/login', formData, {
             timeout: 30000, // 30 segundos para dar más tiempo en producción
             headers: {
               'Content-Type': 'multipart/form-data'
