@@ -85,6 +85,51 @@ const interpolatePrompt = (template, variables, lastUserMessage) => {
 };
 
 // Function to execute AI Node logic
+// Function to execute Emotion Detection Node logic
+const executeEmotionDetectionNodeAction = async (nodeData, currentVariables, inputText, t) => {
+  const jwtToken = getAuthToken();
+  if (!jwtToken) {
+    return { success: false, error: t('simulation.errorAuthGeneric', 'Error de autenticación: Token no encontrado.') };
+  }
+
+  const interpolatedText = interpolatePrompt(inputText, currentVariables, '');
+
+  if (!interpolatedText) {
+    return { success: false, error: 'Error en Nodo de Emoción: El texto de entrada está vacío.' };
+  }
+
+  const apiUrlFromEnv = import.meta.env.VITE_API_URL || '';
+  const endpoint = `${apiUrlFromEnv}/api/emotion-detect`; // Endpoint específico
+
+  try {
+    console.log('[EmotionDetection] URL del endpoint:', endpoint);
+    const response = await fetch(endpoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${jwtToken}`,
+      },
+      body: JSON.stringify({ text: interpolatedText }),
+    });
+
+    console.log('[EmotionDetection] Respuesta de la API:', response.status, response.statusText, response.url);
+    if (!response.ok) {
+      return { success: false, error: response.statusText || 'Error en la API de detección de emoción.' };
+    }
+
+    const responseData = await response.json();
+    console.log('[EmotionDetection] Datos de la respuesta:', responseData);
+    // La API debe devolver { emotion: 'happy' }
+    const detectedEmotion = responseData.emotion || 'unknown';
+    return { success: true, data: { detectedEmotion } };
+
+  } catch (error) {
+    console.error('[EmotionDetection] Error ejecutando nodo de detección de emoción:', error);
+    return { success: false, error: 'Error de red o servidor al detectar la emoción: ' + error.message };
+  }
+};
+
+// Function to execute AI Node logic
 const executeAiNodeAction = async (nodeData, currentVariables, lastUserMessage, t) => {
   const jwtToken = getAuthToken();
   if (!jwtToken) {
@@ -163,6 +208,7 @@ const SimulationInterface = ({
   edges = [],
   onClose = () => {},
   analyticsTracker = null,
+  isUltraMode = false,
 }) => {
   const { t } = useTranslation();
   const safeNodes = Array.isArray(nodes) ? nodes : [];
@@ -170,6 +216,7 @@ const SimulationInterface = ({
 
   const [simulationHistory, setSimulationHistory] = useState([]);
   const [userInput, setUserInput] = useState('');
+  const [isClosing, setIsClosing] = useState(false);
   const scrollRef = useRef(null);
   const inputRef = useRef(null);
   const [scrollToBottom, setScrollToBottom] = useState(true);
@@ -179,6 +226,8 @@ const SimulationInterface = ({
   const [flowStatus, setFlowStatus] = useState('idle'); // idle, processing, waiting_input, executing_action, ended, error
   const [userResponses, setUserResponses] = useState({}); // Para nodos de decisión
   const [userMessageForNode, setUserMessageForNode] = useState(null); // Para nodos de mensaje
+
+  console.log('[Simulation] Inicializando componente de simulación');
 
   const startNode = safeNodes.find(n => n.type === 'start' || n.type === 'startNode' || (typeof n.type === 'string' && n.type.toLowerCase().includes('start')));
   const initialStartNodeId = startNode?.id;
@@ -283,6 +332,88 @@ const SimulationInterface = ({
         }
         break;
 
+      case 'emotionDetection':
+        setFlowStatus('executing_action');
+        addMessageToHistory({
+          id: `system-executing-emotion-${node.id}`,
+          type: 'system',
+          content: t('simulation.executingEmotionDetection', 'Ejecutando Nodo de Detección de Emoción...'),
+          isActionStatus: true,
+          timestamp: new Date().toISOString(),
+        });
+
+        // Determinar el texto de entrada para el nodo de emoción
+        let inputText = '';
+        const sourceEdges = safeEdges.filter(edge => edge.target === node.id);
+        if (sourceEdges.length > 0) {
+          const sourceEdge = sourceEdges[0];
+          const sourceNode = safeNodes.find(n => n.id === sourceEdge.source);
+          console.log('[EmotionDetection] Nodo anterior encontrado:', sourceNode);
+          if (sourceNode) {
+            const outputHandle = sourceEdge.sourceHandle || 'default';
+            console.log('[EmotionDetection] Handle de salida del nodo anterior:', outputHandle);
+            if (sourceNode.type === 'message') {
+              if (currentMessageForNode) {
+                inputText = currentMessageForNode;
+              } else {
+                console.log('[EmotionDetection] No se encontró texto con las claves estándar, buscando último mensaje...');
+                const lastMessage = simulationHistory.length > 0 ? simulationHistory[simulationHistory.length - 1].content : '';
+                inputText = lastMessage;
+              }
+            } else {
+              console.log('[EmotionDetection] Buscando texto en los datos del nodo anterior:', sourceNode.data);
+              inputText = sourceNode.data.text || sourceNode.data.message || sourceNode.data.content || '';
+              if (!inputText) {
+                console.log('[EmotionDetection] No se encontró texto en los datos del nodo anterior, intentando con currentResponses');
+                inputText = currentResponses[sourceNode.id] || '';
+              }
+            }
+            console.log('[EmotionDetection] Texto extraído de los datos del nodo anterior:', inputText);
+          }
+        } else {
+          console.log('[EmotionDetection] Intentando extraer texto de currentResponses:', currentResponses);
+          inputText = Object.values(currentResponses).find(val => typeof val === 'string' && val.trim() !== '') || '';
+        }
+        console.log('[EmotionDetection] Texto extraído final:', inputText);
+
+        const emotionResult = await executeEmotionDetectionNodeAction(node.data, currentResponses, inputText, t);
+
+        if (emotionResult.success) {
+          const { detectedEmotion } = emotionResult.data;
+          
+          // No usar useFlowStore, simplemente continuar con el flujo
+          console.log('[EmotionDetection] Emoción detectada:', detectedEmotion);
+
+          // Encontrar la rama correspondiente a la emoción detectada
+          const nextEdge = safeEdges.find(edge => edge.source === node.id && edge.sourceHandle === `emotion-${detectedEmotion}`);
+          
+          if (nextEdge) {
+            await processNode(nextEdge.target, currentResponses, currentMessageForNode);
+          } else {
+            // Si no hay una rama para la emoción, el flujo podría terminar aquí
+            setFlowStatus('ended');
+            addMessageToHistory({
+              id: 'flow-end-no-emotion-branch',
+              type: 'system',
+              content: t('simulation.flowEndedNoEmotionBranch', 'Flujo finalizado: No hay rama para la emoción detectada.'),
+              timestamp: new Date().toISOString(),
+            });
+          }
+        } else {
+          setFlowStatus('error');
+          addMessageToHistory({
+            id: `error-emotion-${node.id}`,
+            type: 'error',
+            content: t('simulation.errorEmotionDetection', 'Error al detectar la emoción: ') + emotionResult.error,
+            timestamp: new Date().toISOString(),
+          });
+          if (analyticsTracker) {
+            try { analyticsTracker('simulation_node_error', { nodeId: node.id, nodeType: node.type, error: emotionResult.error }); } catch(e) {}
+          }
+        }
+        return;
+        break;
+
       case 'ai':
         addMessageToHistory({
           id: `action-status-${node.id}`,
@@ -355,6 +486,7 @@ const SimulationInterface = ({
   }, [safeNodes, safeEdges, addMessageToHistory, t, analyticsTracker]);
 
   const startSimulation = useCallback(() => {
+    console.log('[Simulation] Iniciando simulación. Estado actual:', flowStatus);
     setSimulationHistory([]);
     setUserResponses({});
     setUserMessageForNode(null);
@@ -387,6 +519,29 @@ const SimulationInterface = ({
     }
   }, [simulationHistory, scrollToBottom, flowStatus]);
 
+  useEffect(() => {
+    console.log('[Simulation] useEffect para nodes o edges detectado. Estado de simulación:', flowStatus);
+    // Evitar reinicio si la simulación ya está en curso y no hay cambios significativos
+    if (flowStatus !== 'idle') {
+      console.log('[Simulation] Simulación en curso, verificando si hay cambios significativos en nodes o edges');
+      // Aquí puedes agregar lógica para comparar los nodos o aristas anteriores con los nuevos
+      // Por ahora, simplemente no reiniciamos automáticamente
+      console.log('[Simulation] No se reiniciará la simulación automáticamente');
+      return;
+    }
+    console.log('[Simulation] Reinicio detectado. Estado cambiado a idle');
+    setFlowStatus('idle');
+    setSimulationHistory([]);
+    setUserResponses({});
+    setUserMessageForNode(null);
+    setCurrentNodeId(null);
+    // Iniciar simulación nuevamente después de un reinicio
+    setTimeout(() => {
+      console.log('[Simulation] Iniciando simulación después de reinicio');
+      startSimulation();
+    }, 0);
+  }, [nodes, edges, startSimulation]);
+
   const handleUserInputSubmit = async (e) => {
     e.preventDefault();
     if (!userInput.trim() || flowStatus !== 'waiting_input') return;
@@ -415,6 +570,13 @@ const SimulationInterface = ({
             addMessageToHistory({ id: 'flow-end-after-user-message', type: 'system', content: t('simulation.flowEndedAfterUserMessage', 'Flujo finalizado después de tu mensaje.'), timestamp: new Date().toISOString() });
         }
     }
+  };
+
+  const handleClose = () => {
+    setIsClosing(true);
+    setTimeout(() => {
+      onClose();
+    }, 300); // Duración de la animación en ms
   };
 
   const handleOptionClick = async (optionLabel) => {
@@ -484,69 +646,54 @@ const SimulationInterface = ({
   const isEnded = flowStatus === 'ended';
   const isError = flowStatus === 'error';
 
-
   return (
-    <div className="ts-simulation-interface" style={mainStyle}>
+    <div className={`ts-simulation-interface ${isClosing ? 'ts-closing' : ''}`} style={mainStyle}>
       <div className="ts-header">
-        <h3>{t('simulation.title', 'Simulación de Conversación')}</h3>
-        <div className="ts-header-controls">
-          <button
-            className="ts-btn-reset"
-            onClick={() => {
-              if (window.confirm(t('simulation.confirmReset', '¿Reiniciar simulación?'))) {
-                startSimulation();
-              }
-            }}
-            aria-label={t('simulation.reset', 'Reiniciar')}
-          >
-            <i className="fas fa-undo"></i>
-          </button>
-          <button className="ts-btn-close" onClick={onClose} aria-label={t('simulation.close', 'Cerrar')}> ✕ </button>
-        </div>
+        <h2>{t('simulation.title', 'Simulación')}</h2>
+        <button onClick={handleClose} className="ts-close-btn" aria-label={t('simulation.close', 'Cerrar')}>
+          <i className="fas fa-times"></i>
+        </button>
       </div>
-
-      <div className="ts-conversation-wrapper">
-        <div className="ts-conversation-container" ref={scrollRef} onScroll={() => {
-          if (scrollRef.current) {
-            const { scrollTop, scrollHeight, clientHeight } = scrollRef.current;
-            setScrollToBottom(scrollHeight - scrollTop - clientHeight < 20);
-          }
-        }}>
-          {simulationHistory.length > 0 ? (
-            simulationHistory.map((message, index) => (
-              <MessageItem key={`msg-${index}-${message.id}`} message={message} />
-            ))
-          ) : (
-            <div className="ts-message ts-system">
-              <div className="ts-message-content">{t('simulation.startPrompt', 'Comienza la conversación...')}</div>
-            </div>
-          )}
-          {isExecuting && (
-            <div className="ts-message ts-system ts-action-status ts-typing">
-              <div className="ts-message-content ts-typing-content">
-                <div className="ts-typing-indicator"><span></span><span></span><span></span></div>
-                 {t('simulation.executingAction', 'Procesando acción...')}
+      <div className="ts-chat-container" ref={scrollRef}>
+        {simulationHistory.length > 0 ? (
+          simulationHistory.map((msg) => (
+            <div key={msg.id} className={`ts-message ts-${msg.type}${msg.isActionStatus ? ' ts-action-status' : ''}`}>
+              {msg.type === 'bot' && !msg.isActionStatus && <div className="ts-bot-avatar"></div>}
+              <div className="ts-message-content">
+                <ReactMarkdown>{msg.content}</ReactMarkdown>
+                {msg.timestamp && <div className="ts-timestamp">{new Date(msg.timestamp).toLocaleTimeString()}</div>}
               </div>
             </div>
-          )}
-          <div className="ts-scroll-anchor"></div>
-        </div>
+          ))
+        ) : (
+          <div className="ts-message ts-system">
+            <div className="ts-message-content">{t('simulation.startPrompt', 'Comienza la conversación...')}</div>
+          </div>
+        )}
+        {flowStatus === 'waiting_input' && (
+          <div className="ts-message ts-system ts-action-status">
+            <div className="ts-message-content">
+              {t('simulation.waitingForInput', 'Esperando tu respuesta...')}
+            </div>
+          </div>
+        )}
+        {flowStatus === 'ended' && (
+          <div className="ts-message ts-system ts-action-status">
+            <div className="ts-message-content">
+              {t('simulation.flowEnded', 'El flujo ha finalizado.')}
+            </div>
+          </div>
+        )}
+        {flowStatus === 'error' && (
+          <div className="ts-message ts-error ts-action-status">
+            <div className="ts-message-content">
+              <strong>{t('simulation.error', 'Error')}:</strong> {t('simulation.errorGeneric', 'Ocurrió un error.')}
+            </div>
+          </div>
+        )}
       </div>
 
-      {isWaitingForUserInput && currentDecisionOptions.length > 0 ? (
-        <div className="ts-decision-options">
-          {currentDecisionOptions.map((option, index) => (
-            <button
-              key={`option-${index}`}
-              onClick={() => handleOptionClick(option)}
-              className="ts-decision-option-btn"
-              disabled={isExecuting}
-            >
-              {option}
-            </button>
-          ))}
-        </div>
-      ) : isWaitingForUserInput && currentProcessingNode?.type === 'message' ? (
+      {flowStatus === 'waiting_input' && (
         <form onSubmit={handleUserInputSubmit} className="ts-user-input-container">
           <input
             ref={inputRef}
@@ -558,31 +705,44 @@ const SimulationInterface = ({
             disabled={isExecuting}
             aria-label={t('simulation.inputLabel', 'Tu respuesta')}
           />
-          <button type="submit" disabled={isExecuting || !userInput.trim()} aria-label={t('simulation.send', 'Enviar')}>
+          <button
+            type="submit"
+            disabled={isExecuting || !userInput.trim()}
+            aria-label={t('simulation.send', 'Enviar')}
+          >
             <i className="fas fa-paper-plane"></i>
           </button>
         </form>
-      ) : null}
+      )}
       
-      {(isEnded || isError) && (
-         <div className="ts-message ts-system">
-            <div className="ts-message-content">
-                {isEnded && t('simulation.conversationEnded', 'La conversación ha finalizado.')}
-                {isError && t('simulation.conversationError', 'La conversación ha finalizado debido a un error.')}
-            </div>
+      {flowStatus === 'waiting_input' && currentNodeId && safeNodes.find(n => n.id === currentNodeId)?.type === 'decision' && (
+        <div className="ts-decision-options">
+          {safeNodes
+            .filter(
+              (node) =>
+                node.type === 'option' &&
+                node.data.parentDecisionNodeId === currentNodeId
+            )
+            .map((optionNode) => (
+              <button
+                key={optionNode.id}
+                onClick={() => handleOptionClick(optionNode.data.label)}
+                className="ts-decision-option-btn"
+                disabled={flowStatus !== 'waiting_input'}
+              >
+                {optionNode.data.label}
+              </button>
+            ))}
         </div>
       )}
-
-      <div className="ts-simulation-info">
-        <div className="ts-current-node">
-          <span>{t('simulation.currentNode', 'Nodo actual')}: </span>
-          {currentProcessingNode ? (
-            <strong>{currentProcessingNode.data?.label || currentProcessingNode.data?.question || currentProcessingNode.id}</strong>
-          ) : (
-            <em>{flowStatus === 'ended' ? t('simulation.flowEndedState', 'Finalizado') : t('simulation.noNode', 'Ninguno')}</em>
-          )}
+      
+      {(flowStatus === 'ended' || flowStatus === 'error') && (
+        <div className="ts-restart-container">
+          <button onClick={startSimulation} className="ts-restart-btn">
+            {t('simulation.restart', 'Reiniciar Simulación')}
+          </button>
         </div>
-      </div>
+      )}
     </div>
   );
 };

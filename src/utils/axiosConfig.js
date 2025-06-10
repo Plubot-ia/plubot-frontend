@@ -98,8 +98,7 @@ instance.interceptors.response.use(
       try {
         const refreshToken = localStorage.getItem('refresh_token') || sessionStorage.getItem('refresh_token');
         if (refreshToken) {
-          const refreshUrl = isDevelopment ? `${baseURL}/auth/refresh` : `${baseURL}/api/auth/refresh`;
-          const response = await axios.post(refreshUrl, { 
+          const response = await axios.post(`${baseURL}/auth/refresh`, { 
             refresh_token: refreshToken 
           }, {
             _retry: true // Marcar como reintento para evitar bucles
@@ -132,7 +131,7 @@ instance.interceptors.response.use(
         }
         
         // Redirigir al login si no se puede renovar el token
-        if (window.location.pathname !== '/login') {
+        if (window.location.pathname !== '/auth/login') {
           if (isDevelopment) {
             console.log('[axiosConfig] Redirigiendo a login por sesión expirada');
           }
@@ -144,7 +143,7 @@ instance.interceptors.response.use(
           sessionStorage.removeItem('refresh_token');
           
           // Redirigir con parámetro de sesión expirada
-          window.location.href = '/login?session_expired=true';
+          window.location.href = '/auth/login?session_expired=true';
         }
         
         return Promise.reject(refreshError);

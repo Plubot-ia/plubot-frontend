@@ -153,7 +153,26 @@ export const NODE_CATEGORIES = [
             { type: NODE_TYPES.POWER_NODE, label: NODE_LABELS.POWER_NODE, icon: 'fas fa-plug' },
         ]
     },
-]; // End of NODE_CATEGORIES. The 'ai' category is removed as AI nodes will be under 'Powers'.
+  {
+    id: 'ai',
+    label: 'Inteligencia Artificial',
+    icon: 'fas fa-robot',
+    nodes: [
+      {
+        type: 'ai',
+        label: 'IA Genérica',
+        icon: 'fas fa-brain',
+        description: 'Un nodo de IA configurable para diversas tareas.',
+      },
+      {
+        type: 'emotionDetection',
+        label: 'Detección de Emoción',
+        icon: 'fas fa-smile-beam',
+        description: 'Detecta la emoción predominante en un texto.',
+      },
+    ],
+  },
+]; // End of NODE_CATEGORIES.
 
 // Función para obtener los datos iniciales de un nodo
 export const getNodeInitialData = (nodeType, nodeLabel, powerItemData = null) => {

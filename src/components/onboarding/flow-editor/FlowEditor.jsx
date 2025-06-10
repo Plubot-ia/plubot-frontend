@@ -64,6 +64,7 @@ const HttpRequestNode = lazy(() => import('../nodes/httprequestnode/HttpRequestN
 const PowerNode = lazy(() => import('../nodes/powernode/PowerNode.jsx'));
 const DiscordNode = lazy(() => import('../nodes/discordnode/DiscordNode.tsx'));
 const AiNode = lazy(() => import('../nodes/ainode/AiNode')); // Import for the new AI Node
+const EmotionDetectionNode = lazy(() => import('../nodes/emotiondetectionnode'));
 
 // Estilos
 import './FlowEditor.css';
@@ -142,6 +143,7 @@ const useNodeTypes = (isUltraPerformanceMode = false) => {
       power: createNodeRenderer(PowerNode),
       discord: createNodeRenderer(DiscordNode), // Registered DiscordNode
       ai: createNodeRenderer(AiNode), // Registered AiNode
+      emotionDetection: createNodeRenderer(EmotionDetectionNode),
     };
   }, [nodeStyles]);
 };
@@ -177,10 +179,10 @@ const useHandleValidator = (nodes, edges) => {
   // Mapa de conexiones válidas por tipo de nodo
   const validConnections = useMemo(() => ({
     // Nodo de inicio solo puede conectarse a nodos de mensaje, decisión o acción
-    start: ['message', 'decision', 'action', 'httpRequest', 'power', 'discord', 'ai'], 
+    start: ['message', 'decision', 'action', 'httpRequest', 'power', 'discord', 'ai', 'emotionDetection'], 
     
     // Nodo de mensaje puede conectarse a cualquier tipo excepto a sí mismo
-    message: ['message', 'end', 'decision', 'action', 'option', 'httpRequest', 'power', 'discord', 'ai'], 
+    message: ['message', 'end', 'decision', 'action', 'option', 'httpRequest', 'power', 'discord', 'ai', 'emotionDetection'], 
     
     // Nodo de decisión puede conectarse a cualquier tipo excepto inicio
     decision: ['message', 'end', 'action', 'option', 'httpRequest', 'power', 'discord', 'ai'],
@@ -201,7 +203,10 @@ const useHandleValidator = (nodes, edges) => {
     discord: ['message', 'end', 'decision', 'action', 'option', 'httpRequest', 'power', 'discord', 'ai'],
 
     // Nodo AI: Puede conectarse a la mayoría y recibir de la mayoría (excepto start)
-    ai: ['message', 'decision', 'action', 'end', 'httpRequest', 'power', 'discord', 'ai'],
+    ai: ['message', 'decision', 'action', 'end', 'httpRequest', 'power', 'discord', 'ai', 'emotionDetection'],
+
+    // Nodo de Detección de Emociones: Puede conectarse a la mayoría de nodos.
+    emotionDetection: ['message', 'end', 'decision', 'action', 'option', 'httpRequest', 'power', 'discord', 'ai'],
 
     // Nodo final no puede conectarse a ningún otro nodo
     end: []
@@ -570,6 +575,25 @@ const FlowEditorInner = ({
   }, [onEdgesChange]);
   
   // Función para conectar nodos
+  const isValidConnection = useCallback((connection) => {
+    // Evita que un nodo se conecte a sí mismo.
+    if (connection.source === connection.target) {
+      return false;
+    }
+
+    // Regla: Un handle de tipo 'target' solo puede tener una conexión entrante.
+    // Esto previene que a un nodo le lleguen múltiples flujos al mismo punto de entrada.
+    const isTargetHandleAlreadyConnected = edges.some(
+      (edge) => edge.target === connection.target && edge.targetHandle === connection.targetHandle
+    );
+
+    if (isTargetHandleAlreadyConnected) {
+      return false;
+    }
+
+    return true;
+  }, [edges]);
+
   const onConnectNodes = useCallback((params) => {
     // Guardar estado actual en el historial antes de conectar
     saveHistoryState(nodes, edges);
@@ -1071,6 +1095,7 @@ const FlowEditorInner = ({
           onNodesChange={onNodesChangeOptimized}
           onEdgesChange={onEdgesChangeOptimized}
           onConnect={onConnectNodes}
+          isValidConnection={isValidConnection}
           nodeTypes={nodeTypes}
           edgeTypes={edgeTypes}
           project={{
@@ -1102,6 +1127,7 @@ const FlowEditorInner = ({
               nodes={nodes}
               edges={edges}
               onClose={() => setShowSimulation(false)}
+              isUltraMode={isUltraMode}
             />
           </Suspense>
         )}

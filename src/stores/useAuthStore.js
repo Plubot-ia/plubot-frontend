@@ -40,7 +40,7 @@ const useAuthStore = create(
           console.log('Enviando datos de login:', { email: email.trim() });
           
           // Aumentar el timeout para esta solicitud específica y configurar para FormData
-          const loginResponse = await instance.post('/api/auth/login', formData, {
+          const loginResponse = await instance.post('/auth/login', formData, {
             timeout: 30000, // 30 segundos para dar más tiempo en producción
             headers: {
               'Content-Type': 'multipart/form-data'
@@ -54,7 +54,7 @@ const useAuthStore = create(
             localStorage.setItem('access_token', data.access_token);
             
             // Obtener el perfil del usuario
-            const profileResponse = await instance.get('/api/auth/profile', {
+            const profileResponse = await instance.get('/auth/profile', {
               headers: {
                 'Authorization': `Bearer ${data.access_token}`
               },
@@ -115,7 +115,7 @@ const useAuthStore = create(
           formData.append('password', password);
           
           // Configuración especial para enviar FormData
-          const response = await instance.post('/api/auth/register', formData, {
+          const response = await instance.post('/auth/register', formData, {
             headers: {
               'Content-Type': 'multipart/form-data'
             }
@@ -235,7 +235,7 @@ const useAuthStore = create(
         
         try {
           // Verificar token con el servidor
-          const response = await instance.get('/api/auth/profile', {
+          const response = await instance.get('/auth/profile', {
             headers: { 'Authorization': `Bearer ${token}` },
             // Evitar caché del navegador
             params: { _: Date.now() }
@@ -446,7 +446,7 @@ const useAuthStore = create(
           
           while (retryCount < maxRetries) {
             try {
-              response = await instance.get('/api/auth/profile', {
+              response = await instance.get('/auth/profile', {
                 headers: { 'Authorization': `Bearer ${token}` },
                 params: { _t: Date.now() }, // Evitar caché del navegador
                 timeout: 15000 // 15 segundos de timeout
@@ -775,7 +775,7 @@ const useAuthStore = create(
           console.log('Procesando token de autenticación de Google:', token);
           
           // Enviar el token al backend para verificarlo
-          const response = await instance.post('/api/auth/google/success', { token });
+          const response = await instance.post('/auth/google/success', { token });
           console.log('Respuesta del backend al procesar token:', response.data);
           
           if (response.data?.success === true) {
@@ -783,7 +783,7 @@ const useAuthStore = create(
             localStorage.setItem('access_token', response.data.access_token);
             
             // Obtener el perfil del usuario
-            const profileResponse = await instance.get('/api/auth/profile', {
+            const profileResponse = await instance.get('/auth/profile', {
               headers: {
                 'Authorization': `Bearer ${response.data.access_token}`
               }
@@ -876,7 +876,7 @@ const useAuthStore = create(
             console.log('[Auth] Actualizando perfil...', updates);
           }
           
-          const response = await instance.put('/api/auth/profile', formData, {
+          const response = await instance.put('/auth/profile', formData, {
             headers: {
               'Content-Type': 'multipart/form-data',
             },

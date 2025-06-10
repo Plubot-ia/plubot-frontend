@@ -37,7 +37,8 @@ const getNodeIcon = (iconIdentifier) => {
     case 'fas fa-link': return <Link size={20} />; 
     case 'fas fa-database': return <Database size={20} />; 
     case 'fas fa-plug': return <PlugZap size={20} />; 
-    case 'fas fa-brain': return <Brain size={20} />; 
+    case 'fas fa-brain': return <Brain size={20} />;
+    case 'emotionDetection': return <Brain size={20} color="#e9829b" />; 
     case 'fas fa-language': return <Languages size={20} />; 
     case 'start': return <PlayCircle size={20} />;
     case 'message': return <MessageCircle size={20} />;

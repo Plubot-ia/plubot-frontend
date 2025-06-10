@@ -242,39 +242,37 @@ const ByteAssistant = ({ simulationMode }) => {
 
       <div className="ts-byte-messages">
         <div className="ts-message-container">
-          {messages.map((msg) => (
+          {messages.map((msg, index) => (
             <div
-              key={msg.id}
-              className={`ts-message-bubble ts-message-${msg.sender} ts-message-type-${msg.type}`}
-              style={{
-                borderColor: getTypeColor(msg.type),
-                boxShadow: `0 0 6px ${getTypeColor(msg.type)}`,
-              }}
+              key={msg.id || index}
+              className={`ts-message-bubble ts-message-${msg.sender}`}
+              style={{ borderColor: getTypeColor(msg.type) }}
             >
               <p>{msg.text}</p>
             </div>
           ))}
+          {isLoading && (
+            <div className="ts-message-bubble ts-message-byte">
+              <p>Escribiendo...</p>
+            </div>
+          )}
           <div ref={messagesEndRef} />
         </div>
-
-        <form onSubmit={handleSendMessage} className="ts-byte-input-container">
-          <input
-            type="text"
-            className="ts-byte-input"
-            value={userInput}
-            onChange={(e) => setUserInput(e.target.value)}
-            placeholder="Pregunta a Byte..."
-            disabled={isLoading}
-          />
-          <button
-            type="submit"
-            className="ts-byte-send-btn"
-            disabled={isLoading || !userInput.trim()}
-          >
-            {isLoading ? '...' : 'Enviar'}
-          </button>
-        </form>
       </div>
+
+      <form onSubmit={handleSendMessage} className="ts-byte-form">
+        <input
+          type="text"
+          value={userInput}
+          onChange={(e) => setUserInput(e.target.value)}
+          placeholder="Pregunta a Byte..."
+          className="ts-byte-input"
+          disabled={isLoading}
+        />
+        <button type="submit" className="ts-byte-submit" disabled={isLoading}>
+          Enviar
+        </button>
+      </form>
     </div>
   );
 };

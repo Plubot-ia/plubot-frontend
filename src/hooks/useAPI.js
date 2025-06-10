@@ -59,7 +59,7 @@ const useAPI = () => {
           console.error('No se pudo renovar el token. Redirigiendo al login...');
           localStorage.removeItem('access_token');
           localStorage.removeItem('refresh_token');
-          window.location.href = '/login?expired=true';
+          window.location.href = '/auth/login?expired=true';
           throw new Error('Sesión expirada. Por favor, inicia sesión nuevamente.');
         }
       }
@@ -110,8 +110,8 @@ const useAPI = () => {
         localStorage.removeItem('refresh_token');
         
         // Solo redirigir si no estamos ya en la página de login
-        if (!window.location.pathname.includes('/login')) {
-          window.location.href = '/login?expired=true';
+        if (!window.location.pathname.includes('/auth/login')) {
+          window.location.href = '/auth/login?expired=true';
         }
         
         throw new Error('Sesión expirada o no autorizada. Por favor, inicia sesión nuevamente.');

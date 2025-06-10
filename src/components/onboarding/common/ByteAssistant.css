@@ -1,17 +1,21 @@
+/* Estructura principal del asistente */
 .ts-byte-assistant {
     position: fixed;
-    bottom: 0; /* Eliminar margen inferior completamente */
+    bottom: 1rem;
     right: 1rem;
-    width: 300px;
-    height: 450px;
+    width: 320px;
+    max-height: 500px;
     z-index: 1002;
     display: flex;
     flex-direction: column;
-    transition: width 0.3s ease;
-    overflow: hidden;
-    border: 1px solid #00e0ff; /* Añadir borde para cerrar el cuadrado correctamente */
-    border-radius: 8px 8px 0 0; /* Redondear solo las esquinas superiores */
-    background-color: rgba(10, 20, 35, 0.95); /* Fondo oscuro semi-transparente */
+    gap: 1rem;
+    padding: 1rem;
+    border: 1px solid var(--ts-border-primary, rgba(0, 224, 255, 0.5));
+    border-radius: 12px;
+    background: rgba(16, 16, 24, 0.85);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 0 20px -5px var(--ts-shadow-glow, rgba(0, 224, 255, 0.5));
+    transition: all 0.4s ease;
 }
 
 .ts-byte-expanded {
@@ -19,48 +23,52 @@
 }
 
 .ts-byte-with-simulation {
-    bottom: 100px; /* Adjust for SimulationInterface */
+    bottom: 100px;
 }
 
+/* --- CABECERA Y AVATAR --- */
 .ts-byte-header {
-    flex-shrink: 0; /* Prevent shrinking */
+    flex-shrink: 0;
     display: flex;
     flex-direction: column;
-    width: 100%;
+    align-items: center;
+    position: relative;
 }
 
 .ts-byte-controls {
-    position: sticky;
-    top: 0;
+    position: absolute;
+    top: -8px;
+    right: -8px;
     display: flex;
-    justify-content: flex-end;
-    width: 100%;
-    gap: 0.5rem; /* Space between buttons */
-    z-index: 1003;
+    gap: 0.5rem;
 }
 
 .ts-byte-control-btn {
-    background: rgba(18, 18, 40, 0.7); /* Background moved to buttons */
-    border: 1px solid #00e0ff;
-    color: #e0e0ff;
-    padding: 0.3rem 0.6rem;
-    border-radius: 4px;
-    font-size: 0.7rem;
+    background: rgba(20, 20, 30, 0.8);
+    border: 1px solid var(--ts-border-primary-alpha, rgba(0, 224, 255, 0.3));
+    color: var(--ts-text-secondary, #a0a0c0);
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    font-size: 1rem;
     cursor: pointer;
     transition: all 0.3s ease;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    line-height: 1;
 }
 
 .ts-byte-control-btn:hover {
-    background: rgba(0, 224, 255, 0.2);
-    box-shadow: 0 0 5px #00e0ff;
+    background: var(--ts-accent-primary, #00e0ff);
+    color: #101018;
+    box-shadow: 0 0 8px var(--ts-accent-primary, #00e0ff);
 }
 
 .ts-byte-hologram {
-    height: 150px;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: transform 0.3s ease;
 }
 
 .ts-byte-image-container {
@@ -71,22 +79,16 @@
 }
 
 .ts-byte-image {
-    width: 120px;
-    height: 120px;
+    width: 100px;
+    height: 100px;
     object-fit: contain;
     position: relative;
     z-index: 2;
     animation: ts-byteFloat 4s ease-in-out infinite;
 }
 
-/* Desactivar animación en modo Ultra */
-.ts-byte-ultra-mode .ts-byte-image {
+body.ultra-mode .ts-byte-image {
     animation: none !important;
-}
-
-/* Garantizar que la animación esté activa en modo normal */
-body:not(.ultra-mode) .ts-byte-image:not(.ts-byte-static) {
-    animation: ts-byteFloat 4s ease-in-out infinite;
 }
 
 .ts-byte-thinking {
@@ -101,8 +103,128 @@ body:not(.ultra-mode) .ts-byte-image:not(.ts-byte-static) {
     z-index: 1;
     opacity: 0.3;
     animation: ts-neonPulse 2s infinite;
+    filter: blur(10px);
 }
 
+/* --- ÁREA DE MENSAJES --- */
+.ts-byte-messages {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: rgba(0,0,0,0.2);
+    border-radius: 8px;
+}
+
+.ts-message-container {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    /* Firefox scrollbar */
+    scrollbar-width: auto;
+    scrollbar-color: rgba(0, 224, 255, 0.6) rgba(0,0,0,0.3);
+}
+
+/* Webkit scrollbar styles */
+.ts-message-container::-webkit-scrollbar {
+    width: 10px;
+}
+
+.ts-message-container::-webkit-scrollbar-track {
+    background: rgba(0,0,0,0.3);
+    border-radius: 10px;
+}
+
+.ts-message-container::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 224, 255, 0.5);
+    border-radius: 10px;
+    border: 2px solid rgba(0, 224, 255, 0.7);
+    transition: all 0.3s ease;
+}
+
+.ts-message-container::-webkit-scrollbar-thumb:hover {
+    background-color: #00e0ff;
+    border-color: #00e0ff;
+    box-shadow: 0 0 5px #00e0ff;
+}
+
+.ts-message-bubble {
+    padding: 0.8rem 1rem;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    color: var(--ts-text-primary, #e0e0ff);
+    line-height: 1.5;
+    border: 1px solid;
+    animation: ts-messageFade 0.4s ease-out;
+    max-width: 90%;
+}
+
+.ts-message-user {
+    background: rgba(100, 80, 220, 0.2);
+    border-color: rgba(100, 80, 220, 0.8);
+    align-self: flex-end;
+    border-top-right-radius: 4px;
+}
+
+.ts-message-byte {
+    background: rgba(0, 150, 200, 0.15);
+    border-color: rgba(0, 150, 200, 0.6);
+    align-self: flex-start;
+    border-top-left-radius: 4px;
+}
+
+/* --- FORMULARIO DE ENTRADA --- */
+.ts-byte-form {
+    display: flex;
+    width: 100%;
+    gap: 0.75rem;
+    flex-shrink: 0;
+}
+
+.ts-byte-input {
+    flex: 1;
+    padding: 0.8rem;
+    border-radius: 6px;
+    border: 1px solid var(--ts-border-primary-alpha, rgba(0, 224, 255, 0.3));
+    background: rgba(0,0,0,0.3);
+    color: var(--ts-text-primary, #e0e0ff);
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+}
+
+.ts-byte-input:focus {
+    outline: none;
+    border-color: var(--ts-accent-primary, #00e0ff);
+    background: rgba(0,0,0,0.1);
+    box-shadow: 0 0 8px -2px var(--ts-accent-primary, #00e0ff);
+}
+
+.ts-byte-submit {
+    padding: 0.8rem 1.2rem;
+    border-radius: 6px;
+    border: 1px solid var(--ts-accent-primary, #00e0ff);
+    background: transparent;
+    color: var(--ts-accent-primary, #00e0ff);
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.ts-byte-submit:hover:not(:disabled) {
+    background: var(--ts-accent-primary, #00e0ff);
+    color: #101018;
+    box-shadow: 0 0 10px var(--ts-accent-primary, #00e0ff);
+}
+
+.ts-byte-submit:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* --- ESTADO MINIMIZADO --- */
 .ts-byte-minimized {
     position: fixed;
     bottom: 1rem;
@@ -114,10 +236,16 @@ body:not(.ultra-mode) .ts-byte-image:not(.ts-byte-static) {
     display: flex;
     justify-content: center;
     align-items: center;
-    animation: ts-neonPulse 2s infinite;
+    animation: ts-neonPulse 2.5s infinite;
     border-radius: 50%;
-    background: rgba(18, 18, 40, 0.7);
-    border: 2px solid #00e0ff;
+    background: rgba(16, 16, 24, 0.9);
+    border: 2px solid var(--ts-accent-primary, #00e0ff);
+    transition: all 0.3s ease;
+}
+
+.ts-byte-minimized:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 15px var(--ts-accent-primary, #00e0ff);
 }
 
 .ts-byte-icon-minimized {
@@ -127,227 +255,42 @@ body:not(.ultra-mode) .ts-byte-image:not(.ts-byte-static) {
     animation: ts-byteFloat 4s ease-in-out infinite;
 }
 
-.ts-byte-messages {
-    flex: 1; /* Take remaining space */
-    background: rgba(18, 18, 40, 0.7);
-    backdrop-filter: blur(5px);
-    padding: 1rem;
-    border-radius: 8px;
-    border: 2px solid #00e0ff;
-    box-shadow: 0 0 4px #00e0ff;
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-}
-
-.ts-message-container {
-    flex: 1;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    margin-bottom: 0.8rem;
-    scrollbar-width: thin; /* Visible scrollbar in Firefox */
-    scrollbar-color: #00e0ff #171727;
-}
-
-.ts-message-container::-webkit-scrollbar {
-    width: 6px; /* Visible scrollbar in Chrome/Safari */
-}
-
-.ts-message-container::-webkit-scrollbar-track {
-    background: #171727;
-}
-
-.ts-message-container::-webkit-scrollbar-thumb {
-    background-color: #00e0ff;
-    border-radius: 6px;
-}
-
-.ts-message-bubble {
-    padding: 0.8rem;
-    border-radius: 6px;
-    font-size: 0.9rem;
-    color: #e0e0ff;
-    letter-spacing: 0.5px;
-    border: 1px solid transparent;
-    transition: all 0.3s ease;
-    animation: ts-messageFade 0.3s ease-out;
-    max-width: 85%;
-}
-
-.ts-message-user {
-    background: rgba(255, 0, 255, 0.2);
-    border: 1px solid #ff00ff;
-    align-self: flex-end;
-    text-align: right;
-}
-
-.ts-message-byte {
-    background: rgba(0, 224, 255, 0.2);
-    border: 1px solid #00e0ff;
-    align-self: flex-start;
-}
-
-.ts-message-system {
-    background: #171727;
-    align-self: center;
-    text-align: center;
-}
-
-.ts-message-bubble p {
-    margin: 0;
-}
-
-.ts-message-type-error {
-    border-left: 3px solid #ff2e5b;
-}
-
-.ts-message-type-success {
-    border-left: 3px solid #00ff9d;
-}
-
-.ts-message-type-warning {
-    border-left: 3px solid #ffb700;
-}
-
-.ts-byte-input {
-    display: flex;
-    gap: 0.5rem;
-    width: 100%;
-    margin-top: auto; /* Push to bottom */
-}
-
-.ts-byte-text-input {
-    flex: 1;
-    background: rgba(23, 23, 39, 0.8);
-    border: 1px solid #00e0ff;
-    color: #e0e0ff;
-    padding: 0.5rem;
-    border-radius: 4px;
-    font-size: 0.9rem;
-    resize: none;
-    min-height: 40px;
-    max-height: 100px;
-    transition: all 0.3s ease;
-}
-
-.ts-byte-text-input:focus {
-    outline: none;
-    box-shadow: 0 0 5px #00e0ff;
-}
-
-.ts-byte-send-btn {
-    background: #00e0ff;
-    color: #0a0a14;
-    border: none;
-    padding: 0.5rem 1rem;
-    border-radius: 4px;
-    cursor: pointer;
-    font-weight: bold;
-    transition: all 0.3s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.ts-byte-send-btn:hover {
-    background: #00c4e0;
-    box-shadow: 0 0 8px #00e0ff;
-}
-
-.ts-byte-send-btn:disabled {
-    background: #555;
-    cursor: not-allowed;
-    opacity: 0.6;
-}
-
-/* Animations */
-@keyframes ts-byteFloat {
-    0% {
-        transform: translateY(0);
-    }
-    50% {
-        transform: translateY(-10px);
-    }
-    100% {
-        transform: translateY(0);
-    }
-}
-
-@keyframes ts-byteThinking {
-    0% {
-        transform: translateY(0) rotate(0deg);
-    }
-    25% {
-        transform: translateY(-5px) rotate(-5deg);
-    }
-    50% {
-        transform: translateY(0) rotate(0deg);
-    }
-    75% {
-        transform: translateY(-5px) rotate(5deg);
-    }
-    100% {
-        transform: translateY(0) rotate(0deg);
-    }
-}
-
-@keyframes ts-neonPulse {
-    0% {
-        box-shadow: 0 0 5px #00e0ff, 0 0 10px #00e0ff;
-    }
-    50% {
-        box-shadow: 0 0 15px #00e0ff, 0 0 20px #00e0ff;
-    }
-    100% {
-        box-shadow: 0 0 5px #00e0ff, 0 0 10px #00e0ff;
-    }
-}
-
+/* --- ANIMACIONES --- */
 @keyframes ts-messageFade {
-    0% {
+    from {
         opacity: 0;
         transform: translateY(10px);
     }
-    100% {
+    to {
         opacity: 1;
         transform: translateY(0);
     }
 }
 
-/* Loading animation */
-.ts-byte-loading {
-    display: flex;
-    gap: 0.3rem;
-    padding: 0.5rem;
-    align-self: flex-start;
-}
-
-.ts-byte-loading-dot {
-    width: 8px;
-    height: 8px;
-    background: #00e0ff;
-    border-radius: 50%;
-    animation: ts-loadingPulse 1.5s infinite ease-in-out;
-}
-
-.ts-byte-loading-dot:nth-child(2) {
-    animation-delay: 0.2s;
-}
-
-.ts-byte-loading-dot:nth-child(3) {
-    animation-delay: 0.4s;
-}
-
-@keyframes ts-loadingPulse {
+@keyframes ts-byteFloat {
     0%, 100% {
-        transform: scale(0.5);
-        opacity: 0.5;
+        transform: translateY(0);
     }
     50% {
-        transform: scale(1);
+        transform: translateY(-8px);
+    }
+}
+
+@keyframes ts-byteThinking {
+    0% { transform: rotate(0deg) scale(1); }
+    25% { transform: rotate(4deg) scale(1.02); }
+    50% { transform: rotate(0deg) scale(1); }
+    75% { transform: rotate(-4deg) scale(1.02); }
+    100% { transform: rotate(0deg) scale(1); }
+}
+
+@keyframes ts-neonPulse {
+    0%, 100% {
+        box-shadow: 0 0 5px var(--ts-accent-primary, #00e0ff), 0 0 10px var(--ts-accent-primary, #00e0ff);
+        opacity: 0.8;
+    }
+    50% {
+        box-shadow: 0 0 10px var(--ts-accent-primary, #00e0ff), 0 0 20px var(--ts-accent-primary, #00e0ff);
         opacity: 1;
     }
 }

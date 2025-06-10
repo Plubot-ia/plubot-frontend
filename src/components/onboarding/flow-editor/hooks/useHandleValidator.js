@@ -32,6 +32,9 @@ const useHandleValidator = () => {
       
       // Usar un timeout para garantizar que no haya actualizaciones continuas
       validationTimeout.current = setTimeout(() => {
+        const ALLOWED_CONNECTIONS = {
+          emotionDetection: ['message', 'ai', 'end', 'lead', 'condition', 'data', 'date', 'delay', 'email', 'math', 'notification', 'random', 'response', 'variable', 'webhook', 'zapier', 'script', 'tag', 'note']
+        };
         const currentEdges = getEdges();
         if (!currentEdges || currentEdges.length === 0) {
           validationRunning.current = false;

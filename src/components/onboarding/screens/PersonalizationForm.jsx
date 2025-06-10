@@ -361,7 +361,7 @@ const PersonalizationForm = () => {
       updateProfile({ plubots: newPlubots });
       
       // Forzar recarga de datos del perfil para asegurar consistencia
-      const profileResponse = await request('GET', '/api/auth/profile');
+      const profileResponse = await request('GET', '/auth/profile');
       if (profileResponse?.status === 'success') {
         updateProfile({
           ...profileResponse.user,
@@ -447,7 +447,7 @@ const PersonalizationForm = () => {
       // Actualizar el perfil del usuario CON DATOS FRESCOS DEL BACKEND
       try {
         console.log('[PersonalizationForm] Forzando recarga de perfil después de crear Plubot...');
-        const profileResponse = await request('GET', '/api/auth/profile');
+        const profileResponse = await request('GET', '/auth/profile');
         if (profileResponse?.success === true && profileResponse?.user) {
           console.log('[PersonalizationForm] Perfil recargado OK. Respuesta del backend (profileResponse directo):', JSON.stringify(profileResponse, null, 2));
           console.log('[PersonalizationForm] Datos del usuario en perfil recargado (profileResponse.user):', JSON.stringify(profileResponse.user, null, 2));

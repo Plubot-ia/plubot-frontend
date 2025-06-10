@@ -24,7 +24,7 @@ const NodePalette = lazy(() => import('../common/NodePalette'));
 const ByteAssistant = lazy(() => import('../common/ByteAssistant'));
 const CustomMiniMap = lazy(() => import('../flow-editor/ui/CustomMiniMap'));
 const ConnectionEditor = lazy(() => import('../simulation/ConnectionEditor'));
-const SimulationInterface = lazy(() => import('../simulation/SimulationInterface'));
+
 
 // Modales con lazy loading
 const SuggestionsModal = lazy(() => import('../modals/SuggestionsModal'));
@@ -1389,17 +1389,6 @@ async function saveFlowData() {
       </div>
       
       {renderModals()}
-      
-      {/* Componentes condicionales */}
-      {showSimulation && (
-        <Suspense fallback={<div className="loading-simulation">Cargando simulación...</div>}>
-          <SimulationInterface 
-            nodes={nodes} 
-            edges={edges} 
-            onClose={() => setShowSimulation(false)} 
-          />
-        </Suspense>
-      )}
       
       {/* ByteAssistant siempre visible */}
       <Suspense fallback={null}>

@@ -84,7 +84,7 @@ const ResetPassword = () => {
       };
 
     const handleNavigateToLogin = () => {
-        navigate('/login');
+        navigate('/auth/login');
         window.scrollTo(0, 0);
     };
 

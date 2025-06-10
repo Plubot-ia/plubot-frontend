@@ -44,7 +44,7 @@ import EdgeContextMenu from './menus/EdgeContextMenu';
 import EliteEdge from '../ui/EliteEdge';
 
 // Importar modales
-import SimulationInterface from '@/components/onboarding/simulation/SimulationInterface';
+
 import EmbedModal from '@/components/onboarding/modals/EmbedModal';
 import SyncModal from '@/components/onboarding/modals/SyncModal';
 import TemplateSelector from '@/components/onboarding/modals/TemplateSelector';
@@ -188,7 +188,7 @@ const FlowMain = ({
   
   // Estados para modales internos (solo los que no vienen de props)
   const [showSyncModal, setShowSyncModal] = useState(false);
-  const [showSimulation, setShowSimulation] = useState(false);
+  
   
   // -----------------------------------------
   // ACCESO AL STORE DE ZUSTAND (SELECTORES)
@@ -1281,16 +1281,7 @@ const FlowMain = ({
           </div>
         )} */}
         
-        {/* Modal de simulación - Activado desde el botón de EpicHeader */}
-        {showSimulation && (
-          <div style={{ pointerEvents: 'auto' }}>
-            <SimulationInterface
-              onClose={() => setShowSimulation(false)}
-              flowId={flowId}
-              plubotInfo={plubotInfo}
-            />
-          </div>
-        )}
+
         
         {/* Modal de compartir (EmbedModal) - Activado desde EpicHeader */}
         {externalShowEmbedModal && (
