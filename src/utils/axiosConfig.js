@@ -5,7 +5,7 @@ import axios from 'axios';
 const isDevelopment = import.meta.env.MODE === 'development';
 const baseURL = isDevelopment 
   ? '/api' // Usará el proxy configurado en vite.config.js
-  : import.meta.env.VITE_API_URL || 'https://plubot-backend.onrender.com';
+  : (import.meta.env.VITE_API_URL || 'https://plubot-backend.onrender.com/api');
 
 // Log para depurar la configuración
 if (isDevelopment) {
