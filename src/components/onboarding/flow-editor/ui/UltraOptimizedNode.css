@@ -1,0 +1,75 @@
+/* UltraOptimizedNode.css - SOLO OPTIMIZACIONES TÉCNICAS */
+/* IMPORTANTE: Este archivo contiene únicamente optimizaciones técnicas y de rendimiento */
+/* Los estilos visuales (colores, bordes, gradientes) están en los CSS individuales de cada tipo de nodo */
+
+/* ============================================================= */
+/* OPTIMIZACIONES DE RENDIMIENTO Y POSICIONAMIENTO */
+/* ============================================================= */
+
+/* Optimizaciones básicas para todos los nodos */
+.flow-editor-wrapper .react-flow__node,
+.flow-editor-container .react-flow__node {
+  position: relative;
+  overflow: visible; /* Crucial para handles */
+  pointer-events: auto;
+}
+
+/* Optimización de capas para contenedores de contenido */
+.flow-editor-wrapper .node-content-container,
+.flow-editor-container .node-content-container {
+  position: relative;
+  z-index: 1;
+  pointer-events: auto;
+}
+
+/* Optimizaciones para estados interactivos */
+.flow-editor-wrapper .react-flow__node.selected,
+.flow-editor-container .react-flow__node.selected {
+  z-index: 10; /* Prioridad de capa */
+  outline: none !important; /* Remover outline default */
+}
+
+.flow-editor-wrapper .react-flow__node:hover,
+.flow-editor-container .react-flow__node:hover {
+  z-index: 5; /* Prioridad media para hover */
+}
+
+/* Eliminar elementos visuales default de ReactFlow */
+.flow-editor-wrapper .react-flow__node,
+.flow-editor-wrapper .react-flow__node-default,
+.flow-editor-wrapper .react-flow__node-input,
+.flow-editor-wrapper .react-flow__node-output,
+.flow-editor-container .react-flow__node,
+.flow-editor-container .react-flow__node-default,
+.flow-editor-container .react-flow__node-input,
+.flow-editor-container .react-flow__node-output {
+  outline: none !important;
+}
+
+/* Eliminar selección visual default de ReactFlow */
+.flow-editor-wrapper .react-flow__selection,
+.flow-editor-container .react-flow__selection {
+  background-color: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+/* ============================================================= */
+/* OPTIMIZACIONES PARA HANDLES (CONECTORES) */
+/* ============================================================= */
+
+.flow-editor-wrapper .react-flow__handle,
+.flow-editor-container .react-flow__handle {
+  z-index: 3; /* Asegurar visibilidad sobre nodos */
+  pointer-events: auto; /* Mejorar interactividad */
+}
+
+/* ============================================================= */
+/* MODO ULTRA-RENDIMIENTO */
+/* ============================================================= */
+
+.flow-editor-wrapper.ultra-performance .react-flow__node,
+.flow-editor-container.ultra-performance .react-flow__node {
+  transition: none !important; /* Eliminar animaciones */
+  will-change: transform; /* Optimización GPU */
+}

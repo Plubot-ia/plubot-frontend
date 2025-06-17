@@ -1,0 +1,57 @@
+/* DESHABILITADO: Estilos de debug para forzar visibilidad de nodos en ReactFlow */
+/*
+.debug-rf-visible .react-flow__node {
+  background-color: #ffcc00 !important;
+  border: 3px solid #ff3333 !important;
+  color: #000000 !important;
+  font-weight: bold !important;
+  min-width: 150px !important;
+  min-height: 60px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  z-index: 1000 !important;
+  box-shadow: 0 0 20px rgba(255,204,0,0.8) !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: all !important;
+  transform: scale(1) !important;
+  position: relative !important;
+}
+
+.debug-rf-visible .react-flow__handle {
+  width: 12px !important;
+  height: 12px !important;
+  background: red !important;
+  border: 2px solid black !important;
+  z-index: 1001 !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+*/
+
+/*
+.debug-rf-visible .react-flow__edge {
+  stroke: #ff3333 !important;
+  stroke-width: 3px !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  z-index: 999 !important;
+}
+*/
+
+/* Overlay para mostrar información de debug - DESHABILITADO */
+/*
+.node-count-overlay {
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  background: rgba(255, 0, 0, 0.8);
+  color: white;
+  padding: 10px;
+  border-radius: 4px;
+  font-weight: bold;
+  z-index: 9999;
+  pointer-events: none;
+}
+*/
