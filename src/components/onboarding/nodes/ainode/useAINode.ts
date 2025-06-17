@@ -57,7 +57,7 @@ const callGrokApi = async (
 };
 
 export const useAINode = ({ id, data }: UseAINodeProps) => {
-  const updateNode = useFlowStore((state) => state.actions.updateNode);
+    const updateNode = useFlowStore((state) => state.updateNode);
 
   // Función genérica para actualizar cualquier parte de node.data
   const updateNodeData = useCallback((newData: Partial<AiNodeData>) => {
