@@ -207,4 +207,25 @@ const DiscordNode: React.FC<NodeProps<DiscordNodeData>> = ({ id, data, selected,
   );
 };
 
-export default memo(DiscordNode);
+const arePropsEqual = (prevProps: NodeProps<DiscordNodeData>, nextProps: NodeProps<DiscordNodeData>) => {
+  // Compare primitive props that change often
+  if (
+    prevProps.selected !== nextProps.selected ||
+    prevProps.isConnectable !== nextProps.isConnectable
+  ) {
+    return false;
+  }
+
+  // Shallow compare relevant data properties
+  const prevData = prevProps.data;
+  const nextData = nextProps.data;
+
+  return (
+    prevData.label === nextData.label &&
+    prevData.discordToken === nextData.discordToken &&
+    prevData.channelId === nextData.channelId &&
+    prevData.messageContent === nextData.messageContent
+  );
+};
+
+export default memo(DiscordNode, arePropsEqual);

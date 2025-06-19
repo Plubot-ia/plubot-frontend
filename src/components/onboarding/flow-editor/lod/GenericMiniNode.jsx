@@ -12,6 +12,27 @@ import { Handle, Position } from 'reactflow';
 import GenericNodeIcon from './GenericNodeIcon';
 import './lodStyles.css'; // Usaremos un CSS dedicado para los estilos LOD
 
+const arePropsEqual = (prevProps, nextProps) => {
+  // Comparación superficial (shallow) del objeto 'data'.
+  // Esto es crucial porque el hook de virtualización crea nuevos objetos 'data'
+  // en cada render, pero su contenido a menudo no cambia. La comparación de referencia (===) fallaría.
+  const prevDataKeys = Object.keys(prevProps.data);
+  if (prevDataKeys.length !== Object.keys(nextProps.data).length) {
+    return false;
+  }
+
+  for (const key of prevDataKeys) {
+    if (prevProps.data[key] !== nextProps.data[key]) {
+      return false;
+    }
+  }
+
+  // Solo re-renderizar si 'data' o 'selected' cambian. Se ignoran cambios de posición
+  // (xPos, yPos) y de arrastre (dragging), ya que son manejados por el transform de React Flow
+  // y no afectan la apariencia interna del MiniNode.
+  return prevProps.selected === nextProps.selected;
+};
+
 const GenericMiniNode = memo(({ data, selected }) => {
   const { nodeType } = data;
 
@@ -29,7 +50,9 @@ const GenericMiniNode = memo(({ data, selected }) => {
       <Handle type="source" position={Position.Bottom} className="lod-node__handle" />
     </div>
   );
-});
+}, arePropsEqual);
+
+GenericMiniNode.displayName = 'GenericMiniNode';
 
 GenericMiniNode.propTypes = {
   data: PropTypes.shape({

@@ -9,7 +9,7 @@ import './AiNode.css';
 const Tooltip = lazy(() => import('../../ui/ToolTip'));
 import { useAINode } from './useAINode';
 
-const AiNode: React.FC<NodeProps<AiNodeData>> = memo(({ id, data, selected, isConnectable }) => {
+const AiNodeComponent: React.FC<NodeProps<AiNodeData>> = ({ id, data, selected, isConnectable }) => {
   const promptTextareaRef = useRef<HTMLTextAreaElement>(null);
   const {
     promptTemplate,
@@ -205,6 +205,21 @@ const AiNode: React.FC<NodeProps<AiNodeData>> = memo(({ id, data, selected, isCo
       />
     </div>
   );
-});
+};
+
+const arePropsEqual = (prevProps: NodeProps<AiNodeData>, nextProps: NodeProps<AiNodeData>) => {
+  // Comparación superficial de las propiedades de 'data' que afectan la UI.
+  const dataChanged = Object.keys(prevProps.data).length !== Object.keys(nextProps.data).length ||
+    Object.keys(prevProps.data).some(key => 
+      prevProps.data[key as keyof AiNodeData] !== nextProps.data[key as keyof AiNodeData]
+    );
+
+  // Re-renderizar solo si 'selected' o los datos relevantes han cambiado.
+  return prevProps.selected === nextProps.selected && !dataChanged;
+};
+
+const AiNode = memo(AiNodeComponent, arePropsEqual);
+
+AiNode.displayName = 'AiNode';
 
 export default AiNode;

@@ -12,7 +12,26 @@ import { Handle, Position } from 'reactflow';
 import GenericNodeIcon from './GenericNodeIcon';
 import './lodStyles.css';
 
-const GenericCompactNode = memo(({ data, selected }) => {
+const arePropsEqual = (prevProps, nextProps) => {
+  // Comparación superficial (shallow) del objeto 'data'.
+  // Esto es crucial porque el hook de virtualización crea nuevos objetos 'data'
+  // en cada render, pero su contenido a menudo no cambia. La comparación de referencia (===) fallaría.
+  const prevDataKeys = Object.keys(prevProps.data);
+  if (prevDataKeys.length !== Object.keys(nextProps.data).length) {
+    return false;
+  }
+
+  for (const key of prevDataKeys) {
+    if (prevProps.data[key] !== nextProps.data[key]) {
+      return false;
+    }
+  }
+
+  // Solo re-renderizar si 'data' o 'selected' cambian.
+  return prevProps.selected === nextProps.selected;
+};
+
+const GenericCompactNodeComponent = ({ data, selected }) => {
   const { nodeType, label, title } = data;
 
   const displayLabel = title || label || nodeType; // Usa título, luego etiqueta, o el tipo de nodo como fallback
@@ -38,7 +57,11 @@ const GenericCompactNode = memo(({ data, selected }) => {
       <Handle type="source" position={Position.Bottom} className="lod-node__handle" />
     </div>
   );
-});
+};
+
+const GenericCompactNode = memo(GenericCompactNodeComponent, arePropsEqual);
+
+GenericCompactNode.displayName = 'GenericCompactNode';
 
 GenericCompactNode.propTypes = {
   data: PropTypes.shape({

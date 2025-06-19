@@ -16,7 +16,8 @@ import ReactFlow, {
   addEdge,
   useEdgesState,
   useNodesState,
-  useReactFlow
+  useReactFlow,
+  useViewport
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 
@@ -36,6 +37,8 @@ import { useGlobalContext } from "@/context/GlobalProvider";
 // Hooks específicos para optimización y rendimiento
 import useNodeStyles from '../hooks/useNodeStyles';
 import useAdaptivePerformance from '../hooks/useAdaptivePerformance';
+import useNodeVirtualization from '../hooks/useNodeVirtualization'; // ¡El nuevo hook de virtualización!
+import useResizeObserver from 'use-resize-observer';
 
 // Componentes de UI
 import MiniMapWrapper from './MiniMapWrapper';
@@ -54,6 +57,7 @@ import ImportExportModal from '@/components/onboarding/modals/ImportExportModal'
 
 // Importar utilidades
 import { throttle, debounce } from 'lodash';
+import { getLODLevel, LOD_LEVELS } from '../utils/lodUtils'; // Importar utilidades LOD
 import { ensureEdgesAreVisible } from '../utils/edgeFixUtil';
 import { NODE_TYPES } from '@/utils/nodeConfig';
 // Importar definiciones de límites para el canvas y los nodos
@@ -189,13 +193,12 @@ const FlowMain = ({
   const [selectedNode, setSelectedNode] = useState(null);
   const [selectedEdge, setSelectedEdge] = useState(null);
   const [isDragging, setIsDragging] = useState(false);
+  const [lodLevel, setLodLevel] = useState(LOD_LEVELS.FULL); // Estado para el nivel de detalle
   
   // Estados para modales internos (solo los que no vienen de props)
   const [showSyncModal, setShowSyncModal] = useState(false);
   
-  // Estado para la virtualización: solo nodos y aristas visibles
-  const [visibleNodes, setVisibleNodes] = useState([]);
-  const [visibleEdges, setVisibleEdges] = useState([]);
+  // La virtualización ahora es gestionada por el hook useNodeVirtualization.
 
   // -----------------------------------------
   // ACCESO AL STORE DE ZUSTAND (SELECTORES)
@@ -247,61 +250,67 @@ const FlowMain = ({
   // Instancia de ReactFlow para operaciones de viewport
   const reactFlowInstance = useReactFlow();
   
-  // -----------------------------------------
-  // LÓGICA DE VIRTUALIZACIÓN (VIEWPORT CULLING)
-  // -----------------------------------------
-  const calculateVisibleElements = useCallback(() => {
-    if (!reactFlowInstance || !flowContainerRef.current) return;
+  // --- NUEVO SISTEMA DE VIRTUALIZACIÓN DE ALTO RENDIMIENTO ---
+  const { ref: flowWrapperRef, width: containerWidth, height: containerHeight } = useResizeObserver();
+  const viewport = useViewport();
 
-    const viewport = reactFlowInstance.getViewport();
-    const wrapper = flowContainerRef.current;
+  // El corazón de la nueva arquitectura: el hook de virtualización
+  const { visibleNodes, visibleEdges } = useNodeVirtualization({
+    nodes,
+    edges,
+    viewport,
+    containerDimensions: { width: containerWidth, height: containerHeight },
+    // Opciones adicionales para el hook de virtualización si fueran necesarias
+  });
 
-    const visible = nodes.filter(node => {
-      if (!node.position || typeof node.width === 'undefined' || typeof node.height === 'undefined') {
-        return true; // Siempre renderiza nodos sin posición/dimensiones para evitar errores
-      }
+  // --- GESTIÓN CENTRALIZADA DE LOD CON HISTÉRESIS CORREGIDA ---
+  
+  // Jerarquía numérica para una comparación lógica correcta de los niveles de LOD.
+  const lodHierarchy = {
+    [LOD_LEVELS.FULL]: 2,
+    [LOD_LEVELS.COMPACT]: 1,
+    [LOD_LEVELS.MINI]: 0,
+  };
 
-      const buffer = 200; // Un buffer para cargar nodos un poco antes de que entren en la vista
+  const hysteresisTimer = useRef(null);
 
-      const nodeRect = {
-        x: node.position.x,
-        y: node.position.y,
-        width: node.width,
-        height: node.height,
-      };
-
-      const viewportRect = {
-        x: -viewport.x / viewport.zoom - buffer,
-        y: -viewport.y / viewport.zoom - buffer,
-        width: wrapper.clientWidth / viewport.zoom + buffer * 2,
-        height: wrapper.clientHeight / viewport.zoom + buffer * 2,
-      };
-
-      // Comprobar si el rectángulo del nodo se solapa con el del viewport
-      return (
-        nodeRect.x < viewportRect.x + viewportRect.width &&
-        nodeRect.x + nodeRect.width > viewportRect.x &&
-        nodeRect.y < viewportRect.y + viewportRect.height &&
-        nodeRect.y + nodeRect.height > viewportRect.y
-      );
-    });
-
-    const visibleNodeIds = new Set(visible.map(n => n.id));
-    const visibleE = edges.filter(edge => visibleNodeIds.has(edge.source) && visibleNodeIds.has(edge.target));
-
-    setVisibleNodes(visible);
-    setVisibleEdges(visibleE);
-  }, [nodes, edges, reactFlowInstance]);
-
-  const debouncedUpdateVisibleElements = useMemo(() => debounce(calculateVisibleElements, 50), [calculateVisibleElements]);
-
-  // Efecto para la actualización inicial y cuando cambian los nodos/aristas o la instancia de RF
+  // Efecto para gestionar el Nivel de Detalle (LOD) con histéresis.
   useEffect(() => {
-    calculateVisibleElements(); // Llamada inicial sin debounce
-    return () => {
-      debouncedUpdateVisibleElements.cancel(); // Limpiar el debounce al desmontar
-    };
-  }, [nodes, edges, calculateVisibleElements, debouncedUpdateVisibleElements]);
+    // Aquí se podrían pasar umbrales personalizados si se cargaran desde una config.
+    const newLodLevel = getLODLevel(viewport.zoom);
+
+    if (newLodLevel !== lodLevel) {
+      clearTimeout(hysteresisTimer.current);
+
+      const currentNumericLod = lodHierarchy[lodLevel];
+      const newNumericLod = lodHierarchy[newLodLevel];
+
+      // Si el nuevo nivel es MÁS detallado (número mayor), actualiza inmediatamente.
+      if (newNumericLod > currentNumericLod) {
+        setLodLevel(newLodLevel);
+      } else {
+        // Si el nuevo nivel es MENOS detallado (número menor), espera para evitar flickering.
+        hysteresisTimer.current = setTimeout(() => {
+          setLodLevel(newLodLevel);
+        }, 250); // 250ms de retardo para la histéresis.
+      }
+    }
+
+    return () => clearTimeout(hysteresisTimer.current);
+  }, [viewport.zoom, lodLevel]);
+
+  // Inyectar el nivel de LOD calculado centralmente en los nodos visibles.
+  const nodesWithLOD = useMemo(() => {
+    return visibleNodes.map(node => ({
+      ...node,
+      data: {
+        ...node.data,
+        lodLevel: lodLevel, // Inyectar el nivel de LOD desde el estado centralizado.
+      },
+    }));
+    return result;
+  }, [visibleNodes, lodLevel]);
+  // --- FIN DEL NUEVO SISTEMA DE VIRTUALIZACIÓN ---
   
   // -----------------------------------------
   // TIPOS DE NODOS Y ARISTAS
@@ -313,8 +322,8 @@ const FlowMain = ({
    */
   const nodeTypes = useMemo(() => {
     if (externalNodeTypes) return externalNodeTypes;
-    return createNodeTypes(nodeStyles, isUltraMode);
-  }, [externalNodeTypes, nodeStyles, isUltraMode]);
+    return createNodeTypes(isUltraMode);
+  }, [externalNodeTypes, isUltraMode]);
   
   /**
    * Configura los tipos de aristas disponibles en el editor
@@ -555,7 +564,7 @@ const FlowMain = ({
       // Obtener el tipo de nodo desde el dataTransfer
       const nodeType = event.dataTransfer.getData('application/reactflow');
       if (!nodeType) {
-        console.log('[FlowMain] No se encontró tipo de nodo en el drop');
+        console.warn('[FlowMain] No se encontró tipo de nodo en el drop');
         return;
       }
       
@@ -573,7 +582,7 @@ const FlowMain = ({
       
       // Añadir el nodo al store
       useFlowStore.getState().addNode(newNode);
-      console.log('[FlowMain] Nodo añadido correctamente con ID:', newNode.id);
+
       
     } catch (error) {
       console.error('[FlowMain] Error al manejar drop:', error);
@@ -820,7 +829,7 @@ const FlowMain = ({
         
         // Si se obtuvieron nodos actualizados y son diferentes, actualizarlos
         if (updatedNodes && updatedNodes !== nodes && typeof setNodes === 'function') {
-          console.log('[FlowMain] Aplicando nodos reposicionados');
+
           setNodes(updatedNodes);
         }
       } catch (error) {
@@ -845,65 +854,14 @@ const FlowMain = ({
   useEffect(() => {
     return () => {
       // Limpiar recursos cuando el componente se desmonta
-      console.log('[FlowMain] Desmontando y limpiando recursos');
+
       // Detener el sistema de garantía de interacción de nodos
       stopNodeInteractionObserver();
     };
   }, []);
   
-  // Lógica de virtualización
-  const updateVisibleElements = useCallback(debounce(() => {
-    if (!reactFlowInstance || !flowContainerRef.current) return;
-
-    // SOLUCIÓN: Obtener el estado más reciente directamente del store para evitar dependencias inestables
-    const { nodes: currentNodes, edges: currentEdges } = useFlowStore.getState();
-
-    const viewport = reactFlowInstance.getViewport();
-    const wrapper = flowContainerRef.current;
-
-    const visibleNodes = currentNodes.filter(node => {
-      if (!node.position || typeof node.width === 'undefined' || typeof node.height === 'undefined') {
-        return true; // Siempre renderiza nodos sin posición/dimensiones para evitar errores
-      }
-
-      const buffer = 200; // Un buffer para cargar nodos un poco antes de que entren en la vista
-
-      const nodeRect = {
-        x: node.position.x,
-        y: node.position.y,
-        width: node.width,
-        height: node.height,
-      };
-
-      const viewportRect = {
-        x: -viewport.x / viewport.zoom - buffer,
-        y: -viewport.y / viewport.zoom - buffer,
-        width: wrapper.clientWidth / viewport.zoom + buffer * 2,
-        height: wrapper.clientHeight / viewport.zoom + buffer * 2,
-      };
-
-      // Comprobar si el rectángulo del nodo se solapa con el del viewport
-      return (
-        nodeRect.x < viewportRect.x + viewportRect.width &&
-        nodeRect.x + nodeRect.width > viewportRect.x &&
-        nodeRect.y < viewportRect.y + viewportRect.height &&
-        nodeRect.y + nodeRect.height > viewportRect.y
-      );
-    });
-
-    const visibleNodeIds = new Set(visibleNodes.map(n => n.id));
-    const visibleEdges = currentEdges.filter(edge => visibleNodeIds.has(edge.source) && visibleNodeIds.has(edge.target));
-
-    setVisibleNodes(visibleNodes);
-    setVisibleEdges(visibleEdges);
-
-    console.log(`[Virtualización] Nodos: ${visibleNodes.length}/${currentNodes.length} | Aristas: ${visibleEdges.length}/${currentEdges.length}`);
-  }, 100), [reactFlowInstance]); // Dependencia estabilizada: solo depende de la instancia de React Flow
-
-  // Efecto para la actualización inicial y cuando cambian los nodos/aristas
-  useEffect(() => {
-    updateVisibleElements();
-  }, [nodes.length, edges.length, updateVisibleElements]); // Se dispara solo al añadir/eliminar, no al mover
+  // La lógica de virtualización ahora está centralizada en el hook useNodeVirtualization
+  // y se actualiza reactivamente. No se necesita lógica adicional aquí.
 
   // -----------------------------------------
   // RENDERIZADO
@@ -914,8 +872,9 @@ const FlowMain = ({
       <StorageQuotaManager project={project} />
       <HideControls />
       {/* SOLUCIÓN DIRECTA: ReactFlow con configuración optimizada para posicionamiento correcto */}
-      <ReactFlow
-        nodes={visibleNodes}
+      <div className="flow-main-container" ref={flowWrapperRef} style={{ width: '100%', height: '100%' }}>
+        <ReactFlow
+        nodes={nodesWithLOD} // Usar nodos optimizados con LOD
         edges={visibleEdges}
         nodeTypes={nodeTypes}
         edgeTypes={edgeTypes}
@@ -936,10 +895,6 @@ const FlowMain = ({
           }
         }}
         onDrop={handleDrop}
-        onMove={(event, viewport) => {
-          // Lógica de virtualización: se actualizan los elementos visibles en el viewport
-          debouncedUpdateVisibleElements();
-        }}
         onDragOver={handleDragOver}
         onSelectionChange={(params) => {
           // Procesamiento condicional pero SIEMPRE manteniendo la estructura de hooks
@@ -976,7 +931,7 @@ const FlowMain = ({
         onEdgeClick={handleEdgeClick}
         onNodeDragStop={handleNodeDragStop}
         onNodeDragStart={(event, node) => {
-          console.log('[FlowMain] onNodeDragStart: setting isNodeBeingDragged = true', 'Node ID:', node.id);
+
           setIsNodeBeingDragged(true);
           setIsDragging(true);
           // Aquí puedes añadir cualquier lógica específica que necesites al iniciar el arrastre
@@ -1075,7 +1030,7 @@ const FlowMain = ({
         <div className="flow-minimap-container bottom-left">
           <MiniMapWrapper
             nodes={visibleNodes}
-            edges={visibleEdges}
+            edges={visibleEdges} // Usar solo las aristas visibles
             isExpanded={false}
             isUltraMode={isUltraMode}
             viewport={{
@@ -1093,7 +1048,7 @@ const FlowMain = ({
               }
             }}
             setByteMessage={(msg) => {
-              console.log("[MiniMap]", msg);
+
             }}
           />
         </div>
@@ -1140,6 +1095,7 @@ const FlowMain = ({
           </div>
         )}
       </ReactFlow>
+      </div>
       
       {/* Contenedor para los controles de la barra lateral - Posicionamiento absoluto para evitar reflow */}
       <div className="vertical-buttons-container" style={{
@@ -1212,7 +1168,7 @@ const FlowMain = ({
                   }
                 }
                 
-                console.log('[FlowMain] Abriendo modal de sincronización');
+
                 
                 // IMPORTANTE: Ya NO usamos el sistema local para evitar duplicación de modales
                 // setShowSyncModal(true); // DESACTIVADO
@@ -1238,7 +1194,7 @@ const FlowMain = ({
                 // 4. Forzar apertura con un pequeño retraso para asegurar que el DOM esté listo
                 setTimeout(() => {
                   setShowSyncModal(true);
-                  console.log('[FlowMain] Forzando apertura del modal de sincronización');
+
                 }, 100);
               } catch (error) {
                 console.error('[FlowMain] Error al abrir modal de sincronización:', error);
@@ -1280,7 +1236,7 @@ const FlowMain = ({
               onSync={onSave}
               project={plubotInfo}
               onNotify={(message, type) => {
-                console.log('[SyncModal] Notificación:', message, type);
+
               }}
             />
           </div>
@@ -1293,7 +1249,7 @@ const FlowMain = ({
           <div style={{ pointerEvents: 'auto' }}>
             <EmbedModal
               onClose={() => {
-                console.log('[FlowMain] Cerrando modal EmbedModal');
+
                 if (typeof externalCloseModal === 'function') {
                   externalCloseModal('embedModal');
                 } else {
@@ -1310,7 +1266,7 @@ const FlowMain = ({
                 edges: edgesMemo || []
               }}
               onExport={() => {
-                console.log('[FlowMain] Exportando flujo desde EmbedModal');
+
                 if (typeof handleExportFlow === 'function') {
                   handleExportFlow();
                 } else if (typeof handleSaveFlow === 'function') {
@@ -1326,7 +1282,7 @@ const FlowMain = ({
           <div style={{ pointerEvents: 'auto' }}>
             <TemplateSelector
               onClose={() => {
-                console.log('[FlowMain] Cerrando modal TemplateSelector');
+
                 if (typeof externalCloseModal === 'function') {
                   externalCloseModal('templateSelector');
                 } else {

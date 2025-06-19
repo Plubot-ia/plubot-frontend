@@ -43,6 +43,7 @@ import useFlowStore from '@/stores/useFlowStore';
 import ReactMarkdown from '@/lib/simplified-markdown';
 import { replaceVariablesInMessage } from '@/utils/messageUtils';
 import './MessageNode.css';
+import './MessageNodeLOD.css';
 import { MessageNodeIcon } from './MessageNodeIcon';
 
 // Configuración centralizada para el MessageNode
@@ -685,6 +686,51 @@ const SavingIndicator = () => {
  */
 SavingIndicator.displayName = 'SavingIndicator';
 
+const LOD_LEVELS = {
+  FULL: 'FULL',
+  COMPACT: 'COMPACT',
+  MINI: 'MINI',
+};
+
+// Vista para el nivel de detalle MÍNIMO (MINI)
+const MiniView = memo(({ messageType }) => (
+  <div className="message-node__mini-content">
+    <MessageNodeIcon type={messageType} isUltraPerformanceMode={true} />
+  </div>
+));
+MiniView.displayName = 'MiniView';
+MiniView.propTypes = { messageType: PropTypes.string };
+
+
+// Vista para el nivel de detalle COMPACTO
+const CompactView = memo(({ messageType, title, message, variables }) => {
+  const processedMessage = useMemo(() => {
+    if (!message) return DEFAULT_MESSAGE;
+    const processed = replaceVariablesInMessage(message, variables);
+    return processed.length > 50 ? `${processed.substring(0, 50)}...` : processed;
+  }, [message, variables]);
+
+  return (
+    <div className="message-node__compact-content">
+      <div className="message-node__compact-header">
+        <MessageNodeIcon type={messageType} isUltraPerformanceMode={true} />
+        <span className="message-node__compact-title">{title}</span>
+      </div>
+      <div className="message-node__compact-message">
+        {processedMessage}
+      </div>
+    </div>
+  );
+});
+CompactView.displayName = 'CompactView';
+CompactView.propTypes = {
+  messageType: PropTypes.string,
+  title: PropTypes.string,
+  message: PropTypes.string,
+  variables: PropTypes.array,
+};
+
+
 /**
  * Componente principal MessageNode
  * @param {Object} props - Propiedades del componente
@@ -696,18 +742,17 @@ SavingIndicator.displayName = 'SavingIndicator';
  * @param {boolean} props.isUltraPerformanceMode - Indica si está en modo ultra rendimiento
  * @returns {JSX.Element} - Componente MessageNode
  */
-const MessageNode = memo(({ 
+const MessageNodeComponent = ({ 
   data = {
     message: DEFAULT_MESSAGE,
     type: MESSAGE_TYPES.SYSTEM,
-    variables: []
+    variables: [],
+    lodLevel: LOD_LEVELS.FULL, // Valor por defecto
   }, 
   isConnectable = true, 
   selected = false, 
   id, 
   setNodes: legacySetNodes, // Mantener compatibilidad con implementación existente
-  isUltraPerformanceMode = false, 
-  performanceMode = false,
   onEdit = () => {},
   onDuplicate = () => {},
   onDelete = () => {}
@@ -721,10 +766,9 @@ const MessageNode = memo(({
     lastUpdated: data?.lastUpdated
   }), [data]);
   
-  // Determinar si estamos en modo ultra rendimiento
-  const { isUltraMode } = useFlowMeta();
-  
-  // Determinar si las animaciones deben estar deshabilitadas para este nodo
+  // Extraer el nivel de detalle (LOD) de los datos del nodo.
+  const { lodLevel = LOD_LEVELS.FULL } = data;
+  const isUltraMode = lodLevel !== LOD_LEVELS.FULL;
   const disableAnimations = isUltraMode;
 
   // Estados locales (preservando exactamente el comportamiento original)
@@ -958,55 +1002,7 @@ const MessageNode = memo(({
 
  // Dependencias del efecto (zoomLevel removido ya que isUltraMode lo cubre)
   
-  /**
-   * Optimización para modo ultra rendimiento
-   * Reduce la cantidad de elementos renderizados
-   */
-  const renderUltraPerformanceContent = () => {
-    // ultraHandleBaseStyle ya no es necesario, los estilos se manejan por CSS.
-    return (
 
-    <div className="message-node__ultra-content" data-testid={`message-node-ultra-content-${id}`}>
-      <Handle
-        type="target"
-        position={Position.Top} // O la posición que corresponda para modo ultra
-        id="default"
-        isConnectable={isConnectable} // Usar directamente isConnectable
-        className="message-node__handle message-node__handle--target message-node__handle--ultra"
-        aria-label="Conector de entrada (ultra)"
-        title="Conectar desde otro nodo (ultra)"
-        tabIndex={-1} // Generalmente no focuseable en modo ultra
-        role="button"
-        data-testid={`message-node-target-handle-ultra-${id}`}
-        // La prop 'style' se elimina para depender de las clases CSS
-      />
-      <Handle
-        type="source"
-        position={Position.Bottom} // O la posición que corresponda para modo ultra
-        id="default"
-        isConnectable={isConnectable} // Usar directamente isConnectable
-        className="message-node__handle message-node__handle--source message-node__handle--ultra"
-        aria-label="Conector de salida (ultra)"
-        title="Conectar hacia otro nodo (ultra)"
-        tabIndex={-1} // Generalmente no focuseable en modo ultra
-        role="button"
-        data-testid={`message-node-source-handle-ultra-${id}`}
-        // La prop 'style' se elimina para depender de las clases CSS
-      />
-      <div className="message-node__ultra-header">
-        <MessageNodeIcon type={messageType} isUltraPerformanceMode={true} />
-        <span className="message-node__ultra-title">{typeToTitle(messageType)}</span>
-      </div>
-      <div className="message-node__ultra-message">
-        {(() => {
-          if (!safeData.message) return DEFAULT_MESSAGE;
-          const processed = replaceVariablesInMessage(safeData.message, safeData.variables);
-          return processed.length > 50 ? `${processed.substring(0, 50)}...` : processed;
-        })()}
-      </div>
-    </div>
-  );
-};
 
   /**
    * Renderizar el componente MessageNode
@@ -1016,97 +1012,160 @@ const MessageNode = memo(({
       ref={nodeRef}
       className={nodeClasses}
       style={nodeStyle}
-      onDoubleClick={handleDoubleClick}
-      onContextMenu={handleNodeContextMenu} // Add context menu handler
+      onDoubleClick={lodLevel === LOD_LEVELS.FULL ? handleDoubleClick : undefined}
+      onContextMenu={handleNodeContextMenu}
       data-testid="message-node"
-      aria-labelledby={`message-node-title-${id}`} // Add for accessibility
-      aria-describedby={`message-node-content-${id}`} // Add for accessibility
+      aria-labelledby={`message-node-title-${id}`}
       role="group"
-      // aria-label removed as labelledby/describedby are more specific
       tabIndex={0}
-      onKeyDown={(e) => { // Add keydown handler
-        if (e.key === 'Enter' && !isEditing) {
-          // Optional: handleDoubleClick(); 
-        }
-        if (e.key === 'Escape' && isEditing) {
-          cancelEdit(); // Escape should cancel edits
-        }
-      }}
     >
-      <MessageNodeHeader
-        id={id}
-        titleFromData={safeData.title} 
-        messageType={safeData.type} // Usar safeData.type que es el tipo procesado
-        isUltraMode={isUltraMode}
-        isSaving={nodeState.isSaving} // Usar el estado local isSaving
-        isSelected={selected}
-        onDoubleClickHeader={handleDoubleClick}
-        lastUpdatedTimestamp={safeData.lastUpdated}
-        disableAnimations={disableAnimations} // Pasar la prop disableAnimations
-      />
-      
-      <MessageNodeContent
-        id={id}
-        isEditing={isEditing}
-        isUltraMode={isUltraMode}
-        safeData={safeData}
-        DEFAULT_MESSAGE={DEFAULT_MESSAGE}
-        editState={editState}
-        editorActions={editorActions}
-      />
+      {(() => {
+        const handleProps = {
+          type: "source",
+          position: Position.Bottom,
+          id: "default",
+          isConnectable: isConnectable,
+        };
 
-        {/* Pie del nodo con información de última actualización */}
-        {!isEditing && safeData.lastUpdated && !isUltraMode && (
-          <footer className="message-node__footer">
-            <div className="message-node__timestamp">
-              <Clock size={12} aria-hidden="true" />
-              <span title={formatTime(safeData.lastUpdated)}>
-                {formatDateRelative(safeData.lastUpdated)}
-              </span>
-            </div>
-          </footer>
-        )}
+        switch (lodLevel) {
+          case LOD_LEVELS.MINI:
+            return (
+              <>
+                <Handle {...handleProps} type="target" position={Position.Top} className={`message-node__handle message-node__handle--target message-node__handle--ultra`} />
+                <Handle {...handleProps} type="source" position={Position.Bottom} className={`message-node__handle message-node__handle--source message-node__handle--ultra`} />
+                <MiniView messageType={messageType} />
+              </>
+            );
 
-        {/* Conectores para entradas y salidas - con mejoras de accesibilidad */}
-        <Handle
-          type="target"
-          position={Position.Top}
-          id="default" // ID estandarizado para el handle de entrada
-          isConnectable={isConnectable}
-          className={`message-node__handle message-node__handle--target ${isUltraMode ? 'message-node__handle--ultra' : ''}`}
-          aria-label="Conector de entrada"
-          title="Conectar desde otro nodo"
-          tabIndex={isConnectable && !isUltraMode ? 0 : -1}
-          role="button"
-          data-testid="message-node-target-handle"
-          
-        />
-        <Handle
-          type="source"
-          position={Position.Bottom}
-          id="default" // ID estandarizado para el handle de salida
-          isConnectable={isConnectable}
-          className={`message-node__handle message-node__handle--source ${isUltraMode ? 'message-node__handle--ultra' : ''}`}
-          aria-label="Conector de salida"
-          title="Conectar hacia otro nodo"
-          tabIndex={isConnectable && !isUltraMode ? 0 : -1}
-          role="button"
-          data-testid="message-node-source-handle"
-          
-        />
-    
-    {/* Texto para lectores de pantalla */}
-    <span className="sr-only">
-      Nodo de mensaje tipo {messageType}. {safeData.message}
-      {safeData.variables && safeData.variables.length > 0 && ` Con ${safeData.variables.length} variables.`}
-      {safeData.lastUpdated && ` Última actualización: ${formatDateRelative(safeData.lastUpdated)}.`}
-    </span>
-  </div>
-);
-}); // Corrected closing for: const MessageNode = memo(...) 
+          case LOD_LEVELS.COMPACT:
+            return (
+              <>
+                <Handle {...handleProps} type="target" position={Position.Top} className={`message-node__handle message-node__handle--target message-node__handle--ultra`} />
+                <Handle {...handleProps} type="source" position={Position.Bottom} className={`message-node__handle message-node__handle--source message-node__handle--ultra`} />
+                <CompactView 
+                  messageType={messageType} 
+                  title={typeToTitle(messageType)}
+                  message={safeData.message}
+                  variables={safeData.variables}
+                />
+              </>
+            );
 
+          default: // FULL
+            return (
+              <>
+                <MessageNodeHeader
+                  id={id}
+                  titleFromData={safeData.title} 
+                  messageType={safeData.type}
+                  isUltraMode={isUltraMode}
+                  isSaving={nodeState.isSaving}
+                  isSelected={selected}
+                  onDoubleClickHeader={handleDoubleClick}
+                  lastUpdatedTimestamp={safeData.lastUpdated}
+                  disableAnimations={disableAnimations}
+                />
+                <MessageNodeContent
+                  id={id}
+                  isEditing={isEditing}
+                  isUltraMode={isUltraMode}
+                  safeData={safeData}
+                  DEFAULT_MESSAGE={DEFAULT_MESSAGE}
+                  editState={editState}
+                  editorActions={editorActions}
+                />
+                {!isEditing && safeData.lastUpdated && !isUltraMode && (
+                  <footer className="message-node__footer">
+                    <div className="message-node__timestamp">
+                      <Clock size={12} aria-hidden="true" />
+                      <span title={formatTime(safeData.lastUpdated)}>
+                        {formatDateRelative(safeData.lastUpdated)}
+                      </span>
+                    </div>
+                  </footer>
+                )}
+                <Handle
+                  type="target"
+                  position={Position.Top}
+                  id="default"
+                  isConnectable={isConnectable}
+                  className={`message-node__handle message-node__handle--target`}
+                  aria-label="Conector de entrada"
+                  title="Conectar desde otro nodo"
+                  tabIndex={isConnectable ? 0 : -1}
+                  role="button"
+                />
+                <Handle
+                  type="source"
+                  position={Position.Bottom}
+                  id="default"
+                  isConnectable={isConnectable}
+                  className={`message-node__handle message-node__handle--source`}
+                  aria-label="Conector de salida"
+                  title="Conectar hacia otro nodo"
+                  tabIndex={isConnectable ? 0 : -1}
+                  role="button"
+                />
+                <span className="sr-only">
+                  Nodo de mensaje tipo {messageType}. {safeData.message}
+                </span>
+              </>
+            );
+        }
+      })()}
+    </div>
+  );
+};
+
+/**
+ * Función de comparación personalizada para React.memo.
+ * Evita re-renderizados innecesarios comparando props relevantes.
+ * @param {Object} prevProps - Propiedades anteriores
+ * @param {Object} nextProps - Nuevas propiedades
+ * @returns {boolean} - `true` si las props son iguales, `false` en caso contrario.
+ */
+const arePropsEqual = (prevProps, nextProps) => {
+  // Comparación de props primitivas y de primer nivel
+  if (
+    prevProps.selected !== nextProps.selected ||
+    prevProps.isConnectable !== nextProps.isConnectable ||
+    prevProps.id !== nextProps.id
+  ) {
+    return false;
+  }
+
+  const prevData = prevProps.data || {};
+  const nextData = nextProps.data || {};
+
+  // Comparación de campos clave del objeto `data`
+  if (
+    prevData.message !== nextData.message ||
+    prevData.type !== nextData.type ||
+    prevData.lastUpdated !== nextData.lastUpdated ||
+    prevData.lodLevel !== nextData.lodLevel ||
+    prevData.title !== nextData.title
+  ) {
+    return false;
+  }
+
+  // Comparación profunda pragmática para el array de variables.
+  // JSON.stringify es una solución aceptable aquí para evitar comparaciones complejas
+  // y dado que el array no debería ser masivo.
+  if (JSON.stringify(prevData.variables) !== JSON.stringify(nextData.variables)) {
+    return false;
+  }
+
+  // Si ninguna de las comprobaciones anteriores falló, las props son iguales
+  return true;
+};
+
+// Envolvemos el componente con React.memo y la función de comparación personalizada
+const MessageNode = memo(MessageNodeComponent, arePropsEqual);
+
+// Asignamos un nombre para facilitar la depuración en React DevTools
 MessageNode.displayName = 'MessageNode';
 
+// Definimos los propTypes para el componente memoizado final
 MessageNode.propTypes = {
   data: PropTypes.shape({
     message: PropTypes.string,
@@ -1118,19 +1177,17 @@ MessageNode.propTypes = {
       })
     ),
     lastUpdated: PropTypes.string,
-    x: PropTypes.number,
-    y: PropTypes.number,
-    id: PropTypes.string
+    lodLevel: PropTypes.string,
+    title: PropTypes.string,
   }),
   isConnectable: PropTypes.bool,
   selected: PropTypes.bool,
   id: PropTypes.string.isRequired,
-  setNodes: PropTypes.func,
-  isUltraPerformanceMode: PropTypes.bool,
+  setNodes: PropTypes.func, // Para compatibilidad
   onEdit: PropTypes.func,
   onDuplicate: PropTypes.func,
   onDelete: PropTypes.func,
-  performanceMode: PropTypes.bool // Alias para isUltraPerformanceMode (compatibilidad)
 };
 
+// Exportamos el componente optimizado
 export default MessageNode;

@@ -1,77 +1,87 @@
 import { useState, useEffect, useRef } from 'react';
 
-/**
- * Hook de virtualización de nodos - COMPLETAMENTE DESACTIVADO
- * 
- * Este hook ahora es un simple pass-through que devuelve todos los nodos sin filtrar.
- * La virtualización ha sido identificada como la causa principal de los problemas
- * de nodos invisibles o que desaparecían en el editor de flujos.
- * 
- * SOLUCIÓN DEFINITIVA: Mantener todos los nodos visibles en todo momento para
- * garantizar la consistencia del editor.
- * 
- * @param {Array} nodes - Lista de nodos del flujo
- * @param {Object} viewport - Información del viewport (x, y, zoom)
- * @param {Object} containerRef - Referencia al contenedor del editor
- * @returns {Object} - Todos los nodos sin filtrar para garantizar visibilidad
- */
-const useNodeVirtualization = (nodes, viewport, containerRef) => {
-  // Estado para el conteo (mantenemos esto por compatibilidad con la API)
-  const [visibleCount, setVisibleCount] = useState(0);
-  
-  // Referencia para garantizar que el mensaje solo se muestra una vez
-  const loggedRef = useRef(false);
-  
-  // Crear una bandera global que permita verificar el estado de la virtualización
-  if (typeof window !== 'undefined') {
-    // window._virtualizationEnabled = false; // Desactivado y no leído en otra parte
-    // window._showAllNodes = true; // Desactivado y no leído en otra parte
-  }
-  
-  // Actualizar el contador para mantener la compatibilidad con el API
-  useEffect(() => {
-    setVisibleCount(nodes?.length || 0);
-    
-    // Log de depuración una sola vez por componente
-    if (!loggedRef.current) {
-      loggedRef.current = true;
-    }
-  }, [nodes]);
-  
-  // API compatible pero sin efecto para mantener compatibilidad con componentes existentes
-  const registerNodeInteraction = () => {};
-  const registerNodesInteraction = () => {};
-  const getVisibilityStatus = () => ({ allVisible: true, visibleCount: nodes?.length || 0 });
-  
-  // Forzar visibilidad de nodos a nivel de datos
-  useEffect(() => {
-    if (Array.isArray(nodes) && nodes.length > 0) {
-      // Forzar que los nodos sean visibles agregando propiedades si no las tienen
-      nodes.forEach(node => {
-        // Asegurar que el nodo tenga posición
-        if (!node.position) {
-          node.position = { x: 100, y: 100 };
-        }
-        
-        // Asegurar que el nodo tenga dimensiones
-        if (!node.width) node.width = 150;
-        if (!node.height) node.height = 50;
-        
-        // Asegurar visibilidad explícita
-        node.hidden = false;
-        node.style = { ...node.style, visibility: 'visible', display: 'block', opacity: 1 };
-      });
-    }
-  }, [nodes]);
+import { useMemo } from 'react';
+import { nodeEstimatedDimensions } from '@/flow/nodeDimensions';
 
-  return {
-    // Garantizar que TODOS los nodos sean siempre visibles
-    visibleNodes: Array.isArray(nodes) ? nodes : [],
-    visibleCount: nodes?.length || 0,
-    registerNodeInteraction,
-    registerNodesInteraction,
-    getVisibilityStatus
-  };
+const OVERSCAN_PX = 400; // Aumentar el área de overscan para una experiencia más fluida
+
+/**
+ * Hook de virtualización de nodos de alto rendimiento.
+ * Calcula qué nodos y aristas son visibles dentro del viewport actual,
+ * utilizando dimensiones estimadas para evitar el renderizado inicial masivo.
+ *
+ * @param {Array} allNodes - La lista COMPLETA de nodos del flujo.
+ * @param {Array} allEdges - La lista COMPLETA de aristas del flujo.
+ * @param {Object} viewport - El objeto viewport de React Flow (x, y, zoom).
+ * @param {Object} containerSize - El tamaño del contenedor del canvas ({ width, height }).
+ * @returns {{ visibleNodes: Array, visibleEdges: Array }} - Los nodos y aristas filtrados que deben renderizarse.
+ */
+const useNodeVirtualization = ({ nodes: allNodes, edges: allEdges, viewport, containerDimensions: containerSize }) => {
+  const [throttledViewport, setThrottledViewport] = useState(viewport);
+  const throttleTimeout = useRef(null);
+
+  useEffect(() => {
+    if (throttleTimeout.current) {
+      clearTimeout(throttleTimeout.current);
+    }
+
+    throttleTimeout.current = setTimeout(() => {
+      setThrottledViewport(viewport);
+      throttleTimeout.current = null;
+    }, 50); // 50ms throttle delay
+
+    return () => {
+      if (throttleTimeout.current) {
+        clearTimeout(throttleTimeout.current);
+      }
+    };
+  }, [viewport]);
+
+  const { x, y, zoom } = throttledViewport; // Use the throttled viewport
+  const { width: containerWidth, height: containerHeight } = containerSize;
+
+  return useMemo(() => {
+    if (!containerWidth || !containerHeight || zoom === 0) {
+      return { visibleNodes: [], visibleEdges: [] };
+    }
+
+    const viewBounds = {
+      left: -x / zoom - OVERSCAN_PX / zoom,
+      right: (-x + containerWidth) / zoom + OVERSCAN_PX / zoom,
+      top: -y / zoom - OVERSCAN_PX / zoom,
+      bottom: (-y + containerHeight) / zoom + OVERSCAN_PX / zoom,
+    };
+
+    const visibleNodes = allNodes.filter(node => {
+      if (!node.position) return false;
+
+      const nodeWidth = node.width || nodeEstimatedDimensions[node.type]?.width || nodeEstimatedDimensions.default.width;
+      const nodeHeight = node.height || nodeEstimatedDimensions[node.type]?.height || nodeEstimatedDimensions.default.height;
+
+      const nodeBounds = {
+        left: node.position.x,
+        right: node.position.x + nodeWidth,
+        top: node.position.y,
+        bottom: node.position.y + nodeHeight,
+      };
+
+      return (
+        nodeBounds.left < viewBounds.right &&
+        nodeBounds.right > viewBounds.left &&
+        nodeBounds.top < viewBounds.bottom &&
+        nodeBounds.bottom > viewBounds.top
+      );
+    });
+
+    const visibleNodeIds = new Set(visibleNodes.map(n => n.id));
+
+    const visibleEdges = allEdges.filter(edge =>
+      visibleNodeIds.has(edge.source) && visibleNodeIds.has(edge.target)
+    );
+
+    return { visibleNodes, visibleEdges };
+
+  }, [allNodes, allEdges, x, y, zoom, containerWidth, containerHeight]);
 };
 
 export default useNodeVirtualization;

@@ -56,6 +56,7 @@ import EliteEdge from './ui/EliteEdge.jsx'; // Added import for EliteEdge
 
 // Nodos - El resto se carga bajo demanda para optimizar el tiempo de carga
 const EndNode = lazy(() => import('../nodes/endnode/EndNode'));
+const MessageNode = lazy(() => import('../nodes/messagenode/MessageNode'));
 const DecisionNode = lazy(() => import('../nodes/decisionnode/DecisionNode.jsx'));
 const ActionNode = lazy(() => import('../nodes/actionnode/ActionNode.jsx'));
 const OptionNode = lazy(() => import('../nodes/optionnode/OptionNode.jsx'));
@@ -443,7 +444,7 @@ const FlowEditorInner = ({
   const nodeStyles = useNodeStyles(isUltraMode);
 
   // Tipos de nodos con optimización de rendimiento
-  const nodeTypes = useMemo(() => createNodeTypes(nodeStyles, isUltraMode), [nodeStyles, isUltraMode]);
+  const nodeTypes = useMemo(() => createNodeTypes(isUltraMode), [isUltraMode]);
 
   // Tipos de aristas con variantes de estilo
   const edgeTypes = useMemo(() => sharedEdgeTypes, []);

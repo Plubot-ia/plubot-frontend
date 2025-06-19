@@ -26,8 +26,7 @@ export const prepareEdgesForSaving = (edges, nodeIdMap = {}) => {
     return [];
   }
   
-  console.log(`Preparando ${edges.length} aristas para guardar`);
-  console.log('Usando mapa de IDs:', nodeIdMap);
+
   
   // Crear un mapa para rastrear aristas duplicadas
   const processedEdges = new Set();
@@ -134,8 +133,7 @@ export const prepareEdgesForSaving = (edges, nodeIdMap = {}) => {
         isFromBackend: edge.isFromBackend || false
       };
       
-      // Registrar la arista preparada para depuración
-      console.log(`Arista preparada para guardar: ${preparedEdge.id} - source: ${preparedEdge.source} (original/backend: ${preparedEdge.sourceOriginal}), target: ${preparedEdge.target} (original/backend: ${preparedEdge.targetOriginal})`);
+
       
       return preparedEdge;
     } catch (error) {
@@ -161,35 +159,32 @@ let throttledEnsureEdgesVisible;
 const executionTimestamps = {};
 
 const getThrottledCheck = (cacheKey, isUltraMode, maxAttempts, delay) => {
-  // console.log(`[edgeFixUtil|getThrottledCheck] Llamado para cacheKey: ${cacheKey}`);
+  
   if (!executionTimestamps[cacheKey]) {
-    // console.log(`[edgeFixUtil|getThrottledCheck] Creando nueva función throttled para cacheKey: ${cacheKey}`);
+
     executionTimestamps[cacheKey] = throttle(
       (currentEdges, currentIsUltraMode, currentMaxAttempts, currentDelay) => {
-        const callId = Math.random().toString(36).substring(2, 7);
-        console.log(`[edgeFixUtil|THROTTLED_FUNC_EXEC ${callId}] Ejecutando. Aristas: ${currentEdges?.length}, isUltraMode: ${currentIsUltraMode}`);
         const resultFromImpl = _ensureEdgesAreVisibleImpl(currentEdges, currentIsUltraMode, currentMaxAttempts, currentDelay);
-        console.log(`[edgeFixUtil|THROTTLED_FUNC_EXEC ${callId}] _ensureEdgesAreVisibleImpl devolvió (tipo: ${typeof resultFromImpl}, esArray: ${Array.isArray(resultFromImpl)}, long: ${resultFromImpl?.length}):`, JSON.stringify(resultFromImpl)?.substring(0,100) + (JSON.stringify(resultFromImpl)?.length > 100 ? '...' : ''));
         return resultFromImpl;
       },
       1000, { leading: true, trailing: false }
     );
   } else {
-    // console.log(`[edgeFixUtil|getThrottledCheck] Reutilizando función throttled para cacheKey: ${cacheKey}`);
+
   }
   return executionTimestamps[cacheKey];
 };
 
-export const ensureEdgesAreVisible = async (currentEdges, currentIsUltraMode, currentMaxAttempts, currentDelay) => {
+export const ensureEdgesAreVisible = (currentEdges, currentIsUltraMode, currentMaxAttempts, currentDelay) => {
   const uniqueId = Math.random().toString(36).substring(2, 7);
-  console.log(`[edgeFixUtil|ensureEdgesAreVisible ENTRADA ${uniqueId}] Llamada. Aristas: ${currentEdges?.length}, isUltraMode: ${currentIsUltraMode}`);
+
 
   try {
     // Obtener la función throttled (se crea una vez y se reutiliza)
     const throttledCheck = getThrottledCheck();
-    console.log(`[edgeFixUtil|ensureEdgesAreVisible ${uniqueId}] A punto de llamar a throttledCheck.`);
-    const resultFromThrottledCheck = await throttledCheck(currentEdges, currentIsUltraMode, currentMaxAttempts, currentDelay);
-    console.log(`[edgeFixUtil|ensureEdgesAreVisible ${uniqueId}] Resultado de throttledCheck (tipo: ${typeof resultFromThrottledCheck}, esArray: ${Array.isArray(resultFromThrottledCheck)}, long: ${resultFromThrottledCheck?.length}):`, JSON.stringify(resultFromThrottledCheck)?.substring(0,100) + (JSON.stringify(resultFromThrottledCheck)?.length > 100 ? '...' : ''));
+
+    const resultFromThrottledCheck = throttledCheck(currentEdges, currentIsUltraMode, currentMaxAttempts, currentDelay);
+
 
     // Si throttledCheck devuelve undefined, significa que _ensureEdgesAreVisibleImpl no pudo garantizar
     // la visibilidad o encontró un problema. En lugar de devolver un array vacío (lo que eliminaría las aristas),

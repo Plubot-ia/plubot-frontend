@@ -22,69 +22,69 @@ const useModalManagement = () => {
 
   // Funciones para abrir modales (combinan el sistema local y global)
   const openTemplateSelector = useCallback(() => {
-    console.log('[useModalManagement] Abriendo TemplateSelector');
+
     setShowTemplateSelector(true);
     openModal('templateSelector');
   }, []);
 
   const openEmbedModal = useCallback(() => {
-    console.log('[useModalManagement] Abriendo EmbedModal');
+
     setShowEmbedModal(true);
     openModal('embedModal');
   }, []);
 
   const openImportExportModal = useCallback(() => {
-    console.log('[useModalManagement] Abriendo ImportExportModal');
+
     setShowImportExportModal(true);
     openModal('importExportModal');
   }, []);
 
   const openSimulation = useCallback(() => {
-    console.log('[useModalManagement] Abriendo Simulation');
+
     setShowSimulation(true);
     openModal('simulationModal');
   }, []);
 
   const openSyncModal = useCallback(() => {
-    console.log('[useModalManagement] Abriendo SyncModal');
+
     setShowSyncModal(true);
     openModal('syncModal');
   }, []);
 
   // Funciones para cerrar modales (combinan el sistema local y global)
   const closeTemplateSelector = useCallback(() => {
-    console.log('[useModalManagement] Cerrando TemplateSelector');
+
     setShowTemplateSelector(false);
     closeModal('templateSelector');
   }, []);
 
   const closeEmbedModal = useCallback(() => {
-    console.log('[useModalManagement] Cerrando EmbedModal');
+
     setShowEmbedModal(false);
     closeModal('embedModal');
   }, []);
 
   const closeImportExportModal = useCallback(() => {
-    console.log('[useModalManagement] Cerrando ImportExportModal');
+
     setShowImportExportModal(false);
     closeModal('importExportModal');
   }, []);
 
   const closeSimulation = useCallback(() => {
-    console.log('[useModalManagement] Cerrando Simulation');
+
     setShowSimulation(false);
     closeModal('simulationModal');
   }, []);
 
   const closeSyncModal = useCallback(() => {
-    console.log('[useModalManagement] Cerrando SyncModal');
+
     setShowSyncModal(false);
     closeModal('syncModal');
   }, []);
 
   // Función genérica para abrir cualquier modal
   const openModalByName = useCallback((modalName) => {
-    console.log(`[useModalManagement] Abriendo modal por nombre: ${modalName}`);
+
     
     if (modalName === 'templateSelector') openTemplateSelector();
     else if (modalName === 'embedModal') openEmbedModal();
@@ -99,7 +99,7 @@ const useModalManagement = () => {
 
   // Función genérica para cerrar cualquier modal
   const closeModalByName = useCallback((modalName) => {
-    console.log(`[useModalManagement] Cerrando modal por nombre: ${modalName}`);
+
     
     if (modalName === 'templateSelector') closeTemplateSelector();
     else if (modalName === 'embedModal') closeEmbedModal();

@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { Handle, Position } from 'reactflow';
 import PropTypes from 'prop-types';
 import './PowerNode.css'; // Asumimos que PowerNode.css estará en el mismo directorio
 
-const PowerNode = ({
+const PowerNodeComponent = ({
   data,
   isConnectable,
   isUltraPerformanceMode = false,
@@ -44,5 +44,40 @@ const PowerNode = ({
     </div>
   );
 };
+
+PowerNodeComponent.propTypes = {
+  data: PropTypes.shape({
+    label: PropTypes.string,
+    powerId: PropTypes.string,
+    powerTitle: PropTypes.string,
+    powerIcon: PropTypes.node,
+    powerDescription: PropTypes.string,
+  }).isRequired,
+  isConnectable: PropTypes.bool,
+  isUltraPerformanceMode: PropTypes.bool,
+};
+
+const arePropsEqual = (prevProps, nextProps) => {
+  if (
+    prevProps.isConnectable !== nextProps.isConnectable ||
+    prevProps.isUltraPerformanceMode !== nextProps.isUltraPerformanceMode
+  ) {
+    return false;
+  }
+
+  const prevData = prevProps.data || {};
+  const nextData = nextProps.data || {};
+
+  return (
+    prevData.label === nextData.label &&
+    prevData.powerTitle === nextData.powerTitle &&
+    prevData.powerIcon === nextData.powerIcon &&
+    prevData.powerDescription === nextData.powerDescription
+  );
+};
+
+const PowerNode = memo(PowerNodeComponent, arePropsEqual);
+
+PowerNode.displayName = 'PowerNode';
 
 export default PowerNode;

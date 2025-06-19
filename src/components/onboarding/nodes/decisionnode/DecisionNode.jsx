@@ -252,7 +252,15 @@ const DecisionNodeInternal = ({ id, selected, isConnectable }) => {
   );
 };
 
-const DecisionNode = React.memo(DecisionNodeInternal);
+const arePropsEqual = (prevProps, nextProps) => {
+  return (
+    prevProps.id === nextProps.id &&
+    prevProps.selected === nextProps.selected &&
+    prevProps.isConnectable === nextProps.isConnectable
+  );
+};
+
+const DecisionNode = React.memo(DecisionNodeInternal, arePropsEqual);
 
 DecisionNode.displayName = 'DecisionNode';
 

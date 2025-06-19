@@ -5,6 +5,7 @@ import PrivateRoute from '../components/auth/PrivateRoute.jsx';
 import { useEffect, Suspense, lazy } from 'react';
 import useAuthStore from '@/stores/useAuthStore';
 import preventFlowReset from '../components/onboarding/flow-editor/utils/prevent-flow-reset.js';
+import FlowBenchmarkTool from '../components/benchmarking/FlowBenchmarkTool'; // Herramienta de benchmarking
 
 // Componentes que se cargan inmediatamente (críticos para la experiencia inicial)
 import Layout from '../pages/layout/Layout.jsx';
@@ -264,6 +265,7 @@ const AppWrapper = () => {
     '/training',
     '/plubot/edit/training',
     '/plubot/create/training',
+    '/benchmark',
   ].some(route => pathname.startsWith(route));
   
   // Verificación adicional para rutas con parámetros de consulta
@@ -308,6 +310,7 @@ const AppWrapper = () => {
                   <Routes>
                     {/* Rutas públicas */}
                     <Route path="/" element={<Home />} />
+                    <Route path="/benchmark" element={<FlowBenchmarkTool />} />
                     <Route path="/tutoriales" element={<Tutoriales />} />
                     <Route path="/tutoriales/automatizacion" element={<TutorialesAutomatizacion />} />
                     <Route path="/tutoriales/aprendizaje" element={<TutorialesAprendizaje />} />

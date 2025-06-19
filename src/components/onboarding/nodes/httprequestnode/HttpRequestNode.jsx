@@ -18,6 +18,43 @@ import { NODE_TYPES } from '@/utils/nodeConfig';
 import { v4 as uuidv4 } from 'uuid'; 
 import './HttpRequestNode.css';
 
+const arePropsEqual = (prevProps, nextProps) => {
+  if (
+    prevProps.selected !== nextProps.selected ||
+    prevProps.isConnectable !== nextProps.isConnectable
+  ) {
+    return false;
+  }
+
+  // Deep comparison for the data object
+  const prevData = prevProps.data || {};
+  const nextData = nextProps.data || {};
+
+  // Compare primitive and easily comparable fields first
+  if (
+    prevData.label !== nextData.label ||
+    prevData.method !== nextData.method ||
+    prevData.url !== nextData.url ||
+    prevData.bodyType !== nextData.bodyType ||
+    prevData.bodyString !== nextData.bodyString ||
+    prevData.isCollapsed !== nextData.isCollapsed
+  ) {
+    return false;
+  }
+
+  // Use JSON.stringify for deep comparison of arrays of objects
+  // This is a pragmatic approach for complex but serializable data.
+  if (
+    JSON.stringify(prevData.headers) !== JSON.stringify(nextData.headers) ||
+    JSON.stringify(prevData.bodyFormData) !== JSON.stringify(nextData.bodyFormData) ||
+    JSON.stringify(prevData.responseMapping) !== JSON.stringify(nextData.responseMapping)
+  ) {
+    return false;
+  }
+
+  return true; // Props are equal
+};
+
 const HttpRequestNode = React.memo(
   ({
     data = {}, 
@@ -648,4 +685,4 @@ HttpRequestNode.propTypes = {
 
 HttpRequestNode.displayName = 'HttpRequestNode';
 
-export default HttpRequestNode;
+export default React.memo(HttpRequestNode, arePropsEqual);

@@ -208,7 +208,7 @@ ParameterFields.propTypes = {
   onParameterChange: PropTypes.func.isRequired,
 };
 
-const ActionNodeComponent = ({ isConnectable = true, selected = false, id }) => {
+const ActionNodeRoot = ({ isConnectable = true, selected = false, id }) => {
   const nodeRef = useRef(null);
   const textareaRef = useRef(null);
   const menuRef = useRef(null);
@@ -436,13 +436,21 @@ const ActionNodeComponent = ({ isConnectable = true, selected = false, id }) => 
   );
 };
 
-ActionNodeComponent.propTypes = {
-  id: PropTypes.string.isRequired,
-  selected: PropTypes.bool,
+ActionNodeRoot.displayName = 'ActionNode';
+
+ActionNodeRoot.propTypes = {
   isConnectable: PropTypes.bool,
+  selected: PropTypes.bool,
+  id: PropTypes.string.isRequired,
 };
 
-const ActionNode = memo(ActionNodeComponent);
-ActionNode.displayName = 'ActionNode';
+const arePropsEqual = (prevProps, nextProps) => {
+  return (
+    prevProps.selected === nextProps.selected &&
+    prevProps.isConnectable === nextProps.isConnectable
+  );
+};
+
+const ActionNode = memo(ActionNodeRoot, arePropsEqual);
 
 export default ActionNode;

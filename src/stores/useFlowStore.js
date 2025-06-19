@@ -72,6 +72,17 @@ const initialState = {
   contextMenuNodeId: null,
   contextMenuItems: [],
   isNodeBeingDragged: false, // Flag to indicate if a node is currently being dragged
+
+  // Umbrales de LOD para control dinámico
+  lodThresholds: {
+    FULL: 0.3,
+    COMPACT: 0.15,
+  },
+  // Guardar los umbrales por defecto para poder restaurarlos
+  defaultLodThresholds: {
+    FULL: 0.3,
+    COMPACT: 0.15,
+  },
 };
 
 const useFlowStore = create(
@@ -115,6 +126,9 @@ const useFlowStore = create(
 
       // Action to set the React Flow instance
       setReactFlowInstance: (instance) => set({ reactFlowInstance: instance }),
+
+      // Acción para actualizar los umbrales de LOD dinámicamente
+      setLodThresholds: (thresholds) => set({ lodThresholds: thresholds }),
 
       // Acciones para el menú contextual global - implementación mejorada
       showContextMenu: (x, y, nodeId, items) => {

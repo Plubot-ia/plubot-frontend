@@ -924,7 +924,53 @@ import React, {
 
   EndNode.displayName = 'EndNode';
 
-  export default memo(EndNode);
+  const arePropsEqual = (prevProps: EndNodeProps, nextProps: EndNodeProps): boolean => {
+  if (
+    prevProps.selected !== nextProps.selected ||
+    prevProps.isConnectable !== nextProps.isConnectable ||
+    prevProps.dragging !== nextProps.dragging ||
+    prevProps.isUltraPerformanceMode !== nextProps.isUltraPerformanceMode ||
+    prevProps.readonly !== nextProps.readonly ||
+    prevProps.debugMode !== nextProps.debugMode
+  ) {
+    return false;
+  }
+
+  const prevData = prevProps.data;
+  const nextData = nextProps.data;
+
+  // Fast checks for common changes
+  if (
+    prevData.label !== nextData.label ||
+    prevData.status !== nextData.status ||
+    prevData.isCollapsed !== nextData.isCollapsed ||
+    prevData.highlight !== nextData.highlight
+  ) {
+    return false;
+  }
+
+  // Deeper checks for complex or less frequently changed properties
+  if (
+    JSON.stringify(prevData.variables) !== JSON.stringify(nextData.variables) ||
+    JSON.stringify(prevData.tags) !== JSON.stringify(nextData.tags)
+  ) {
+    return false;
+  }
+  
+  // Check other properties that affect rendering
+  return (
+    prevData.description === nextData.description &&
+    prevData.customIconComponent === nextData.customIconComponent &&
+    prevData.theme === nextData.theme &&
+    prevData.width === nextData.width &&
+    prevData.height === nextData.height &&
+    prevData.priority === nextData.priority &&
+    prevData.dynamicContent === nextData.dynamicContent &&
+    prevData.lastRun === nextData.lastRun
+  );
+};
+
+export default memo(EndNode, arePropsEqual);
 
   // Export additional utilities
   export { 

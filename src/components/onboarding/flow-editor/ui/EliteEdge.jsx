@@ -248,7 +248,7 @@ const EliteEdge = ({
   
   useEffect(() => {
     if (process.env.NODE_ENV === 'development') {
-      console.log('[EliteEdge] Modo Ultra Rendimiento:', isUltraMode ? 'Activado' : 'Desactivado');
+      // console.log('[EliteEdge] Modo Ultra Rendimiento:', isUltraMode ? 'Activado' : 'Desactivado');
     }
   }, [isUltraMode]);
   

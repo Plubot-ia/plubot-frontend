@@ -120,4 +120,22 @@ const EmotionDetectionNode: React.FC<EmotionDetectionNodeProps> = ({ id, data, s
   );
 };
 
-export default memo(EmotionDetectionNode);
+const arePropsEqual = (prevProps: EmotionDetectionNodeProps, nextProps: EmotionDetectionNodeProps) => {
+  // Re-render if selection changes
+  if (prevProps.selected !== nextProps.selected) {
+    return false;
+  }
+
+  // Compare relevant data properties
+  const prevData = prevProps.data;
+  const nextData = nextProps.data;
+
+  return (
+    prevData.ultraMode === nextData.ultraMode &&
+    prevData.detectedEmotion === nextData.detectedEmotion &&
+    prevData.outputVariable === nextData.outputVariable &&
+    prevData.inputText === nextData.inputText
+  );
+};
+
+export default memo(EmotionDetectionNode, arePropsEqual);

@@ -264,7 +264,7 @@ interface StartNodeComponentProps extends NodeProps {
   };
 }
 
-const StartNode: React.FC<StartNodeComponentProps> = ({ id, data, selected, xPos, yPos }) => {
+const StartNodeComponent: React.FC<StartNodeComponentProps> = ({ id, data, selected, xPos, yPos }) => {
   const { getNode, setNodes } = useReactFlow();
   const updateNodeData = useFlowStore((state) => state.updateNode);
   const showContextMenu = useFlowStore((state) => state.showContextMenu);
@@ -462,7 +462,7 @@ const areStartNodePropsEqual = (prevProps: Readonly<StartNodeComponentProps>, ne
   return prevProps.selected === nextProps.selected && !dataChanged;
 };
 
-const MemoizedStartNode = memo(StartNode, areStartNodePropsEqual);
+const MemoizedStartNode = memo(StartNodeComponent, areStartNodePropsEqual);
 MemoizedStartNode.displayName = 'StartNode';
 
 export default MemoizedStartNode;

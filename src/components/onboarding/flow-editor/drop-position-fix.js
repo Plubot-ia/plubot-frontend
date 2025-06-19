@@ -23,10 +23,10 @@ export function calculateCorrectDropPosition(event) {
   }
 
   try {
-    console.log('[DropPositionFix] Event object:', event);
-    console.log('[DropPositionFix] reactFlowInstance available:', !!reactFlowInstance);
+
+
     if (event) {
-      console.log('[DropPositionFix] event.clientX:', event.clientX, 'event.clientY:', event.clientY);
+
     }
 
     // Obtener el elemento ReactFlow principal
@@ -38,7 +38,7 @@ export function calculateCorrectDropPosition(event) {
 
     // Obtener los límites y posición del elemento ReactFlow
     const flowBounds = reactFlowElement.getBoundingClientRect();
-    console.log('[DropPositionFix] flowBounds:', flowBounds);
+
 
     // Calcular la posición del cursor relativa al viewport de ReactFlow
     const clientX = event.clientX - flowBounds.left;
@@ -47,37 +47,37 @@ export function calculateCorrectDropPosition(event) {
     // Obtener el estado actual del viewport (zoom, pan)
     const viewport = reactFlowInstance.getViewport();
     const { x: panX, y: panY, zoom } = viewport;
-    console.log('[DropPositionFix] Viewport (panX, panY, zoom):', panX, panY, zoom);
-    console.log('[DropPositionFix] Relative clientX, clientY:', clientX, clientY);
+
+
 
     // Variable para almacenar la posición calculada
     let flowPosition;
     
     // Intentar usar el método oficial de ReactFlow si está disponible
     if (typeof reactFlowInstance.screenToFlowPosition === 'function') {
-      console.log('[DropPositionFix] Attempting reactFlowInstance.screenToFlowPosition...');
+
       // Método más nuevo y preciso de ReactFlow
       flowPosition = reactFlowInstance.screenToFlowPosition({
         x: event.clientX,
         y: event.clientY
       });
-      console.log('[DropPositionFix] Result from screenToFlowPosition:', flowPosition);
+
     } else if (typeof reactFlowInstance.project === 'function') {
-      console.log('[DropPositionFix] Attempting reactFlowInstance.project...');
+
       // Método alternativo (versiones anteriores)
       flowPosition = reactFlowInstance.project({
         x: clientX,
         y: clientY
       });
-      console.log('[DropPositionFix] Result from project:', flowPosition);
+
     } else {
-      console.log('[DropPositionFix] Attempting manual calculation fallback...');
+
       // Cálculo manual como fallback
       flowPosition = {
         x: (clientX - panX) / zoom,
         y: (clientY - panY) / zoom
       };
-      console.log('[DropPositionFix] Result from manual calculation:', flowPosition);
+
     }
     
     // VALIDACIÓN CRÍTICA: Verificar que las coordenadas sean números válidos
@@ -88,7 +88,7 @@ export function calculateCorrectDropPosition(event) {
       return safePosition;
     }
     
-    console.log('[DropPositionFix] Posición calculada:', flowPosition);
+
     
     // Agregar un offset aleatorio para evitar superposición exacta
     // cuando se sueltan múltiples nodos en la misma posición
@@ -107,7 +107,7 @@ export function calculateCorrectDropPosition(event) {
       lastValidDropPosition = finalPosition;
     }
 
-    console.log('[DropPositionFix] Posición calculada correctamente:', finalPosition);
+
     return finalPosition;
   } catch (error) {
     console.error('[DropPositionFix] Error al calcular posición:', error);

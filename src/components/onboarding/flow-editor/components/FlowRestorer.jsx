@@ -7,7 +7,7 @@ import useFlowStore from '@/stores/useFlowStore';
  */
 const FlowRestorer = () => {
   useEffect(() => {
-    console.log('[FlowRestorer] Iniciando restauración completa del editor de flujos...');
+
     
     // Paso 1: Crear estilos globales que sobrescriban cualquier interferencia
     const createGlobalStyles = () => {
@@ -79,7 +79,7 @@ const FlowRestorer = () => {
         }
       `;
       document.head.appendChild(style);
-      console.log('[FlowRestorer] Estilos globales aplicados');
+
     };
     
     // Paso 2: Función para validar y corregir nodos
@@ -87,7 +87,7 @@ const FlowRestorer = () => {
       const nodes = useFlowStore.getState().nodes || [];
       if (!nodes.length) return;
       
-      console.log('[FlowRestorer] Validando y reparando', nodes.length, 'nodos...');
+
       
       // Crear posiciones únicas para evitar apilamiento
       const usedPositions = new Set();
@@ -148,7 +148,7 @@ const FlowRestorer = () => {
       
       // Actualizar los nodos en el store
       useFlowStore.getState().setNodes(repairedNodes);
-      console.log('[FlowRestorer] Nodos reparados y actualizados');
+
     };
     
     // Paso 3: Función para restaurar la interactividad completa
@@ -160,7 +160,7 @@ const FlowRestorer = () => {
         return;
       }
       
-      console.log('[FlowRestorer] Restaurando interactividad completa...');
+
       
       try {
         // Reiniciar el zoom para activar el viewport
@@ -168,7 +168,7 @@ const FlowRestorer = () => {
           reactFlowInstance.zoomTo(0.99);
           setTimeout(() => {
             reactFlowInstance.zoomTo(1);
-            console.log('[FlowRestorer] Zoom reiniciado con éxito');
+
           }, 100);
         }, 200);
       } catch (error) {
@@ -192,7 +192,7 @@ const FlowRestorer = () => {
               sheet.href.includes('reset-transform')
             )) {
               sheet.disabled = true;
-              console.log('[FlowRestorer] Deshabilitado:', sheet.href);
+
             }
           } catch (e) {
             // Algunas hojas pueden ser inaccesibles por CORS

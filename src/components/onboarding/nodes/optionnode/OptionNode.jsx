@@ -5,7 +5,7 @@
  * @version 2.0.0 - Refactorizado para integración directa con Zustand
  */
 
-import React, { useState, useCallback, useMemo, useRef, useEffect } from 'react';
+import React, { useState, useCallback, useMemo, useRef, useEffect, memo } from 'react';
 import PropTypes from 'prop-types';
 import { Position, Handle } from 'reactflow';
 import { 
@@ -141,7 +141,7 @@ OptionNodeHandle.propTypes = {
 /**
  * Componente principal OptionNode - Refactorizado para integración directa y granular con Zustand
  */
-const OptionNode = ({ 
+const OptionNodeComponent = ({ 
   id, 
   selected = false, 
   isConnectable = true 
@@ -423,10 +423,14 @@ const OptionNode = ({
   );
 };
 
-OptionNode.propTypes = {
+OptionNodeComponent.propTypes = {
   id: PropTypes.string.isRequired,
   selected: PropTypes.bool,
   isConnectable: PropTypes.bool
 };
+
+const OptionNode = memo(OptionNodeComponent);
+
+OptionNode.displayName = 'OptionNode';
 
 export default OptionNode;
