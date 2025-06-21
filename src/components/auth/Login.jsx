@@ -26,9 +26,12 @@ const Login = () => {
     
     // Procesar parámetros de la URL
     const searchParams = new URLSearchParams(location.search);
+    const sessionExpired = searchParams.get('session_expired');
     const urlMessage = searchParams.get('message');
-    
-    if (urlMessage) {
+
+    if (sessionExpired) {
+      setMessage({ text: 'Tu sesión ha expirado. Por favor, inicia sesión de nuevo.', type: 'info' });
+    } else if (urlMessage) {
       switch (urlMessage) {
         case 'verified':
           setMessage({ text: '¡Correo verificado exitosamente! Ya puedes iniciar sesión.', type: 'success' });

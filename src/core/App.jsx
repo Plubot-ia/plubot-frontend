@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { GamificationProvider } from '../context/GamificationContext';
 import { PlubotCreationProvider } from '../context/PlubotCreationContext';
-import PrivateRoute from '../components/auth/PrivateRoute.jsx';
+import ProtectedRoute from '../components/auth/ProtectedRoute.jsx';
 import { useEffect, Suspense, lazy } from 'react';
 import useAuthStore from '@/stores/useAuthStore';
 import preventFlowReset from '../components/onboarding/flow-editor/utils/prevent-flow-reset.js';
@@ -342,90 +342,90 @@ const AppWrapper = () => {
                     {/* Rutas protegidas */}
                     <Route path="/pluniverse" element={<PluniverseDashboard />} />
                     <Route path="/plubot-studio" element={
-                      <PrivateRoute>
+                      <ProtectedRoute>
                         <PlubotStudio />
-                      </PrivateRoute>
+                      </ProtectedRoute>
                     } />
                     <Route path="/academy" element={
-                      <PrivateRoute>
+                      <ProtectedRoute>
                         <Academy />
-                      </PrivateRoute>
+                      </ProtectedRoute>
                     } />
                     <Route path="/marketplace" element={<Marketplace />} />
                     <Route path="/pluniverse/marketplace" element={<Navigate to="/marketplace" replace />} />
                     <Route path="/coliseum" element={
-                      <PrivateRoute>
+                      <ProtectedRoute>
                         <Coliseum />
-                      </PrivateRoute>
+                      </ProtectedRoute>
                     } />
                     <Route path="/pluniverse/coliseum" element={<Navigate to="/coliseum" replace />} />
                     <Route path="/tower" element={
-                      <PrivateRoute>
+                      <ProtectedRoute>
                         <Tower />
-                      </PrivateRoute>
+                      </ProtectedRoute>
                     } />
                     <Route path="/sanctuary" element={
-                      <PrivateRoute>
+                      <ProtectedRoute>
                         <Sanctuary />
-                      </PrivateRoute>
+                      </ProtectedRoute>
                     } />
                     <Route path="/pluniverse/sanctuary" element={<Navigate to="/sanctuary" replace />} />
                     <Route path="/plubot/create" element={
-                      <PrivateRoute>
+                      <ProtectedRoute>
                         <CreatePlubot />
-                      </PrivateRoute>
+                      </ProtectedRoute>
                     } />
                     <Route path="/plubot/edit/:id" element={
-                      <PrivateRoute>
+                      <ProtectedRoute>
                         <PlubotEdit />
-                      </PrivateRoute>
+                      </ProtectedRoute>
                     } />
                     <Route path="/plubot/edit/personalization" element={
-                      <PrivateRoute>
+                      <ProtectedRoute>
                         <PersonalizationForm />
-                      </PrivateRoute>
+                      </ProtectedRoute>
                     } />
                     <Route path="/plubot/edit/training/:plubotId" element={
-                      <PrivateRoute>
+                      <ProtectedRoute>
                         <Layout hideHeaderFooter={true}>
                           <TrainingScreen />
                         </Layout>
-                      </PrivateRoute>
+                      </ProtectedRoute>
                     } />
                     <Route path="/welcome" element={<WelcomeSequence />} />
                     <Route path="/factory" element={<FactoryScreen />} />
                     <Route path="/plubot/create/welcome" element={<Navigate to="/welcome" replace />} />
                     <Route path="/plubot/create/factory" element={<Navigate to="/factory" replace />} />
                     <Route path="/personalization" element={
-                      <PrivateRoute>
+                      <ProtectedRoute>
                         <PersonalizationForm />
-                      </PrivateRoute>
+                      </ProtectedRoute>
                     } />
                     <Route path="/plubot/create/personalization" element={<Navigate to="/personalization" replace />} />
                     <Route path="/training" element={
-                      <PrivateRoute>
+                      <ProtectedRoute>
                         <Layout hideHeaderFooter={true}>
                           <TrainingScreen />
                         </Layout>
-                      </PrivateRoute>
+                      </ProtectedRoute>
                     } />
                     <Route path="/plubot/edit/training" element={<Navigate to="/training" replace />} />
                     <Route path="/profile" element={
-                      <PrivateRoute>
+                      <ProtectedRoute>
                         <Profile />
-                      </PrivateRoute>
+                      </ProtectedRoute>
                     } />
                     <Route path="/change-password" element={
-                      <PrivateRoute>
+                      <ProtectedRoute>
                         <ChangePassword />
-                      </PrivateRoute>
+                      </ProtectedRoute>
                     } />
                     <Route path="/tutoriales/discord" element={<TutorialDiscord />} />
                     <Route path="/tutoriales/discord-id-canal" element={<TutorialDiscordChannelId />} />
                     <Route path="/logout" element={
-                      <PrivateRoute>
+                      <ProtectedRoute>
                         <Logout />
-                      </PrivateRoute>
+                      </ProtectedRoute>
                     } />
                     
                     {/* Redirecciones */}

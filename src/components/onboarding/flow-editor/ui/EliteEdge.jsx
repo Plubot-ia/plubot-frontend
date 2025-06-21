@@ -9,13 +9,13 @@ import './EliteEdge.css';
 // y errores en las aristas personalizadas
 
 /**
- * EliteEdge 2025 - Renderizador avanzado de aristas
- * Implementa aristas con flujo de energía dinámico y efectos visuales de élite
- * Optimizado para rendimiento y estética según estándares de visualización de datos 2025
- * @version 2.0.0
+ * EliteEdge 2025 - Renderizador avanzado de aristas con LOD.
+ * Implementa aristas con flujo de energía dinámico, efectos visuales y sistema de Nivel de Detalle (LOD).
+ * El renderizado cambia entre estático y animado según el `lodLevel` y `isUltraMode`.
+ * @version 2.1.0
  * @author Cascade AI
  */
-const EliteEdge = ({
+const EliteEdgeComponent = ({
   id,
   source,
   target,
@@ -36,11 +36,20 @@ const EliteEdge = ({
   // Nueva prop para detectar si la arista está siendo arrastrada actualmente
   // Esto permite renderizar la arista de manera visible durante el arrastre
   isDragging = false,
-  // isUltraMode se obtiene directamente del store, ya no se usa como prop
+  lodLevel,      // Prop inyectada por HOC
+  isUltraMode,   // Prop inyectada por HOC
   ...props
 }) => {
-  // Obtener el estado de modo Ultra Rendimiento directamente del store
-  const isUltraMode = useFlowStore(state => state.isUltraMode);
+
+  // Condición unificada para determinar si el renderizado debe ser estático.
+  // Es estático si el modo ultra está activo o si el nivel de detalle no es el máximo.
+  const renderStatic = isUltraMode || lodLevel !== 'FULL';
+
+  // INSTRUMENTATION: Log de render de aristas
+  useEffect(() => {
+    const renderType = isUltraMode || lodLevel !== 'FULL' ? "Estática" : "Animada";
+    console.log(`[Render] Arista ${id} - Memoized: SÍ - Render: ${renderType} - LOD: ${lodLevel} - Ultra: ${isUltraMode}`);
+  }, [id, isUltraMode, lodLevel]);
   
   // Procesamiento ultra-eficiente de handles con máxima optimización
   // MEJORA: Eliminar logs excesivos y optimizar cálculo para mejor rendimiento
@@ -292,8 +301,8 @@ const EliteEdge = ({
     const weight = parseFloat(safeProps.data?.weight) || 1;
     width *= Math.max(0.5, Math.min(1.5, weight));
     
-    // Reducir grosor en modo ultra rendimiento
-    if (isUltraMode) width *= 0.8;
+    // Reducir grosor en modo estático para menor carga visual
+    if (renderStatic) width *= 0.8;
     
     return width;
   }, [safeProps.selected, isHovered, safeProps.data, isUltraMode]);
@@ -381,8 +390,8 @@ const EliteEdge = ({
   
   // Función para animar el flujo a lo largo de la arista
   const animate = useCallback((time) => {
-    // No animar en modo ultra rendimiento
-    if (isUltraMode) return;
+    // No animar si el renderizado es estático (por modo ultra o LOD)
+    if (renderStatic) return;
     
     // Calcular desplazamiento de la línea punteada para crear efecto de movimiento
     // const offset = (time / 500) % 100; // Ya no necesitamos offset para el movimiento de guiones
@@ -787,32 +796,22 @@ const EliteEdge = ({
   );
 };
 
-export default memo(EliteEdge, (prevProps, nextProps) => {
-  // Comparación profunda de props relevantes para decidir si re-renderizar
-  // Esta es una optimización crítica para el rendimiento con muchas aristas
-  const relevantPropsChanged = (
-    prevProps.id !== nextProps.id ||
-    prevProps.sourceX !== nextProps.sourceX ||
-    prevProps.sourceY !== nextProps.sourceY ||
-    prevProps.targetX !== nextProps.targetX ||
-    prevProps.targetY !== nextProps.targetY ||
-    prevProps.selected !== nextProps.selected ||
-    prevProps.isDragging !== nextProps.isDragging || // Importante para el feedback visual durante el arrastre
-    JSON.stringify(prevProps.data) !== JSON.stringify(nextProps.data) ||
-    prevProps.label !== nextProps.label ||
-    prevProps.markerEnd !== nextProps.markerEnd ||
-    prevProps.sourcePosition !== nextProps.sourcePosition ||
-    prevProps.targetPosition !== nextProps.targetPosition ||
-    // Comparar el estado de isUltraMode que ahora viene del store
-    // Esto requiere que EliteEdge tenga acceso al store o reciba isUltraMode como prop
-    // (Actualmente lo lee del store directamente, así que esta comparación aquí puede ser redundante
-    // si el componente se re-renderiza cuando cambia el store. Sin embargo, es bueno ser explícito)
-    useFlowStore.getState().isUltraMode !== useFlowStore.getState().isUltraMode // Esto podría no funcionar como se espera en memo
-  );
+// Función de comparación personalizada para React.memo
+const arePropsEqual = (prevProps, nextProps) => {
+  // Compara si las props relevantes han cambiado.
+  const propsAreEqual = 
+    prevProps.id === nextProps.id &&
+    prevProps.selected === nextProps.selected &&
+    prevProps.lodLevel === nextProps.lodLevel &&
+    prevProps.isUltraMode === nextProps.isUltraMode &&
+    prevProps.sourceX === nextProps.sourceX &&
+    prevProps.sourceY === nextProps.sourceY &&
+    prevProps.targetX === nextProps.targetX &&
+    prevProps.targetY === nextProps.targetY;
 
-  if (!relevantPropsChanged && process.env.NODE_ENV === 'development') {
-    // console.log(`[EliteEdge] Re-renderizado de arista ${nextProps.id} evitado por memoización.`);
-  }
-  
-  return !relevantPropsChanged;
-});
+  return propsAreEqual;
+};
+
+const EliteEdge = memo(EliteEdgeComponent, arePropsEqual);
+
+export default EliteEdge;

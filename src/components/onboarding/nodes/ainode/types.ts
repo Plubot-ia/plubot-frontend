@@ -19,6 +19,7 @@ export interface AiNodeData {
   // Configuración de UI/UX
   ultraMode?: boolean; // true = sin animación
   isCollapsed?: boolean; // Estado de expansión del nodo
+  lodLevel?: string; // Nivel de detalle inyectado por el Flow
 }
 
 // Podríamos añadir más tipos relacionados con la IA aquí en el futuro

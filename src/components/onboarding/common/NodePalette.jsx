@@ -64,12 +64,16 @@ const advancedNodeDefinitions = [];
 const advancedCategories = NODE_CATEGORIES.filter(cat => ['advanced', 'integrations', 'ai'].includes(cat.id));
 advancedCategories.forEach(category => {
   category.nodes.forEach(node => {
-    if (node.type !== NODE_TYPES.POWER_NODE) {
+    // Se añade una guarda para asegurar que el nodo tiene un 'type' definido.
+    // Esto previene el warning de 'key' en React y el error de 'undefined' al arrastrar.
+    if (node && node.type && node.type !== NODE_TYPES.POWER_NODE) {
       advancedNodeDefinitions.push({
         type: node.type,
         label: node.label,
-        icon: node.icon, 
-        description: NODE_DESCRIPTIONS[node.type] || `Nodo ${node.label}`
+        icon: node.icon,
+        description: NODE_DESCRIPTIONS[node.type] || `Nodo ${node.label}`,
+        // Se restaura la propagación de la categoría, que es necesaria para la lógica de drag-and-drop.
+        category: category.id
       });
     }
   });

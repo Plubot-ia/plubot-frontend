@@ -4,10 +4,17 @@ import PropTypes from 'prop-types';
 import './PowerNode.css'; // Asumimos que PowerNode.css estará en el mismo directorio
 
 const PowerNodeComponent = ({
+  id,
   data,
   isConnectable,
   isUltraPerformanceMode = false,
 }) => {
+  // INSTRUMENTATION: Log de render de nodos
+  useEffect(() => {
+    const memoStatus = 'Memoized: Yes (React.memo)';
+    console.log(`[Render] Nodo ${id} - Tipo: PowerNode - LOD: ${data.lodLevel} - ${memoStatus}`);
+  }, [id, data.lodLevel]);
+
   // data contendrá: label, powerId, powerTitle, powerIcon, powerDescription, powerCategory, config, status
 
   return (
@@ -46,6 +53,7 @@ const PowerNodeComponent = ({
 };
 
 PowerNodeComponent.propTypes = {
+  id: PropTypes.string.isRequired,
   data: PropTypes.shape({
     label: PropTypes.string,
     powerId: PropTypes.string,

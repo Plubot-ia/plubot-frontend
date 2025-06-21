@@ -13,6 +13,7 @@ export const NODE_TYPES = {
     WEBHOOK_NODE: 'webhookNode',
     DATABASE_NODE: 'databaseNode',
     AI_NODE: 'aiNode',
+    AI_NODE_PRO: 'aiNodePro',
     NLP_NODE: 'nlpNode',
     COMPLEX_CONDITION_NODE: 'complexConditionNode',
     POWER_NODE: 'powerNode',
@@ -94,6 +95,7 @@ export const NODE_LABELS = {
     COMPLEX_CONDITION_NODE: 'Condición Compleja',
     POWER_NODE: 'Poder',
     ADVANCED_AI_NODE: 'IA Avanzada',
+    AI_NODE_PRO: 'IA Pro',
 };
 
 export const NODE_DESCRIPTIONS = {
@@ -106,7 +108,8 @@ export const NODE_DESCRIPTIONS = {
     HTTP_REQUEST_NODE: 'Realiza una solicitud HTTP a un servicio externo.',
     WEBHOOK_NODE: 'Recibe eventos externos a través de un endpoint.',
     DATABASE_NODE: 'Interactúa con una base de datos para guardar o recuperar información.',
-    AI_NODE: 'Utiliza inteligencia artificial para generar respuestas o analizar datos.',
+    AI_NODE: 'Ejecuta un prompt de IA para generar texto, tomar decisiones o analizar datos.',
+    AI_NODE_PRO: 'Un nodo de IA avanzado con controles de creatividad y tamaño de respuesta.',
     NLP_NODE: 'Procesa lenguaje natural para extraer significado, entidades o intenciones.',
     COMPLEX_CONDITION_NODE: 'Evalúa múltiples condiciones con operaciones lógicas AND/OR/NOT.',
     POWER_NODE: 'Integra tu Plubot con aplicaciones y servicios externos.',
@@ -155,14 +158,16 @@ export const NODE_CATEGORIES = [
     },
   {
     id: 'ai',
-    label: 'Inteligencia Artificial',
+    name: 'Inteligencia Artificial',
+    description: 'Nodos para integrar capacidades de IA en tu flujo.',
     icon: 'fas fa-robot',
     nodes: [
+
       {
-        type: 'ai',
-        label: 'IA Genérica',
-        icon: 'fas fa-brain',
-        description: 'Un nodo de IA configurable para diversas tareas.',
+        type: NODE_TYPES.AI_NODE_PRO,
+        label: NODE_LABELS.AI_NODE_PRO,
+        icon: 'fas fa-star',
+        description: NODE_DESCRIPTIONS.AI_NODE_PRO,
       },
       {
         type: 'emotionDetection',
@@ -226,6 +231,22 @@ export const getNodeInitialData = (nodeType, nodeLabel, powerItemData = null) =>
                 interpolatedPromptPreview: '',
                 ultraMode: false,
             };
+
+            case NODE_TYPES.AI_NODE_PRO:
+                return {
+                    ...baseData,
+                    label: NODE_LABELS.AI_NODE_PRO,
+                    type: NODE_TYPES.AI_NODE_PRO,
+                    prompt: 'Escribe un prompt para el modelo Pro.',
+                    temperature: 0.7,
+                    maxTokens: 256,
+                    isCollapsed: false,
+                    isLoading: false,
+                    error: null,
+                    lastResponse: null,
+                    lastPrompt: '',
+                    ultraMode: false,
+                };
 
         case NODE_TYPES.DATABASE_NODE:
             return {

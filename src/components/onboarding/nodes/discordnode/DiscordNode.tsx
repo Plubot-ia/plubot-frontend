@@ -11,9 +11,16 @@ export interface DiscordNodeData {
   discordToken?: string;
   channelId?: string;
   messageContent?: string;
+  lodLevel?: string;
 }
 
 const DiscordNode: React.FC<NodeProps<DiscordNodeData>> = ({ id, data, selected, isConnectable }) => {
+  // INSTRUMENTATION: Log de render de nodos
+  useEffect(() => {
+    const memoStatus = 'Memoized: Yes (React.memo with custom arePropsEqual)';
+    console.log(`[Render] Nodo ${id} - Tipo: DiscordNode - LOD: ${data.lodLevel} - ${memoStatus}`);
+  }, [id, data.lodLevel]);
+
   // Contenido para los tooltips
   const tokenTooltipContent = (
     <>

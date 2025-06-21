@@ -14,6 +14,7 @@ export interface EmotionDetectionNodeData {
   detectedEmotion?: string; // La emoción detectada por la IA (ej: 'happy', 'sad')
   isCollapsed?: boolean; // Estado de la UI para colapsar el nodo
   ultraMode?: boolean; // Flag para el modo de alto rendimiento sin animaciones
+  lodLevel?: string; // Nivel de detalle inyectado por el Flow
 }
 
 // Define las props que recibe el componente del nodo desde React Flow

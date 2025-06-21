@@ -18,6 +18,7 @@ import PowerNode from '@/components/onboarding/nodes/powernode/PowerNode.jsx';
 import DiscordNode from '@/components/onboarding/nodes/discordnode/DiscordNode.tsx';
 import AiNode from '@/components/onboarding/nodes/ainode/AiNode';
 import EmotionDetectionNode from '@/components/onboarding/nodes/emotiondetectionnode';
+import AiNodePro from '@/components/onboarding/nodes/ainodepro';
 
 // --- Message Node Specific LOD Components ---
 const MessageNode = React.lazy(() => import('@/components/onboarding/nodes/messagenode/MessageNode'));
@@ -117,6 +118,11 @@ export const createNodeTypes = (isUltraPerformanceMode = false) => {
     },
     emotionDetection: {
       Full: EmotionDetectionNode,
+      Compact: GenericCompactNode,
+      Mini: GenericMiniNode,
+    },
+    aiNodePro: {
+      Full: AiNodePro,
       Compact: GenericCompactNode,
       Mini: GenericMiniNode,
     },

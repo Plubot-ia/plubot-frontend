@@ -65,12 +65,19 @@ const DecisionNodeInternal = ({ id, selected, isConnectable }) => {
       enableMarkdown: node.data.enableMarkdown,
       enableVariables: node.data.enableVariables,
       isUltraPerformanceMode: node.data.isUltraPerformanceMode,
+      lodLevel: node.data.lodLevel,
     };
   }, shallow);
 
   const [currentQuestion, setCurrentQuestion] = useState(nodeData?.question || '');
   const [markdownEnabled, setMarkdownEnabled] = useState(nodeData?.enableMarkdown || false);
   const [variablesEnabled, setVariablesEnabled] = useState(nodeData?.enableVariables || false);
+
+  // INSTRUMENTATION: Log de render de nodos
+  useEffect(() => {
+    const memoStatus = 'Memoized: Yes (React.memo)';
+    console.log(`[Render] Nodo ${id} - Tipo: DecisionNode - LOD: ${nodeData?.lodLevel} - ${memoStatus}`);
+  }, [id, nodeData?.lodLevel]);
 
   const prevIsEditing = useRef(nodeData?.isEditing);
   

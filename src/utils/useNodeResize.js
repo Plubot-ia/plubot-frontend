@@ -2,6 +2,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import { useAnalytics } from '@/hooks/useAnalytics';
 import { useReactFlow } from 'reactflow';
+import { throttle } from 'lodash';
 
 export const useNodeResize = (nodeId, initialWidth, initialHeight, minWidth = 100, minHeight = 60) => {
   const [isResizing, setIsResizing] = useState(false);
@@ -14,11 +15,18 @@ export const useNodeResize = (nodeId, initialWidth, initialHeight, minWidth = 10
     setIsResizing(true);
   }, []);
 
+  const throttledSetNodes = useCallback(
+    throttle((updater) => {
+      setNodes(updater);
+    }, 16), // Throttle to ~60fps, ensuring smooth but controlled updates
+    [setNodes]
+  );
+
   const handleMouseMove = useCallback(
     (e) => {
       if (!isResizing) return;
 
-      setNodes((nds) =>
+      throttledSetNodes((nds) =>
         nds.map((node) => {
           if (node.id === nodeId) {
             const currentWidth = node.data?.width || node.style?.width || initialWidth;
@@ -28,15 +36,15 @@ export const useNodeResize = (nodeId, initialWidth, initialHeight, minWidth = 10
 
             return {
               ...node,
-              style: { ...node.style, width: newWidth, height: newHeight }, // Actualiza el estilo para el DOM
-              data: { ...node.data, width: newWidth, height: newHeight }, // Persiste en data
+              style: { ...node.style, width: newWidth, height: newHeight },
+              data: { ...node.data, width: newWidth, height: newHeight },
             };
           }
           return node;
         })
       );
     },
-    [isResizing, nodeId, setNodes, initialWidth, initialHeight, minWidth, minHeight]
+    [isResizing, nodeId, throttledSetNodes, initialWidth, initialHeight, minWidth, minHeight]
   );
 
   const handleMouseUp = useCallback(() => {

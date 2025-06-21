@@ -153,7 +153,8 @@ import React, {
     highlight: z.boolean().optional().default(false),
     dynamicContent: z.string().optional().default('Este es el final del flujo.'),
     connections: z.number().min(0).optional().default(1),
-    lastRun: z.string().optional().default(new Date().toLocaleDateString())
+    lastRun: z.string().optional().default(new Date().toLocaleDateString()),
+    lodLevel: z.string().optional()
   });
   
   export type EndNodeData = z.infer<typeof END_NODE_ZOD_SCHEMA>;
@@ -214,6 +215,7 @@ import React, {
     onStatusChange?: (nodeId: string, status: EndNodeData['status']) => void;
     readonly?: boolean;
     debugMode?: boolean;
+    lodLevel?: string;
   }
   
   export interface EndNodeRef {
@@ -362,7 +364,14 @@ import React, {
       onStatusChange,
       readonly = false,
       debugMode = false,
+      lodLevel,
     } = props;
+
+    // INSTRUMENTATION: Log de render de nodos
+    useEffect(() => {
+      const memoStatus = 'Memoized: Yes (custom comparison)';
+      console.log(`[Render] Nodo ${nodeId} - Tipo: EndNode - LOD: ${lodLevel} - ${memoStatus}`);
+    }, [nodeId, lodLevel]);
 
     const { t } = useTranslation();
     const { theme } = useTheme();
@@ -931,7 +940,8 @@ import React, {
     prevProps.dragging !== nextProps.dragging ||
     prevProps.isUltraPerformanceMode !== nextProps.isUltraPerformanceMode ||
     prevProps.readonly !== nextProps.readonly ||
-    prevProps.debugMode !== nextProps.debugMode
+    prevProps.debugMode !== nextProps.debugMode ||
+    prevProps.lodLevel !== nextProps.lodLevel // <-- CRÍTICO: Añadido el chequeo de LOD
   ) {
     return false;
   }

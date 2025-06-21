@@ -6,6 +6,7 @@
 
 import React, { useState, useCallback, useRef, useMemo, useEffect, lazy, Suspense } from 'react';
 import { useNavigate } from 'react-router-dom';
+import useAuthStore from '@/stores/useAuthStore';
 import { ReactFlowProvider, applyNodeChanges, applyEdgeChanges, addEdge } from 'reactflow';
 
 // Hooks del core de la aplicación
@@ -24,7 +25,6 @@ import { onEvent } from '@/utils/eventBus';
 import { applyNodeVisibilityFix } from './utils/optimized-flow-fixes';
 import { 
   prepareEdgesForSaving, 
-  ensureEdgesAreVisible, 
   recoverEdgesFromLocalStorage, 
   backupEdgesToLocalStorage 
 } from './utils/edgeFixUtil';
@@ -64,6 +64,7 @@ const HttpRequestNode = lazy(() => import('../nodes/httprequestnode/HttpRequestN
 const PowerNode = lazy(() => import('../nodes/powernode/PowerNode.jsx'));
 const DiscordNode = lazy(() => import('../nodes/discordnode/DiscordNode.tsx'));
 const AiNode = lazy(() => import('../nodes/ainode/AiNode')); // Import for the new AI Node
+const AiNodePro = lazy(() => import('../nodes/ainodepro'));
 const EmotionDetectionNode = lazy(() => import('../nodes/emotiondetectionnode'));
 
 // Estilos
@@ -143,6 +144,7 @@ const useNodeTypes = (isUltraPerformanceMode = false) => {
       power: createNodeRenderer(PowerNode),
       discord: createNodeRenderer(DiscordNode), // Registered DiscordNode
       ai: createNodeRenderer(AiNode), // Registered AiNode
+      aiNodePro: createNodeRenderer(AiNodePro),
       emotionDetection: createNodeRenderer(EmotionDetectionNode),
     };
   }, [nodeStyles]);
@@ -179,34 +181,37 @@ const useHandleValidator = (nodes, edges) => {
   // Mapa de conexiones válidas por tipo de nodo
   const validConnections = useMemo(() => ({
     // Nodo de inicio solo puede conectarse a nodos de mensaje, decisión o acción
-    start: ['message', 'decision', 'action', 'httpRequest', 'power', 'discord', 'ai', 'emotionDetection'], 
+    start: ['message', 'decision', 'action', 'httpRequest', 'power', 'discord', 'ai', 'aiNodePro', 'emotionDetection'], 
     
     // Nodo de mensaje puede conectarse a cualquier tipo excepto a sí mismo
-    message: ['message', 'end', 'decision', 'action', 'option', 'httpRequest', 'power', 'discord', 'ai', 'emotionDetection'], 
+    message: ['message', 'end', 'decision', 'action', 'option', 'httpRequest', 'power', 'discord', 'ai', 'aiNodePro', 'emotionDetection'], 
     
     // Nodo de decisión puede conectarse a cualquier tipo excepto inicio
-    decision: ['message', 'end', 'action', 'option', 'httpRequest', 'power', 'discord', 'ai'],
+    decision: ['message', 'end', 'action', 'option', 'httpRequest', 'power', 'discord', 'ai', 'aiNodePro'],
     
     // Nodo de acción puede conectarse a cualquier tipo excepto inicio
-    action: ['message', 'end', 'decision', 'option', 'httpRequest', 'power', 'discord', 'ai'],
+    action: ['message', 'end', 'decision', 'option', 'httpRequest', 'power', 'discord', 'ai', 'aiNodePro'],
     
     // Nodo de opción puede conectarse a nodos de mensaje, decisión o acción
-    option: ['message', 'decision', 'action', 'httpRequest', 'end', 'ai'],
+    option: ['message', 'decision', 'action', 'httpRequest', 'end', 'ai', 'aiNodePro'],
     
     // Nodo HTTP puede conectarse a nodos de mensaje, decisión o acción
-    httpRequest: ['message', 'decision', 'action', 'end', 'option', 'power', 'discord', 'ai'],
+    httpRequest: ['message', 'decision', 'action', 'end', 'option', 'power', 'discord', 'ai', 'aiNodePro'],
     
     // Nodo especial puede conectarse a cualquier tipo excepto inicio
-    power: ['message', 'end', 'decision', 'action', 'option', 'httpRequest', 'discord', 'ai'],
+    power: ['message', 'end', 'decision', 'action', 'option', 'httpRequest', 'discord', 'ai', 'aiNodePro'],
     
     // Nodo Discord: Puede conectarse a la mayoría y recibir de la mayoría
-    discord: ['message', 'end', 'decision', 'action', 'option', 'httpRequest', 'power', 'discord', 'ai'],
+    discord: ['message', 'end', 'decision', 'action', 'option', 'httpRequest', 'power', 'discord', 'ai', 'aiNodePro'],
 
     // Nodo AI: Puede conectarse a la mayoría y recibir de la mayoría (excepto start)
-    ai: ['message', 'decision', 'action', 'end', 'httpRequest', 'power', 'discord', 'ai', 'emotionDetection'],
+    ai: ['message', 'decision', 'action', 'end', 'httpRequest', 'power', 'discord', 'ai', 'aiNodePro', 'emotionDetection'],
+
+    // Nodo AI Pro: Mismas reglas que el nodo AI normal
+    aiNodePro: ['message', 'decision', 'action', 'end', 'httpRequest', 'power', 'discord', 'ai', 'aiNodePro', 'emotionDetection'],
 
     // Nodo de Detección de Emociones: Puede conectarse a la mayoría de nodos.
-    emotionDetection: ['message', 'end', 'decision', 'action', 'option', 'httpRequest', 'power', 'discord', 'ai'],
+    emotionDetection: ['message', 'end', 'decision', 'action', 'option', 'httpRequest', 'power', 'discord', 'ai', 'aiNodePro'],
 
     // Nodo final no puede conectarse a ningún otro nodo
     end: []
@@ -720,24 +725,7 @@ const FlowEditorInner = ({
     };
   }, [handleByteMessage]);
   
-  // Asegurar visibilidad de aristas periódicamente
-  useEffect(() => {
-    const interval = setInterval(() => {
-      // NUEVA CONDICIÓN: Solo ejecutar si no se está arrastrando un nodo
-      if (typeof window !== 'undefined' && window.__dragInProgress) {
-        // console.log('[FlowEditor Periodic Edge Check] Drag in progress, skipping ensureEdgesAreVisible.');
-        return;
-      }
-      if (edges && edges.length > 0) {
-        const visibleEdges = ensureEdgesAreVisible(edges, isUltraMode);
-        if (visibleEdges !== undefined && JSON.stringify(visibleEdges) !== JSON.stringify(edges)) {
-          setEdges(visibleEdges);
-        }
-      }
-    }, 10000); // Verificar cada 10 segundos
-    
-    return () => clearInterval(interval);
-  }, [edges, setEdges, isUltraMode]);
+
 
   // Ajustar la vista cuando la instancia de ReactFlow esté lista o los nodos cambien
   // useEffect(() => {
@@ -855,6 +843,7 @@ const FlowEditor = ({
   saveFlowData,
   hideHeader = false
 }) => {
+  const { isAuthenticated } = useAuthStore(state => ({ isAuthenticated: state.isAuthenticated }));
   const {
     contextMenuVisible,
     contextMenuPosition,
@@ -871,6 +860,12 @@ const FlowEditor = ({
   );
 
   try {
+    // Si el usuario no está autenticado y no es una vista pública, no renderizar el editor.
+    // Esto previene el "flash" del estado por defecto durante la redirección.
+    if (!isAuthenticated && !isPublic) {
+      return <div className="flow-editor-unauthenticated">Cargando sesión...</div>;
+    }
+
     return (
       <ReactFlowProvider>
         <FlowEditorInner

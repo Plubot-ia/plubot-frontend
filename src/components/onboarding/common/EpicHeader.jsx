@@ -14,6 +14,7 @@ import '@fontsource/orbitron/700.css';
 import { useFlowMeta, useFlowNodesEdges } from '@/stores/selectors';
 import useTrainingStore from '@/stores/useTrainingStore';
 import { useSyncService } from '@/services/syncService'; // Importar el servicio de sincronización
+import useAuthStore from '@/stores/useAuthStore';
 
 const EpicHeader = ({ 
   onCloseModals, // Mantenemos esta prop para cerrar modales y volver al editor
@@ -39,6 +40,7 @@ const EpicHeader = ({
     saveFlow, // Acción de guardado del store
   } = useFlowMeta();
 
+  const { isAuthenticated } = useAuthStore(state => ({ isAuthenticated: state.isAuthenticated }));
   const { nodes, edges, getVisibleEdgeCount } = useFlowNodesEdges();
   
   // Determinar el nombre del flujo a mostrar.
@@ -287,6 +289,21 @@ const EpicHeader = ({
     }
   };
 
+  // Si el usuario no está autenticado, renderizar un encabezado mínimo o nulo
+  if (!isAuthenticated) {
+    return (
+      <header className="epic-header epic-header-unauthenticated">
+        <div className="epic-header-left">
+          <img src={logoSrc} alt="Logo" className="epic-header-logo" />
+        </div>
+        <div className="epic-header-center">
+          <span className="epic-header-flow-name">Cargando...</span>
+        </div>
+        <div className="epic-header-right"></div>
+      </header>
+    );
+  }
+
   return (
     <header className="epic-header">
       {/* Partículas y efectos de fondo eliminados para mejorar el rendimiento */}
@@ -360,73 +377,7 @@ const EpicHeader = ({
           <Save size={16} className="epic-header-button-icon" />
           <span>Guardar</span>
         </button>
-        
-        <button 
-          className="epic-header-button epic-header-button--share"
-          onClick={() => {
-            try {
-              console.log('[EpicHeader] Abriendo modal de compartir...');
-              
-              // Abrir directamente el modal sin notificaciones innecesarias
-              openModal('embedModal');
-              
-              // Respaldos en caso de fallos (sin notificaciones)
-              if (typeof finalShareModal === 'function') {
-                try { finalShareModal(); } catch (e) {}
-              }
-              
-              // Disparar eventos globales como último respaldo
-              try {
-                window.dispatchEvent(new CustomEvent('open-embed-modal'));
-                window.dispatchEvent(new CustomEvent('plubot-open-modal', { 
-                  detail: { modal: 'embedModal', source: 'EpicHeader', timestamp: Date.now() } 
-                }));
-              } catch (e) {}
-            } catch (error) {
-              console.error('[EpicHeader] Error al abrir modal de compartir:', error);
-              // Solo mostrar notificación en caso de error
-              showNotification('Error al abrir modal de compartir', 'error');
-            }
-          }}
-          title="Compartir flujo"
-        >
-          <Share2 size={16} className="epic-header-button-icon" />
-          <span>Compartir</span>
-        </button>
-        
-        <button
-          className="epic-header-button"
-          onClick={() => {
-            try {
-              console.log('[EpicHeader] Abriendo modal de simulación...');
-              
-              // Abrir directamente el modal sin notificaciones innecesarias
-              openModal('simulationModal');
-              
-              // Respaldos en caso de fallos (sin notificaciones)
-              if (typeof finalSimulateModal === 'function') {
-                try { finalSimulateModal(); } catch (e) {}
-              }
-              
-              // Disparar eventos globales como último respaldo
-              try {
-                window.dispatchEvent(new CustomEvent('open-simulate-modal'));
-                window.dispatchEvent(new CustomEvent('plubot-open-modal', { 
-                  detail: { modal: 'simulationModal', source: 'EpicHeader', timestamp: Date.now() } 
-                }));
-              } catch (e) {}
-            } catch (error) {
-              console.error('[EpicHeader] Error al abrir modal de simulación:', error);
-              // Solo mostrar notificación en caso de error
-              showNotification('Error al iniciar simulación', 'error');
-            }
-          }}
-          title="Simular flujo"
-        >
-          <Monitor size={16} className="epic-header-button-icon" />
-          <span>Simular</span>
-        </button>
-        
+
         <button 
           className="epic-header-button"
           onClick={() => {
@@ -459,7 +410,73 @@ const EpicHeader = ({
           <LayoutTemplate size={16} className="epic-header-button-icon" />
           <span>Plantillas</span>
         </button>
-        
+
+        <button
+          className="epic-header-button"
+          onClick={() => {
+            try {
+              console.log('[EpicHeader] Abriendo modal de simulación...');
+              
+              // Abrir directamente el modal sin notificaciones innecesarias
+              openModal('simulationModal');
+              
+              // Respaldos en caso de fallos (sin notificaciones)
+              if (typeof finalSimulateModal === 'function') {
+                try { finalSimulateModal(); } catch (e) {}
+              }
+              
+              // Disparar eventos globales como último respaldo
+              try {
+                window.dispatchEvent(new CustomEvent('open-simulate-modal'));
+                window.dispatchEvent(new CustomEvent('plubot-open-modal', { 
+                  detail: { modal: 'simulationModal', source: 'EpicHeader', timestamp: Date.now() } 
+                }));
+              } catch (e) {}
+            } catch (error) {
+              console.error('[EpicHeader] Error al abrir modal de simulación:', error);
+              // Solo mostrar notificación en caso de error
+              showNotification('Error al iniciar simulación', 'error');
+            }
+          }}
+          title="Simular flujo"
+        >
+          <Monitor size={16} className="epic-header-button-icon" />
+          <span>Simular</span>
+        </button>
+
+        <button 
+          className="epic-header-button epic-header-button--share"
+          onClick={() => {
+            try {
+              console.log('[EpicHeader] Abriendo modal de compartir...');
+              
+              // Abrir directamente el modal sin notificaciones innecesarias
+              openModal('embedModal');
+              
+              // Respaldos en caso de fallos (sin notificaciones)
+              if (typeof finalShareModal === 'function') {
+                try { finalShareModal(); } catch (e) {}
+              }
+              
+              // Disparar eventos globales como último respaldo
+              try {
+                window.dispatchEvent(new CustomEvent('open-embed-modal'));
+                window.dispatchEvent(new CustomEvent('plubot-open-modal', { 
+                  detail: { modal: 'embedModal', source: 'EpicHeader', timestamp: Date.now() } 
+                }));
+              } catch (e) {}
+            } catch (error) {
+              console.error('[EpicHeader] Error al abrir modal de compartir:', error);
+              // Solo mostrar notificación en caso de error
+              showNotification('Error al abrir modal de compartir', 'error');
+            }
+          }}
+          title="Compartir flujo"
+        >
+          <Share2 size={16} className="epic-header-button-icon" />
+          <span>Compartir</span>
+        </button>
+
         <div className="epic-header-dropdown" ref={optionsMenuRef}>
           <button 
             className="epic-header-button"
@@ -495,10 +512,10 @@ const EpicHeader = ({
                 showNotification('Error al abrir opciones', 'error');
               }
             }}
-            title="Opciones de importación/exportación"
+            title="Exportar / Importar"
           >
             <MoreHorizontal size={16} className="epic-header-button-icon" />
-            <span>Opciones</span>
+            <span>Exportar</span>
           </button>
           
           {/* Menú desplegable dentro del mismo contenedor para mantener la referencia */}

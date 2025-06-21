@@ -6,6 +6,7 @@
  */
 
 import React, { useState, useCallback, useMemo, useRef, useEffect, memo } from 'react';
+import { useUpdateNodeInternals } from 'reactflow';
 import PropTypes from 'prop-types';
 import { Position, Handle } from 'reactflow';
 import { 
@@ -98,13 +99,12 @@ const OptionNodeHandle = React.memo(({
      position === 'bottom' ? Position.Bottom : 
      position === 'left' ? Position.Left : Position.Bottom);
     
-  const baseStyle = {
+    const baseStyle = {
     zIndex: 50,
     '--option-node-handle-bg-color': handleColor || '#3b82f6',
-    // width, height, border, boxShadow, background, transition serán manejados por CSS
-    ...style // Mantenemos los estilos de posicionamiento que vienen de OptionNode (top, left, etc.)
+    ...style
   };
-  
+
   // Los efectos visuales de hover ahora se manejan puramente con CSS.
   
   return (
@@ -144,62 +144,66 @@ OptionNodeHandle.propTypes = {
 const OptionNodeComponent = ({ 
   id, 
   selected = false, 
-  isConnectable = true 
+  isConnectable = true,
+  lodLevel // <-- Prop recibida del HOC para que React.memo la detecte
 }) => {
-  // --- STATE AND REFS ---
-  const [isEditing, setIsEditing] = useState(false);
-  const [isHovered, setIsHovered] = useState(false);
-  const [currentInstruction, setCurrentInstruction] = useState('');
+  // --- REFS ---
   const textareaRef = useRef(null);
   const nodeRef = useRef(null);
+  const updateNodeInternals = useUpdateNodeInternals();
 
-  // --- ZUSTAND HOOKS (GRANULAR & STABLE SELECTORS) ---
-  // --- Estado y Selectores de Zustand ---
-  // Obtenemos primero los datos básicos del nodo, incluyendo las referencias a su origen.
+  // --- ZUSTAND STORE (SELECTORS & ACTIONS) ---
+  // Selectors are granular to prevent unnecessary re-renders.
+  
+  // 1. Get node-specific data and editing state from a dedicated selector
+  const nodeData = useNodeData(id);
   const {
-    instruction,
+    instruction: initialInstruction,
     sourceNode,
     sourceHandle,
     lastUpdated,
-    isEditing: isNodeEditing,
-    isUltraPerformanceMode: isNodeUltra,
+    isEditing,
+    isUltra,
     color,
-  } = useNodeData(id) || {};
+  } = nodeData || {};
 
-  // Selector granular y reactivo para obtener el 'label' directamente desde la condición del nodo padre (DecisionNode).
-  // Esto asegura que cualquier cambio en el texto de la condición se refleje instantáneamente aquí.
-  const label = useFlowStore(state => {
-    if (!sourceNode || !sourceHandle) {
-      // Si no hay nodo padre o handle, usamos el label propio del nodo como fallback.
-      return state.nodes.find(n => n.id === id)?.data?.label || 'Opción';
-    }
-    const parentNode = state.nodes.find(n => n.id === sourceNode);
-    const condition = parentNode?.data?.conditions?.find(c => c.id === sourceHandle);
-    // Devolvemos el texto de la condición, con un fallback por si algo falla.
-    return condition?.text || 'Opción';
-  }, shallow);
-
+  // 2. Get global state and actions
   const {
     updateNodeData,
     setNodeEditing,
     isUltraPerformanceModeGlobal,
-    fitView,
-    setNodes,
-    reactFlowInstance
+    panToNode,
   } = useFlowStore(state => ({
     updateNodeData: state.updateNodeData,
     setNodeEditing: state.setNodeEditing,
     isUltraPerformanceModeGlobal: state.isUltraPerformanceModeGlobal,
-    fitView: state.fitView,
-    setNodes: state.setNodes,
-    reactFlowInstance: state.reactFlowInstance,
+    panToNode: state.panToNode,
   }), shallow);
 
-  // El color se obtiene directamente de useNodeData para asegurar que es el
-  // color persistente asignado en el DecisionNode, eliminando recalculos.
+  // 3. Get the label reactively from the parent DecisionNode's condition
+  const label = useFlowStore(state => {
+    if (!sourceNode || !sourceHandle) {
+      return nodeData?.label || 'Opción';
+    }
+    const parentNode = state.nodes.find(n => n.id === sourceNode);
+    const condition = parentNode?.data?.conditions?.find(c => c.id === sourceHandle);
+    return condition?.text || 'Opción';
+  }, shallow);
+
+  // --- INSTRUMENTATION LOG ---
+  // Surgical log for auditing renders, to be removed after analysis.
+  useEffect(() => {
+    const memoStatus = 'Memoized: Yes (React.memo)';
+    console.log(`[Render] Nodo ${id} - Tipo: OptionNode - LOD: ${lodLevel} - ${memoStatus}`);
+  }, [id, lodLevel]);
+
+  // --- LOCAL UI STATE ---
+  const [currentInstruction, setCurrentInstruction] = useState(initialInstruction || '');
+  const [isHovered, setIsHovered] = useState(false);
 
   // --- MEMOIZED VALUES ---
-  const isUltraPerformanceMode = useMemo(() => isNodeUltra || isUltraPerformanceModeGlobal, [isNodeUltra, isUltraPerformanceModeGlobal]);
+  const instruction = useMemo(() => initialInstruction || NODE_CONFIG.DEFAULT_INSTRUCTION, [initialInstruction]);
+  const isUltraPerformanceMode = useMemo(() => isUltra || isUltraPerformanceModeGlobal, [isUltra, isUltraPerformanceModeGlobal]);
 
   const borderColor = useMemo(() => {
     const currentLabelText = label?.toLowerCase() || '';
@@ -222,13 +226,16 @@ const OptionNodeComponent = ({
     backgroundColor: isUltraPerformanceMode ? '#2d2d2d' : undefined,
   }), [isUltraPerformanceMode, borderColor]);
 
+
   // --- EFFECTS ---
+  // Sync local editing buffer when not editing
   useEffect(() => {
     if (!isEditing) {
       setCurrentInstruction(instruction || '');
     }
   }, [instruction, isEditing]);
 
+  // Handle textarea focus and resize when editing starts
   useEffect(() => {
     if (isEditing && textareaRef.current) {
       const ta = textareaRef.current;
@@ -238,6 +245,25 @@ const OptionNodeComponent = ({
       ta.select();
     }
   }, [isEditing]);
+
+  // Update React Flow internals on resize to keep edges connected correctly
+  useEffect(() => {
+    const debouncedUpdate = debounce(() => updateNodeInternals(id), 50);
+    const observer = new ResizeObserver(() => {
+      debouncedUpdate();
+    });
+    const currentRef = nodeRef.current;
+    if (currentRef) {
+      observer.observe(currentRef);
+    }
+    return () => {
+      debouncedUpdate.cancel();
+      if (currentRef) {
+        observer.unobserve(currentRef);
+      }
+    };
+  }, [id, updateNodeInternals]);
+
 
   // --- CALLBACKS ---
   const handleInstructionChange = useCallback((e) => {
@@ -249,33 +275,29 @@ const OptionNodeComponent = ({
     }
   }, []);
 
+  const startEditing = useCallback(() => {
+    if (!isUltraPerformanceMode) {
+      setNodeEditing(id, true);
+    }
+  }, [id, isUltraPerformanceMode, setNodeEditing]);
+
   const finishEditing = useCallback(() => {
     if (currentInstruction !== instruction) {
-      // Actualiza el nodo local (OptionNode) y sincroniza con el padre (DecisionNode)
-      updateNodeData(id, { instruction: currentInstruction });
-      if (sourceNode && sourceHandle) {
-        // La sincronización del texto de la condición (label) es reactiva y se gestiona en el DecisionNode.
-        // La 'instruction' es propia del OptionNode.
-      }
+      updateNodeData(id, { instruction: currentInstruction, lastUpdated: new Date().toISOString() });
     }
-    setIsEditing(false);
-  }, [id, currentInstruction, instruction, sourceNode, sourceHandle, updateNodeData]);
+    setNodeEditing(id, false);
+  }, [id, currentInstruction, instruction, updateNodeData, setNodeEditing]);
 
   const cancelEditing = useCallback(() => {
     setCurrentInstruction(instruction || '');
-    setIsEditing(false);
-  }, [instruction]);
-
-  const handleDoubleClick = useCallback(() => {
-    if (!isUltraPerformanceMode) setIsEditing(true);
-  }, [isUltraPerformanceMode]);
+    setNodeEditing(id, false);
+  }, [instruction, id, setNodeEditing]);
 
   const navigateToParent = useCallback(() => {
-    if (sourceNode && reactFlowInstance) {
-      setNodes(nds => nds.map(n => ({ ...n, selected: n.id === sourceNode })));
-      reactFlowInstance.fitView({ nodes: [{ id: sourceNode }], duration: 800, padding: 0.2 });
+    if (sourceNode) {
+      panToNode(sourceNode, { select: true });
     }
-  }, [sourceNode, setNodes, reactFlowInstance]);
+  }, [sourceNode, panToNode]);
 
   const handleKeyDown = useCallback((e) => {
     if (isEditing) {
@@ -289,20 +311,21 @@ const OptionNodeComponent = ({
     } else {
       if (e.key === 'Enter' && !e.ctrlKey && !e.metaKey) {
         e.preventDefault();
-        handleDoubleClick();
+        startEditing();
       } else if (e.key === 'p' && e.ctrlKey && sourceNode) {
         e.preventDefault();
         navigateToParent();
       }
     }
-  }, [isEditing, finishEditing, cancelEditing, handleDoubleClick, navigateToParent, sourceNode]);
-  
+  }, [isEditing, finishEditing, cancelEditing, startEditing, navigateToParent, sourceNode]);
+
+  // --- RENDER ---
   return (
     <div
       ref={nodeRef}
       className={nodeClasses}
       style={nodeStyle}
-      onDoubleClick={handleDoubleClick}
+      onDoubleClick={startEditing}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       onKeyDown={handleKeyDown}
@@ -312,7 +335,6 @@ const OptionNodeComponent = ({
       aria-expanded={isEditing}
       aria-describedby={`option-node-description-${id}`}
     >
-      {/* Conector de entrada en la parte superior */}
       <OptionNodeHandle
         type="target"
         position={Position.Top}
@@ -358,14 +380,13 @@ const OptionNodeComponent = ({
           ) : (
             <p 
               className="option-node__instruction-text" 
-              onClick={!isUltraPerformanceMode ? handleDoubleClick : undefined}
+              onClick={startEditing}
             >
               {instruction}
             </p>
           )}
         </div>
 
-        {/* Botones de acción en modo edición */}
         {isEditing && (
           <div className="option-node__actions">
             <Tooltip content="Cancelar (Esc)" position="top">
@@ -391,7 +412,6 @@ const OptionNodeComponent = ({
           </div>
         )}
 
-        {/* Metadatos */}
         {!isUltraPerformanceMode && !isEditing && lastUpdated && (
           <div className="option-node__footer">
             <span className="option-node__timestamp">
@@ -401,7 +421,6 @@ const OptionNodeComponent = ({
         )}
       </div>
 
-      {/* Conector de salida en la parte inferior */}
       <OptionNodeHandle
         type="source"
         position={Position.Bottom}
@@ -412,7 +431,6 @@ const OptionNodeComponent = ({
         handleColor={color}
       />
 
-      {/* Texto para lectores de pantalla - Accesibilidad mejorada */}
       <span className="sr-only" id={`option-node-description-${id}`}>
         Nodo de opción: {label || 'Opción sin etiqueta'}. 
         Instrucción: {instruction || NODE_CONFIG.DEFAULT_INSTRUCTION}. 
@@ -426,7 +444,8 @@ const OptionNodeComponent = ({
 OptionNodeComponent.propTypes = {
   id: PropTypes.string.isRequired,
   selected: PropTypes.bool,
-  isConnectable: PropTypes.bool
+  isConnectable: PropTypes.bool,
+  lodLevel: PropTypes.number
 };
 
 const OptionNode = memo(OptionNodeComponent);

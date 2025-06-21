@@ -32,6 +32,12 @@ const EMOTION_EMOJIS: Record<string, string> = {
 };
 
 const EmotionDetectionNode: React.FC<EmotionDetectionNodeProps> = ({ id, data, selected }) => {
+  // INSTRUMENTATION: Log de render de nodos
+  React.useEffect(() => {
+    const memoStatus = 'Memoized: Yes (React.memo with custom arePropsEqual)';
+    console.log(`[Render] Nodo ${id} - Tipo: EmotionDetectionNode - LOD: ${data.lodLevel} - ${memoStatus}`);
+  }, [id, data.lodLevel]);
+
   const { handleOutputVariableChange } = useEmotionDetectionNode(id, data);
 
   const nodeClasses = clsx('emotion-node', {

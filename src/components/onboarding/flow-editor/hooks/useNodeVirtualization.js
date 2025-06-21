@@ -79,6 +79,10 @@ const useNodeVirtualization = ({ nodes: allNodes, edges: allEdges, viewport, con
       visibleNodeIds.has(edge.source) && visibleNodeIds.has(edge.target)
     );
 
+    console.log(
+      `[Virtualization] Nodes: ${visibleNodes.length}/${allNodes.length} | Edges: ${visibleEdges.length}/${allEdges.length}`
+    );
+
     return { visibleNodes, visibleEdges };
 
   }, [allNodes, allEdges, x, y, zoom, containerWidth, containerHeight]);

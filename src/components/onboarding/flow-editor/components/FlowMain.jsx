@@ -58,7 +58,7 @@ import ImportExportModal from '@/components/onboarding/modals/ImportExportModal'
 // Importar utilidades
 import { throttle, debounce } from 'lodash';
 import { getLODLevel, LOD_LEVELS } from '../utils/lodUtils'; // Importar utilidades LOD
-import { ensureEdgesAreVisible } from '../utils/edgeFixUtil';
+
 import { NODE_TYPES } from '@/utils/nodeConfig';
 // Importar definiciones de límites para el canvas y los nodos
 import { NODE_EXTENT, TRANSLATE_EXTENT, MIN_ZOOM, MAX_ZOOM } from '../utils/flow-extents';
@@ -286,18 +286,21 @@ const FlowMain = ({
       const newNumericLod = lodHierarchy[newLodLevel];
 
       // Si el nuevo nivel es MÁS detallado (número mayor), actualiza inmediatamente.
-      if (newNumericLod > currentNumericLod) {
-        setLodLevel(newLodLevel);
-      } else {
-        // Si el nuevo nivel es MENOS detallado (número menor), espera para evitar flickering.
-        hysteresisTimer.current = setTimeout(() => {
-          setLodLevel(newLodLevel);
-        }, 250); // 250ms de retardo para la histéresis.
-      }
+      setLodLevel(newLodLevel);
     }
 
     return () => clearTimeout(hysteresisTimer.current);
   }, [viewport.zoom, lodLevel]);
+
+  // INSTRUMENTATION: Log canvas zoom and LOD changes
+  useEffect(() => {
+    console.log(`[Canvas] Zoom: ${viewport.zoom.toFixed(4)} - LODLevel: ${lodLevel}`);
+  }, [viewport.zoom, lodLevel]);
+
+  // INSTRUMENTATION: Log canvas panning
+  useEffect(() => {
+    console.log(`[Canvas] Panning - Viewport: x:${viewport.x.toFixed(2)}, y:${viewport.y.toFixed(2)}`);
+  }, [viewport.x, viewport.y]);
 
   // Inyectar el nivel de LOD calculado centralmente en los nodos visibles.
   const nodesWithLOD = useMemo(() => {
@@ -308,8 +311,23 @@ const FlowMain = ({
         lodLevel: lodLevel, // Inyectar el nivel de LOD desde el estado centralizado.
       },
     }));
-    return result;
   }, [visibleNodes, lodLevel]);
+
+  // Inyectar el nivel de LOD en las aristas visibles para sincronizar su apariencia.
+  const edgesWithLOD = useMemo(() => {
+    return visibleEdges.map(edge => ({
+      ...edge,
+      data: {
+        ...edge.data,
+        lodLevel: lodLevel, // Inyectar el mismo lodLevel que a los nodos.
+      },
+    }));
+  }, [visibleEdges, lodLevel]);
+
+  // INSTRUMENTATION: Log virtualization stats
+  useEffect(() => {
+    console.log(`[Virtualization] Total Nodos: ${visibleNodes.length} / ${nodes.length} - Total Aristas: ${visibleEdges.length} / ${edges.length}`);
+  }, [visibleNodes.length, nodes.length, visibleEdges.length, edges.length]);
   // --- FIN DEL NUEVO SISTEMA DE VIRTUALIZACIÓN ---
   
   // -----------------------------------------
@@ -322,7 +340,33 @@ const FlowMain = ({
    */
   const nodeTypes = useMemo(() => {
     if (externalNodeTypes) return externalNodeTypes;
-    return createNodeTypes(isUltraMode);
+
+    const originalNodeTypes = createNodeTypes(isUltraMode);
+
+    // Envolvemos cada componente de nodo para inyectar la prop lodLevel
+    // Esto es CRÍTICO para que el sistema LOD funcione en los nodos.
+    const enhancedNodeTypes = Object.keys(originalNodeTypes).reduce((acc, key) => {
+      const OriginalComponent = originalNodeTypes[key];
+      
+      // El HOC que inyecta la prop
+      // El HOC ahora es un adaptador que lee desde props.data, que es el patrón estándar de RF.
+      const NodeWithLOD = (props) => {
+        // Log de diagnóstico para inspeccionar las props en el HOC
+        if (props.id.startsWith('option-')) { // Loguear solo para un tipo de nodo para evitar spam
+          console.log(`[HOC] Node ${props.id} data:`, props.data);
+        }
+        return <OriginalComponent {...props} lodLevel={props.data?.lodLevel} />;
+      };
+      
+      // Asignamos un nombre para facilitar el debugging en React DevTools
+      NodeWithLOD.displayName = `WithLOD(${OriginalComponent.displayName || OriginalComponent.name || 'Node'})`;
+      
+      acc[key] = NodeWithLOD;
+      return acc;
+    }, {});
+
+    return enhancedNodeTypes;
+  // lodLevel se elimina de las dependencias porque el HOC ya no depende del estado del closure.
   }, [externalNodeTypes, isUltraMode]);
   
   /**
@@ -332,7 +376,28 @@ const FlowMain = ({
    */
   const edgeTypes = useMemo(() => {
     if (externalEdgeTypes) return externalEdgeTypes;
-    return sharedEdgeTypes;
+
+    // Envolvemos cada componente de arista para inyectar la prop lodLevel
+    // Esto es CRÍTICO para que el sistema LOD funcione en las aristas.
+    const enhancedEdgeTypes = Object.keys(sharedEdgeTypes).reduce((acc, key) => {
+        const OriginalComponent = sharedEdgeTypes[key];
+        
+        // El HOC que inyecta la prop lodLevel
+        // El HOC de la arista también se actualiza para leer desde props.data.
+        const EdgeWithLOD = (props) => {
+          // Log de diagnóstico para inspeccionar las props en el HOC de aristas
+          // console.log(`[HOC] Edge ${props.id} data:`, props.data);
+          return <OriginalComponent {...props} lodLevel={props.data?.lodLevel} />;
+        };
+        
+        EdgeWithLOD.displayName = `WithLOD(${OriginalComponent.displayName || OriginalComponent.name || 'Edge'})`;
+        
+        acc[key] = EdgeWithLOD;
+        return acc;
+    }, {});
+
+    return enhancedEdgeTypes;
+  // lodLevel se elimina de las dependencias aquí también por la misma razón.
   }, [externalEdgeTypes]);
   
   // -----------------------------------------
@@ -728,6 +793,19 @@ const FlowMain = ({
     id: project?.id || plubotId,
     name: project?.name || flowName || 'Flujo sin nombre'
   }), [project, plubotId, flowName]);
+
+// ID del flujo (igual al ID del plubot)
+const flowId = project?.id || plubotId;
+
+// Aplicar solución unificada para todos los problemas de ReactFlow
+useEffect(() => {
+  // Importamos la solución optimizada
+  // import('../utils/optimized-flow-fixes').then(({ initOptimizedFixes }) => {
+  // Configuración mínima: sin logs y con intervalo largo para mejor rendimiento
+  /*      const cleanup = initOptimizedFixes({
+    id: project?.id || plubotId,
+    name: project?.name || flowName || 'Flujo sin nombre'
+  }), [project, plubotId, flowName]);
   
   // ID del flujo (igual al ID del plubot)
   const flowId = project?.id || plubotId;
@@ -759,35 +837,7 @@ const FlowMain = ({
     }); */
   }, []); // Sin dependencias para ejecutarse solo al montar/desmontar
   
-  /**
-   * Efecto para asegurar visibilidad de aristas periódicamente
-   */
-  useEffect(() => {
-    if (!edges || edges.length === 0) return;
-    
-    // Verificar aristas cada 10 segundos para asegurar visibilidad
-    const interval = setInterval(() => {
-      // NUEVA CONDICIÓN: Solo ejecutar si no se está arrastrando un nodo
-      if (isNodeBeingDragged) {
-        // console.log('[FlowMain Periodic Edge Check] Drag in progress, skipping ensureEdgesAreVisible.');
-        return;
-      }
-      
-      // Modificación para manejar la promesa de ensureEdgesAreVisible
-      (async () => {
-        try {
-          // Llamamos a ensureEdgesAreVisible con los parámetros que espera.
-          // Si isUltraMode, maxAttempts, delay no están disponibles aquí, tomarán sus defaults.
-          // Por ahora, solo pasamos 'edges' como en el código original.
-        } catch (error) {
-          console.error('[FlowMain Periodic Edge Check] Error al asegurar la visibilidad de las aristas:', error);
-        }
-      })();
-    }, 10000); // Verificar cada 10 segundos
 
-    // Limpiar el intervalo cuando el componente se desmonte o las dependencias cambien
-    return () => clearInterval(interval);
-  }, [edges, setEdges, externalOnEdgesChange]); // Añadido externalOnEdgesChange a las dependencias por si se usa
   
   /**
    * Efecto para sincronizar instancia de ReactFlow
@@ -874,26 +924,26 @@ const FlowMain = ({
       {/* SOLUCIÓN DIRECTA: ReactFlow con configuración optimizada para posicionamiento correcto */}
       <div className="flow-main-container" ref={flowWrapperRef} style={{ width: '100%', height: '100%' }}>
         <ReactFlow
-        nodes={nodesWithLOD} // Usar nodos optimizados con LOD
-        edges={visibleEdges}
-        nodeTypes={nodeTypes}
-        edgeTypes={edgeTypes}
-        onNodesChange={handleNodesChange}
-        onEdgesChange={handleEdgesChange}
-        onConnect={handleConnect}
-        onInit={(instance) => {
-          // Guardar la instancia
-          reactFlowInstanceRef.current = instance;
-          if (typeof window !== 'undefined') {
-            window.reactFlowInstance = instance;
-          }
-          useFlowStore.getState().setReactFlowInstance(instance);
-          
-          // Si hay una función externa para establecer la instancia, llamarla
-          if (typeof externalSetReactFlowInstance === 'function') {
-            externalSetReactFlowInstance(instance);
-          }
-        }}
+          nodes={nodesWithLOD} // Usar nodos con LOD inyectado
+          edges={edgesWithLOD} // Usar aristas con LOD inyectado
+          nodeTypes={nodeTypes}
+          edgeTypes={edgeTypes}
+          onNodesChange={handleNodesChange}
+          onEdgesChange={handleEdgesChange}
+          onConnect={handleConnect}
+          onInit={(instance) => {
+            // Guardar la instancia
+            reactFlowInstanceRef.current = instance;
+            if (typeof window !== 'undefined') {
+              window.reactFlowInstance = instance;
+            }
+            useFlowStore.getState().setReactFlowInstance(instance);
+
+            // Si hay una función externa para establecer la instancia, llamarla
+            if (typeof externalSetReactFlowInstance === 'function') {
+              externalSetReactFlowInstance(instance);
+            }
+          }}
         onDrop={handleDrop}
         onDragOver={handleDragOver}
         onSelectionChange={(params) => {

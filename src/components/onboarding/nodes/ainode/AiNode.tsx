@@ -10,6 +10,12 @@ const Tooltip = lazy(() => import('../../ui/ToolTip'));
 import { useAINode } from './useAINode';
 
 const AiNodeComponent: React.FC<NodeProps<AiNodeData>> = ({ id, data, selected, isConnectable }) => {
+  // INSTRUMENTATION: Log de render de nodos
+  useEffect(() => {
+    const memoStatus = 'Memoized: Yes (React.memo with custom arePropsEqual)';
+    console.log(`[Render] Nodo ${id} - Tipo: AiNode - LOD: ${data.lodLevel} - ${memoStatus}`);
+  }, [id, data.lodLevel]);
+
   const promptTextareaRef = useRef<HTMLTextAreaElement>(null);
   const {
     promptTemplate,

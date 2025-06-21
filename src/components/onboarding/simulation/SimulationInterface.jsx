@@ -103,7 +103,7 @@ const executeEmotionDetectionNodeAction = async (nodeData, currentVariables, inp
   const endpoint = `${apiUrlFromEnv}/api/emotion-detect`; // Endpoint específico
 
   try {
-    console.log('[EmotionDetection] URL del endpoint:', endpoint);
+
     const response = await fetch(endpoint, {
       method: 'POST',
       headers: {
@@ -113,13 +113,13 @@ const executeEmotionDetectionNodeAction = async (nodeData, currentVariables, inp
       body: JSON.stringify({ text: interpolatedText }),
     });
 
-    console.log('[EmotionDetection] Respuesta de la API:', response.status, response.statusText, response.url);
+
     if (!response.ok) {
       return { success: false, error: response.statusText || 'Error en la API de detección de emoción.' };
     }
 
     const responseData = await response.json();
-    console.log('[EmotionDetection] Datos de la respuesta:', responseData);
+
     // La API debe devolver { emotion: 'happy' }
     const detectedEmotion = responseData.emotion || 'unknown';
     return { success: true, data: { detectedEmotion } };
@@ -132,22 +132,15 @@ const executeEmotionDetectionNodeAction = async (nodeData, currentVariables, inp
 
 // Function to execute AI Node logic
 const executeAiNodeAction = async (nodeData, currentVariables, lastUserMessage, t) => {
+
   const jwtToken = getAuthToken();
   if (!jwtToken) {
     return { success: false, error: t('simulation.errorAuthGeneric', 'Error de autenticación: Token no encontrado.') };
   }
 
-  const {
-    promptTemplate,
-    temperature,
-    maxTokens,
-    systemMessage,
-    responseVariable
-  } = nodeData;
-
-  if (!responseVariable) {
-    return { success: false, error: t('simulation.errorAiNodeNoResponseVar', 'Error de configuración del Nodo IA: La "Variable de Respuesta" no está definida en los datos del nodo.') };
-  }
+  // CORRECTED: Handle both aiNode (prompt) and aiNodePro (promptTemplate)
+  const promptTemplate = nodeData.promptTemplate || nodeData.prompt || '';
+  const systemMessage = nodeData.systemMessage || '';
 
   const interpolatedPrompt = interpolatePrompt(promptTemplate, currentVariables, lastUserMessage);
 
@@ -155,34 +148,34 @@ const executeAiNodeAction = async (nodeData, currentVariables, lastUserMessage, 
     return { success: false, error: t('simulation.errorAiNodeNoPrompt', 'Error del Nodo IA: El prompt (plantilla) y el mensaje de sistema están vacíos, incluso después de intentar interpolar variables.') };
   }
 
-  const apiUrlFromEnv = import.meta.env.VITE_API_URL || '';
-  const endpoint = `${apiUrlFromEnv}/api/ai-node`;
+  // CORRECTED: Use the correct API endpoint discovered during the audit.
+  const apiEndpoint = `${import.meta.env.VITE_API_URL}/api/ai-node`;
 
   try {
-    const response = await fetch(endpoint, {
+    const response = await fetch(apiEndpoint, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${jwtToken}`,
       },
       body: JSON.stringify({
+        // The backend expects a 'prompt' field.
         prompt: interpolatedPrompt,
-        temperature,
-        maxTokens,
-        systemMessage,
+        temperature: nodeData.temperature,
+        maxTokens: nodeData.maxTokens,
+        systemMessage: systemMessage,
       }),
     });
 
-    const responseData = await response.json();
-
-    if (response.ok) {
-      return { success: true, data: responseData.response || t('simulation.aiEmptyResponse', '(Respuesta vacía del IA)') };
-    } else {
-      return { success: false, error: responseData.message || responseData.error || `${t('simulation.errorServerGeneric', 'Error del servidor')}: ${response.status}` };
+    if (!response.ok) {
+      const errorData = await response.json();
+      return { success: false, error: errorData.error || `Error del servidor: ${response.status}` };
     }
+
+    const result = await response.json();
+    return { success: true, data: result.response };
   } catch (error) {
-    console.error('Error al ejecutar acción de Nodo IA:', error);
-    return { success: false, error: `${t('simulation.errorNetworkGeneric', 'Error de red o conexión')}: ${error.message}` };
+    return { success: false, error: `Error de red o de conexión: ${error.message}` };
   }
 };
 
@@ -227,8 +220,9 @@ const SimulationInterface = ({
   const [flowStatus, setFlowStatus] = useState('idle'); // idle, processing, waiting_input, executing_action, ended, error
   const [userResponses, setUserResponses] = useState({}); // Para nodos de decisión
   const [userMessageForNode, setUserMessageForNode] = useState(null); // Para nodos de mensaje
+  const simulationStarted = useRef(false);
 
-  console.log('[Simulation] Inicializando componente de simulación');
+
 
   const startNode = safeNodes.find(n => n.type === 'start' || n.type === 'startNode' || (typeof n.type === 'string' && n.type.toLowerCase().includes('start')));
   const initialStartNodeId = startNode?.id;
@@ -238,6 +232,7 @@ const SimulationInterface = ({
   }, []);
 
   const processNode = useCallback(async (nodeId, currentResponses, currentMessageForNode) => {
+
     if (!nodeId) {
       setFlowStatus('ended');
       addMessageToHistory({ id: 'flow-end-no-node', type: 'system', content: t('simulation.flowEndedNoNode', 'Flujo finalizado: no hay más nodos.'), timestamp: new Date().toISOString() });
@@ -275,13 +270,15 @@ const SimulationInterface = ({
         addMessageToHistory({
           id: node.id,
           type: node.data.sender || 'bot',
-          content: node.data.message || t('simulation.undefinedMessage', 'Mensaje no definido'), // Modificado para leer de node.data.message
+          content: node.data.message || t('simulation.undefinedMessage', 'Mensaje no definido'),
           timestamp: new Date().toISOString(),
         });
-        setFlowStatus('waiting_input'); // Espera entrada del usuario
+        // Un nodo de mensaje siempre espera la entrada del usuario.
+        setFlowStatus('waiting_input');
         break;
 
       case 'decision':
+
         addMessageToHistory({
           id: node.id,
           type: 'bot',
@@ -289,6 +286,17 @@ const SimulationInterface = ({
           timestamp: new Date().toISOString(),
         });
         setFlowStatus('waiting_input'); // Espera selección de opción
+        break;
+
+      // Option nodes are transient, just pass through to the next node.
+      case 'option':
+        const nextEdgeFromOption = safeEdges.find(edge => edge.source === node.id);
+        if (nextEdgeFromOption) {
+          await processNode(nextEdgeFromOption.target, currentResponses, currentMessageForNode);
+        } else {
+          setFlowStatus('ended');
+          addMessageToHistory({ id: 'flow-end-no-option-target', type: 'system', content: t('simulation.flowEndedAfterOption', 'Flujo finalizado después de la opción.'), timestamp: new Date().toISOString() });
+        }
         break;
 
       case 'discord': // NUEVO CASO PARA NODO DISCORD
@@ -300,7 +308,7 @@ const SimulationInterface = ({
           isActionStatus: true,
         });
         setFlowStatus('executing_action');
-        console.log('[Simulation] Processing Discord Node ID:', node.id, 'Data:', JSON.parse(JSON.stringify(node.data || {})));
+
         
         // Asegúrate que node.data contiene: discordToken, channelId, messageContent
         const actionData = {
@@ -349,33 +357,33 @@ const SimulationInterface = ({
         if (sourceEdges.length > 0) {
           const sourceEdge = sourceEdges[0];
           const sourceNode = safeNodes.find(n => n.id === sourceEdge.source);
-          console.log('[EmotionDetection] Nodo anterior encontrado:', sourceNode);
+
           if (sourceNode) {
             const outputHandle = sourceEdge.sourceHandle || 'default';
-            console.log('[EmotionDetection] Handle de salida del nodo anterior:', outputHandle);
+
             if (sourceNode.type === 'message') {
               if (currentMessageForNode) {
                 inputText = currentMessageForNode;
               } else {
-                console.log('[EmotionDetection] No se encontró texto con las claves estándar, buscando último mensaje...');
+
                 const lastMessage = simulationHistory.length > 0 ? simulationHistory[simulationHistory.length - 1].content : '';
                 inputText = lastMessage;
               }
             } else {
-              console.log('[EmotionDetection] Buscando texto en los datos del nodo anterior:', sourceNode.data);
+
               inputText = sourceNode.data.text || sourceNode.data.message || sourceNode.data.content || '';
               if (!inputText) {
-                console.log('[EmotionDetection] No se encontró texto en los datos del nodo anterior, intentando con currentResponses');
+
                 inputText = currentResponses[sourceNode.id] || '';
               }
             }
-            console.log('[EmotionDetection] Texto extraído de los datos del nodo anterior:', inputText);
+
           }
         } else {
-          console.log('[EmotionDetection] Intentando extraer texto de currentResponses:', currentResponses);
+
           inputText = Object.values(currentResponses).find(val => typeof val === 'string' && val.trim() !== '') || '';
         }
-        console.log('[EmotionDetection] Texto extraído final:', inputText);
+
 
         const emotionResult = await executeEmotionDetectionNodeAction(node.data, currentResponses, inputText, t);
 
@@ -383,7 +391,7 @@ const SimulationInterface = ({
           const { detectedEmotion } = emotionResult.data;
           
           // No usar useFlowStore, simplemente continuar con el flujo
-          console.log('[EmotionDetection] Emoción detectada:', detectedEmotion);
+
 
           // Encontrar la rama correspondiente a la emoción detectada
           const nextEdge = safeEdges.find(edge => edge.source === node.id && edge.sourceHandle === `emotion-${detectedEmotion}`);
@@ -415,36 +423,57 @@ const SimulationInterface = ({
         return;
         break;
 
-      case 'ai':
-        addMessageToHistory({
-          id: `action-status-${node.id}`,
-          type: 'system',
-          content: t('simulation.executingAiNode', 'Ejecutando Nodo IA...'),
-          timestamp: new Date().toISOString(),
-          isActionStatus: true,
-        });
-        setFlowStatus('executing_action');
-        console.log('[Simulation] Processing AI Node ID:', node.id, 'Data:', JSON.parse(JSON.stringify(node.data || {})), 'Variables:', JSON.parse(JSON.stringify(currentResponses || {})));
+      case 'aiNode':
+      case 'aiNodePro': // Handle aiNodePro identically to aiNode
+        // CORRECTED: Validate prompt for both aiNode (prompt) and aiNodePro (promptTemplate)
+        const hasPrompt = (node.data.prompt && node.data.prompt.trim() !== '') || (node.data.promptTemplate && node.data.promptTemplate.trim() !== '');
+        if (!hasPrompt) {
+          addMessageToHistory({
+            id: `error-ai-prompt-${node.id}`,
+            type: 'error',
+            content: t('simulation.errorAiNodeNoPrompt', 'Error de configuración del Nodo IA: El prompt está vacío.'),
+            timestamp: new Date().toISOString(),
+          });
+          setFlowStatus('error');
+          break;
+        }
 
-        const aiResult = await executeAiNodeAction(node.data, currentResponses, currentMessageForNode, t);
+        setFlowStatus('executing_action');
+        addMessageToHistory({
+          id: `system-executing-ai-${node.id}`,
+          type: 'system',
+          content: t('simulation.executingAi', 'Ejecutando Nodo IA...'),
+          isActionStatus: true,
+          timestamp: new Date().toISOString(),
+        });
+
+        const lastUserMessage = currentMessageForNode || userMessageForNode || Object.values(userResponses).pop() || '';
+
         
+        const nodeDataForAction = {
+          ...node.data,
+          responseVariable: node.data.responseVariable || 'ai_response',
+        };
+        const aiResult = await executeAiNodeAction(nodeDataForAction, userResponses, lastUserMessage, t);
+
         if (aiResult.success) {
+          const aiResponse = aiResult.data;
+          const responseVarName = nodeDataForAction.responseVariable; // Use the potentially fixed variable
+          const newResponsesWithAI = { 
+            ...currentResponses, 
+            [responseVarName]: aiResponse 
+          };
+          
           addMessageToHistory({
             id: `ai-response-${node.id}`,
             type: 'bot',
-            content: aiResult.data,
+            content: aiResponse,
             timestamp: new Date().toISOString(),
           });
 
-          const updatedResponses = { 
-            ...currentResponses, 
-            [node.data.responseVariable]: aiResult.data 
-          };
-          
-          setFlowStatus('processing');
           const nextEdge = safeEdges.find(edge => edge.source === node.id);
           if (nextEdge) {
-            await processNode(nextEdge.target, updatedResponses, currentMessageForNode);
+            await processNode(nextEdge.target, newResponsesWithAI, userMessageForNode);
           } else {
             setFlowStatus('ended');
             addMessageToHistory({ id: 'flow-end-after-ai', type: 'system', content: t('simulation.flowEndedAfterAi', 'Flujo finalizado después del Nodo IA.'), timestamp: new Date().toISOString() });
@@ -487,7 +516,7 @@ const SimulationInterface = ({
   }, [safeNodes, safeEdges, addMessageToHistory, t, analyticsTracker]);
 
   const startSimulation = useCallback(() => {
-    console.log('[Simulation] Iniciando simulación. Estado actual:', flowStatus);
+
     setSimulationHistory([]);
     setUserResponses({});
     setUserMessageForNode(null);
@@ -501,73 +530,24 @@ const SimulationInterface = ({
     }
   }, [initialStartNodeId, processNode, safeNodes.length, analyticsTracker]);
 
+  // Controla el inicio de la simulación para que se ejecute solo una vez.
+  // El botón de reinicio llama a `startSimulation` directamente para reinicios manuales.
   useEffect(() => {
-    if (initialStartNodeId && safeNodes.length > 0) {
+    if (initialStartNodeId && !simulationStarted.current) {
+
+      simulationStarted.current = true;
       startSimulation();
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [initialStartNodeId, safeNodes, safeEdges]); // No incluir startSimulation para evitar bucles
+  }, [initialStartNodeId, startSimulation]);
 
   const { height: viewportHeight } = useWindowSize();
 
+  // Efecto para auto-scroll hacia abajo
   useEffect(() => {
     if (scrollRef.current && scrollToBottom) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
   }, [simulationHistory, scrollToBottom, flowStatus]);
-
-  useEffect(() => {
-    console.log('[Simulation] useEffect para nodes o edges detectado. Estado de simulación:', flowStatus);
-    // Evitar reinicio si la simulación ya está en curso y no hay cambios significativos
-    if (flowStatus !== 'idle') {
-      console.log('[Simulation] Simulación en curso, verificando si hay cambios significativos en nodes o edges');
-      // Aquí puedes agregar lógica para comparar los nodos o aristas anteriores con los nuevos
-      // Por ahora, simplemente no reiniciamos automáticamente
-      console.log('[Simulation] No se reiniciará la simulación automáticamente');
-      return;
-    }
-    console.log('[Simulation] Reinicio detectado. Estado cambiado a idle');
-    setFlowStatus('idle');
-    setSimulationHistory([]);
-    setUserResponses({});
-    setUserMessageForNode(null);
-    setCurrentNodeId(null);
-    // Iniciar simulación nuevamente después de un reinicio
-    setTimeout(() => {
-      console.log('[Simulation] Iniciando simulación después de reinicio');
-      startSimulation();
-    }, 0);
-  }, [nodes, edges, startSimulation]);
-
-  const handleUserInputSubmit = async (e) => {
-    e.preventDefault();
-    if (!userInput.trim() || flowStatus !== 'waiting_input') return;
-
-    const userMsgContent = userInput;
-    setUserInput('');
-    addMessageToHistory({
-      id: `user-${currentNodeId}-${Date.now()}`,
-      type: 'user',
-      content: userMsgContent,
-      timestamp: new Date().toISOString(),
-    });
-    setUserMessageForNode(userMsgContent);
-
-    if (analyticsTracker) {
-      try { analyticsTracker('simulation_user_message_sent', { nodeId: currentNodeId, messageLength: userMsgContent.length }); } catch(e) {}
-    }
-
-    const currentNodeObject = safeNodes.find(n => n.id === currentNodeId);
-    if (currentNodeObject && currentNodeObject.type === 'message') {
-        const nextEdge = safeEdges.find(edge => edge.source === currentNodeId);
-        if (nextEdge) {
-            await processNode(nextEdge.target, userResponses, userMsgContent);
-        } else {
-            setFlowStatus('ended');
-            addMessageToHistory({ id: 'flow-end-after-user-message', type: 'system', content: t('simulation.flowEndedAfterUserMessage', 'Flujo finalizado después de tu mensaje.'), timestamp: new Date().toISOString() });
-        }
-    }
-  };
 
   const handleClose = () => {
     setIsClosing(true);
@@ -576,45 +556,6 @@ const SimulationInterface = ({
     }, 300); // Duración de la animación en ms
   };
 
-  const handleOptionClick = async (optionLabel) => {
-    if (flowStatus !== 'waiting_input') return;
-
-    addMessageToHistory({
-      id: `user-option-${currentNodeId}-${Date.now()}`,
-      type: 'user',
-      content: optionLabel,
-      timestamp: new Date().toISOString(),
-    });
-    
-    const newResponses = { ...userResponses, [currentNodeId]: optionLabel };
-    setUserResponses(newResponses);
-
-    if (analyticsTracker) {
-      try { analyticsTracker('simulation_decision_option_selected', { nodeId: currentNodeId, option: optionLabel }); } catch(e) {}
-    }
-
-    const decisionNode = safeNodes.find(n => n.id === currentNodeId);
-    const optionNode = safeNodes.find(
-      node =>
-        node.type === 'option' &&
-        node.data.parentDecisionNodeId === decisionNode.id &&
-        node.data.label.toLowerCase() === optionLabel.toLowerCase()
-    );
-
-    if (optionNode) {
-      const nextEdge = safeEdges.find(edge => edge.source === optionNode.id); // El flujo continúa desde el nodo 'option'
-      if (nextEdge) {
-        await processNode(nextEdge.target, newResponses, userMessageForNode);
-      } else {
-        setFlowStatus('ended');
-        addMessageToHistory({ id: 'flow-end-after-option', type: 'system', content: t('simulation.flowEndedAfterOption', 'Flujo finalizado después de tu selección.'), timestamp: new Date().toISOString() });
-      }
-    } else {
-        setFlowStatus('error');
-        addMessageToHistory({ id: `error-option-not-found-${currentNodeId}`, type: 'system', content: t('simulation.errorOptionNotFound', 'Error: Opción no encontrada o flujo mal configurado.'), timestamp: new Date().toISOString() });
-    }
-  };
-  
   const currentProcessingNode = useMemo(() => {
     return safeNodes.find(n => n.id === currentNodeId);
   }, [safeNodes, currentNodeId]);
@@ -623,20 +564,107 @@ const SimulationInterface = ({
     return flowStatus === 'waiting_input';
   }, [flowStatus]);
 
+  // FINAL REFACTOR: Options are the actual nodes connected to the DecisionNode's outputs.
   const currentDecisionOptions = useMemo(() => {
+
     if (isWaitingForUserInput && currentProcessingNode?.type === 'decision') {
-      return safeNodes
-        .filter(node => node.type === 'option' && node.data.parentDecisionNodeId === currentProcessingNode.id)
-        .map(optionNode => optionNode.data.label);
+      const connectedEdges = safeEdges.filter(edge => edge.source === currentProcessingNode.id);
+      const options = connectedEdges.map(edge => {
+        const targetNode = safeNodes.find(node => node.id === edge.target);
+        if (targetNode && targetNode.type === 'option') {
+          // Lógica robusta: Asumir que el orden de las aristas coincide con el orden de las condiciones.
+          const conditions = currentProcessingNode.data?.conditions || [];
+          const edgeIndex = connectedEdges.findIndex(e => e.id === edge.id);
+          const condition = conditions[edgeIndex];
+
+          return {
+            label: condition?.text || `Opción ${edgeIndex + 1}`,
+            targetNodeId: targetNode.id,
+          };
+        }
+        return null;
+      }).filter(Boolean);
+
+
+    return options;
     }
     return [];
-  }, [isWaitingForUserInput, currentProcessingNode, safeNodes]);
+  }, [isWaitingForUserInput, currentProcessingNode, safeEdges, safeNodes]);
+
+  const handleOptionClick = useCallback(async (option) => {
+
+    if (flowStatus !== 'waiting_input') return;
+
+    setFlowStatus('processing');
+    addMessageToHistory({
+      id: `user-option-${currentNodeId}-${Date.now()}`,
+      type: 'user',
+      content: option.label,
+      timestamp: new Date().toISOString(),
+    });
+
+    const newResponses = { ...userResponses, [currentNodeId]: option.label };
+    setUserResponses(newResponses);
+
+    if (analyticsTracker) {
+      try { analyticsTracker('simulation_decision_option_selected', { nodeId: currentNodeId, option: option.label }); } catch (e) {}
+    }
+
+    await new Promise(resolve => setTimeout(resolve, 50)); // Pausa para refresco de UI
+
+    // La lógica correcta: procesar el OptionNode. Su ID está en targetNodeId.
+    // La función processNode se encargará de la transición desde el OptionNode al siguiente.
+    await processNode(option.targetNodeId, newResponses, null);
+  }, [flowStatus, currentNodeId, userResponses, addMessageToHistory, setUserResponses, analyticsTracker, processNode]);
+
+  const handleUserInputSubmit = async (e) => {
+    e.preventDefault();
+    if (!userInput.trim() || flowStatus !== 'waiting_input') return;
+
+    const userMsgContent = userInput.trim();
+    setUserInput('');
+
+    addMessageToHistory({
+      id: `user-${currentNodeId}-${Date.now()}`,
+      type: 'user',
+      content: userMsgContent,
+      timestamp: new Date().toISOString(),
+    });
+
+    if (analyticsTracker) {
+      try { analyticsTracker('simulation_user_message_sent', { nodeId: currentNodeId, messageLength: userMsgContent.length }); } catch (e) {}
+    }
+
+    if (currentProcessingNode?.type === 'decision') {
+      const selectedOption = currentDecisionOptions.find(opt => opt.label.toLowerCase() === userMsgContent.toLowerCase());
+      if (selectedOption) {
+        await handleOptionClick(selectedOption);
+      } else {
+        addMessageToHistory({
+          id: `user-error-${currentNodeId}-${Date.now()}`,
+          type: 'system',
+          content: t('simulation.invalidOption', 'Opción no válida. Por favor, elige una de las opciones disponibles o escribe una de ellas.'),
+          timestamp: new Date().toISOString(),
+        });
+      }
+    } else if (currentProcessingNode?.type === 'message') {
+      setUserMessageForNode(userMsgContent);
+      const nextEdge = safeEdges.find(edge => edge.source === currentNodeId);
+      if (nextEdge) {
+        await processNode(nextEdge.target, userResponses, userMsgContent);
+      } else {
+        setFlowStatus('ended');
+        addMessageToHistory({ id: 'flow-end-after-user-message', type: 'system', content: t('simulation.flowEndedAfterUserMessage', 'Flujo finalizado después de tu mensaje.'), timestamp: new Date().toISOString() });
+      }
+    }
+  };
 
   useEffect(() => {
-    if (inputRef.current && flowStatus === 'waiting_input' && !currentDecisionOptions.length) {
+    // Focus input only if it's a message node waiting for input
+    if (inputRef.current && isWaitingForUserInput && currentProcessingNode?.type === 'message') {
       inputRef.current.focus();
     }
-  }, [flowStatus, currentDecisionOptions]);
+  }, [isWaitingForUserInput, currentProcessingNode]);
 
   const mainStyle = { height: `${viewportHeight}px` };
   const isExecuting = flowStatus === 'executing_action';
@@ -690,46 +718,46 @@ const SimulationInterface = ({
         )}
       </div>
 
-      {flowStatus === 'waiting_input' && (
-        <form onSubmit={handleUserInputSubmit} className="ts-user-input-container">
-          <input
-            ref={inputRef}
-            type="text"
-            value={userInput}
-            onChange={(e) => setUserInput(e.target.value)}
-            onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleUserInputSubmit(e); }}}
-            placeholder={t('simulation.inputPlaceholder', 'Escribe tu respuesta...')}
-            disabled={isExecuting}
-            aria-label={t('simulation.inputLabel', 'Tu respuesta')}
-          />
-          <button
-            type="submit"
-            disabled={isExecuting || !userInput.trim()}
-            aria-label={t('simulation.send', 'Enviar')}
-          >
-            <i className="fas fa-paper-plane"></i>
-          </button>
-        </form>
-      )}
-      
-      {flowStatus === 'waiting_input' && currentNodeId && safeNodes.find(n => n.id === currentNodeId)?.type === 'decision' && (
-        <div className="ts-decision-options">
-          {safeNodes
-            .filter(
-              (node) =>
-                node.type === 'option' &&
-                node.data.parentDecisionNodeId === currentNodeId
-            )
-            .map((optionNode) => (
-              <button
-                key={optionNode.id}
-                onClick={() => handleOptionClick(optionNode.data.label)}
-                className="ts-decision-option-btn"
-                disabled={flowStatus !== 'waiting_input'}
-              >
-                {optionNode.data.label}
-              </button>
-            ))}
+      {isWaitingForUserInput && (
+        <div className="ts-input-area">
+          {currentDecisionOptions.length > 0 && (
+            <div className="ts-decision-options">
+              {currentDecisionOptions.map((option) => (
+                <button
+                  key={option.targetNodeId} // La clave debe ser el ID del nodo de opción, que es único.
+                  onClick={() => handleOptionClick(option)}
+                  className="ts-decision-option-btn"
+                  disabled={!isWaitingForUserInput}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
+          )}
+
+          <form onSubmit={handleUserInputSubmit} className="ts-user-input-container">
+            <input
+              ref={inputRef}
+              type="text"
+              value={userInput}
+              onChange={(e) => setUserInput(e.target.value)}
+              onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleUserInputSubmit(e); }}}
+              placeholder={
+                currentDecisionOptions.length > 0
+                  ? t('simulation.decisionPlaceholder', 'Elige una opción o escribe tu respuesta...')
+                  : t('simulation.inputPlaceholder', 'Escribe tu respuesta...')
+              }
+              disabled={isExecuting}
+              aria-label={t('simulation.inputLabel', 'Tu respuesta')}
+            />
+            <button
+              type="submit"
+              disabled={isExecuting || !userInput.trim()}
+              aria-label={t('simulation.send', 'Enviar')}
+            >
+              <i className="fas fa-paper-plane"></i>
+            </button>
+          </form>
         </div>
       )}
       

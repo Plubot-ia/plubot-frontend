@@ -223,12 +223,13 @@ const ActionNodeRoot = ({ isConnectable = true, selected = false, id }) => {
         actionType: node?.data?.actionType || '',
         parameters: node?.data?.parameters || {},
         isCollapsed: node?.data?.isCollapsed || false,
+        lodLevel: node?.data?.lodLevel,
       };
     },
     [id]
   );
 
-  const { description, actionType, parameters, isCollapsed } = useFlowStore(selector, shallow);
+  const { description, actionType, parameters, isCollapsed, lodLevel } = useFlowStore(selector, shallow);
   const updateNode = useFlowStore((state) => state.updateNode);
   const deleteNode = useFlowStore((state) => state.deleteNode);
 
@@ -242,6 +243,12 @@ const ActionNodeRoot = ({ isConnectable = true, selected = false, id }) => {
   const [contextMenuPosition, setContextMenuPosition] = useState({ x: 0, y: 0 });
   const [currentWidth, setCurrentWidth] = useState(300);
   const [currentHeight, setCurrentHeight] = useState('auto');
+
+  // INSTRUMENTATION: Log de render de nodos
+  useEffect(() => {
+    const memoStatus = 'Memoized: Yes (React.memo)';
+    console.log(`[Render] Nodo ${id} - Tipo: ActionNode - LOD: ${lodLevel} - ${memoStatus}`);
+  }, [id, lodLevel]);
 
   const handleSaveChanges = useCallback(() => {
     if (!permissions.canEdit) return;

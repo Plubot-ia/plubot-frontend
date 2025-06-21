@@ -1,4 +1,4 @@
-import { create } from 'zustand';
+import { createWithEqualityFn } from 'zustand/traditional';
 
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { shallow } from 'zustand/shallow';
@@ -7,7 +7,7 @@ import { applyNodeChanges, applyEdgeChanges, addEdge } from 'reactflow';
 import { preventNodeStacking } from '../components/onboarding/flow-editor/utils/fix-node-positions';
 import { debounce } from 'lodash';
 import { validateNodePositions, sanitizeEdgePaths } from '../components/onboarding/flow-editor/utils/node-position-validator';
-import { ensureEdgesAreVisible } from '../components/onboarding/flow-editor/utils/edgeFixUtil.js';
+
 import { NODE_TYPES, EDGE_TYPES, EDGE_COLORS, NODE_LABELS } from '@/utils/nodeConfig';
 import { toggleUltraMode as toggleUltraModeManager } from '@/components/onboarding/flow-editor/ui/UltraModeManager';
 
@@ -85,7 +85,7 @@ const initialState = {
   },
 };
 
-const useFlowStore = create(
+const useFlowStore = createWithEqualityFn(
   persist(
     (set, get) => ({
       ...initialState,
@@ -218,31 +218,13 @@ const useFlowStore = create(
       },
       
       // Acción para manejar cambios en las aristas
-      onEdgesChange: async (changes) => { // Made async
-        const currentEdges = get().edges;
-        const currentIsUltraMode = get().isUltraMode;
-        const appliedEdges = applyEdgeChanges(changes, currentEdges);
-        
-        try {
-          // Llamar a ensureEdgesAreVisible después de aplicar los cambios de React Flow
-          // y antes de hacer el 'set' final en el store.
-          const visibleEdges = await ensureEdgesAreVisible(appliedEdges, currentIsUltraMode);
-          set({
-            edges: visibleEdges, // Usar las aristas procesadas por ensureEdgesAreVisible
-            isUndoing: false,
-            isRedoing: false,
-            hasChanges: true,
-          });
-        } catch (error) {
-          console.error('[FlowStore onEdgesChange] Error al asegurar la visibilidad de las aristas:', error);
-          // Fallback: si ensureEdgesAreVisible falla, al menos aplicar los cambios básicos.
-          set({
-            edges: appliedEdges, // Usar las aristas solo con applyEdgeChanges
-            isUndoing: false,
-            isRedoing: false,
-            hasChanges: true,
-          });
-        }
+      onEdgesChange: (changes) => {
+        set(state => ({
+          edges: applyEdgeChanges(changes, state.edges),
+          isUndoing: false,
+          isRedoing: false,
+          hasChanges: true,
+        }));
       },
       
       addNode: (nodeData, position, userData) => {
@@ -1528,11 +1510,11 @@ deleteNode: (nodeIdToDelete) => {
         console.log(`[FlowStore] resetFlow: shouldAttemptLoad = ${shouldAttemptLoad}`);
 
         if (shouldAttemptLoad) {
-          console.log(`[FlowStore] resetFlow: INSIDE shouldAttemptLoad block. Attempting to get loadFlow.`);
+
           let loadFlowFn;
           try {
             loadFlowFn = get().loadFlow;
-            console.log(`[FlowStore] resetFlow: get().loadFlow retrieved. Type: ${typeof loadFlowFn}, Exists: ${!!loadFlowFn}`);
+
           } catch (e) {
             console.error(`[FlowStore] resetFlow: ERROR during get().loadFlow access:`, e);
             set({
@@ -1551,10 +1533,10 @@ deleteNode: (nodeIdToDelete) => {
           }
 
           if (typeof loadFlowFn === 'function') {
-            console.log(`[FlowStore] resetFlow: loadFlowFn IS a function. Calling for ID: ${plubotIdToSet}`);
+
             loadFlowFn(plubotIdToSet)
               .then(() => {
-                console.log(`[FlowStore] resetFlow: loadFlowFn(${plubotIdToSet}) .then() reached.`);
+
                 // loadFlow ya debería haber establecido el flowName desde el backend.
                 // Solo aseguramos que plubotIdToSet esté correctamente en el store si es diferente.
                 if (plubotIdToSet && get().plubotId !== plubotIdToSet) {
@@ -1562,7 +1544,7 @@ deleteNode: (nodeIdToDelete) => {
                 }
                 // NO sobrescribir get().flowName con flowNameToSet aquí si loadFlow tuvo éxito,
                 // ya que loadFlow obtiene el nombre autoritativo del backend.
-                console.log(`[FlowStore] Carga de datos completada para ${plubotIdToSet} después de resetFlow. Nombre actual en store (debería ser de loadFlow): ${get().flowName}`);
+
               })
               .catch(error => {
                 console.error(`[FlowStore] resetFlow: loadFlowFn(${plubotIdToSet}) .catch() reached:`, error);
@@ -1632,7 +1614,7 @@ deleteNode: (nodeIdToDelete) => {
             console.log(`[FlowStore] resetFlow: Final check - Current name ('${currentStoreName}') is default/error/generic. Updating with flowNameToSet ('${flowNameToSet}').`);
             set({ flowName: flowNameToSet });
           } else if (currentStoreName !== flowNameToSet) {
-            console.log(`[FlowStore] resetFlow: Final check - Current name ('${currentStoreName}') is specific (likely from backend via loadFlow). Not overwriting with flowNameToSet ('${flowNameToSet}').`);
+
           }
         }
 
@@ -1783,15 +1765,15 @@ deleteNode: (nodeIdToDelete) => {
           get().reset(); // Resetea al estado inicial completo
           return;
         }
-        console.log(`[FlowStore] Iniciando carga de flujo para Plubot ID: ${plubotId}`);
+
         set({ isSaving: true, plubotId: plubotId, hasChanges: false }); // Marcar como cargando, setear ID y resetear cambios
 
         try {
           const flowData = await flowService.loadFlow(plubotId);
-          console.log(`[FlowStore] loadFlow: Received flowData for plubotId ${plubotId}. Name: ${flowData?.name || 'N/A'}, Nodes: ${flowData?.nodes?.length || 0}, Edges: ${flowData?.edges?.length || 0}`);
-          console.log(`[FlowStore] loadFlow: Data is valid. Setting flowName to: '${flowData.name || `Flujo de ${plubotId}`}'`);
+
+
           if (flowData && typeof flowData === 'object') {
-            console.log(`[FlowStore] loadFlow: Data is valid. Setting flowName to: '${flowData.name || `Flujo de ${plubotId}`}'`);
+
             
             const nodes = Array.isArray(flowData.nodes) ? flowData.nodes : [];
             const edges = Array.isArray(flowData.edges) ? flowData.edges : [];
@@ -1821,24 +1803,19 @@ deleteNode: (nodeIdToDelete) => {
             const currentNodes = get().nodes; 
             currentNodes.forEach(node => {
               if (node.type === NODE_TYPES.decision) {
-                console.log(`[FlowStore loadFlow] Llamando a generateOptionNodes para DecisionNode ID: ${node.id} después de la carga.`);
+
                 get().generateOptionNodes(node.id);
               }
             });
 
             const finalEdgesAfterOptionGeneration = get().edges;
-            console.log(`[FlowStore loadFlow] Estado final de ARISTAS después de generateOptionNodes. Total: ${finalEdgesAfterOptionGeneration.length}`);
-            finalEdgesAfterOptionGeneration.forEach(edge => {
-              if (edge.source.startsWith('decision-') || edge.target.startsWith('option-')) {
-                console.log(`[FlowStore loadFlow] Arista Decision/Option: ID=${edge.id}, Source=${edge.source}, Target=${edge.target}, Type=${edge.type}, Animated=${edge.animated}`);
-              }
-            });
+
+
 
             // Opcional: Llamar a cleanUpEdges o sanitizeEdgePaths si es necesario después de generar las aristas de OptionNode
             // Ejemplo: setTimeout(() => get().cleanUpEdges(), 0);
             // Por ahora, nos enfocamos en la generación de las aristas de OptionNode.
             // Si sanitizeEdgePaths sigue siendo relevante, puede reincorporarse.
-            // Considera que generateOptionNodes ya añade/actualiza aristas.
             // setTimeout(() => sanitizeEdgePaths(), 0); // Comentado temporalmente para aislar el efecto de generateOptionNodes
 
             console.log(`[FlowStore] Flujo ${plubotId} cargado y estado actualizado, OptionNodes y sus aristas generados/actualizados.`);
@@ -1894,7 +1871,7 @@ deleteNode: (nodeIdToDelete) => {
       }),
     } // Fin del objeto de configuración de persist
   ) // Fin de persist()
-); // Fin de create()
+, shallow); // Fin de createWithEqualityFn()
 
 // Selectores optimizados para el store
 export const useNode = (id) => 

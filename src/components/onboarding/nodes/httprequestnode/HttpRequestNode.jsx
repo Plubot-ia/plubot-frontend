@@ -64,6 +64,12 @@ const HttpRequestNode = React.memo(
     onNodesChange,
     isUltraPerformanceMode = false,
   }) => {
+    // INSTRUMENTATION: Log de render de nodos
+    useEffect(() => {
+      const memoStatus = 'Memoized: Yes (React.memo)';
+      console.log(`[Render] Nodo ${id} - Tipo: HttpRequestNode - LOD: ${data.lodLevel} - ${memoStatus}`);
+    }, [id, data.lodLevel]);
+
     const defaultData = {
       label: 'Llamada API',
       type: NODE_TYPES.httpRequest,

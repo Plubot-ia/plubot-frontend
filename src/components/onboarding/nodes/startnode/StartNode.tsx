@@ -253,8 +253,7 @@ StartNodeContent.displayName = 'StartNodeContent';
 
 // Props para el componente principal StartNode, usando NodeProps de reactflow
 interface StartNodeComponentProps extends NodeProps {
-  // Aquí puedes añadir props específicos si los hubiera, además de los de data
-  // data ya viene tipado por NodeProps como { [key: string]: any } o puedes sobreescribirlo
+  lodLevel?: string; // lodLevel ahora es una prop de primer nivel
   data: {
     label?: string;
     dynamicContent?: string;
@@ -264,7 +263,13 @@ interface StartNodeComponentProps extends NodeProps {
   };
 }
 
-const StartNodeComponent: React.FC<StartNodeComponentProps> = ({ id, data, selected, xPos, yPos }) => {
+const StartNodeComponent: React.FC<StartNodeComponentProps> = ({ id, data, selected, lodLevel, xPos, yPos }) => {
+  // INSTRUMENTATION: Log de render de nodos
+  useEffect(() => {
+    const memoStatus = 'Memoized: Yes (custom comparison)';
+    console.log(`[Render] Nodo ${id} - Tipo: StartNode - LOD: ${lodLevel} - ${memoStatus}`);
+  }, [id, lodLevel]);
+
   const { getNode, setNodes } = useReactFlow();
   const updateNodeData = useFlowStore((state) => state.updateNode);
   const showContextMenu = useFlowStore((state) => state.showContextMenu);
@@ -451,15 +456,17 @@ const StartNodeComponent: React.FC<StartNodeComponentProps> = ({ id, data, selec
 
 // Custom comparison function for memoization to prevent unnecessary re-renders
 const areStartNodePropsEqual = (prevProps: Readonly<StartNodeComponentProps>, nextProps: Readonly<StartNodeComponentProps>) => {
-  // Shallow compare data object properties that affect rendering
+  // Comparamos las props que realmente afectan al renderizado.
   const dataChanged =
     prevProps.data.label !== nextProps.data.label ||
     prevProps.data.dynamicContent !== nextProps.data.dynamicContent ||
     prevProps.data.lastModified !== nextProps.data.lastModified;
 
-  // Re-render only if selection state or relevant data has changed.
-  // xPos and yPos changes are handled by react-flow's transform, not re-rendering the component itself.
-  return prevProps.selected === nextProps.selected && !dataChanged;
+  const lodChanged = prevProps.lodLevel !== nextProps.lodLevel;
+
+  // El nodo solo debe re-renderizarse si su estado de selección, sus datos internos o el nivel de detalle (LOD) cambian.
+  // xPos y yPos son manejados por la transformación CSS de React Flow, no necesitan causar un re-render del componente interno.
+  return prevProps.selected === nextProps.selected && !dataChanged && !lodChanged;
 };
 
 const MemoizedStartNode = memo(StartNodeComponent, areStartNodePropsEqual);
