@@ -258,7 +258,7 @@ const Contact = () => {
     data.append('message', formData.mensaje);
 
     try {
-      const response = await axiosInstance.post('/contact', data, {
+      const response = await axiosInstance.post('contact', data, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },

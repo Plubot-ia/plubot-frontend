@@ -15,7 +15,7 @@ const useGoogleSheets = () => {
     setError(null);
     
     try {
-      const response = await axiosInstance.post('/integrations/google/sheets/connect', {
+      const response = await axiosInstance.post('integrations/google/sheets/connect', {
         user_id: user.id,
         credentials: credentials
       });
@@ -34,7 +34,7 @@ const useGoogleSheets = () => {
     setError(null);
     
     try {
-      const response = await axiosInstance.post('/integrations/google/sheets/data', {
+      const response = await axiosInstance.post('integrations/google/sheets/data', {
         user_id: user.id,
         spreadsheet_id: spreadsheetId,
         range: range

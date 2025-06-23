@@ -78,7 +78,7 @@ instance.interceptors.response.use(
           throw new Error('Session expired: No refresh token');
         }
 
-        const { data } = await instance.post('/auth/refresh', { refresh_token: refreshToken });
+        const { data } = await instance.post('auth/refresh', { refresh_token: refreshToken });
 
         if (data && data.access_token) {
           localStorage.setItem('access_token', data.access_token);

@@ -33,7 +33,7 @@ const AddIntegrationModal = ({ isOpen, onClose, onIntegrationAdded, onIntegratio
       if (isEditMode) {
         response = await instance.put(`/discord-integrations/${integrationToEdit.id}`, payload);
       } else {
-        response = await instance.post('/discord-integrations/', payload);
+        response = await instance.post('discord-integrations/', payload);
       }
 
       // If the request was successful (axios doesn't throw for 2xx status codes),

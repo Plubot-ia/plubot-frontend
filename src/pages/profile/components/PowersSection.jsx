@@ -56,7 +56,7 @@ const PowersSection = ({ user, setUser, showNotification, navigate }) => {
 
     try {
       showNotification('Adquiriendo poder...', 'info');
-      const response = await axiosInstance.post('/auth/profile/powers', { powerId: newPower });
+      const response = await axiosInstance.post('auth/profile/powers', { powerId: newPower });
 
       if (response.data.status === 'success') {
         setUser({ ...user, powers: response.data.powers });
@@ -86,7 +86,7 @@ const PowersSection = ({ user, setUser, showNotification, navigate }) => {
   const handleRemovePower = async (powerId) => {
     try {
       showNotification('Desactivando poder...', 'info');
-      const response = await axiosInstance.delete('/auth/profile/powers', {
+      const response = await axiosInstance.delete('auth/profile/powers', {
         data: { powerId },
       });
 

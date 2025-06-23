@@ -34,7 +34,7 @@ const ProfileHeader = memo(({
     formData.append('profile_picture', file);
 
     try {
-      const response = await axiosInstance.put('/auth/profile', formData);
+      const response = await axiosInstance.post('auth/profile', formData);
       const data = response.data;
       if (data.status === 'success' && data.user?.profile_picture) {
         setUser({ ...user, profile_picture: data.user.profile_picture });

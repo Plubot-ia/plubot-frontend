@@ -69,7 +69,7 @@ const DiscordNode: React.FC<NodeProps<DiscordNodeData>> = ({ id, data, selected,
       setIsLoadingProfileToken(true);
       try {
         // 1. Obtener la lista de integraciones
-        const listResponse = await instance.get('/discord-integrations/');
+        const listResponse = await instance.get('discord-integrations/');
         if (listResponse.data && listResponse.data.integrations && listResponse.data.integrations.length > 0) {
           // 2. Buscar la primera integración activa
           const activeIntegration = listResponse.data.integrations.find(

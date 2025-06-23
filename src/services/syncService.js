@@ -47,7 +47,7 @@ const syncPlubot = async (plubot) => {
       const token = localStorage.getItem('access_token');
       if (!token) throw new Error('No hay token de autenticación');
       
-      const response = await instance.post('/plubots/create', syncData);
+      const response = await instance.post('plubots/create', syncData);
       
       if (response.data?.status === 'success' && response.data.plubot?.id) {
         // Actualizar el plubot local con el ID del servidor

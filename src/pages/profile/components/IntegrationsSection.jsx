@@ -18,7 +18,7 @@ const IntegrationsSection = ({ user, showNotification }) => {
     setIsLoading(true);
     setError(null);
     try {
-      const response = await instance.get('/discord-integrations/');
+      const response = await instance.get('discord-integrations/');
       if (response.data && response.data.integrations) {
         const mappedIntegrations = response.data.integrations.map(int => ({
           id: int.id,

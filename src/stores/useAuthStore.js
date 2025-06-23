@@ -54,7 +54,7 @@ const useAuthStore = create(
             localStorage.setItem('access_token', data.access_token);
             
             // Obtener el perfil del usuario
-            const profileResponse = await instance.get('/auth/profile', {
+            const profileResponse = await instance.get('auth/profile', {
               headers: {
                 'Authorization': `Bearer ${data.access_token}`
               },
@@ -115,7 +115,7 @@ const useAuthStore = create(
           formData.append('password', password);
           
           // Configuración especial para enviar FormData
-          const response = await instance.post('/auth/register', formData, {
+          const response = await instance.post('auth/register', formData, {
             headers: {
               'Content-Type': 'multipart/form-data'
             }
@@ -235,7 +235,7 @@ const useAuthStore = create(
         
         try {
           // Verificar token con el servidor
-          const response = await instance.get('/auth/profile', {
+          const response = await instance.get('auth/profile', {
             headers: { 'Authorization': `Bearer ${token}` },
             // Evitar caché del navegador
             params: { _: Date.now() }
@@ -434,7 +434,7 @@ const useAuthStore = create(
           
           while (retryCount < maxRetries) {
             try {
-              response = await instance.get('/auth/profile', {
+              response = await instance.get('auth/profile', {
                 headers: { 'Authorization': `Bearer ${token}` },
                 params: { _t: Date.now() }, // Evitar caché del navegador
                 timeout: 15000 // 15 segundos de timeout
@@ -564,7 +564,7 @@ const useAuthStore = create(
           const formData = new FormData();
           formData.append('email', email.trim());
           
-          const response = await instance.post('/auth/forgot_password', formData, {
+          const response = await instance.post('auth/forgot_password', formData, {
             headers: {
               'Content-Type': 'multipart/form-data'
             }
@@ -595,7 +595,7 @@ const useAuthStore = create(
           formData.append('password', newPassword);
           formData.append('password_confirmation', newPassword);
           
-          const response = await instance.post('/auth/reset_password', formData, {
+          const response = await instance.post('auth/reset_password', formData, {
             headers: {
               'Content-Type': 'multipart/form-data'
             }
@@ -649,7 +649,7 @@ const useAuthStore = create(
           const formData = new FormData();
           formData.append('token', token);
           
-          const response = await instance.post('/auth/verify_email', formData, {
+          const response = await instance.post('auth/verify_email', formData, {
             headers: {
               'Content-Type': 'multipart/form-data'
             }
@@ -678,7 +678,7 @@ const useAuthStore = create(
           const formData = new FormData();
           formData.append('email', email.trim());
           
-          const response = await instance.post('/auth/resend_verification', formData, {
+          const response = await instance.post('auth/resend_verification', formData, {
             headers: {
               'Content-Type': 'multipart/form-data'
             }
@@ -737,14 +737,14 @@ const useAuthStore = create(
         try {
           
           // Enviar el token al backend para verificarlo
-          const response = await instance.post('/auth/google/success', { token });
+          const response = await instance.post('auth/google/success', { token });
           
           if (response.data?.success === true) {
             // Guardar el token
             localStorage.setItem('access_token', response.data.access_token);
             
             // Obtener el perfil del usuario
-            const profileResponse = await instance.get('/auth/profile', {
+            const profileResponse = await instance.get('auth/profile', {
               headers: {
                 'Authorization': `Bearer ${response.data.access_token}`
               }
