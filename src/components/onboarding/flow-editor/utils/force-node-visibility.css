@@ -1,0 +1,51 @@
+/**
+ * force-node-visibility.css
+ * Este archivo contiene reglas CSS específicas para forzar la visibilidad
+ * de los nodos en ReactFlow, sobrescribiendo cualquier otra regla.
+ */
+
+/* Asegurar que todos los nodos son visibles */
+.react-flow__node {
+  visibility: visible !important;
+  display: block !important;
+  opacity: 1 !important;
+  /* position: absolute !important; */ /* <-- Comentado para probar si interfiere con React Flow */
+  z-index: 999 !important;
+  pointer-events: all !important;
+  /* transform: translate(0, 0) !important; */ /* <-- Eliminado para permitir el posicionamiento de React Flow */
+  min-width: 50px !important;
+  min-height: 40px !important;
+}
+
+/* Forzar visibilidad de los handles de conexión */
+.react-flow__handle {
+  visibility: visible !important;
+  display: block !important;
+  opacity: 1 !important;
+  z-index: 1000 !important;
+  pointer-events: all !important;
+}
+
+/* Asegurar que el wrapper de nodos tiene las dimensiones necesarias */
+.react-flow__nodes {
+  transform-origin: 0 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  position: absolute !important;
+  pointer-events: all !important;
+}
+
+/* Contorno temporal para debugging */
+.react-flow__node {
+  outline: 2px solid rgba(255, 0, 0, 0.8) !important;
+}
+
+/* Contorno temporal para debugging del nodo de inicio */
+.react-flow__node-start {
+  outline: 3px solid rgba(0, 255, 0, 0.8) !important;
+}
+
+/* Mejor contraste para nodos tipo message */
+.react-flow__node-message {
+  background-color: rgba(255, 255, 255, 0.9) !important;
+}
