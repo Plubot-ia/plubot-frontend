@@ -156,7 +156,7 @@ const TrainingScreen = () => {
   const navigate = useNavigate();
   const { plubotData, updatePlubotData } = usePlubotCreation();
   const { addXp, addPluCoins } = useGamification();
-  const { request } = useAPI();
+    const { request } = useAPI();
   
   // Referencias y estado local
   const nodeCounters = useRef({});
@@ -785,7 +785,7 @@ async function saveFlowData() {
     // Siempre resetear a un flujo limpio (con nodos por defecto) al descartar, 
     // independientemente de si había un backup o no, porque el usuario eligió no restaurar o no había nada que restaurar.
 
-    useFlowStore.getState().resetFlow(currentPlubotId, targetFlowName, { skipLoad: false, forceDefaultNodes: true });
+    resetFlow({ id: currentPlubotId, name: targetFlowName, nodes: [], edges: [] }, currentPlubotId, { skipLoad: false, forceDefaultNodes: true });
   };
 
   // Wrappers para las acciones del modal EmergencyRecovery
