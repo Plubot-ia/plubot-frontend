@@ -2,9 +2,10 @@ import axios from 'axios';
 import useAuthStore from '@/stores/useAuthStore';
 
 const isDevelopment = import.meta.env.MODE === 'development';
+const prodApiUrl = import.meta.env.VITE_API_URL || 'https://plubot-backend.onrender.com';
 const baseURL = isDevelopment 
   ? '/api'
-  : (import.meta.env.VITE_API_URL || 'https://plubot-backend.onrender.com/api');
+  : (prodApiUrl.endsWith('/api') ? prodApiUrl : `${prodApiUrl}/api`);
 
 const instance = axios.create({
   baseURL,

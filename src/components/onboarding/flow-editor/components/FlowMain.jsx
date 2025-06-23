@@ -113,7 +113,7 @@ import { patchReactFlowEdgePaths, useEdgePathSanitizer } from '../utils/edge-pat
 // Importar el nuevo validador de posiciones de nodos
 import { validateNodePositions, sanitizeEdgePaths } from '../utils/node-position-validator';
 // Importar y aplicar automáticamente el parche de validación de posiciones
-import '../utils/position-validator-patch';
+
 
 /**
  * Componente principal FlowMain
@@ -228,6 +228,7 @@ const FlowMain = ({
   }, []); // El array de dependencias vacío asegura que se ejecute solo una vez, al montar.
   
   // Acciones del store con memoización
+  const setReactFlowInstanceFromStore = useFlowStore(state => state.setReactFlowInstance);
   const { setNodes, setEdges, onNodesChange, onEdgesChange, onConnect, toggleUltraMode, undo, redo, setIsNodeBeingDragged, hideContextMenu } = useFlowStore();
   
   // Determinar si se están usando nodos externos o internos
@@ -907,7 +908,7 @@ useEffect(() => {
             if (typeof window !== 'undefined') {
               window.reactFlowInstance = instance;
             }
-            useFlowStore.getState().setReactFlowInstance(instance);
+            setReactFlowInstanceFromStore(instance);
 
             // Si hay una función externa para establecer la instancia, llamarla
             if (typeof externalSetReactFlowInstance === 'function') {

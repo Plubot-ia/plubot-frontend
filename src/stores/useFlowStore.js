@@ -28,6 +28,10 @@ import { nodePositionCache, flowStateManager } from '@/components/onboarding/flo
 // Importar el sistema de persistencia para respaldo adicional
 import { saveLocalBackup } from '@/components/onboarding/flow-editor/utils/persistenceManager';
 
+// Module-level variables to manage the position validation logic (integrated from patch)
+let positionValidatorInterval = null;
+let positionValidatorObserver = null;
+
 // Función para generar IDs únicos (ahora usa el servicio de flujo)
 const generateNodeId = (type = 'node') => generateId(type);
 
@@ -178,7 +182,57 @@ const useFlowStore = createWithEqualityFn(
       setIsNodeBeingDragged: (isDragging) => set({ isNodeBeingDragged: isDragging }),
 
       // Action to set the React Flow instance
-      setReactFlowInstance: (instance) => set({ reactFlowInstance: instance }),
+            setReactFlowInstance: (instance) => {
+        // Primero, guardamos la instancia en el estado
+        set({ reactFlowInstance: instance });
+
+        // Ahora, integramos la lógica del parche de validación de posiciones
+        console.log('[useFlowStore] setReactFlowInstance: Applying position validation logic.');
+
+        // Validar posiciones de nodos existentes al inicializar
+        const currentNodes = get().nodes;
+        if (currentNodes && currentNodes.length > 0) {
+          const validatedNodes = validateNodePositions(currentNodes);
+          if (JSON.stringify(validatedNodes) !== JSON.stringify(currentNodes)) {
+            console.log('[useFlowStore] Correcting invalid node positions on init.');
+            get().setNodes(validatedNodes, false); // No forzar historial en esta corrección automática
+          }
+        }
+
+        // Limpiar cualquier intervalo u observador previo para evitar duplicados
+        if (positionValidatorInterval) clearInterval(positionValidatorInterval);
+        if (positionValidatorObserver) positionValidatorObserver.disconnect();
+
+        // Configurar un intervalo para sanitizar paths de aristas periódicamente
+        positionValidatorInterval = setInterval(() => {
+          if (!get().isNodeBeingDragged) {
+            sanitizeEdgePaths();
+          }
+        }, 2000);
+
+        // Configurar un observador para cambios en el DOM que podrían afectar las aristas
+        const observer = new MutationObserver(() => {
+          if (!get().isNodeBeingDragged) {
+            sanitizeEdgePaths();
+          }
+        });
+
+        const reactFlowElement = document.querySelector('.react-flow');
+        if (reactFlowElement) {
+          observer.observe(reactFlowElement, { childList: true, subtree: true });
+          positionValidatorObserver = observer;
+        }
+
+        // Registrar limpieza al cerrar/recargar la página
+        // Usamos un listener único para evitar añadir múltiples
+        if (!window.cleanupAttached) {
+          window.addEventListener('beforeunload', () => {
+            if (positionValidatorInterval) clearInterval(positionValidatorInterval);
+            if (positionValidatorObserver) positionValidatorObserver.disconnect();
+          });
+          window.cleanupAttached = true;
+        }
+      },
 
       // Acción para actualizar los umbrales de LOD dinámicamente
       setLodThresholds: (thresholds) => set({ lodThresholds: thresholds }),
