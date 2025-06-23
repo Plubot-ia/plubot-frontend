@@ -30,11 +30,11 @@ const callGrokApi = async (
 ): Promise<string> => {
   
   try {
-    const apiUrl = import.meta.env.VITE_API_URL || '';
+        const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
     if (!apiUrl) {
       throw new Error('La URL de la API no está configurada');
     }
-    const response = await fetch(`${apiUrl}/api/ai-node`, {
+    const response = await fetch(`${apiUrl}/ai-node`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

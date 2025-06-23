@@ -3,9 +3,17 @@ import useAuthStore from '@/stores/useAuthStore';
 
 const isDevelopment = import.meta.env.MODE === 'development';
 const prodApiUrl = import.meta.env.VITE_API_URL || 'https://plubot-backend.onrender.com';
-const baseURL = isDevelopment 
-  ? '/api'
-  : (prodApiUrl.endsWith('/api') ? prodApiUrl : `${prodApiUrl}/api`);
+
+// Lógica robusta para construir la baseURL de producción
+let finalProdApiUrl = prodApiUrl;
+if (finalProdApiUrl.endsWith('/')) {
+  finalProdApiUrl = finalProdApiUrl.slice(0, -1); // Eliminar barra final si existe
+}
+if (!finalProdApiUrl.endsWith('/api')) {
+  finalProdApiUrl = `${finalProdApiUrl}/api`; // Añadir /api si no existe
+}
+
+const baseURL = isDevelopment ? '/api' : finalProdApiUrl;
 
 const instance = axios.create({
   baseURL,
@@ -36,7 +44,7 @@ const processQueue = (error, token = null) => {
 
 instance.interceptors.request.use(
   (config) => {
-    const publicEndpoints = ['/auth/login', '/auth/register', '/contact', '/opinion'];
+        const publicEndpoints = ['auth/login', 'auth/register', 'contact', 'opinion'];
     const isPublicEndpoint = publicEndpoints.some(endpoint => config.url?.includes(endpoint));
     
     if (!isPublicEndpoint) {

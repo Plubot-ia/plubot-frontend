@@ -24,7 +24,8 @@ export const loadPlubotName = async (plubotId) => {
   
   try {
     // Luego intentar obtener del backend (más actualizado)
-    const response = await fetch(`/api/plubots/${plubotId}`);
+        const baseUrl = import.meta.env.VITE_API_URL || 'http://127.0.0.1:5000/api';
+    const response = await fetch(`${baseUrl}/plubots/${plubotId}`);
     if (response.ok) {
       const data = await response.json();
       if (data?.status === 'success' && data?.plubot?.name) {

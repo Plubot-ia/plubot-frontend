@@ -87,7 +87,7 @@ const GoogleAuthCallback = () => {
                 localStorage.setItem('access_token', data.access_token);
                 
                 // Obtener los datos del usuario
-                const userResponse = await fetch(`${backendBaseUrl}/api/auth/profile`, {
+                const userResponse = await fetch(`${backendBaseUrl}/auth/profile`, {
                   headers: {
                     'Authorization': `Bearer ${data.access_token}`
                   }

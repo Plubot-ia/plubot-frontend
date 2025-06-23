@@ -179,7 +179,8 @@ const useAuthStore = create(
           const controller = new AbortController();
           const timeoutId = setTimeout(() => controller.abort(), 3000); // 3 segundos de timeout
           
-          fetch('/api/auth/logout', {
+                  const baseUrl = import.meta.env.VITE_API_URL || 'http://127.0.0.1:5000/api';
+        fetch(`${baseUrl}/auth/logout`, {
             method: 'POST',
             signal: controller.signal,
             credentials: 'include'

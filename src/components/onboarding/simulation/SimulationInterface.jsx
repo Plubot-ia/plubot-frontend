@@ -35,7 +35,8 @@ const executeDiscordAction = async (nodeData) => {
   }
 
   try {
-    const response = await fetch('/api/actions/discord/send_message', {
+        const baseUrl = import.meta.env.VITE_API_URL || 'http://127.0.0.1:5000/api';
+    const response = await fetch(`${baseUrl}/actions/discord/send_message`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
