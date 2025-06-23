@@ -40,7 +40,7 @@ const useAuthStore = create(
 
           
           // Aumentar el timeout para esta solicitud específica y configurar para FormData
-          const loginResponse = await instance.post('/auth/login', formData, {
+              const loginResponse = await instance.post('auth/login', formData, {
             timeout: 30000, // 30 segundos para dar más tiempo en producción
             headers: {
               'Content-Type': 'multipart/form-data'
@@ -619,7 +619,7 @@ const useAuthStore = create(
       changePassword: async (currentPassword, newPassword, confirmPassword) => {
         set({ loading: true, error: null });
         try {
-          const response = await instance.post('auth/login', {
+                    const response = await instance.post('auth/change_password', {
             current_password: currentPassword,
             new_password: newPassword,
             confirm_password: confirmPassword,
