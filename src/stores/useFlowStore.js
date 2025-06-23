@@ -92,6 +92,30 @@ const initialState = {
  * @param {object} updates - Objeto con las actualizaciones de estado (ej. { nodes: newNodes }).
  * @param {boolean} [forceHistory=false] - Si es true, fuerza la creación de una entrada en el historial.
  */
+const _resetFlowAction = (set, get) => (flow, plubotId, options = {}) => {
+  const { nodes, edges, viewport, name } = flow;
+  const { allowResetFromLoader = false } = options;
+
+  if (!allowResetFromLoader && get().nodes.length > 0) {
+    console.warn('[preventFlowReset] Reset bloqueado para prevenir pérdida de datos.');
+    return;
+  }
+
+  set(
+    {
+      nodes: nodes || [],
+      edges: edges || [],
+      viewport: viewport || null,
+      flowName: name || get().flowName,
+      plubotId: plubotId !== undefined ? plubotId : get().plubotId,
+      isFlowLoaded: true,
+      history: { past: [], future: [] },
+    },
+    true, // Reemplazar estado
+    'resetFlow'
+  );
+};
+
 const useFlowStore = createWithEqualityFn(
   persist(
     (set, get) => ({
@@ -1163,31 +1187,7 @@ const useFlowStore = createWithEqualityFn(
         });
       },
       
-      // Resetear solo los nodos y aristas manteniendo el resto del estado
-      // Útil para cambiar de un Plubot a otro sin perder configuraciones
-      resetFlow: (flow, plubotId, options = {}) => {
-        const { nodes, edges, viewport, name } = flow;
-        const { allowResetFromLoader = false } = options;
-
-        if (!allowResetFromLoader && get().nodes.length > 0) {
-          console.warn('[preventFlowReset] Reset bloqueado para prevenir pérdida de datos.');
-          return;
-        }
-
-        set(
-          {
-            nodes: nodes || [],
-            edges: edges || [],
-            viewport: viewport || null,
-            flowName: name || get().flowName,
-            plubotId: plubotId !== undefined ? plubotId : get().plubotId,
-            isFlowLoaded: true,
-            history: { past: [], future: [] },
-          },
-          true, // Reemplazar estado
-          'resetFlow'
-        );
-      },
+      resetFlow: _resetFlowAction(set, get),
       
       _saveFlowToServer: async (flowState) => {
         const { id: plubotId, nodes, edges, flowName } = flowState;
