@@ -619,7 +619,7 @@ const useAuthStore = create(
       changePassword: async (currentPassword, newPassword, confirmPassword) => {
         set({ loading: true, error: null });
         try {
-          const response = await instance.post('/auth/change_password', {
+          const response = await instance.post('auth/login', {
             current_password: currentPassword,
             new_password: newPassword,
             confirm_password: confirmPassword,
@@ -835,7 +835,7 @@ const useAuthStore = create(
           
           
           
-          const response = await instance.put('/auth/profile', formData, {
+                const response = await instance.post('auth/profile', formData, {
             headers: {
               'Content-Type': 'multipart/form-data',
             },
