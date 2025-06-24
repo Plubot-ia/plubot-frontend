@@ -114,13 +114,13 @@ const CaseStudies = () => {
               data-aos={caseStudy.aos}
             >
               <div className="case-study-icon">
-                <i className={caseStudy.icon}></i>
+                <i className={caseStudy.icon} />
               </div>
               <div className="case-study-content">
                 <h2>{caseStudy.title}</h2>
                 <p dangerouslySetInnerHTML={{ __html: caseStudy.description }} />
               </div>
-              <div className="holographic-scan"></div>
+              <div className="holographic-scan" />
             </div>
           ))}
         </div>

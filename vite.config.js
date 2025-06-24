@@ -1,8 +1,12 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
+import { fileURLToPath } from 'url';
 
-export default defineConfig({
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const viteConfig = {
   plugins: [react()],
   assetsInclude: ['**/*.webp', '**/*.png', '**/*.svg', '**/*.jpg', '**/*.jpeg', '**/*.gif', '**/*.ico'],
   base: '/',
@@ -42,7 +46,7 @@ export default defineConfig({
     },
   },
   build: {
-    outDir: 'dist', 
+    outDir: 'dist',
     chunkSizeWarningLimit: 1500,
     minify: 'esbuild',
     target: 'esnext',
@@ -64,4 +68,8 @@ export default defineConfig({
     },
     assetsInlineLimit: 4096,
   },
-});
+};
+
+export { viteConfig };
+
+export default defineConfig(viteConfig);

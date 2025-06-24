@@ -83,14 +83,16 @@ const AiNodeComponent: React.FC<NodeProps<AiNodeData>> = ({ id, data, selected, 
                 <InfoIcon style={{ fontSize: '16px', marginLeft: '8px', cursor: 'help', verticalAlign: 'middle' }} />
               </Tooltip>
             </h3>
-            <textarea
-              className="ainode-textarea"
-              ref={promptTextareaRef}
-              value={promptTemplate}
-              onChange={(e) => handlePromptChange(e.target.value)}
-              placeholder="Escribe tu prompt aquí. Usa {{variable}} para variables dinámicas."
-              rows={4}
-            />
+            <div className="nodrag">
+              <textarea
+                className="ainode-textarea"
+                ref={promptTextareaRef}
+                value={promptTemplate}
+                onChange={(e) => handlePromptChange(e.target.value)}
+                placeholder="Escribe tu prompt aquí. Usa {{variable}} para variables dinámicas."
+                rows={4}
+              />
+            </div>
           </div>
 
           {isSettingsExpanded && (
@@ -134,14 +136,16 @@ const AiNodeComponent: React.FC<NodeProps<AiNodeData>> = ({ id, data, selected, 
                     <InfoIcon style={{ fontSize: '14px', marginLeft: '4px', cursor: 'help', verticalAlign: 'middle' }} />
                   </Tooltip>
                 </label>
-                <textarea
-                  id={`system-${id}`}
-                  className="ainode-textarea"
-                  value={systemMessage || ''}
-                  onChange={(e) => onSettingChange('systemMessage', e)}
-                  placeholder="Ej: Eres un asistente experto en marketing..."
-                  rows={2}
-                />
+                <div className="nodrag">
+                  <textarea
+                    id={`system-${id}`}
+                    className="ainode-textarea"
+                    value={systemMessage || ''}
+                    onChange={(e) => onSettingChange('systemMessage', e)}
+                    placeholder="Ej: Eres un asistente experto en marketing..."
+                    rows={2}
+                  />
+                </div>
               </div>
             </div>
           )}

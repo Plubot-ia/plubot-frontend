@@ -1,6 +1,6 @@
+import PropTypes from 'prop-types';
 import React, { memo } from 'react';
 import { Handle, Position } from 'reactflow';
-import PropTypes from 'prop-types';
 import './PowerNode.css';
 
 const PowerNodeComponent = ({

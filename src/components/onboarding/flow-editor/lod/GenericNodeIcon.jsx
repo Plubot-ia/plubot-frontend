@@ -6,22 +6,22 @@
  * @version 1.0.0
  */
 
-import React, { memo } from 'react';
-import PropTypes from 'prop-types';
 import {
-  Play,          // StartNode
-  StopCircle,    // EndNode
+  Play, // StartNode
+  StopCircle, // EndNode
   MessageSquare, // MessageNode (default)
-  GitMerge,      // DecisionNode
-  Zap,           // ActionNode
-  ListTree,      // OptionNode
-  Server,        // HttpRequestNode
-  Cpu,           // PowerNode
+  GitMerge, // DecisionNode
+  Zap, // ActionNode
+  ListTree, // OptionNode
+  Server, // HttpRequestNode
+  Cpu, // PowerNode
   MessageCircle, // DiscordNode
-  BrainCircuit,  // AiNode
-  Smile,         // EmotionDetectionNode
-  Puzzle,        // Default
+  BrainCircuit, // AiNode
+  Smile, // EmotionDetectionNode
+  Puzzle, // Default
 } from 'lucide-react';
+import PropTypes from 'prop-types';
+import React, { memo } from 'react';
 
 const iconMap = {
   start: Play,

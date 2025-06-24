@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { useSyncService, getSyncState } from '../../services/syncService';
 import { motion, AnimatePresence } from 'framer-motion';
+import React, { useState, useEffect } from 'react';
+
+import { useSyncService, getSyncState } from '../../services/syncService';
 import './SyncStatusIndicator.css';
 
 /**
@@ -10,40 +11,40 @@ import './SyncStatusIndicator.css';
 const SyncStatusIndicator = ({ expanded = false, showControls = true }) => {
   const [isExpanded, setIsExpanded] = useState(expanded);
   const [syncDetails, setSyncDetails] = useState(null);
-  
+
   // Usar el servicio de sincronización
   const { syncState, syncAllPlubots } = useSyncService();
-  
+
   // Actualizar estado cada segundo para mantener la UI actualizada
   useEffect(() => {
     const updateInterval = setInterval(() => {
       setSyncDetails(getSyncState());
     }, 1000);
-    
+
     return () => clearInterval(updateInterval);
   }, []);
-  
+
   // Inicializar detalles de sincronización
   useEffect(() => {
     setSyncDetails(getSyncState());
   }, []);
-  
+
   // Manejar clic en el indicador
   const handleClick = () => {
     if (!showControls) return;
     setIsExpanded(!isExpanded);
   };
-  
+
   // Forzar sincronización manual
   const handleSync = (e) => {
     e.stopPropagation();
     syncAllPlubots();
   };
-  
+
   // Determinar el icono y color según el estado
   const getStatusIcon = () => {
     if (!syncDetails) return '⏳'; // Reloj de arena
-    
+
     switch (syncDetails.syncStatus) {
       case 'syncing':
         return '↻'; // Flecha circular
@@ -55,10 +56,10 @@ const SyncStatusIndicator = ({ expanded = false, showControls = true }) => {
         return 'ℹ'; // Información
     }
   };
-  
+
   const getStatusColor = () => {
     if (!syncDetails) return 'var(--color-gray)';
-    
+
     switch (syncDetails.syncStatus) {
       case 'syncing':
         return 'var(--color-blue)';
@@ -70,7 +71,7 @@ const SyncStatusIndicator = ({ expanded = false, showControls = true }) => {
         return 'var(--color-gray)';
     }
   };
-  
+
   // Si no hay detalles de sincronización, mostrar indicador de carga
   if (!syncDetails) {
     return (
@@ -79,9 +80,9 @@ const SyncStatusIndicator = ({ expanded = false, showControls = true }) => {
       </div>
     );
   }
-  
+
   return (
-    <div 
+    <div
       className={`sync-indicator ${syncDetails.syncStatus} ${isExpanded ? 'expanded' : ''}`}
       onClick={handleClick}
       style={{ '--status-color': getStatusColor() }}
@@ -91,16 +92,16 @@ const SyncStatusIndicator = ({ expanded = false, showControls = true }) => {
           {getStatusIcon()}
         </span>
         <span className="sync-status-text">
-          {syncDetails.isSyncing ? 'Sincronizando...' : 
-           syncDetails.syncStatus === 'success' ? 'Sincronizado' :
-           syncDetails.syncStatus === 'error' ? 'Error de sincronización' :
-           'Listo para sincronizar'}
+          {syncDetails.isSyncing ? 'Sincronizando...' :
+            syncDetails.syncStatus === 'success' ? 'Sincronizado' :
+              syncDetails.syncStatus === 'error' ? 'Error de sincronización' :
+                'Listo para sincronizar'}
         </span>
       </div>
-      
+
       <AnimatePresence>
         {isExpanded && (
-          <motion.div 
+          <motion.div
             className="sync-details"
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
@@ -111,7 +112,7 @@ const SyncStatusIndicator = ({ expanded = false, showControls = true }) => {
               <span>Última sincronización:</span>
               <span>{syncDetails.lastSyncFormatted}</span>
             </div>
-            
+
             {syncDetails.syncErrors.length > 0 && (
               <div className="sync-errors">
                 <h4>Errores ({syncDetails.syncErrors.length}):</h4>
@@ -125,11 +126,11 @@ const SyncStatusIndicator = ({ expanded = false, showControls = true }) => {
                 </ul>
               </div>
             )}
-            
+
             {showControls && (
               <div className="sync-controls">
-                <button 
-                  className="sync-now-btn" 
+                <button
+                  className="sync-now-btn"
                   onClick={handleSync}
                   disabled={syncDetails.isSyncing}
                 >

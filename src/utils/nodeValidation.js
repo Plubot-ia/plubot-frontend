@@ -114,7 +114,7 @@ export const validateConnection = (connection, nodes, edges) => {
     }
 
     // Validar si el tipo de nodo destino es permitido desde el origen
-    if (sourceValidationRules.allowedOutgoingConnections && 
+    if (sourceValidationRules.allowedOutgoingConnections &&
         !sourceValidationRules.allowedOutgoingConnections.includes(targetNode.type)) {
       // alert(`No se puede conectar un nodo '${sourceNode.type}' a un nodo '${targetNode.type}'.`);
 
@@ -132,6 +132,6 @@ export const validateConnection = (connection, nodes, edges) => {
       return false;
     }
   }
-  
+
   return true; // Si pasa todas las validaciones
 };

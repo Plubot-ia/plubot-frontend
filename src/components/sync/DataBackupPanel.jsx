@@ -1,8 +1,9 @@
+import { motion } from 'framer-motion';
 import React, { useState, useRef } from 'react';
+
 import { exportAllPlubots, exportPlubot, importPlubots } from '../../services/exportImportService';
 import { useSyncService } from '../../services/syncService';
 import useAuthStore from '../../stores/useAuthStore';
-import { motion } from 'framer-motion';
 import './DataBackupPanel.css';
 
 /**
@@ -15,15 +16,15 @@ const DataBackupPanel = () => {
   const fileInputRef = useRef(null);
   const { user } = useAuthStore();
   const { syncAllPlubots } = useSyncService();
-  
+
   // Manejar exportación de todos los plubots
   const handleExportAll = async () => {
     setIsLoading(true);
     setStatus({ type: '', message: '' });
-    
+
     try {
       const result = await exportAllPlubots();
-      
+
       if (result.success) {
         setStatus({ type: 'success', message: result.message });
       } else {
@@ -36,23 +37,23 @@ const DataBackupPanel = () => {
       setIsLoading(false);
     }
   };
-  
+
   // Manejar importación de plubots
   const handleImport = async (e) => {
     e.preventDefault();
-    
+
     if (!fileInputRef.current.files || fileInputRef.current.files.length === 0) {
       setStatus({ type: 'error', message: 'Por favor, selecciona un archivo' });
       return;
     }
-    
+
     const file = fileInputRef.current.files[0];
     setIsLoading(true);
     setStatus({ type: '', message: '' });
-    
+
     try {
       const result = await importPlubots(file);
-      
+
       if (result.success) {
         setStatus({ type: 'success', message: result.message });
         // Sincronizar después de importar
@@ -71,50 +72,50 @@ const DataBackupPanel = () => {
       fileInputRef.current.value = '';
     }
   };
-  
+
   // Manejar clic en el botón de importar
   const handleImportClick = () => {
     fileInputRef.current.click();
   };
-  
+
   return (
     <div className="data-backup-panel">
       <h2>Respaldo de Datos</h2>
       <p className="panel-description">
         Exporta tus plubots como archivo JSON para tener un respaldo adicional o importa plubots previamente exportados.
       </p>
-      
+
       <div className="backup-actions">
         <div className="action-card export-card">
           <h3>Exportar Plubots</h3>
           <p>Descarga todos tus plubots como archivo JSON para guardarlos de forma segura.</p>
-          <button 
-            className="action-button export-button" 
+          <button
+            className="action-button export-button"
             onClick={handleExportAll}
             disabled={isLoading || !user || !user.plubots || user.plubots.length === 0}
           >
             {isLoading ? 'Exportando...' : 'Exportar todos los plubots'}
           </button>
-          
+
           {user && user.plubots && user.plubots.length > 0 && (
             <div className="plubot-count">
               {user.plubots.length} {user.plubots.length === 1 ? 'plubot disponible' : 'plubots disponibles'}
             </div>
           )}
         </div>
-        
+
         <div className="action-card import-card">
           <h3>Importar Plubots</h3>
           <p>Restaura plubots desde un archivo JSON previamente exportado.</p>
-          <input 
-            type="file" 
-            ref={fileInputRef} 
-            onChange={handleImport} 
-            accept=".json,application/json" 
-            style={{ display: 'none' }} 
+          <input
+            type="file"
+            ref={fileInputRef}
+            onChange={handleImport}
+            accept=".json,application/json"
+            style={{ display: 'none' }}
           />
-          <button 
-            className="action-button import-button" 
+          <button
+            className="action-button import-button"
             onClick={handleImportClick}
             disabled={isLoading}
           >
@@ -122,9 +123,9 @@ const DataBackupPanel = () => {
           </button>
         </div>
       </div>
-      
+
       {status.message && (
-        <motion.div 
+        <motion.div
           className={`status-message ${status.type}`}
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -133,7 +134,7 @@ const DataBackupPanel = () => {
           {status.message}
         </motion.div>
       )}
-      
+
       <div className="backup-tips">
         <h4>Consejos de respaldo</h4>
         <ul>

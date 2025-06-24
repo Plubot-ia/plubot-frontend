@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+
 import useAuthStore from '@/stores/useAuthStore';
 
 const Logout = () => {
@@ -12,7 +13,7 @@ const Logout = () => {
       navigate('/login');
       window.scrollTo(0, 0);
     };
-    
+
     performLogout();
   }, [logout, navigate]);
 

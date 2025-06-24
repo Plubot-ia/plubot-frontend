@@ -10,11 +10,11 @@ const useFlowHistory = (setNodes, setEdges) => {
   // Historial de acciones y posición actual en el historial
   const [history, setHistory] = useState([]);
   const [currentHistoryIndex, setCurrentHistoryIndex] = useState(-1);
-  
+
   // Crear las listas past y future para compatibilidad
   const past = history.slice(0, currentHistoryIndex + 1);
   const future = history.slice(currentHistoryIndex + 1);
-  
+
   /**
    * Añade una acción al historial
    */
@@ -24,7 +24,7 @@ const useFlowHistory = (setNodes, setEdges) => {
       const newHistory = prev.slice(0, currentHistoryIndex + 1);
       return [...newHistory, action];
     });
-    
+
     setCurrentHistoryIndex(prev => prev + 1);
   }, [currentHistoryIndex]);
 
@@ -33,23 +33,23 @@ const useFlowHistory = (setNodes, setEdges) => {
    */
   const undo = useCallback(() => {
     if (currentHistoryIndex < 0) return;
-    
+
     const action = history[currentHistoryIndex];
-    
+
     // Deshacer la acción según su tipo
     switch (action.type) {
       case 'add':
         // Eliminar nodos añadidos
-        setNodes(nodes => nodes.filter(node => 
-          !action.nodes.some(actionNode => actionNode.id === node.id)
+        setNodes(nodes => nodes.filter(node =>
+          !action.nodes.some(actionNode => actionNode.id === node.id),
         ));
         break;
-        
+
       case 'remove':
         // Restaurar nodos eliminados
         setNodes(nodes => [...nodes, ...action.nodes]);
         break;
-        
+
       case 'move':
         // Restaurar posiciones anteriores
         setNodes(nodes => nodes.map(node => {
@@ -60,23 +60,23 @@ const useFlowHistory = (setNodes, setEdges) => {
           return node;
         }));
         break;
-        
+
       case 'addEdge':
         // Eliminar aristas añadidas
-        setEdges(edges => edges.filter(edge => 
-          !action.edges.some(actionEdge => actionEdge.id === edge.id)
+        setEdges(edges => edges.filter(edge =>
+          !action.edges.some(actionEdge => actionEdge.id === edge.id),
         ));
         break;
-        
+
       case 'removeEdge':
         // Restaurar aristas eliminadas
         setEdges(edges => [...edges, ...action.edges]);
         break;
-        
+
       default:
         break;
     }
-    
+
     setCurrentHistoryIndex(prev => prev - 1);
   }, [history, currentHistoryIndex, setNodes, setEdges]);
 
@@ -85,23 +85,23 @@ const useFlowHistory = (setNodes, setEdges) => {
    */
   const redo = useCallback(() => {
     if (currentHistoryIndex >= history.length - 1) return;
-    
+
     const action = history[currentHistoryIndex + 1];
-    
+
     // Rehacer la acción según su tipo
     switch (action.type) {
       case 'add':
         // Añadir nodos nuevamente
         setNodes(nodes => [...nodes, ...action.nodes]);
         break;
-        
+
       case 'remove':
         // Eliminar nodos nuevamente
-        setNodes(nodes => nodes.filter(node => 
-          !action.nodes.some(actionNode => actionNode.id === node.id)
+        setNodes(nodes => nodes.filter(node =>
+          !action.nodes.some(actionNode => actionNode.id === node.id),
         ));
         break;
-        
+
       case 'move':
         // Aplicar movimientos nuevamente
         setNodes(nodes => nodes.map(node => {
@@ -112,23 +112,23 @@ const useFlowHistory = (setNodes, setEdges) => {
           return node;
         }));
         break;
-        
+
       case 'addEdge':
         // Añadir aristas nuevamente
         setEdges(edges => [...edges, ...action.edges]);
         break;
-        
+
       case 'removeEdge':
         // Eliminar aristas nuevamente
-        setEdges(edges => edges.filter(edge => 
-          !action.edges.some(actionEdge => actionEdge.id === edge.id)
+        setEdges(edges => edges.filter(edge =>
+          !action.edges.some(actionEdge => actionEdge.id === edge.id),
         ));
         break;
-        
+
       default:
         break;
     }
-    
+
     setCurrentHistoryIndex(prev => prev + 1);
   }, [history, currentHistoryIndex, setNodes, setEdges]);
 
@@ -151,7 +151,7 @@ const useFlowHistory = (setNodes, setEdges) => {
     past,
     future,
     history,
-    currentHistoryIndex
+    currentHistoryIndex,
   };
 };
 

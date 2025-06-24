@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { applyNodeChanges } from 'reactflow';
+
 import { generateNodeId } from '../utils/flowEditorUtils';
 
 /**
@@ -12,10 +13,10 @@ import { generateNodeId } from '../utils/flowEditorUtils';
 const useFlowNodes = (initialNodes, setNodes, addToHistory) => {
   // Estado interno para nodos
   const [internalNodes, setInternalNodes] = useState(initialNodes || []);
-  
+
   // Map para acceso rápido a nodos por ID
   const nodesMapRef = useRef(new Map());
-  
+
   // Inicializar el mapa de nodos
   useEffect(() => {
     const nodesMap = new Map();
@@ -33,7 +34,7 @@ const useFlowNodes = (initialNodes, setNodes, addToHistory) => {
     // Aplicar cambios a los nodos internos
     setInternalNodes(nodes => {
       const newNodes = applyNodeChanges(changes, nodes);
-      
+
       // Actualizar el mapa de nodos
       const nodesMap = nodesMapRef.current;
       changes.forEach(change => {
@@ -46,15 +47,15 @@ const useFlowNodes = (initialNodes, setNodes, addToHistory) => {
           }
         }
       });
-      
+
       // Propagar cambios al componente padre
       setTimeout(() => setNodes(newNodes), 0);
-      
+
       // Registrar cambios en el historial si es necesario
-      const positionChanges = changes.filter(change => 
-        change.type === 'position' && change.dragging === false
+      const positionChanges = changes.filter(change =>
+        change.type === 'position' && change.dragging === false,
       );
-      
+
       if (positionChanges.length > 0) {
         const movedNodes = positionChanges.map(change => {
           const node = nodesMap.get(change.id);
@@ -64,7 +65,7 @@ const useFlowNodes = (initialNodes, setNodes, addToHistory) => {
           }
           return null;
         }).filter(Boolean); // Filtrar nodos nulos
-        
+
         // Solo agregar al historial si hay nodos válidos
         if (movedNodes.length > 0) {
           addToHistory({
@@ -73,7 +74,7 @@ const useFlowNodes = (initialNodes, setNodes, addToHistory) => {
           });
         }
       }
-      
+
       return newNodes;
     });
   }, [setNodes, addToHistory]);
@@ -84,7 +85,7 @@ const useFlowNodes = (initialNodes, setNodes, addToHistory) => {
   const addNode = useCallback((nodeType, position, data = {}) => {
     // Generar un ID único para el nodo
     const nodeId = generateNodeId(nodeType);
-    
+
     // Crear el nuevo nodo con el ID original preservado
     const newNode = {
       id: nodeId,
@@ -92,21 +93,21 @@ const useFlowNodes = (initialNodes, setNodes, addToHistory) => {
       position,
       data: { ...data },
       // Guardar el ID original para evitar problemas al guardar/cargar
-      originalId: nodeId
+      originalId: nodeId,
     };
-    
+
     setInternalNodes(nodes => {
       const newNodes = [...nodes, newNode];
       nodesMapRef.current.set(newNode.id, newNode);
       setTimeout(() => setNodes(newNodes), 0);
       return newNodes;
     });
-    
+
     addToHistory({
       type: 'add',
       nodes: [newNode],
     });
-    
+
     return newNode;
   }, [setNodes, addToHistory]);
 
@@ -117,16 +118,16 @@ const useFlowNodes = (initialNodes, setNodes, addToHistory) => {
     setInternalNodes(nodes => {
       const nodeToRemove = nodes.find(n => n.id === nodeId);
       if (!nodeToRemove) return nodes;
-      
+
       const newNodes = nodes.filter(n => n.id !== nodeId);
       nodesMapRef.current.delete(nodeId);
       setTimeout(() => setNodes(newNodes), 0);
-      
+
       addToHistory({
         type: 'remove',
         nodes: [nodeToRemove],
       });
-      
+
       return newNodes;
     });
   }, [setNodes, addToHistory]);
@@ -150,7 +151,7 @@ const useFlowNodes = (initialNodes, setNodes, addToHistory) => {
         }
         return node;
       });
-      
+
       setTimeout(() => setNodes(newNodes), 0);
       return newNodes;
     });

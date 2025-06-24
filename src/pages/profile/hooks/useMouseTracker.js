@@ -19,7 +19,7 @@ const useMouseTracker = () => {
     };
 
     document.addEventListener('mousemove', handleMouseMove);
-    
+
     return () => {
       document.removeEventListener('mousemove', handleMouseMove);
     };
@@ -27,7 +27,7 @@ const useMouseTracker = () => {
 
   return {
     mousePosition,
-    containerRef
+    containerRef,
   };
 };
 

@@ -1,18 +1,25 @@
+import React, { useEffect, Suspense, lazy } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
-import { GamificationProvider } from '../context/GamificationContext';
-import { PlubotCreationProvider } from '../context/PlubotCreationContext';
-import ProtectedRoute from '../components/auth/ProtectedRoute.jsx';
-import { useEffect, Suspense, lazy } from 'react';
+
+
 import useAuthStore from '@/stores/useAuthStore';
-import preventFlowReset from '../components/onboarding/flow-editor/utils/prevent-flow-reset.js';
+
+import Login from '../components/auth/Login.jsx';
+import ProtectedRoute from '../components/auth/ProtectedRoute.jsx';
+import Register from '../components/auth/Register.jsx';
 import FlowBenchmarkTool from '../components/benchmarking/FlowBenchmarkTool'; // Herramienta de benchmarking
+import ModalContainer from '../components/modals/ModalContainer';
+import preventFlowReset from '../components/onboarding/flow-editor/utils/prevent-flow-reset.js';
+import TrainingScreen from '../components/onboarding/screens/TrainingScreen.jsx';
+import { GamificationProvider } from '../context/GamificationContext';
+import { GlobalProvider } from '../context/GlobalProvider';
+import { PlubotCreationProvider } from '../context/PlubotCreationContext';
+import Home from '../pages/home/Home.jsx';
+import Layout from '../pages/layout/Layout.jsx';
+import NotFound from '../pages/notfound/NotFound.jsx';
+
 
 // Componentes que se cargan inmediatamente (críticos para la experiencia inicial)
-import Layout from '../pages/layout/Layout.jsx';
-import Login from '../components/auth/Login.jsx';
-import Register from '../components/auth/Register.jsx';
-import Home from '../pages/home/Home.jsx';
-import NotFound from '../pages/notfound/NotFound.jsx';
 
 // Lazy loading para componentes no críticos para la carga inicial
 const Tutoriales = lazy(() => import('../pages/tutoriales/Tutoriales.jsx'));
@@ -56,31 +63,30 @@ const WelcomeSequence = lazy(() => import('../components/onboarding/screens/Welc
 const FactoryScreen = lazy(() => import('../components/onboarding/screens/FactoryScreen'));
 const PersonalizationForm = lazy(() => import('../components/onboarding/screens/PersonalizationForm'));
 // Importación directa para evitar problemas de carga diferida
-import TrainingScreen from '../components/onboarding/screens/TrainingScreen.jsx';
+
 const EmailVerificationNotice = lazy(() => import('../components/auth/EmailVerificationNotice.jsx'));
 const PlubotEdit = lazy(() => import('../components/plubot-edit/PlubotEdit.jsx'));
 const PublicChat = lazy(() => import('../pages/public-chat/PublicChat.jsx'));
 const GoogleAuthCallback = lazy(() => import('../pages/auth/GoogleAuthCallback.jsx'));
 
 import '@fortawesome/fontawesome-free/css/all.min.css';
-import React from 'react';
 
 // Componente de carga para mostrar durante la carga de componentes lazy
 const LoadingFallback = () => (
-  <div style={{ 
-    display: 'flex', 
-    justifyContent: 'center', 
-    alignItems: 'center', 
+  <div style={{
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
     height: '100vh',
     background: '#0a0e2f',
-    color: '#fff'
+    color: '#fff',
   }}>
     <div>
       <div style={{ textAlign: 'center', marginBottom: '20px' }}>
-        <img 
-          src="/logo.svg" 
-          alt="Plubot Logo" 
-          style={{ width: '120px', height: 'auto' }} 
+        <img
+          src="/logo.svg"
+          alt="Plubot Logo"
+          style={{ width: '120px', height: 'auto' }}
         />
       </div>
       <div style={{ display: 'flex', justifyContent: 'center' }}>
@@ -90,8 +96,8 @@ const LoadingFallback = () => (
           border: '4px solid rgba(255, 255, 255, 0.1)',
           borderRadius: '50%',
           borderTop: '4px solid #ffffff',
-          animation: 'spin 1s linear infinite'
-        }}></div>
+          animation: 'spin 1s linear infinite',
+        }} />
       </div>
       <style>{`
         @keyframes spin {
@@ -124,7 +130,7 @@ class ErrorBoundary extends React.Component {
         <div style={{ padding: '20px', textAlign: 'center', color: 'white' }}>
           <h2>¡Ups! Algo salió mal.</h2>
           <p>Por favor, recarga la página o inténtalo de nuevo más tarde.</p>
-          <button 
+          <button
             onClick={() => window.location.reload()}
             style={{
               padding: '10px 20px',
@@ -134,7 +140,7 @@ class ErrorBoundary extends React.Component {
               border: 'none',
               borderRadius: '4px',
               cursor: 'pointer',
-              fontSize: '16px'
+              fontSize: '16px',
             }}
           >
             Recargar Página
@@ -156,7 +162,7 @@ const AuthInitializer = ({ children }) => {
     // Solo verificar autenticación si no estamos ya cargando y no está inicializado
     if (!loading && !initialized.current) {
       initialized.current = true;
-      
+
       // Verificar el estado de autenticación al cargar la aplicación
       const verifyAuth = async () => {
         try {
@@ -165,9 +171,9 @@ const AuthInitializer = ({ children }) => {
 
         }
       };
-      
+
       verifyAuth();
-      
+
       // Configurar un intervalo para verificar la autenticación periódicamente
       // solo si el usuario está autenticado
       let intervalId;
@@ -176,7 +182,7 @@ const AuthInitializer = ({ children }) => {
           checkAuth();
         }, 5 * 60 * 1000); // Cada 5 minutos
       }
-      
+
       return () => {
         if (intervalId) clearInterval(intervalId);
       };
@@ -199,9 +205,9 @@ function ScrollToTop() {
         document.querySelector('main'),
         document.querySelector('div[style*="overflow-y"]'),
         document.body,
-        document.documentElement
+        document.documentElement,
       ];
-      
+
       return containers.find(container => {
         if (!container) return false;
         const style = getComputedStyle(container);
@@ -210,23 +216,23 @@ function ScrollToTop() {
         return isScrollable && hasScrollableContent;
       }) || window; // Por defecto usar window si no se encuentra otro contenedor
     };
-    
+
     const container = findScrollableContainer();
     if (container) {
       // Usar setTimeout para asegurar que el DOM esté listo
       setTimeout(() => {
         container.scrollTo({ top: 0, behavior: 'smooth' });
-        
+
         // Verificar si el scroll se realizó correctamente
         const checkScroll = () => {
           // Prevenir auto-enfoque en elementos navegables después del scroll
-          if (document.activeElement && 
-              (document.activeElement.tagName === 'A' || 
+          if (document.activeElement &&
+              (document.activeElement.tagName === 'A' ||
                document.activeElement.tagName === 'BUTTON' ||
                document.activeElement.getAttribute('role') === 'button')) {
             document.activeElement.blur();
           }
-          
+
           // Verificar nuevamente después de un breve retraso para asegurar que el scroll se completó
           setTimeout(() => {
             const currentScrollY = container === window ? window.scrollY : container.scrollTop;
@@ -235,16 +241,16 @@ function ScrollToTop() {
             }
           }, 100);
         };
-        
+
         checkScroll();
       }, 0);
     }
-    
+
     // Deshabilitar la restauración automática del desplazamiento
     if ('scrollRestoration' in window.history) {
       window.history.scrollRestoration = 'manual';
     }
-    
+
     // Limpiar el timeout al desmontar
     return () => {};
   }, [pathname]);
@@ -256,10 +262,10 @@ function ScrollToTop() {
 const AppWrapper = () => {
   const location = useLocation();
   const { pathname } = location;
-  
+
   // Páginas de autenticación que no usan el Layout
   const isAuthPage = ['/login', '/register', '/forgot-password', '/reset-password', '/change-password', '/email-verification-notice', '/auth/verify-email'].includes(pathname);
-  
+
   // Rutas donde queremos ocultar el encabezado y pie de página
   const isHideHeaderFooter = [
     '/training',
@@ -267,7 +273,7 @@ const AppWrapper = () => {
     '/plubot/create/training',
     '/benchmark',
   ].some(route => pathname.startsWith(route));
-  
+
   // Verificación adicional para rutas con parámetros de consulta
   const hasTrainingQueryParam = pathname === '/training' || pathname.includes('/training?');
   const shouldHideHeaderFooter = isHideHeaderFooter || hasTrainingQueryParam;
@@ -338,7 +344,7 @@ const AppWrapper = () => {
                     <Route path="/plubot/about" element={<Navigate to="/about-plubot" replace />} />
                     <Route path="/plubot/about-chat-byte" element={<Navigate to="/byte-embajador" replace />} />
                     <Route path="/plubot/create" element={<Navigate to="/welcome" replace />} />
-                    
+
                     {/* Rutas protegidas */}
                     <Route path="/pluniverse" element={<PluniverseDashboard />} />
                     <Route path="/plubot-studio" element={
@@ -387,7 +393,7 @@ const AppWrapper = () => {
                     } />
                     <Route path="/plubot/edit/training/:plubotId" element={
                       <ProtectedRoute>
-                        <Layout hideHeaderFooter={true}>
+                        <Layout hideHeaderFooter>
                           <TrainingScreen />
                         </Layout>
                       </ProtectedRoute>
@@ -404,7 +410,7 @@ const AppWrapper = () => {
                     <Route path="/plubot/create/personalization" element={<Navigate to="/personalization" replace />} />
                     <Route path="/training" element={
                       <ProtectedRoute>
-                        <Layout hideHeaderFooter={true}>
+                        <Layout hideHeaderFooter>
                           <TrainingScreen />
                         </Layout>
                       </ProtectedRoute>
@@ -427,7 +433,7 @@ const AppWrapper = () => {
                         <Logout />
                       </ProtectedRoute>
                     } />
-                    
+
                     {/* Redirecciones */}
                     <Route path="*" element={<NotFound />} />
                   </Routes>
@@ -442,9 +448,7 @@ const AppWrapper = () => {
 };
 
 // Importar el GlobalProvider
-import { GlobalProvider } from '../context/GlobalProvider';
 // Importar el contenedor de modales
-import ModalContainer from '../components/modals/ModalContainer';
 
 function App() {
 // Fallback definition for window.setByteMessage removed as part of refactoring.

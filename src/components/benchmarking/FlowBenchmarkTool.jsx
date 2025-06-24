@@ -1,5 +1,6 @@
 import React, { useState, useCallback, Profiler, useRef } from 'react';
 import { ReactFlowProvider } from 'reactflow';
+
 import FlowMain from '../onboarding/flow-editor/components/FlowMain';
 
 // Estilos para la herramienta de benchmarking
@@ -82,12 +83,12 @@ const FlowBenchmarkTool = () => {
     const mountResults = allResults.filter(r => r.phase === 'mount' && r.nodeCount > 0);
 
     if (mountResults.length === 0) {
-      alert("No se han registrado benchmarks de montaje válidos. Por favor, genera algunos nodos para forzar el re-montaje del editor.");
+      alert('No se han registrado benchmarks de montaje válidos. Por favor, genera algunos nodos para forzar el re-montaje del editor.');
       return;
     }
 
     const dataStr = JSON.stringify(mountResults, null, 2);
-    const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
+    const dataUri = `data:application/json;charset=utf-8,${encodeURIComponent(dataStr)}`;
     const exportFileDefaultName = 'flow-benchmark-results.json';
     const linkElement = document.createElement('a');
     linkElement.setAttribute('href', dataUri);
@@ -98,13 +99,13 @@ const FlowBenchmarkTool = () => {
   };
 
   const onRenderCallback = (
-    id, phase, actualDuration, baseDuration, startTime, commitTime
+    id, phase, actualDuration, baseDuration, startTime, commitTime,
   ) => {
     const nodeCount = parseInt(id.split('-')[1], 10) || 0;
 
     const renderData = {
       profilerId: id,
-      nodeCount: nodeCount,
+      nodeCount,
       phase,
       renderDuration_ms: parseFloat(actualDuration.toFixed(2)),
       baseDuration_ms: parseFloat(baseDuration.toFixed(2)),

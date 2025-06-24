@@ -13,10 +13,10 @@ let lastValidDropPosition = { x: 400, y: 200 }; // Posición central por defecto
  * @returns {Object} - La posición correcta en coordenadas del flujo
  */
 export function calculateCorrectDropPosition(event) {
-  const reactFlowInstance = useFlowStore.getState().reactFlowInstance;
+  const { reactFlowInstance } = useFlowStore.getState();
   // Posición segura predeterminada (centro del canvas) en caso de error
   const safePosition = { x: 400, y: 200 };
-  
+
   if (!reactFlowInstance || !event) {
 
     return safePosition;
@@ -49,56 +49,52 @@ export function calculateCorrectDropPosition(event) {
     const { x: panX, y: panY, zoom } = viewport;
 
 
-
     // Variable para almacenar la posición calculada
     let flowPosition;
-    
+
     // Intentar usar el método oficial de ReactFlow si está disponible
     if (typeof reactFlowInstance.screenToFlowPosition === 'function') {
-
       // Método más nuevo y preciso de ReactFlow
       flowPosition = reactFlowInstance.screenToFlowPosition({
         x: event.clientX,
-        y: event.clientY
+        y: event.clientY,
       });
-
     } else if (typeof reactFlowInstance.project === 'function') {
-
       // Método alternativo (versiones anteriores)
+      // CORRECCIÓN: El método `project` también espera coordenadas de pantalla (clientX/Y),
+      // no coordenadas relativas al contenedor.
       flowPosition = reactFlowInstance.project({
-        x: clientX,
-        y: clientY
+        x: event.clientX,
+        y: event.clientY,
       });
-
     } else {
 
       // Cálculo manual como fallback
       flowPosition = {
         x: (clientX - panX) / zoom,
-        y: (clientY - panY) / zoom
+        y: (clientY - panY) / zoom,
       };
 
     }
-    
+
     // VALIDACIÓN CRÍTICA: Verificar que las coordenadas sean números válidos
-    if (isNaN(flowPosition.x) || isNaN(flowPosition.y) || 
+    if (isNaN(flowPosition.x) || isNaN(flowPosition.y) ||
         !isFinite(flowPosition.x) || !isFinite(flowPosition.y)) {
 
       // Usar el centro del viewport como posición segura
       return safePosition;
     }
-    
 
-    
+
     // Agregar un offset aleatorio para evitar superposición exacta
     // cuando se sueltan múltiples nodos en la misma posición
     const randomOffsetX = Math.floor(Math.random() * 40) - 20; // -20 a +20
     const randomOffsetY = Math.floor(Math.random() * 40) - 20; // -20 a +20
-    
+
     // Posición final con offset aleatorio
     const finalPosition = {
       x: Math.round(flowPosition.x) + randomOffsetX,
-      y: Math.round(flowPosition.y) + randomOffsetY
+      y: Math.round(flowPosition.y) + randomOffsetY,
     };
 
     // Guardar la última posición válida sólo si es realmente válida
@@ -126,10 +122,10 @@ export function calculateCorrectDropPosition(event) {
 export function getViewportCenterPosition() {
   // Posición por defecto (centro aproximado de un lienzo estándar)
   const DEFAULT_POSITION = { x: 400, y: 200 };
-  
+
   try {
     // Intentar obtener la instancia de ReactFlow desde el store
-    const reactFlowInstance = useFlowStore.getState().reactFlowInstance;
+    const { reactFlowInstance } = useFlowStore.getState();
     if (!reactFlowInstance) {
 
       return DEFAULT_POSITION;
@@ -154,32 +150,32 @@ export function getViewportCenterPosition() {
 
       return DEFAULT_POSITION;
     }
-    
+
     // Obtener el estado del viewport desde la instancia
     const viewport = reactFlowInstance.getViewport();
     if (!viewport) {
 
       return DEFAULT_POSITION;
     }
-    
+
     const { x: panX, y: panY, zoom } = viewport;
 
     // Verificar si los valores son válidos
     if (isNaN(panX) || isNaN(panY) || isNaN(zoom) || zoom === 0) {
 
-      
+
       // Intentar usar una posición más dinámica basada en el tamaño del contenedor
       // en lugar de valores fijos
       return {
-        x: width / 2 / (zoom || 1),  // Usar zoom = 1 si zoom es 0 o NaN
-        y: height / 2 / (zoom || 1)
+        x: width / 2 / (zoom || 1), // Usar zoom = 1 si zoom es 0 o NaN
+        y: height / 2 / (zoom || 1),
       };
     }
 
     // Calcular el centro del viewport en coordenadas del flujo
     const centerX = (width / 2 - panX) / zoom;
     const centerY = (height / 2 - panY) / zoom;
-    
+
     // Verificar que el resultado sea válido
     if (isNaN(centerX) || isNaN(centerY) || !isFinite(centerX) || !isFinite(centerY)) {
 

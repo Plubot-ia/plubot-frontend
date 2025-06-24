@@ -1,4 +1,5 @@
 import React, { useRef, useCallback, memo, useState } from 'react';
+
 import axiosInstance from '@/utils/axiosConfig';
 
 /**
@@ -12,14 +13,14 @@ import axiosInstance from '@/utils/axiosConfig';
  * @param {Function} props.setRecentAchievement - Función para establecer el logro reciente
  * @param {Function} props.setShowAchievementUnlocked - Función para mostrar el popup de logro
  */
-const ProfileHeader = memo(({ 
-  user, 
-  setUser, 
-  level, 
-  showNotification, 
-  navigate, 
-  setRecentAchievement, 
-  setShowAchievementUnlocked 
+const ProfileHeader = memo(({
+  user,
+  setUser,
+  level,
+  showNotification,
+  navigate,
+  setRecentAchievement,
+  setShowAchievementUnlocked,
 }) => {
   const fileInputRef = useRef(null);
   const [imageLoaded, setImageLoaded] = useState(false);
@@ -35,7 +36,7 @@ const ProfileHeader = memo(({
 
     try {
       const response = await axiosInstance.post('auth/profile', formData);
-      const data = response.data;
+      const { data } = response;
       if (data.status === 'success' && data.user?.profile_picture) {
         setUser({ ...user, profile_picture: data.user.profile_picture });
         setImageLoaded(false); // Reset image loaded state for the new image
@@ -58,7 +59,7 @@ const ProfileHeader = memo(({
         showNotification('Sesión expirada. Por favor, inicia sesión nuevamente.', 'error');
         navigate('/login');
       } else {
-        showNotification('Error al subir la imagen: ' + error.message, 'error');
+        showNotification(`Error al subir la imagen: ${error.message}`, 'error');
       }
     }
   }, [user, setUser, showNotification, setRecentAchievement, setShowAchievementUnlocked, navigate]);
@@ -96,8 +97,8 @@ const ProfileHeader = memo(({
           accept="image/png,image/jpeg,image/gif"
           className="file-input-hidden"
         />
-        <div className="profile-avatar-ring profile-avatar-ring-zindex"></div>
-        <div className="profile-avatar-ring profile-avatar-ring-zindex"></div>
+        <div className="profile-avatar-ring profile-avatar-ring-zindex" />
+        <div className="profile-avatar-ring profile-avatar-ring-zindex" />
         <div className="profile-level-badge profile-level-badge-zindex">{level ? level.charAt(0) : ''}</div>
       </div>
 
@@ -105,12 +106,14 @@ const ProfileHeader = memo(({
 
       <div className="profile-status">
         <div className="status-pill">
-          <div className="status-indicator"></div>
+          <div className="status-indicator" />
           ONLINE
         </div>
       </div>
     </div>
   );
 });
+
+ProfileHeader.displayName = 'ProfileHeader';
 
 export default ProfileHeader;

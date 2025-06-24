@@ -4,6 +4,7 @@
  */
 import { useCallback, useRef } from 'react';
 import { v4 as uuidv4 } from 'uuid';
+
 import { generateId } from '@/services/flowService';
 
 /**
@@ -16,7 +17,7 @@ import { generateId } from '@/services/flowService';
 const useNodeCreator = (addNode, addEdge, getNodePosition) => {
   // Almacenar el u00faltimo nodo creado para conexiones ru00e1pidas
   const lastCreatedNodeRef = useRef(null);
-  
+
   /**
    * Crea un nuevo nodo con sus propiedades bu00e1sicas
    * @param {string} type - Tipo de nodo (start, message, decision, action, end, etc.)
@@ -27,7 +28,7 @@ const useNodeCreator = (addNode, addEdge, getNodePosition) => {
   const createNode = useCallback((type, position, data = {}) => {
     // Generar ID u00fanico para el nodo
     const nodeId = generateId('node');
-    
+
     // Crear nodo con propiedades bu00e1sicas comunes
     const nodeBase = {
       id: nodeId,
@@ -36,21 +37,21 @@ const useNodeCreator = (addNode, addEdge, getNodePosition) => {
       data: {
         ...data,
         createdAt: Date.now(),
-      }
+      },
     };
-    
+
     // Personalizar nodo segu00fan su tipo
     const configuredNode = configureNodeByType(nodeBase, type, data);
-    
+
     // Guardar referencia al nodo recien creado
     lastCreatedNodeRef.current = configuredNode;
-    
+
     // Agregar nodo al flujo
     addNode(configuredNode);
-    
+
     return configuredNode;
   }, [addNode]);
-  
+
   /**
    * Configura un nodo con propiedades especu00edficas segu00fan su tipo
    * @param {Object} nodeBase - Nodo base a configurar
@@ -61,59 +62,59 @@ const useNodeCreator = (addNode, addEdge, getNodePosition) => {
   const configureNodeByType = useCallback((nodeBase, type, data = {}) => {
     // Clonar el nodo base para evitar mutaciones
     const node = { ...nodeBase };
-    
+
     // Configurar propiedades especu00edficas segu00fan el tipo de nodo
     switch (type) {
       case 'start':
         node.data = {
           ...node.data,
           label: data.label || 'Inicio',
-          message: data.message || 'Bienvenido a la conversaciu00f3n'
+          message: data.message || 'Bienvenido a la conversaciu00f3n',
         };
         break;
-        
+
       case 'message':
         node.data = {
           ...node.data,
           label: data.label || 'Mensaje',
-          message: data.message || 'Escribe tu mensaje aquu00ed'
+          message: data.message || 'Escribe tu mensaje aquu00ed',
         };
         break;
-        
+
       case 'decision':
         node.data = {
           ...node.data,
           label: data.label || 'Decisiu00f3n',
           condition: data.condition || 'Condiciu00f3n',
-          options: data.options || []
+          options: data.options || [],
         };
         break;
-        
+
       case 'action':
         node.data = {
           ...node.data,
           label: data.label || 'Acciu00f3n',
           actionType: data.actionType || 'custom',
-          parameters: data.parameters || {}
+          parameters: data.parameters || {},
         };
         break;
-        
+
       case 'end':
         node.data = {
           ...node.data,
           label: data.label || 'Fin',
-          message: data.message || 'Fin de la conversaciu00f3n'
+          message: data.message || 'Fin de la conversaciu00f3n',
         };
         break;
-        
+
       default:
         // Para tipos personalizados, conservar data tal cual
         break;
     }
-    
+
     return node;
   }, []);
-  
+
   /**
    * Crea una conexiu00f3n entre dos nodos
    * @param {string} sourceId - ID del nodo origen
@@ -126,7 +127,7 @@ const useNodeCreator = (addNode, addEdge, getNodePosition) => {
   const connectNodes = useCallback((sourceId, targetId, sourceHandle = null, targetHandle = null, data = {}) => {
     // Generar ID u00fanico para la arista
     const edgeId = generateId('edge');
-    
+
     // Crear arista con propiedades bu00e1sicas
     const edge = {
       id: edgeId,
@@ -137,15 +138,15 @@ const useNodeCreator = (addNode, addEdge, getNodePosition) => {
       type: data.type || 'default',
       animated: data.animated || false,
       label: data.label || '',
-      data: data.data || {}
+      data: data.data || {},
     };
-    
+
     // Agregar arista al flujo
     addEdge(edge);
-    
+
     return edge;
   }, [addEdge]);
-  
+
   /**
    * Crea un nodo y lo conecta automu00e1ticamente al u00faltimo nodo creado
    * @param {string} type - Tipo de nodo a crear
@@ -156,34 +157,34 @@ const useNodeCreator = (addNode, addEdge, getNodePosition) => {
   const createAndConnectNode = useCallback((type, data = {}, edgeData = {}) => {
     // Obtener nodo de origen (el u00faltimo creado)
     const sourceNode = lastCreatedNodeRef.current;
-    
+
     // Si no hay nodo anterior, solo crear el nuevo
     if (!sourceNode) {
       const newNode = createNode(type, getNodePosition(), data);
       return { node: newNode };
     }
-    
+
     // Calcular posiciu00f3n para el nuevo nodo (a la derecha del anterior)
     const position = {
       x: sourceNode.position.x + 250,
-      y: sourceNode.position.y
+      y: sourceNode.position.y,
     };
-    
+
     // Crear el nuevo nodo
     const newNode = createNode(type, position, data);
-    
+
     // Conectar con el nodo anterior
     const edge = connectNodes(
       sourceNode.id,
       newNode.id,
       edgeData.sourceHandle,
       edgeData.targetHandle,
-      edgeData
+      edgeData,
     );
-    
+
     return { node: newNode, edge };
   }, [createNode, connectNodes, getNodePosition]);
-  
+
   /**
    * Crea un grupo de nodos interconectados segu00fan un patru00f3n predefinido
    * @param {string} pattern - Patru00f3n a crear ('secuencia', 'decisiu00f3n', etc.)
@@ -192,67 +193,67 @@ const useNodeCreator = (addNode, addEdge, getNodePosition) => {
    */
   const createNodePattern = useCallback((pattern, startPosition) => {
     const createdElements = { nodes: [], edges: [] };
-    
+
     switch (pattern) {
       case 'secuencia':
         // Crear secuencia bu00e1sica: Inicio -> Mensaje -> Fin
         const startNode = createNode('start', startPosition, { label: 'Inicio' });
         createdElements.nodes.push(startNode);
-        
-        const messageNode = createNode('message', 
-          { x: startPosition.x + 250, y: startPosition.y }, 
-          { label: 'Mensaje', message: 'Escribe tu mensaje aquu00ed' }
+
+        const messageNode = createNode('message',
+          { x: startPosition.x + 250, y: startPosition.y },
+          { label: 'Mensaje', message: 'Escribe tu mensaje aquu00ed' },
         );
         createdElements.nodes.push(messageNode);
-        
-        const endNode = createNode('end', 
-          { x: startPosition.x + 500, y: startPosition.y }, 
-          { label: 'Fin' }
+
+        const endNode = createNode('end',
+          { x: startPosition.x + 500, y: startPosition.y },
+          { label: 'Fin' },
         );
         createdElements.nodes.push(endNode);
-        
+
         // Conectar nodos
         const edge1 = connectNodes(startNode.id, messageNode.id);
         const edge2 = connectNodes(messageNode.id, endNode.id);
-        
+
         createdElements.edges.push(edge1, edge2);
         break;
-        
+
       case 'decision':
         // Crear patru00f3n de decisiu00f3n: Inicio -> Mensaje -> Decisiu00f3n -> (Su00ed/No) -> Fin
         const start = createNode('start', startPosition, { label: 'Inicio' });
         createdElements.nodes.push(start);
-        
-        const question = createNode('message', 
-          { x: startPosition.x + 250, y: startPosition.y }, 
-          { label: 'Pregunta', message: 'u00bfEstu00e1s de acuerdo?' }
+
+        const question = createNode('message',
+          { x: startPosition.x + 250, y: startPosition.y },
+          { label: 'Pregunta', message: 'u00bfEstu00e1s de acuerdo?' },
         );
         createdElements.nodes.push(question);
-        
-        const decision = createNode('decision', 
-          { x: startPosition.x + 500, y: startPosition.y }, 
-          { label: 'Decisiu00f3n', options: ['Su00ed', 'No'] }
+
+        const decision = createNode('decision',
+          { x: startPosition.x + 500, y: startPosition.y },
+          { label: 'Decisiu00f3n', options: ['Su00ed', 'No'] },
         );
         createdElements.nodes.push(decision);
-        
-        const yesResponse = createNode('message', 
-          { x: startPosition.x + 750, y: startPosition.y - 100 }, 
-          { label: 'Respuesta Su00ed', message: '\u00a1Excelente!' }
+
+        const yesResponse = createNode('message',
+          { x: startPosition.x + 750, y: startPosition.y - 100 },
+          { label: 'Respuesta Su00ed', message: '\u00a1Excelente!' },
         );
         createdElements.nodes.push(yesResponse);
-        
-        const noResponse = createNode('message', 
-          { x: startPosition.x + 750, y: startPosition.y + 100 }, 
-          { label: 'Respuesta No', message: 'Entendido, no hay problema.' }
+
+        const noResponse = createNode('message',
+          { x: startPosition.x + 750, y: startPosition.y + 100 },
+          { label: 'Respuesta No', message: 'Entendido, no hay problema.' },
         );
         createdElements.nodes.push(noResponse);
-        
-        const end = createNode('end', 
-          { x: startPosition.x + 1000, y: startPosition.y }, 
-          { label: 'Fin' }
+
+        const end = createNode('end',
+          { x: startPosition.x + 1000, y: startPosition.y },
+          { label: 'Fin' },
         );
         createdElements.nodes.push(end);
-        
+
         // Conectar nodos
         createdElements.edges.push(connectNodes(start.id, question.id));
         createdElements.edges.push(connectNodes(question.id, decision.id));
@@ -261,22 +262,22 @@ const useNodeCreator = (addNode, addEdge, getNodePosition) => {
         createdElements.edges.push(connectNodes(yesResponse.id, end.id));
         createdElements.edges.push(connectNodes(noResponse.id, end.id));
         break;
-        
+
       default:
         // Caso por defecto, solo crear un nodo de inicio
         const defaultNode = createNode('start', startPosition, { label: 'Inicio' });
         createdElements.nodes.push(defaultNode);
     }
-    
+
     return createdElements;
   }, [createNode, connectNodes]);
-  
+
   return {
     createNode,
     connectNodes,
     createAndConnectNode,
     createNodePattern,
-    getLastCreatedNode: () => lastCreatedNodeRef.current
+    getLastCreatedNode: () => lastCreatedNodeRef.current,
   };
 };
 

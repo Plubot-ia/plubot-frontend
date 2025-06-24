@@ -6,21 +6,19 @@
  * @version 2.0.0
  */
 
-import React, { useState, useEffect, useRef, useCallback, memo, useMemo, useLayoutEffect } from 'react';
-import { Handle, Position, NodeResizer, useUpdateNodeInternals, useReactFlow } from 'reactflow';
-import { 
-  MessageSquare, 
-  User, 
-  Bot, 
-  AlertTriangle, 
-  AlertCircle, 
-  Info, 
+import {
+  MessageSquare,
+  User,
+  Bot,
+  AlertTriangle,
+  AlertCircle,
+  Info,
   HelpCircle,
-  X, 
-  Edit2, 
-  Copy, 
-  Clock, 
-  ChevronDown, 
+  X,
+  Edit2,
+  Copy,
+  Clock,
+  ChevronDown,
   ChevronUp,
   Send,
   Save, // Añadido Save
@@ -29,22 +27,32 @@ import {
   CornerDownRight,
   Maximize2,
   Minimize2,
-  Loader2
+  Loader2,
 } from 'lucide-react';
 import PropTypes from 'prop-types';
-import Tooltip from '../../ui/ToolTip';
-import ContextMenu from '../../ui/context-menu';
-import { formatDateRelative, formatTime } from '@/utils/date';
-// Importamos shallow de Zustand para comparaciones de estado optimizadas
+import React, { useState, useEffect, useRef, useCallback, memo, useMemo, useLayoutEffect } from 'react';
+import { Handle, Position, NodeResizer, useUpdateNodeInternals, useReactFlow } from 'reactflow';
 import { shallow } from 'zustand/shallow';
-// Importamos el store de Zustand
+
+
+import ReactMarkdown from '@/lib/simplified-markdown';
 import { useNodeData, useFlowMeta, useFlowNodesEdges, useContextMenu } from '@/stores/selectors';
 import useFlowStore from '@/stores/useFlowStore';
-import ReactMarkdown from '@/lib/simplified-markdown';
+import { formatDateRelative, formatTime } from '@/utils/date';
+
+// Importamos shallow de Zustand para comparaciones de estado optimizadas
+
+// Importamos el store de Zustand
 import { replaceVariablesInMessage } from '@/utils/messageUtils';
+
+import ContextMenu from '../../ui/context-menu';
+import Tooltip from '../../ui/ToolTip';
+
+import { MessageNodeIcon } from './MessageNodeIcon';
+
+
 import './MessageNode.css';
 import './MessageNodeLOD.css';
-import { MessageNodeIcon } from './MessageNodeIcon';
 
 // Configuración centralizada para el MessageNode
 const NODE_CONFIG = {
@@ -73,13 +81,13 @@ const NODE_CONFIG = {
     INPUT_TYPE: 'target',
     OUTPUT_TYPE: 'source',
     DEFAULT_POSITION: Position.Top, // O Position.Left/Right si cambia el diseño
-  }
+  },
 };
 
 // Constantes y configuración (Mantenemos las específicas si NODE_CONFIG no las cubre todas aún)
 const DEFAULT_MESSAGE = NODE_CONFIG.DEFAULT_MESSAGE_PLACEHOLDER;
-const MAX_PREVIEW_LINES = NODE_CONFIG.MAX_PREVIEW_LINES;
-const TRANSITION_DURATION = NODE_CONFIG.TRANSITION_DURATION;
+const { MAX_PREVIEW_LINES } = NODE_CONFIG;
+const { TRANSITION_DURATION } = NODE_CONFIG;
 
 /**
  * Tipos de mensajes disponibles
@@ -91,13 +99,13 @@ const TRANSITION_DURATION = NODE_CONFIG.TRANSITION_DURATION;
  * @type {Object}
  */
 const MESSAGE_TYPES = {
-  USER: 'user',      // Mensaje del usuario
-  BOT: 'bot',       // Respuesta del bot
+  USER: 'user', // Mensaje del usuario
+  BOT: 'bot', // Respuesta del bot
   SYSTEM: 'system', // Mensaje de sistema
-  ERROR: 'error',   // Mensaje de error
+  ERROR: 'error', // Mensaje de error
   WARNING: 'warning', // Advertencia
-  INFO: 'info',     // Información
-  QUESTION: 'question' // Pregunta
+  INFO: 'info', // Información
+  QUESTION: 'question', // Pregunta
 };
 
 // Helper function to generate titles based on message type
@@ -131,17 +139,17 @@ const typeToTitle = (type) => {
  * @param {boolean} props.isUltraPerformanceMode - Indica si está en modo ultra rendimiento
  * @returns {JSX.Element} - Vista previa del mensaje formateada
  */
-const MessagePreview = memo(function MessagePreview({ message = '', variables = [], isUltraPerformanceMode = false }) {
+const MessagePreview = memo(({ message = '', variables = [], isUltraPerformanceMode = false }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const messageRef = useRef(null);
   const [isTruncated, setIsTruncated] = useState(false);
-  
+
   // Formatear mensaje con variables
   const formattedMessage = useMemo(() => {
     if (!message) return '';
-    
+
     let formatted = message;
-    
+
     // Reemplazar variables en el mensaje
     if (variables && variables.length > 0) {
       variables.forEach(variable => {
@@ -149,7 +157,7 @@ const MessagePreview = memo(function MessagePreview({ message = '', variables = 
         formatted = formatted.replace(regex, variable.value || `{{${variable.name}}}`);
       });
     }
-    
+
     return formatted;
   }, [message, variables]);
 
@@ -159,7 +167,7 @@ const MessagePreview = memo(function MessagePreview({ message = '', variables = 
       const element = messageRef.current;
       const lineHeight = parseInt(window.getComputedStyle(element).lineHeight);
       const maxHeight = lineHeight * MAX_PREVIEW_LINES;
-      
+
       setIsTruncated(element.scrollHeight > maxHeight);
     }
   }, [formattedMessage, isUltraPerformanceMode]);
@@ -172,21 +180,21 @@ const MessagePreview = memo(function MessagePreview({ message = '', variables = 
   // Clases para el contenedor del mensaje
   const messageClasses = useMemo(() => {
     const classes = ['message-node__message'];
-    
+
     if (!isExpanded && !isUltraPerformanceMode) {
       classes.push('message-node__message--truncated');
     }
-    
+
     if (isUltraPerformanceMode) {
       classes.push('message-node__message--ultra');
     }
-    
+
     return classes.join(' ');
   }, [isExpanded, isUltraPerformanceMode]);
 
   return (
     <div className="message-node__message-container">
-      <div 
+      <div
         ref={messageRef}
         className={messageClasses}
       >
@@ -198,10 +206,10 @@ const MessagePreview = memo(function MessagePreview({ message = '', variables = 
           <ReactMarkdown>{formattedMessage}</ReactMarkdown>
         )}
       </div>
-      
+
       {/* Botón para expandir/colapsar si el mensaje está truncado */}
       {isTruncated && !isUltraPerformanceMode && (
-        <button 
+        <button
           type="button"
           className="message-node__expand-button"
           onClick={toggleExpand}
@@ -231,10 +239,10 @@ MessagePreview.propTypes = {
   variables: PropTypes.arrayOf(
     PropTypes.shape({
       name: PropTypes.string.isRequired,
-      value: PropTypes.string
-    })
+      value: PropTypes.string,
+    }),
   ),
-  isUltraPerformanceMode: PropTypes.bool
+  isUltraPerformanceMode: PropTypes.bool,
 };
 
 // Valores predeterminados ahora definidos directamente en los parámetros de la función
@@ -250,13 +258,13 @@ MessagePreview.propTypes = {
  * @param {string} props.nodeId - Identificador del nodo
  * @returns {JSX.Element} - Editor de variables
  */
-const VariableEditor = ({ 
+const VariableEditor = ({
   nodeId, // <--- Añadir nodeId como prop
-  variables = [], 
-  onAddVariable, 
-  onUpdateVariable, 
+  variables = [],
+  onAddVariable,
+  onUpdateVariable,
   onDeleteVariable,
-  isUltraPerformanceMode = false
+  isUltraPerformanceMode = false,
 }) => {
   const [newVariable, setNewVariable] = useState({ name: '', value: '' });
   const [isAdding, setIsAdding] = useState(false);
@@ -338,21 +346,21 @@ Son como etiquetas para guardar información que cambia, como el nombre de un cl
 ¡Así puedes personalizar mensajes fácilmente!`;
 
   return (
-    <div 
+    <div
       className={`message-node__variables ${isUltraPerformanceMode ? 'message-node__variables--ultra' : ''}`}
       role="region"
       aria-label="Editor de variables"
     >
       <div className="message-node__variables-header" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
         <h4 className="message-node__variables-title">Variables</h4>
-        <Tooltip 
+        <Tooltip
           content={<ReactMarkdown children={VARIABLE_EDITOR_TOOLTIP_CONTENT} />}
         >
           <HelpCircle size={16} className="message-node__help-icon" style={{ cursor: 'help' }} />
         </Tooltip>
         {!isAdding && (
-          <button 
-            type="button" 
+          <button
+            type="button"
             className="message-node__variable-button"
             onClick={handleAddClick}
             aria-label="Agregar variable"
@@ -363,9 +371,9 @@ Son como etiquetas para guardar información que cambia, como el nombre de un cl
           </button>
         )}
       </div>
-      
+
       {isAdding && !isUltraPerformanceMode && (
-        <div 
+        <div
           className="message-node__variable"
           role="form"
           aria-labelledby="new-variable-heading"
@@ -391,16 +399,16 @@ Son como etiquetas para guardar información que cambia, como el nombre de un cl
             onKeyDown={handleKeyDown}
           />
           <div className="message-node__variable-actions">
-            <button 
-              type="button" 
+            <button
+              type="button"
               className="message-node__variable-button"
               onClick={handleSubmitAdd}
               aria-label="Guardar variable"
             >
               <Save size={14} aria-hidden="true" />
             </button>
-            <button 
-              type="button" 
+            <button
+              type="button"
               className="message-node__variable-button"
               onClick={handleCancelAdd}
               aria-label="Cancelar"
@@ -410,15 +418,15 @@ Son como etiquetas para guardar información que cambia, como el nombre de un cl
           </div>
         </div>
       )}
-      
-      <div 
+
+      <div
         className="message-node__variables-list"
         role="list"
         aria-label="Lista de variables"
       >
         {variables && variables.map((variable, index) => (
-          <div 
-            key={`var-${index}`} 
+          <div
+            key={`var-${index}`}
             className="message-node__variable"
             role="listitem"
           >
@@ -462,15 +470,14 @@ VariableEditor.propTypes = {
   variables: PropTypes.arrayOf(
     PropTypes.shape({
       name: PropTypes.string.isRequired,
-      value: PropTypes.string
-    })
+      value: PropTypes.string,
+    }),
   ),
   onAddVariable: PropTypes.func.isRequired,
   onUpdateVariable: PropTypes.func.isRequired,
   onDeleteVariable: PropTypes.func.isRequired,
-  isUltraPerformanceMode: PropTypes.bool
+  isUltraPerformanceMode: PropTypes.bool,
 };
-
 
 
 /**
@@ -480,23 +487,23 @@ VariableEditor.propTypes = {
  * @param {boolean} props.isUltraPerformanceMode - Indica si está en modo ultra rendimiento
  * @returns {JSX.Element} - Ícono del nodo de mensaje
  */
-const MessageNodeHeader = memo(({ 
-  id, 
-  titleFromData, 
-  messageType, 
-  isUltraMode, 
-  isSaving, 
-  isSelected, 
+const MessageNodeHeader = memo(({
+  id,
+  titleFromData,
+  messageType,
+  isUltraMode,
+  isSaving,
+  isSelected,
   onDoubleClickHeader,
   lastUpdatedTimestamp,
-  disableAnimations // Prop recibida
+  disableAnimations, // Prop recibida
 }) => {
   const displayTitle = titleFromData || typeToTitle(messageType);
   const headerClasses = [
     'message-node__header',
     isSaving ? 'message-node__header--saving' : '',
     disableAnimations ? 'message-node__header--no-anim' : '', // Usar la prop
-    isSelected ? 'message-node__header--selected' : '' // Mantener si es necesario
+    isSelected ? 'message-node__header--selected' : '', // Mantener si es necesario
   ].filter(Boolean).join(' ');
 
   return (
@@ -526,7 +533,7 @@ MessageNodeHeader.propTypes = {
   isSelected: PropTypes.bool,
   onDoubleClickHeader: PropTypes.func,
   lastUpdatedTimestamp: PropTypes.string, // Cambiado de number a string si es un timestamp ISO
-  disableAnimations: PropTypes.bool // PropType para disableAnimations
+  disableAnimations: PropTypes.bool, // PropType para disableAnimations
 };
 
 const MessageNodeEditor = memo(({
@@ -546,46 +553,46 @@ const MessageNodeEditor = memo(({
   } = editorActions;
 
   return (
-  <>
-    <textarea
-      className="message-node__textarea nodrag"
-      value={message}
-      onChange={handleMessageChange}
-      placeholder={DEFAULT_MESSAGE}
-      aria-label="Editor de mensaje"
-      rows={4}
-      onKeyDown={(e) => {
-        if (e.key === 'Escape') {
-          e.stopPropagation();
-          handleCancel();
-        }
-        if (e.key === 'Enter' && !e.shiftKey) {
-          e.preventDefault();
-          handleSave();
-        }
-      }}
-    />
-    <VariableEditor
-      nodeId={id}
-      variables={variables}
-      onAddVariable={handleAddVariable}
-      onUpdateVariable={handleUpdateVariable}
-      onDeleteVariable={handleDeleteVariable}
-      isUltraPerformanceMode={false} // Siempre es false cuando se está editando
-    />
-    <div className="message-node__editor-actions">
-      <Tooltip content="Guardar cambios (Ctrl+Enter o Cmd+Enter)">
-        <button onClick={handleSave} className="message-node__editor-button message-node__editor-button--save" aria-label="Guardar mensaje">
-          <Send size={14} /> Guardar
-        </button>
-      </Tooltip>
-      <Tooltip content="Descartar cambios (Esc)">
-        <button onClick={handleCancel} className="message-node__editor-button message-node__editor-button--cancel" aria-label="Cancelar edición">
-          <X size={14} /> Cancelar
-        </button>
-      </Tooltip>
-    </div>
-  </>
+    <>
+      <textarea
+        className="message-node__textarea nodrag"
+        value={message}
+        onChange={handleMessageChange}
+        placeholder={DEFAULT_MESSAGE}
+        aria-label="Editor de mensaje"
+        rows={4}
+        onKeyDown={(e) => {
+          if (e.key === 'Escape') {
+            e.stopPropagation();
+            handleCancel();
+          }
+          if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            handleSave();
+          }
+        }}
+      />
+      <VariableEditor
+        nodeId={id}
+        variables={variables}
+        onAddVariable={handleAddVariable}
+        onUpdateVariable={handleUpdateVariable}
+        onDeleteVariable={handleDeleteVariable}
+        isUltraPerformanceMode={false} // Siempre es false cuando se está editando
+      />
+      <div className="message-node__editor-actions">
+        <Tooltip content="Guardar cambios (Ctrl+Enter o Cmd+Enter)">
+          <button onClick={handleSave} className="message-node__editor-button message-node__editor-button--save" aria-label="Guardar mensaje">
+            <Send size={14} /> Guardar
+          </button>
+        </Tooltip>
+        <Tooltip content="Descartar cambios (Esc)">
+          <button onClick={handleCancel} className="message-node__editor-button message-node__editor-button--cancel" aria-label="Cancelar edición">
+            <X size={14} /> Cancelar
+          </button>
+        </Tooltip>
+      </div>
+    </>
   );
 });
 
@@ -675,7 +682,7 @@ MessageNodeContent.propTypes = {
 const SavingIndicator = () => {
   return (
     <div className="message-node__saving-indicator" aria-live="polite" aria-label="Guardando cambios">
-      <Loader2 size={14} className="animate-spin" /> {/* Usando Loader2 de lucide-react con animación */} 
+      <Loader2 size={14} className="animate-spin" /> {/* Usando Loader2 de lucide-react con animación */}
       <span>Guardando...</span>
     </div>
   );
@@ -695,7 +702,7 @@ const LOD_LEVELS = {
 // Vista para el nivel de detalle MÍNIMO (MINI)
 const MiniView = memo(({ messageType }) => (
   <div className="message-node__mini-content">
-    <MessageNodeIcon type={messageType} isUltraPerformanceMode={true} />
+    <MessageNodeIcon type={messageType} isUltraPerformanceMode />
   </div>
 ));
 MiniView.displayName = 'MiniView';
@@ -713,7 +720,7 @@ const CompactView = memo(({ messageType, title, message, variables }) => {
   return (
     <div className="message-node__compact-content">
       <div className="message-node__compact-header">
-        <MessageNodeIcon type={messageType} isUltraPerformanceMode={true} />
+        <MessageNodeIcon type={messageType} isUltraPerformanceMode />
         <span className="message-node__compact-title">{title}</span>
       </div>
       <div className="message-node__compact-message">
@@ -742,30 +749,30 @@ CompactView.propTypes = {
  * @param {boolean} props.isUltraPerformanceMode - Indica si está en modo ultra rendimiento
  * @returns {JSX.Element} - Componente MessageNode
  */
-const MessageNodeComponent = ({ 
+const MessageNodeComponent = ({
   data = {
     message: DEFAULT_MESSAGE,
     type: MESSAGE_TYPES.SYSTEM,
     variables: [],
     lodLevel: LOD_LEVELS.FULL, // Valor por defecto
-  }, 
-  isConnectable = true, 
-  selected = false, 
-  id, 
+  },
+  isConnectable = true,
+  selected = false,
+  id,
   setNodes: legacySetNodes, // Mantener compatibilidad con implementación existente
   onEdit = () => {},
   onDuplicate = () => {},
-  onDelete = () => {}
+  onDelete = () => {},
 }) => {
-  
+
   // Acceso seguro a los datos del nodo
   const safeData = useMemo(() => ({
     message: data?.message || DEFAULT_MESSAGE,
     type: data?.type || MESSAGE_TYPES.SYSTEM,
     variables: data?.variables || [],
-    lastUpdated: data?.lastUpdated
+    lastUpdated: data?.lastUpdated,
   }), [data]);
-  
+
   // Extraer el nivel de detalle (LOD) de los datos del nodo.
   const { lodLevel = LOD_LEVELS.FULL } = data;
   const isUltraMode = lodLevel !== LOD_LEVELS.FULL;
@@ -806,14 +813,14 @@ const MessageNodeComponent = ({
   }, [isEditing, id, updateNodeInternals]);
 
   // Sincronizar estado local con props actualizadas desde Zustand
-  
-  
+
+
   // Compatibilidad con el setNodes proporcionado por props
   const setNodes = legacySetNodes || useFlowStore.getState().setNodes;
-  
+
   // Referencias
   const nodeRef = useRef(null);
-  
+
   // Hooks personalizados eliminados ya que implementamos la lógica directamente
 
   /**
@@ -841,7 +848,7 @@ const MessageNodeComponent = ({
 
     updateNodeData(id, {
       message: currentEditState.message,
-      variables: currentEditState.variables
+      variables: currentEditState.variables,
     });
 
     setEditState(null);
@@ -872,7 +879,7 @@ const MessageNodeComponent = ({
   const handleAddVariable = useCallback((newVar) => {
     setEditState(prev => ({
       ...prev,
-      variables: [...(prev.variables || []), newVar]
+      variables: [...(prev.variables || []), newVar],
     }));
   }, [setEditState]);
 
@@ -882,7 +889,7 @@ const MessageNodeComponent = ({
   const handleUpdateVariable = useCallback((index, updatedVar) => {
     setEditState(prev => ({
       ...prev,
-      variables: prev.variables.map((v, i) => (i === index ? updatedVar : v))
+      variables: prev.variables.map((v, i) => (i === index ? updatedVar : v)),
     }));
   }, [setEditState]);
 
@@ -892,7 +899,7 @@ const MessageNodeComponent = ({
   const handleDeleteVariable = useCallback((index) => {
     setEditState(prev => ({
       ...prev,
-      variables: prev.variables.filter((_, i) => i !== index)
+      variables: prev.variables.filter((_, i) => i !== index),
     }));
   }, [setEditState]);
 
@@ -905,7 +912,7 @@ const MessageNodeComponent = ({
     } else {
       setEditState({
         message: safeData.message || DEFAULT_MESSAGE,
-        variables: safeData.variables || []
+        variables: safeData.variables || [],
       });
     }
   }, [isEditing, saveChanges, safeData.message, safeData.variables, setEditState]);
@@ -918,30 +925,30 @@ const MessageNodeComponent = ({
       label: 'Editar',
       icon: <Edit2 size={14} aria-hidden="true" />,
       action: handleDoubleClick,
-      disabled: isEditing
+      disabled: isEditing,
     },
     {
       label: 'Duplicar',
       icon: <Copy size={14} aria-hidden="true" />,
       action: () => onDuplicate(id),
-      disabled: false
+      disabled: false,
     },
     {
       label: 'Eliminar',
       icon: <Trash2 size={14} aria-hidden="true" />,
       action: () => onDelete(id),
       isDanger: true,
-      disabled: isEditing
-    }
+      disabled: isEditing,
+    },
   ], [isEditing, id, onDuplicate, onDelete, handleDoubleClick]);
 
   const handleNodeContextMenu = useCallback((event) => {
     event.preventDefault();
     event.stopPropagation();
-    
+
     const x = event.clientX;
     const y = event.clientY;
-    
+
     showContextMenu(x, y, id, contextMenuOptions);
   }, [id, contextMenuOptions, showContextMenu]);
 
@@ -974,7 +981,6 @@ const MessageNodeComponent = ({
   // lo que proporciona una transición más suave y performante sin necesidad de forzar actualizaciones.
 
 
-
   /**
    * Clases CSS del nodo
    * Incluye variantes por tipo y estado
@@ -1000,8 +1006,7 @@ const MessageNodeComponent = ({
     return styles;
   }, [isUltraMode, selected]); // Dependencias correctas: isUltraMode y selected del alcance del componente
 
- // Dependencias del efecto (zoomLevel removido ya que isUltraMode lo cubre)
-  
+  // Dependencias del efecto (zoomLevel removido ya que isUltraMode lo cubre)
 
 
   /**
@@ -1021,18 +1026,18 @@ const MessageNodeComponent = ({
     >
       {(() => {
         const handleProps = {
-          type: "source",
+          type: 'source',
           position: Position.Bottom,
-          id: "default",
-          isConnectable: isConnectable,
+          id: 'default',
+          isConnectable,
         };
 
         switch (lodLevel) {
           case LOD_LEVELS.MINI:
             return (
               <>
-                <Handle {...handleProps} type="target" position={Position.Top} className={`message-node__handle message-node__handle--target message-node__handle--ultra`} />
-                <Handle {...handleProps} type="source" position={Position.Bottom} className={`message-node__handle message-node__handle--source message-node__handle--ultra`} />
+                <Handle {...handleProps} type="target" position={Position.Top} className="message-node__handle message-node__handle--target message-node__handle--ultra" />
+                <Handle {...handleProps} type="source" position={Position.Bottom} className="message-node__handle message-node__handle--source message-node__handle--ultra" />
                 <MiniView messageType={messageType} />
               </>
             );
@@ -1040,10 +1045,10 @@ const MessageNodeComponent = ({
           case LOD_LEVELS.COMPACT:
             return (
               <>
-                <Handle {...handleProps} type="target" position={Position.Top} className={`message-node__handle message-node__handle--target message-node__handle--ultra`} />
-                <Handle {...handleProps} type="source" position={Position.Bottom} className={`message-node__handle message-node__handle--source message-node__handle--ultra`} />
-                <CompactView 
-                  messageType={messageType} 
+                <Handle {...handleProps} type="target" position={Position.Top} className="message-node__handle message-node__handle--target message-node__handle--ultra" />
+                <Handle {...handleProps} type="source" position={Position.Bottom} className="message-node__handle message-node__handle--source message-node__handle--ultra" />
+                <CompactView
+                  messageType={messageType}
                   title={typeToTitle(messageType)}
                   message={safeData.message}
                   variables={safeData.variables}
@@ -1056,7 +1061,7 @@ const MessageNodeComponent = ({
               <>
                 <MessageNodeHeader
                   id={id}
-                  titleFromData={safeData.title} 
+                  titleFromData={safeData.title}
                   messageType={safeData.type}
                   isUltraMode={isUltraMode}
                   isSaving={nodeState.isSaving}
@@ -1089,7 +1094,7 @@ const MessageNodeComponent = ({
                   position={Position.Top}
                   id="default"
                   isConnectable={isConnectable}
-                  className={`message-node__handle message-node__handle--target`}
+                  className="message-node__handle message-node__handle--target"
                   aria-label="Conector de entrada"
                   title="Conectar desde otro nodo"
                   tabIndex={isConnectable ? 0 : -1}
@@ -1100,7 +1105,7 @@ const MessageNodeComponent = ({
                   position={Position.Bottom}
                   id="default"
                   isConnectable={isConnectable}
-                  className={`message-node__handle message-node__handle--source`}
+                  className="message-node__handle message-node__handle--source"
                   aria-label="Conector de salida"
                   title="Conectar hacia otro nodo"
                   tabIndex={isConnectable ? 0 : -1}
@@ -1173,8 +1178,8 @@ MessageNode.propTypes = {
     variables: PropTypes.arrayOf(
       PropTypes.shape({
         name: PropTypes.string.isRequired,
-        value: PropTypes.string
-      })
+        value: PropTypes.string,
+      }),
     ),
     lastUpdated: PropTypes.string,
     lodLevel: PropTypes.string,

@@ -1,6 +1,10 @@
 import React, { useRef, useEffect, useState, useCallback, useMemo } from 'react';
-import useWindowSize from '../../../../hooks/useWindowSize';
+
 import { useFlowNodesEdges, useFlowMeta } from '@/stores/selectors';
+
+import useWindowSize from '../../../../hooks/useWindowSize';
+
+
 import './CustomMiniMap.css';
 // Importar el sanitizador para prevenir errores con valores no finitos
 import { sanitizeViewport, sanitizeBounds, sanitizeNode, sanitizeNumber } from './minimap-sanitizer';
@@ -9,14 +13,14 @@ import { sanitizeViewport, sanitizeBounds, sanitizeNode, sanitizeNumber } from '
  * Componente CustomMiniMap - Minimapa optimizado para ReactFlow
  * Versión completamente revisada y optimizada para eliminar código redundante
  */
-const CustomMiniMap = ({ 
-  nodes: propNodes, 
-  edges: propEdges, 
+const CustomMiniMap = ({
+  nodes: propNodes,
+  edges: propEdges,
   isExpanded: propIsExpanded,
   toggleMiniMap,
   setByteMessage: propSetByteMessage,
   viewport: propViewport,
-  isUltraMode: propIsUltraMode
+  isUltraMode: propIsUltraMode,
 }) => {
   // Configuraciones del minimapa - definidas a nivel de componente
 
@@ -24,30 +28,30 @@ const CustomMiniMap = ({
   // Obtener datos del store usando selectores granulares
   const { nodes: storeNodes, edges: storeEdges } = useFlowNodesEdges();
   const { isUltraMode: storeIsUltraMode } = useFlowMeta();
-  
+
   // Preferir props sobre store (para mayor flexibilidad)
   const nodes = propNodes?.length ? propNodes : storeNodes || [];
   const edges = propEdges?.length ? propEdges : storeEdges || [];
   const isUltraMode = propIsUltraMode !== undefined ? propIsUltraMode : storeIsUltraMode;
   // Sanitizar el viewport para evitar valores NaN o Infinity
   const viewport = sanitizeViewport(propViewport || { x: 0, y: 0, zoom: 1 });
-    const { width: windowWidth, height: windowHeight } = useWindowSize();
+  const { width: windowWidth, height: windowHeight } = useWindowSize();
   const canvasRef = useRef(null);
   const containerRef = useRef(null);
   const [canvasReady, setCanvasReady] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [lastPosition, setLastPosition] = useState({ x: 0, y: 0 });
   const [isExpanded, setIsExpanded] = useState(propIsExpanded || false);
-  
+
   // Función segura para mostrar mensajes
   const setByteMessage = propSetByteMessage || (() => {});
-  
+
   // Función para alternar expansión
   const handleToggle = useCallback(() => {
     setIsExpanded(prev => !prev);
     if (toggleMiniMap) toggleMiniMap();
   }, [toggleMiniMap]);
-  
+
   // Configuraciones del minimapa
   const width = isExpanded ? 180 : 45;
   const height = isExpanded ? 180 : 45;
@@ -84,11 +88,11 @@ const CustomMiniMap = ({
   // Filtrar nodos sin posición o dimensiones válidas y sanitizar sus valores
   const validNodes = useMemo(() => {
     if (!nodes || !Array.isArray(nodes)) return [];
-    
+
     return nodes.filter(node => {
-      return node && 
-             node.position && 
-             typeof node.position.x === 'number' && 
+      return node &&
+             node.position &&
+             typeof node.position.x === 'number' &&
              typeof node.position.y === 'number' &&
              !isNaN(node.position.x) &&
              !isNaN(node.position.y) &&
@@ -99,7 +103,7 @@ const CustomMiniMap = ({
 
   const validEdges = useMemo(() => {
     if (!edges || !Array.isArray(edges)) return [];
-    
+
     return edges.filter((edge) => edge && edge.source && edge.target);
   }, [edges]);
 
@@ -113,10 +117,10 @@ const CustomMiniMap = ({
         minY: 0,
         maxY: 100,
         centerX: 50,
-        centerY: 50
+        centerY: 50,
       };
     }
-    
+
     try {
       const bounds = {
         minX: Infinity,
@@ -124,42 +128,42 @@ const CustomMiniMap = ({
         minY: Infinity,
         maxY: -Infinity,
       };
-  
+
       validNodes.forEach((node) => {
         // Asegurarse de que todas las coordenadas son números finitos
         const nodeX = sanitizeNumber(node.position.x, 0);
         const nodeY = sanitizeNumber(node.position.y, 0);
         const nodeWidth = sanitizeNumber(node.width, 150);
         const nodeHeight = sanitizeNumber(node.height, 40);
-        
+
         bounds.minX = Math.min(bounds.minX, nodeX);
         bounds.maxX = Math.max(bounds.maxX, nodeX + nodeWidth);
         bounds.minY = Math.min(bounds.minY, nodeY);
         bounds.maxY = Math.max(bounds.maxY, nodeY + nodeHeight);
       });
-  
+
       // Manejar el caso donde todos los nodos están en la misma posición
       if (bounds.minX === bounds.maxX) {
         bounds.minX -= 50;
         bounds.maxX += 50;
       }
-      
+
       if (bounds.minY === bounds.maxY) {
         bounds.minY -= 50;
         bounds.maxY += 50;
       }
-      
+
       const diagramWidth = bounds.maxX - bounds.minX;
       const diagramHeight = bounds.maxY - bounds.minY;
       const centerX = bounds.minX + diagramWidth / 2;
       const centerY = bounds.minY + diagramHeight / 2;
-  
+
       const margin = Math.max(30, Math.min(diagramWidth, diagramHeight) * 0.1);
       bounds.minX = centerX - (diagramWidth / 2 + margin);
       bounds.maxX = centerX + (diagramWidth / 2 + margin);
       bounds.minY = centerY - (diagramHeight / 2 + margin);
       bounds.maxY = centerY + (diagramHeight / 2 + margin);
-  
+
       // Sanitizar los bounds para asegurar que todos los valores son números finitos
       return sanitizeBounds({ ...bounds, centerX, centerY });
     } catch (error) {
@@ -176,7 +180,7 @@ const CustomMiniMap = ({
     const rect = containerRef.current.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
-    
+
     setIsDragging(true);
     setLastPosition({ x, y });
     e.stopPropagation(); // Evitar que se cierre el minimapa
@@ -190,47 +194,47 @@ const CustomMiniMap = ({
       const rect = containerRef.current.getBoundingClientRect();
       const x = e.clientX - rect.left;
       const y = e.clientY - rect.top;
-      
+
       const dx = x - lastPosition.x;
       const dy = y - lastPosition.y;
-      
+
       // Validar que diagramBounds tenga valores válidos
-      if (!diagramBounds || 
-          typeof diagramBounds.minX !== 'number' || 
+      if (!diagramBounds ||
+          typeof diagramBounds.minX !== 'number' ||
           typeof diagramBounds.maxX !== 'number' ||
-          typeof diagramBounds.minY !== 'number' || 
+          typeof diagramBounds.minY !== 'number' ||
           typeof diagramBounds.maxY !== 'number' ||
           isNaN(diagramBounds.minX) || isNaN(diagramBounds.maxX) ||
           isNaN(diagramBounds.minY) || isNaN(diagramBounds.maxY)) {
         setIsDragging(false);
         return;
       }
-      
+
       // Calcular la cantidad de desplazamiento en coordenadas del flujo
       // Prevenir divisiones por cero
       const diagramWidth = Math.max(diagramBounds.maxX - diagramBounds.minX, 1);
       const diagramHeight = Math.max(diagramBounds.maxY - diagramBounds.minY, 1);
       const scale = Math.min(
         (width - 2 * padding) / diagramWidth,
-        (height - 2 * padding) / diagramHeight
+        (height - 2 * padding) / diagramHeight,
       );
-      
+
       // Sanitizar valores antes de aplicar al viewport
       const newX = sanitizeNumber(viewport.x - dx / viewport.zoom / scale, viewport.x);
       const newY = sanitizeNumber(viewport.y - dy / viewport.zoom / scale, viewport.y);
-      
+
       // Aplicar el movimiento del viewport en la dirección contraria al arrastre
       viewport.setViewport({
         x: newX,
         y: newY,
-        zoom: viewport.zoom
+        zoom: viewport.zoom,
       });
-      
+
       setLastPosition({ x, y });
     } catch (error) {
       setIsDragging(false);
     }
-    
+
     e.stopPropagation();
   }, [isDragging, isExpanded, lastPosition, viewport, width, height, padding, diagramBounds]);
 
@@ -246,44 +250,44 @@ const CustomMiniMap = ({
 
     try {
       if (!isExpanded) {
-      const canvas = canvasRef.current;
-      if (canvas) {
-        const ctx = canvas.getContext('2d');
-        // Clear the canvas to ensure it's blank when collapsed and not drawing
-        ctx.clearRect(0, 0, width, height); 
+        const canvas = canvasRef.current;
+        if (canvas) {
+          const ctx = canvas.getContext('2d');
+          // Clear the canvas to ensure it's blank when collapsed and not drawing
+          ctx.clearRect(0, 0, width, height);
+        }
+        return; // Skip all drawing if collapsed
       }
-      return; // Skip all drawing if collapsed
-    }
-    const canvas = canvasRef.current;
+      const canvas = canvasRef.current;
       const ctx = canvas.getContext('2d');
       if (!ctx) {
         return;
       }
-      
+
       // Sanitizar los bounds para evitar errores de cálculo
       const bounds = sanitizeBounds(diagramBounds);
 
       // Limpiar canvas
       ctx.clearRect(0, 0, width, height);
-      
+
       // Dibujar fondo
       ctx.fillStyle = 'rgba(15, 20, 25, 0.8)';
       ctx.fillRect(0, 0, width, height);
-      
+
       // Dibujar borde protector del canvas
       ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
       ctx.lineWidth = 1;
       ctx.strokeRect(0, 0, width, height);
-      
+
       const availableWidth = width - padding * 2;
       const availableHeight = height - padding * 2;
-      
+
       const diagramWidth = Math.max(diagramBounds.maxX - diagramBounds.minX, 1); // Evitar división por cero
       const diagramHeight = Math.max(diagramBounds.maxY - diagramBounds.minY, 1); // Evitar división por cero
-      
+
       // Optimizar renderizado basado en cantidad de elementos
       // (usamos directamente isUltraMode para simplificar)
-    
+
       // Calcular la escala para mapear el diagrama al canvas
       // Calcular la escala para mapear el diagrama completo al canvas
       const scaleX = availableWidth / diagramWidth;
@@ -306,16 +310,16 @@ const CustomMiniMap = ({
         // Valores por defecto según el eje
         const center = axis === 'x' ? minimapCenterX : minimapCenterY;
         const diagramCenter = axis === 'x' ? diagramBounds.centerX : diagramBounds.centerY;
-        
+
         // Validación de entrada
         if (typeof coord !== 'number' || isNaN(coord) || !isFinite(coord)) {
           return center;
         }
-        
+
         // Transformación relativa al centro
         return (coord - diagramCenter) * scale + center;
       };
-      
+
       // Funciones específicas para cada eje
       const transformX = (x) => transformCoord(x, 'x');
       const transformY = (y) => transformCoord(y, 'y');
@@ -338,7 +342,7 @@ const CustomMiniMap = ({
         const dx = targetX - sourceX;
         const dy = targetY - sourceY;
         const dist = Math.sqrt(dx * dx + dy * dy);
-        
+
         if (isExpanded && dist > 20) {
           // Para conexiones largas, usar curvas Bezier para mejor visualización
           const midX = (sourceX + targetX) / 2;
@@ -347,7 +351,7 @@ const CustomMiniMap = ({
           const curveFactor = 0.2;
           const nx = -dy / dist * curveFactor * dist;
           const ny = dx / dist * curveFactor * dist;
-          
+
           ctx.beginPath();
           ctx.moveTo(sourceX, sourceY);
           ctx.quadraticCurveTo(midX + nx, midY + ny, targetX, targetY);
@@ -373,79 +377,79 @@ const CustomMiniMap = ({
         if (isExpanded) {
           const angle = Math.atan2(targetY - sourceY, targetX - sourceX);
           const arrowSize = 4;
-          
+
           ctx.beginPath();
           ctx.moveTo(targetX, targetY);
           ctx.lineTo(
             targetX - arrowSize * Math.cos(angle - Math.PI / 6),
-            targetY - arrowSize * Math.sin(angle - Math.PI / 6)
+            targetY - arrowSize * Math.sin(angle - Math.PI / 6),
           );
           ctx.lineTo(
             targetX - arrowSize * Math.cos(angle + Math.PI / 6),
-            targetY - arrowSize * Math.sin(angle + Math.PI / 6)
+            targetY - arrowSize * Math.sin(angle + Math.PI / 6),
           );
           ctx.closePath();
           ctx.fillStyle = edgeColor;
           ctx.fill();
         }
       });
-      
+
       // Dibujar nodos
       validNodes.forEach((node) => {
         const nodeX = transformX(node.position.x);
         const nodeY = transformY(node.position.y);
-        
+
         const nodeWidth = node.width ? node.width * scale : 30 * scale;
         const nodeHeight = node.height ? node.height * scale : 20 * scale;
-        
+
         const centerX = nodeX + (nodeWidth / 2);
         const centerY = nodeY + (nodeHeight / 2);
-        
+
         const nodeColor = nodeColors[node.type] || '#ff00ff';
 
         if (isExpanded) {
           const radius = Math.min(4, Math.max(2, nodeWidth * 0.2));
-          
+
           ctx.beginPath();
-          ctx.moveTo(centerX - nodeWidth/2 + radius, centerY - nodeHeight/2);
-          ctx.lineTo(centerX + nodeWidth/2 - radius, centerY - nodeHeight/2);
-          ctx.quadraticCurveTo(centerX + nodeWidth/2, centerY - nodeHeight/2, centerX + nodeWidth/2, centerY - nodeHeight/2 + radius);
-          ctx.lineTo(centerX + nodeWidth/2, centerY + nodeHeight/2 - radius);
-          ctx.quadraticCurveTo(centerX + nodeWidth/2, centerY + nodeHeight/2, centerX + nodeWidth/2 - radius, centerY + nodeHeight/2);
-          ctx.lineTo(centerX - nodeWidth/2 + radius, centerY + nodeHeight/2);
-          ctx.quadraticCurveTo(centerX - nodeWidth/2, centerY + nodeHeight/2, centerX - nodeWidth/2, centerY + nodeHeight/2 - radius);
-          ctx.lineTo(centerX - nodeWidth/2, centerY - nodeHeight/2 + radius);
-          ctx.quadraticCurveTo(centerX - nodeWidth/2, centerY - nodeHeight/2, centerX - nodeWidth/2 + radius, centerY - nodeHeight/2);
+          ctx.moveTo(centerX - nodeWidth / 2 + radius, centerY - nodeHeight / 2);
+          ctx.lineTo(centerX + nodeWidth / 2 - radius, centerY - nodeHeight / 2);
+          ctx.quadraticCurveTo(centerX + nodeWidth / 2, centerY - nodeHeight / 2, centerX + nodeWidth / 2, centerY - nodeHeight / 2 + radius);
+          ctx.lineTo(centerX + nodeWidth / 2, centerY + nodeHeight / 2 - radius);
+          ctx.quadraticCurveTo(centerX + nodeWidth / 2, centerY + nodeHeight / 2, centerX + nodeWidth / 2 - radius, centerY + nodeHeight / 2);
+          ctx.lineTo(centerX - nodeWidth / 2 + radius, centerY + nodeHeight / 2);
+          ctx.quadraticCurveTo(centerX - nodeWidth / 2, centerY + nodeHeight / 2, centerX - nodeWidth / 2, centerY + nodeHeight / 2 - radius);
+          ctx.lineTo(centerX - nodeWidth / 2, centerY - nodeHeight / 2 + radius);
+          ctx.quadraticCurveTo(centerX - nodeWidth / 2, centerY - nodeHeight / 2, centerX - nodeWidth / 2 + radius, centerY - nodeHeight / 2);
           ctx.closePath();
-        
+
           const gradient = ctx.createLinearGradient(
-            centerX - nodeWidth/2, 
-            centerY - nodeHeight/2, 
-            centerX + nodeWidth/2, 
-            centerY + nodeHeight/2
+            centerX - nodeWidth / 2,
+            centerY - nodeHeight / 2,
+            centerX + nodeWidth / 2,
+            centerY + nodeHeight / 2,
           );
-          gradient.addColorStop(0, nodeColor + 'CC');
-          gradient.addColorStop(1, nodeColor + '99');
+          gradient.addColorStop(0, `${nodeColor}CC`);
+          gradient.addColorStop(1, `${nodeColor}99`);
           ctx.fillStyle = gradient;
           ctx.fill();
-          
+
           ctx.strokeStyle = nodeColor;
           ctx.lineWidth = 1;
           ctx.stroke();
 
           ctx.beginPath();
-          ctx.moveTo(centerX - nodeWidth/2 + radius, centerY - nodeHeight/2);
-          ctx.lineTo(centerX + nodeWidth/2 - radius, centerY - nodeHeight/2);
-          ctx.quadraticCurveTo(centerX + nodeWidth/2, centerY - nodeHeight/2, centerX + nodeWidth/2, centerY - nodeHeight/2 + radius);
-          ctx.strokeStyle = nodeColor + 'FF';
+          ctx.moveTo(centerX - nodeWidth / 2 + radius, centerY - nodeHeight / 2);
+          ctx.lineTo(centerX + nodeWidth / 2 - radius, centerY - nodeHeight / 2);
+          ctx.quadraticCurveTo(centerX + nodeWidth / 2, centerY - nodeHeight / 2, centerX + nodeWidth / 2, centerY - nodeHeight / 2 + radius);
+          ctx.strokeStyle = `${nodeColor}FF`;
           ctx.lineWidth = 1.5;
           ctx.stroke();
 
           if (node.data?.label && nodeWidth > 10) {
             const maxLength = Math.floor(nodeWidth / 2);
-            let label = node.data.label;
+            let { label } = node.data;
             if (label.length > maxLength) {
-              label = label.substring(0, maxLength) + '...';
+              label = `${label.substring(0, maxLength)}...`;
             }
 
             const fontSize = Math.max(6, Math.min(9, nodeWidth / 4));
@@ -458,93 +462,93 @@ const CustomMiniMap = ({
         } else {
           // Versión simple para modo no expandido (puntos pequeños)
           const nodeRadius = Math.max(2, Math.min(nodeWidth, nodeHeight) / 2);
-          
+
           ctx.beginPath();
           ctx.arc(centerX, centerY, nodeRadius, 0, 2 * Math.PI);
-          
+
           const gradient = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, nodeRadius);
           gradient.addColorStop(0, nodeColor);
-          gradient.addColorStop(1, nodeColor + '80');
+          gradient.addColorStop(1, `${nodeColor}80`);
           ctx.fillStyle = gradient;
           ctx.fill();
-          
+
           ctx.strokeStyle = '#ffffff50';
           ctx.lineWidth = 0.5;
           ctx.stroke();
         }
-    });
+      });
 
-    if (isExpanded && viewport) {
+      if (isExpanded && viewport) {
       // Ajustar el rectángulo del viewport para que se mueva correctamente
-      const vpLeft = transformX(viewport.x);
-      const vpTop = transformY(viewport.y);
-      
-      // Calcular dimensiones del viewport en el minimapa
-      const vpWidth = (windowWidth / viewport.zoom) * scale;
-      const vpHeight = (windowHeight / viewport.zoom) * scale;
-      const radius = 3; // Radio para las esquinas redondeadas
-      
-      // Dibujar un rectángulo con esquinas redondeadas para el viewport
-      ctx.beginPath();
-      ctx.moveTo(vpLeft + radius, vpTop);
-      ctx.lineTo(vpLeft + vpWidth - radius, vpTop);
-      ctx.arcTo(vpLeft + vpWidth, vpTop, vpLeft + vpWidth, vpTop + radius, radius);
-      ctx.lineTo(vpLeft + vpWidth, vpTop + vpHeight - radius);
-      ctx.arcTo(vpLeft + vpWidth, vpTop + vpHeight, vpLeft + vpWidth - radius, vpTop + vpHeight, radius);
-      ctx.lineTo(vpLeft + radius, vpTop + vpHeight);
-      ctx.arcTo(vpLeft, vpTop + vpHeight, vpLeft, vpTop + vpHeight - radius, radius);
-      ctx.lineTo(vpLeft, vpTop + radius);
-      ctx.arcTo(vpLeft, vpTop, vpLeft + radius, vpTop, radius);
-      
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)';
-      ctx.lineWidth = 1.5;
-      ctx.setLineDash([4, 2]);
-      ctx.stroke();
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
-      ctx.fill();
-      ctx.setLineDash([]);
-    }
+        const vpLeft = transformX(viewport.x);
+        const vpTop = transformY(viewport.y);
 
-    if (isExpanded) {
-      try {
-        const scaleBarLength = 30;
-        // Asegurar que scale sea un número válido y no sea cero
-        const safeScale = (typeof scale === 'number' && scale !== 0 && isFinite(scale)) ? scale : 1;
-        const realDistance = Math.round(scaleBarLength / safeScale);
-        
-        const scaleY = height - 12;
-        
-        ctx.beginPath();
-        ctx.moveTo(width - 50, scaleY + 1);
-        ctx.lineTo(width - 50 + scaleBarLength, scaleY + 1);
-        ctx.strokeStyle = 'rgba(0, 0, 0, 0.5)';
-        ctx.lineWidth = 2;
-        ctx.stroke();
-        
-        ctx.beginPath();
-        ctx.moveTo(width - 50, scaleY);
-        ctx.lineTo(width - 50 + scaleBarLength, scaleY);
-        ctx.strokeStyle = '#ffffff';
-        ctx.lineWidth = 2;
-        ctx.stroke();
-        
-        ctx.beginPath();
-        ctx.moveTo(width - 50, scaleY - 3);
-        ctx.lineTo(width - 50, scaleY + 3);
-        ctx.moveTo(width - 50 + scaleBarLength, scaleY - 3);
-        ctx.lineTo(width - 50 + scaleBarLength, scaleY + 3);
-        ctx.strokeStyle = '#ffffff';
-        ctx.lineWidth = 1;
-        ctx.stroke();
+        // Calcular dimensiones del viewport en el minimapa
+        const vpWidth = (windowWidth / viewport.zoom) * scale;
+        const vpHeight = (windowHeight / viewport.zoom) * scale;
+        const radius = 3; // Radio para las esquinas redondeadas
 
-        ctx.font = 'bold 8px Rajdhani';
-        ctx.fillStyle = '#ffffff';
-        ctx.textAlign = 'center';
-        ctx.fillText(`${realDistance}px`, width - 50 + scaleBarLength / 2, scaleY - 5);
-      } catch (error) {
-        // No hacer nada en caso de error
+        // Dibujar un rectángulo con esquinas redondeadas para el viewport
+        ctx.beginPath();
+        ctx.moveTo(vpLeft + radius, vpTop);
+        ctx.lineTo(vpLeft + vpWidth - radius, vpTop);
+        ctx.arcTo(vpLeft + vpWidth, vpTop, vpLeft + vpWidth, vpTop + radius, radius);
+        ctx.lineTo(vpLeft + vpWidth, vpTop + vpHeight - radius);
+        ctx.arcTo(vpLeft + vpWidth, vpTop + vpHeight, vpLeft + vpWidth - radius, vpTop + vpHeight, radius);
+        ctx.lineTo(vpLeft + radius, vpTop + vpHeight);
+        ctx.arcTo(vpLeft, vpTop + vpHeight, vpLeft, vpTop + vpHeight - radius, radius);
+        ctx.lineTo(vpLeft, vpTop + radius);
+        ctx.arcTo(vpLeft, vpTop, vpLeft + radius, vpTop, radius);
+
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)';
+        ctx.lineWidth = 1.5;
+        ctx.setLineDash([4, 2]);
+        ctx.stroke();
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+        ctx.fill();
+        ctx.setLineDash([]);
       }
-    }
+
+      if (isExpanded) {
+        try {
+          const scaleBarLength = 30;
+          // Asegurar que scale sea un número válido y no sea cero
+          const safeScale = (typeof scale === 'number' && scale !== 0 && isFinite(scale)) ? scale : 1;
+          const realDistance = Math.round(scaleBarLength / safeScale);
+
+          const scaleY = height - 12;
+
+          ctx.beginPath();
+          ctx.moveTo(width - 50, scaleY + 1);
+          ctx.lineTo(width - 50 + scaleBarLength, scaleY + 1);
+          ctx.strokeStyle = 'rgba(0, 0, 0, 0.5)';
+          ctx.lineWidth = 2;
+          ctx.stroke();
+
+          ctx.beginPath();
+          ctx.moveTo(width - 50, scaleY);
+          ctx.lineTo(width - 50 + scaleBarLength, scaleY);
+          ctx.strokeStyle = '#ffffff';
+          ctx.lineWidth = 2;
+          ctx.stroke();
+
+          ctx.beginPath();
+          ctx.moveTo(width - 50, scaleY - 3);
+          ctx.lineTo(width - 50, scaleY + 3);
+          ctx.moveTo(width - 50 + scaleBarLength, scaleY - 3);
+          ctx.lineTo(width - 50 + scaleBarLength, scaleY + 3);
+          ctx.strokeStyle = '#ffffff';
+          ctx.lineWidth = 1;
+          ctx.stroke();
+
+          ctx.font = 'bold 8px Rajdhani';
+          ctx.fillStyle = '#ffffff';
+          ctx.textAlign = 'center';
+          ctx.fillText(`${realDistance}px`, width - 50 + scaleBarLength / 2, scaleY - 5);
+        } catch (error) {
+        // No hacer nada en caso de error
+        }
+      }
     } catch (error) {
       setHasError(true);
     }
@@ -577,24 +581,24 @@ const CustomMiniMap = ({
 
   // Estado para capturar errores de renderizado
   const [hasError, setHasError] = useState(false);
-  
+
   useEffect(() => {
     // Reset error state when expanded state changes
     setHasError(false);
   }, [isExpanded]);
-  
+
   // Si hay un error en el componente o no hay nodos válidos
   if (hasError || !validNodes || validNodes.length === 0) {
     return (
-      <div 
-        className={`ts-custom-minimap-container ${isExpanded ? 'expanded' : 'collapsed'} ${hasError ? 'error' : ''}`} 
+      <div
+        className={`ts-custom-minimap-container ${isExpanded ? 'expanded' : 'collapsed'} ${hasError ? 'error' : ''}`}
         onClick={handleToggle}
       >
         <div className="ts-minimap-empty">
           <p>{hasError ? 'Error en minimapa' : 'Sin nodos'}</p>
           {hasError && isExpanded && (
-            <button 
-              className="ts-minimap-reset" 
+            <button
+              className="ts-minimap-reset"
               onClick={(e) => {
                 e.stopPropagation();
                 setHasError(false);
@@ -610,7 +614,7 @@ const CustomMiniMap = ({
   }
 
   return (
-    <div 
+    <div
       ref={containerRef}
       className={`ts-custom-minimap-container ${isExpanded ? 'expanded' : 'collapsed'} ${isDragging ? 'dragging' : ''}`}
       onClick={isDragging ? null : handleToggle}

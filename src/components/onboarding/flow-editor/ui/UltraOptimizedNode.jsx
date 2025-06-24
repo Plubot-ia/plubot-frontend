@@ -28,7 +28,7 @@ const UltraOptimizedNode = ({
 
   // Referencia al nodo DOM
   const nodeRef = useRef(null);
-  
+
   // Estado para manejar el hover
   const [isHovered, setIsHovered] = useState(false);
 
@@ -64,17 +64,17 @@ const UltraOptimizedNode = ({
       // Eliminar estilo adicional que pueda causar el recuadro fantasma
       outlineColor: 'transparent',
       outlineWidth: 0,
-      outline: 'none'
+      outline: 'none',
     };
 
     return style;
   }, [selected, data.style, xPos, yPos, isUltraMode]);
-  
+
   // Manejadores de eventos de hover optimizados
   const handleMouseEnter = useCallback(() => {
     setIsHovered(true);
     if (!nodeRef.current) return;
-    
+
     const node = nodeRef.current;
     if (isUltraMode) {
       node.style.borderColor = '#2563eb';
@@ -84,11 +84,11 @@ const UltraOptimizedNode = ({
       node.classList.add('hover');
     }
   }, [isUltraMode]);
-  
+
   const handleMouseLeave = useCallback(() => {
     setIsHovered(false);
     if (!nodeRef.current) return;
-    
+
     const node = nodeRef.current;
     if (isUltraMode) {
       node.style.borderColor = selected ? '#2563eb' : '#94a3b8';
@@ -117,24 +117,24 @@ const UltraOptimizedNode = ({
       'COMPLEX_CONDITION_NODE': 'complex-condition-node',
       'POWER_NODE': 'power-node',
       'default': 'message-node',
-      'defaultNode': 'message-node'
+      'defaultNode': 'message-node',
     };
-    
+
     let nodeTypeClass;
-    
+
     // Usar el mapeo existente si existe
     if (nodeTypeMapping[type]) {
       nodeTypeClass = nodeTypeMapping[type];
     } else {
       // Si no existe en el mapeo, intentar convertir el tipo a un formato válido
       try {
-        nodeTypeClass = type.toLowerCase().replace(/[_\s]+/g, '-') + '-node';
+        nodeTypeClass = `${type.toLowerCase().replace(/[_\s]+/g, '-')}-node`;
       } catch (e) {
         // Si hay cualquier error (tipo nulo, indefinido, etc), usar un tipo por defecto
         nodeTypeClass = 'message-node';
       }
     }
-    
+
     return `react-flow__node ${nodeTypeClass} ${selected ? 'selected' : ''} ${isHovered ? 'hover' : ''}`;
   }, [type, selected, isHovered]);
 
@@ -217,12 +217,12 @@ const UltraOptimizedNode = ({
             <div className="node-description">{data.label || 'Nodo Base'}</div>
           </div>
         );
-        
+
       default:
         // Caso por defecto mejorado para usar un estilo de alguna clase existente
         const cssType = type ? type.toLowerCase().replace(/[_\s]+/g, '-') : 'message';
         const displayType = type ? type.replace(/[_\s]+/g, ' ') : 'Nodo';
-        
+
         return (
           <div className={`node-content ${cssType}-node-content`}>
             <div className="node-title">{displayType}</div>
@@ -249,7 +249,7 @@ const UltraOptimizedNode = ({
         // Eliminar estilo adicional que pueda causar el recuadro fantasma
         outlineColor: 'transparent',
         outlineWidth: 0,
-        outline: 'none'
+        outline: 'none',
       }}
       data-id={id}
       data-type={type}
@@ -258,31 +258,31 @@ const UltraOptimizedNode = ({
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
-      <Handle 
-        type="target" 
-        position={targetPosition} 
-        isConnectable={isConnectable ? true : false}
+      <Handle
+        type="target"
+        position={targetPosition}
+        isConnectable={Boolean(isConnectable)}
         className={`node-handle target-handle ${(type && typeof type === 'string') ? type.toLowerCase().replace(/[_\s]+/g, '-') : 'default'}-target-handle`}
         style={{
           opacity: isUltraMode ? 0.5 : 1,
           transition: isUltraMode ? 'none' : undefined,
-          pointerEvents: 'all'
+          pointerEvents: 'all',
         }}
       />
-      
+
       <div className="node-content-container">
         {renderNodeContent}
       </div>
-      
+
       <Handle
         type="source"
         position={sourcePosition}
-        isConnectable={isConnectable ? true : false}
+        isConnectable={Boolean(isConnectable)}
         className={`node-handle source-handle ${(type && typeof type === 'string') ? type.toLowerCase().replace(/[_\s]+/g, '-') : 'default'}-source-handle ${selected ? 'selected' : ''}`}
         style={{
           opacity: isUltraMode ? 0.5 : 1,
           transition: isUltraMode ? 'none' : undefined,
-          pointerEvents: 'all'
+          pointerEvents: 'all',
         }}
       />
     </div>

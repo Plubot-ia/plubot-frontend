@@ -28,17 +28,17 @@ self.onmessage = (e) => {
       const result = tasks[task](...args);
       self.postMessage({ status: 'success', task, result });
     } catch (error) {
-      self.postMessage({ 
-        status: 'error', 
-        task, 
-        error: { message: error.message, stack: error.stack }
+      self.postMessage({
+        status: 'error',
+        task,
+        error: { message: error.message, stack: error.stack },
       });
     }
   } else {
-    self.postMessage({ 
-      status: 'error', 
-      task, 
-      error: { message: `Task "${task}" not found in worker.` }
+    self.postMessage({
+      status: 'error',
+      task,
+      error: { message: `Task "${task}" not found in worker.` },
     });
   }
 };

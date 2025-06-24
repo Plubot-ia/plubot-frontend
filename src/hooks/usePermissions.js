@@ -21,7 +21,6 @@ export const usePermissions = () => {
     const canExecute = isAdmin || canEdit; // Lógica para canExecute
 
 
-
     return { canEdit, canDelete, isAdmin, canExecute };
   }, []); // Dependencias vacías porque los valores son estáticos
 

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, memo } from 'react';
 
 /**
  * Componente LazyImage que carga imágenes solo cuando están a punto de entrar en el viewport
- * 
+ *
  * @param {Object} props - Propiedades del componente
  * @param {string} props.src - URL de la imagen
  * @param {string} props.alt - Texto alternativo para la imagen
@@ -36,12 +36,12 @@ const LazyImage = memo(({
 
   // Detectar soporte de WebP
   const [supportsWebP, setSupportsWebP] = useState(false);
-  
+
   useEffect(() => {
     // Comprobar soporte de WebP
     const checkWebPSupport = async () => {
       if (!webpSupport) return;
-      
+
       try {
         const webPTest = new Image();
         webPTest.onload = () => setSupportsWebP(true);
@@ -51,7 +51,7 @@ const LazyImage = memo(({
         setSupportsWebP(false);
       }
     };
-    
+
     checkWebPSupport();
   }, [webpSupport]);
 
@@ -68,7 +68,7 @@ const LazyImage = memo(({
       {
         threshold,
         rootMargin: '200px', // Precargar imágenes que están a 200px de entrar en viewport
-      }
+      },
     );
 
     // Observar el elemento
@@ -94,7 +94,7 @@ const LazyImage = memo(({
         const webpSrc = src.replace(/\.(jpe?g|png)$/i, '.webp');
         finalSrc = webpSrc;
       }
-      
+
       setImgSrc(finalSrc);
     }
   }, [isInView, src, supportsWebP, webpSupport]);
@@ -143,9 +143,9 @@ const LazyImage = memo(({
           onError={handleImageError}
         />
       )}
-      
+
       {!isLoaded && (
-        <div 
+        <div
           className="lazy-image-placeholder"
           style={{
             position: 'absolute',
@@ -160,9 +160,9 @@ const LazyImage = memo(({
           }}
         >
           {placeholderSrc ? (
-            <img 
-              src={placeholderSrc} 
-              alt={`${alt} placeholder`} 
+            <img
+              src={placeholderSrc}
+              alt={`${alt} placeholder`}
               style={{
                 width: '100%',
                 height: '100%',
@@ -170,7 +170,7 @@ const LazyImage = memo(({
               }}
             />
           ) : (
-            <div 
+            <div
               className="lazy-image-loading-indicator"
               style={{
                 width: '30px',
@@ -184,7 +184,7 @@ const LazyImage = memo(({
           )}
         </div>
       )}
-      
+
       <style jsx>{`
         @keyframes spin {
           0% { transform: rotate(0deg); }

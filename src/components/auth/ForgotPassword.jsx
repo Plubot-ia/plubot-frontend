@@ -1,7 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import useWindowSize from '../../hooks/useWindowSize';
 import { useNavigate } from 'react-router-dom';
+
 import useAuthStore from '@/stores/useAuthStore';
+
+import useWindowSize from '../../hooks/useWindowSize';
+
+
 import './ForgotPassword.css';
 
 const ForgotPassword = () => {
@@ -27,23 +31,23 @@ const ForgotPassword = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-  
+
     if (!email) {
       showMessage('Por favor ingresa tu correo electrónico', 'error');
       setIsSubmitting(false);
       return;
     }
-  
+
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       showMessage('Por favor ingresa un email válido', 'error');
       setIsSubmitting(false);
       return;
     }
-  
+
     try {
       const response = await forgotPassword(email);
-      
+
       if (response?.success) {
         showMessage('Correo de restablecimiento enviado. Revisa tu bandeja de entrada.', 'success');
         const card = document.querySelector('.forgot-password-card');
@@ -80,10 +84,8 @@ const ForgotPassword = () => {
         if (card) {
           card.style.transform = `perspective(1000px) rotateY(${xAxis}deg) rotateX(${yAxis}deg)`;
         }
-      } else {
-        if (card) {
-          card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0)';
-        }
+      } else if (card) {
+        card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0)';
       }
     };
 
@@ -105,17 +107,17 @@ const ForgotPassword = () => {
   return (
     <div className="forgot-password-container">
       <div className="forgot-password-cosmic-lights">
-        <div className="forgot-password-light-beam forgot-password-light-beam-1"></div>
-        <div className="forgot-password-light-beam forgot-password-light-beam-2"></div>
-        <div className="forgot-password-light-beam forgot-password-light-beam-3"></div>
+        <div className="forgot-password-light-beam forgot-password-light-beam-1" />
+        <div className="forgot-password-light-beam forgot-password-light-beam-2" />
+        <div className="forgot-password-light-beam forgot-password-light-beam-3" />
       </div>
       <div className="forgot-password-particles">
-        <div className="forgot-password-particle forgot-password-particle-1"></div>
-        <div className="forgot-password-particle forgot-password-particle-2"></div>
-        <div className="forgot-password-particle forgot-password-particle-3"></div>
-        <div className="forgot-password-particle forgot-password-particle-4"></div>
-        <div className="forgot-password-particle forgot-password-particle-5"></div>
-        <div className="forgot-password-particle forgot-password-particle-6"></div>
+        <div className="forgot-password-particle forgot-password-particle-1" />
+        <div className="forgot-password-particle forgot-password-particle-2" />
+        <div className="forgot-password-particle forgot-password-particle-3" />
+        <div className="forgot-password-particle forgot-password-particle-4" />
+        <div className="forgot-password-particle forgot-password-particle-5" />
+        <div className="forgot-password-particle forgot-password-particle-6" />
       </div>
       <div className="forgot-password-card">
         <div className="forgot-password-card-header">

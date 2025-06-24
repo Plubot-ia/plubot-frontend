@@ -86,12 +86,16 @@ const AiNodeProComponent: React.FC<NodeProps<AiNodeProData>> = ({ id, data, sele
 
   const promptTextareaRef = useRef<HTMLTextAreaElement>(null);
 
+  // Auto-resize textarea height based on content
   useEffect(() => {
     if (promptTextareaRef.current) {
-      promptTextareaRef.current.style.height = 'auto';
-      promptTextareaRef.current.style.height = `${promptTextareaRef.current.scrollHeight}px`;
+      const textarea = promptTextareaRef.current;
+      textarea.style.height = 'auto'; // Reset height to allow shrinking
+      textarea.style.height = `${textarea.scrollHeight}px`; // Set to full content height
     }
-  }, [prompt]);
+  }, [prompt]); // Re-run whenever the prompt text changes
+
+
 
   const getTemperatureLabel = (value: number) => {
     if (value <= 0.4) return '🔬 Racional';
@@ -144,22 +148,23 @@ const AiNodeProComponent: React.FC<NodeProps<AiNodeProData>> = ({ id, data, sele
                     <InfoIcon style={{ fontSize: '16px', marginLeft: '4px', cursor: 'help' }} />
                   </Tooltip>
                 </label>
-                <textarea
-                  id={`prompt-${id}`}
-                  ref={promptTextareaRef}
-                  className="ainodepro-textarea"
-                  value={prompt}
-                  onChange={(e) => handlePromptChange(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' && !e.shiftKey) {
-                      e.preventDefault();
-                      handleExecute();
-                    }
-                  }}
-                  placeholder="Escribe la instrucción para la IA..."
-                  rows={1}
-                  aria-label="Prompt principal para la IA"
-                />
+                <div className="nodrag">
+                  <textarea
+                    ref={promptTextareaRef}
+                    className="ainodepro-textarea"
+                    value={prompt}
+                    onChange={(e) => handlePromptChange(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        handleExecute();
+                      }
+                    }}
+                    placeholder="Escribe la instrucción para la IA..."
+                    rows={1}
+                    aria-label="Prompt principal para la IA"
+                  />
+                </div>
               </div>
 
               <div className="ainodepro-section ainodepro-sliders">

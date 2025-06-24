@@ -7,5 +7,6 @@ export const useEventCallback = (fn, dependencies) => {
 
   ref.current = fn;
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   return useCallback((...args) => ref.current(...args), dependencies);
 };

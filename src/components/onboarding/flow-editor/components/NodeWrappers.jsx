@@ -1,5 +1,6 @@
 import React, { memo } from 'react';
 import { Handle, Position } from 'reactflow';
+
 import { POWER_COLORS } from '@/utils/nodeConfig';
 
 /**

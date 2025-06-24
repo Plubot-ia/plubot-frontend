@@ -1,13 +1,14 @@
-import React, { useState, useEffect } from 'react';
-import { 
-  Gauge, 
-  Cpu, 
-  ChevronDown, 
-  ChevronUp, 
+import {
+  Gauge,
+  Cpu,
+  ChevronDown,
+  ChevronUp,
   Info,
   Save,
-  AlertTriangle
+  AlertTriangle,
 } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+
 import useFlowStore from '@/stores/useFlowStore';
 
 /**
@@ -18,14 +19,14 @@ const PerformanceStats = () => {
   const [expanded, setExpanded] = useState(false);
   const [saveTime, setSaveTime] = useState(null);
   const [memoryUsage, setMemoryUsage] = useState(null);
-  
+
   // Obtener datos del store
   const nodes = useFlowStore(state => state.nodes);
   const edges = useFlowStore(state => state.edges);
   const lastSaved = useFlowStore(state => state.lastSaved);
   const isSaving = useFlowStore(state => state.isSaving);
   const saveFlow = useFlowStore(state => state.saveFlow);
-  
+
   // Calcular estadísticas de rendimiento
   useEffect(() => {
     // Simular medición de uso de memoria
@@ -37,7 +38,7 @@ const PerformanceStats = () => {
       setMemoryUsage(0);
     }
   }, [nodes, edges]);
-  
+
   // Medir tiempo de guardado
   const handleSave = async () => {
     const startTime = performance.now();
@@ -45,18 +46,18 @@ const PerformanceStats = () => {
     const endTime = performance.now();
     setSaveTime(endTime - startTime);
   };
-  
+
   // Formatear el tiempo desde el último guardado
   const formatLastSaved = () => {
     if (!lastSaved) return 'Nunca';
-    
+
     const lastSavedDate = new Date(lastSaved);
     const now = new Date();
     const diffMs = now - lastSavedDate;
-    
+
     // Convertir a segundos
     const diffSec = Math.floor(diffMs / 1000);
-    
+
     if (diffSec < 60) {
       return `hace ${diffSec} segundos`;
     } else if (diffSec < 3600) {
@@ -66,43 +67,43 @@ const PerformanceStats = () => {
       return lastSavedDate.toLocaleTimeString();
     }
   };
-  
+
   // Formatear el tiempo de guardado
   const formatSaveTime = () => {
     if (saveTime === null) return 'N/A';
-    
+
     if (saveTime < 100) {
       return `${saveTime.toFixed(1)} ms`;
     } else {
       return `${(saveTime / 1000).toFixed(2)} s`;
     }
   };
-  
+
   // Formatear el uso de memoria
   const formatMemoryUsage = () => {
     if (memoryUsage === null) return 'N/A';
-    
+
     if (memoryUsage < 1024) {
       return `${memoryUsage} KB`;
     } else {
       return `${(memoryUsage / 1024).toFixed(1)} MB`;
     }
   };
-  
+
   // Calcular la eficiencia de las actualizaciones incrementales
   const calculateEfficiency = () => {
     if (!saveTime || !nodes.length) return 0;
-    
+
     // Fórmula simple: menor tiempo = mayor eficiencia
     // Normalizado para que 100ms o menos sea 100% eficiente
     const baseEfficiency = 100 - Math.min(90, saveTime / 10);
-    
+
     // Ajustar por complejidad (más nodos/aristas = más difícil ser eficiente)
     const complexity = Math.log(nodes.length + edges.length) / Math.log(10);
-    
+
     return Math.max(0, Math.min(100, baseEfficiency + complexity * 5));
   };
-  
+
   return (
     <div
       className="performance-stats-container"
@@ -129,7 +130,7 @@ const PerformanceStats = () => {
           padding: '8px 12px',
           backgroundColor: '#0f0f1b',
           cursor: 'pointer',
-          borderBottom: expanded ? '1px solid rgba(0, 195, 255, 0.2)' : 'none'
+          borderBottom: expanded ? '1px solid rgba(0, 195, 255, 0.2)' : 'none',
         }}
         onClick={() => setExpanded(!expanded)}
       >
@@ -141,22 +142,22 @@ const PerformanceStats = () => {
             </span>
           )}
         </div>
-        <button 
-          style={{ 
-            background: 'transparent', 
-            border: 'none', 
-            cursor: 'pointer', 
-            display: 'flex', 
-            padding: '4px' 
+        <button
+          style={{
+            background: 'transparent',
+            border: 'none',
+            cursor: 'pointer',
+            display: 'flex',
+            padding: '4px',
           }}
         >
-          {expanded ? 
-            <ChevronUp size={16} color="#e0e0e0" /> : 
+          {expanded ?
+            <ChevronUp size={16} color="#e0e0e0" /> :
             <ChevronDown size={16} color="#e0e0e0" />
           }
         </button>
       </div>
-      
+
       {expanded && (
         <div style={{ padding: '16px', backgroundColor: '#1a1a2e' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
@@ -167,7 +168,7 @@ const PerformanceStats = () => {
               {nodes.length}
             </span>
           </div>
-          
+
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
             <span style={{ fontSize: '13px', color: '#a0a0a0' }}>
               Aristas:
@@ -176,7 +177,7 @@ const PerformanceStats = () => {
               {edges.length}
             </span>
           </div>
-          
+
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
             <span style={{ fontSize: '13px', color: '#a0a0a0' }}>
               Memoria estimada:
@@ -185,7 +186,7 @@ const PerformanceStats = () => {
               {formatMemoryUsage()}
             </span>
           </div>
-          
+
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
             <span style={{ fontSize: '13px', color: '#a0a0a0' }}>
               Último guardado:
@@ -194,7 +195,7 @@ const PerformanceStats = () => {
               {formatLastSaved()}
             </span>
           </div>
-          
+
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '16px' }}>
             <span style={{ fontSize: '13px', color: '#a0a0a0' }}>
               Tiempo de guardado:
@@ -203,7 +204,7 @@ const PerformanceStats = () => {
               {formatSaveTime()}
             </span>
           </div>
-          
+
           {saveTime && (
             <div style={{ marginBottom: '12px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
@@ -244,7 +245,7 @@ const PerformanceStats = () => {
               </div>
             </div>
           )}
-          
+
           <div style={{ display: 'flex', justifyContent: 'center', marginTop: '16px' }}>
             <button
               style={{
@@ -267,7 +268,7 @@ const PerformanceStats = () => {
               disabled={isSaving}
             >
               <Cpu size={14} style={{ marginRight: '6px' }} />
-              {isSaving ? "Guardando..." : "Probar rendimiento"}
+              {isSaving ? 'Guardando...' : 'Probar rendimiento'}
             </button>
           </div>
         </div>

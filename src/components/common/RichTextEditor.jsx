@@ -1,5 +1,5 @@
-import React, { useState, useEffect, forwardRef } from 'react';
 import DOMPurify from 'dompurify';
+import React, { useState, useEffect, forwardRef } from 'react';
 
 /**
  * Editor de texto enriquecido para el componente EndNode
@@ -9,9 +9,9 @@ import DOMPurify from 'dompurify';
  * @param {boolean} props.readOnly - Si el editor es de solo lectura
  * @param {Object} props.style - Estilos adicionales para el editor
  */
-const RichTextEditor = forwardRef(({ 
-  initialValue = '', 
-  onChange, 
+const RichTextEditor = forwardRef(({
+  initialValue = '',
+  onChange,
   readOnly = false,
   style = {},
   placeholder = 'Escribe aquí...',
@@ -29,7 +29,7 @@ const RichTextEditor = forwardRef(({
   const handleChange = (e) => {
     const newContent = e.target.innerHTML;
     const sanitizedContent = DOMPurify.sanitize(newContent);
-    
+
     if (sanitizedContent.length <= maxLength) {
       setContent(sanitizedContent);
       onChange && onChange(sanitizedContent);
@@ -48,7 +48,7 @@ const RichTextEditor = forwardRef(({
     transition: preferReducedMotion ? 'none' : 'border-color 0.2s ease',
     backgroundColor: highContrast ? '#000' : '#fff',
     color: highContrast ? '#fff' : '#333',
-    ...style
+    ...style,
   };
 
   return (
@@ -68,10 +68,10 @@ const RichTextEditor = forwardRef(({
         tabIndex={0}
       />
       {maxLength && (
-        <div className="character-count" style={{ 
-          textAlign: 'right', 
+        <div className="character-count" style={{
+          textAlign: 'right',
           fontSize: '0.75rem',
-          color: content.length > maxLength * 0.9 ? '#ef4444' : '#6b7280'
+          color: content.length > maxLength * 0.9 ? '#ef4444' : '#6b7280',
         }}>
           {content.length}/{maxLength}
         </div>

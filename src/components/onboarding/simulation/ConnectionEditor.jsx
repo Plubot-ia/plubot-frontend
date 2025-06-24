@@ -4,12 +4,12 @@ import './ConnectionEditor.css';
 // Componente de previsualización de conexión extraído y optimizado
 const ConnectionPreview = React.memo(({ properties }) => {
   const { stroke, strokeWidth, strokeDasharray } = properties.style;
-  
+
   return (
     <div className="ts-connection-preview">
       <div className="ts-preview-label">Vista previa:</div>
       <div className="ts-preview-container">
-        <div className="ts-preview-node ts-source"></div>
+        <div className="ts-preview-node ts-source" />
         <svg width="120" height="30">
           <defs>
             <marker
@@ -31,11 +31,11 @@ const ConnectionPreview = React.memo(({ properties }) => {
             markerEnd="url(#arrowhead)"
           />
         </svg>
-        <div className="ts-preview-node ts-target"></div>
+        <div className="ts-preview-node ts-target" />
       </div>
       {properties.animated && (
         <div className="ts-preview-animation-indicator">
-          <span className="ts-animation-dot"></span> Animación activa
+          <span className="ts-animation-dot" /> Animación activa
         </div>
       )}
     </div>
@@ -52,13 +52,13 @@ const Tooltip = React.memo(({ text }) => (
 
 // Componente de preset de estilo optimizado con memo
 const StylePreset = React.memo(({ preset, onClick, isActive }) => (
-  <button 
+  <button
     className={`ts-style-preset-button ${isActive ? 'ts-active-preset' : ''}`}
     style={{
-      backgroundColor: preset.stroke, 
+      backgroundColor: preset.stroke,
       borderStyle: preset.strokeDasharray ? 'dashed' : 'solid',
       borderColor: isActive ? '#ffffff' : 'transparent',
-      transform: isActive ? 'scale(1.2)' : 'scale(1)'
+      transform: isActive ? 'scale(1.2)' : 'scale(1)',
     }}
     onClick={() => onClick(preset)}
     title={preset.name}
@@ -67,26 +67,26 @@ const StylePreset = React.memo(({ preset, onClick, isActive }) => (
 ));
 
 // Componente de formulario para propiedades de la conexión
-const ConnectionForm = ({ 
-  connectionProperties, 
-  setConnectionProperties, 
+const ConnectionForm = ({
+  connectionProperties,
+  setConnectionProperties,
   connectionType,
-  suggestLabel 
+  suggestLabel,
 }) => {
   const handleStyleChange = useCallback((property, value) => {
     setConnectionProperties(prev => ({
       ...prev,
       style: {
         ...prev.style,
-        [property]: value
-      }
+        [property]: value,
+      },
     }));
   }, [setConnectionProperties]);
 
   const handlePropertyChange = useCallback((property, value) => {
     setConnectionProperties(prev => ({
       ...prev,
-      [property]: value
+      [property]: value,
     }));
   }, [setConnectionProperties]);
 
@@ -106,7 +106,7 @@ const ConnectionForm = ({
             placeholder={suggestLabel()}
           />
           {!connectionProperties.label && suggestLabel() && (
-            <button 
+            <button
               className="ts-suggestion-button"
               onClick={() => handlePropertyChange('label', suggestLabel())}
               title="Usar sugerencia"
@@ -116,7 +116,7 @@ const ConnectionForm = ({
           )}
         </div>
       </div>
-      
+
       <div className="ts-form-group">
         <label htmlFor="connection-color">
           Color:
@@ -130,7 +130,7 @@ const ConnectionForm = ({
           aria-label="Seleccionar color de línea"
         />
       </div>
-      
+
       <div className="ts-form-group">
         <label htmlFor="connection-width">
           Grosor de línea:
@@ -151,7 +151,7 @@ const ConnectionForm = ({
           <span className="ts-range-value">{connectionProperties.style.strokeWidth}px</span>
         </div>
       </div>
-      
+
       <div className="ts-form-group">
         <label htmlFor="line-style">
           Estilo de línea:
@@ -169,7 +169,7 @@ const ConnectionForm = ({
           <option value="15,5,3,5">Puntos y rayas</option>
         </select>
       </div>
-      
+
       <div className="ts-form-group ts-checkbox-group">
         <div className="ts-checkbox-with-label">
           <input
@@ -185,7 +185,7 @@ const ConnectionForm = ({
           </label>
         </div>
       </div>
-      
+
       {connectionType === 'decision → option' && (
         <div className="ts-form-group">
           <label htmlFor="priority-input">
@@ -219,7 +219,7 @@ const ConnectionEditor = ({
 }) => {
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
-  
+
   // Usar useMemo para los presets de estilo
   const stylePresets = useMemo(() => [
     { name: 'Primario', stroke: '#00e0ff', strokeWidth: 2, strokeDasharray: '' },
@@ -229,31 +229,31 @@ const ConnectionEditor = ({
     { name: 'Éxito', stroke: '#00ff9d', strokeWidth: 2, strokeDasharray: '' },
     { name: 'Alternativo', stroke: '#7700ff', strokeWidth: 2, strokeDasharray: '5,5' },
   ], []);
-  
+
   // Determinar cuál preset está activo
   const activePresetIndex = useMemo(() => {
-    return stylePresets.findIndex(preset => 
-      preset.stroke === connectionProperties.style.stroke && 
-      preset.strokeWidth === connectionProperties.style.strokeWidth && 
-      preset.strokeDasharray === connectionProperties.style.strokeDasharray
+    return stylePresets.findIndex(preset =>
+      preset.stroke === connectionProperties.style.stroke &&
+      preset.strokeWidth === connectionProperties.style.strokeWidth &&
+      preset.strokeDasharray === connectionProperties.style.strokeDasharray,
     );
   }, [connectionProperties.style, stylePresets]);
-  
+
   // Encontrar los nodos de origen y destino
-  const sourceNode = useMemo(() => 
-    nodes.find(node => node.id === selectedConnection?.source), 
-    [nodes, selectedConnection]
+  const sourceNode = useMemo(() =>
+    nodes.find(node => node.id === selectedConnection?.source),
+  [nodes, selectedConnection],
   );
-  
-  const targetNode = useMemo(() => 
-    nodes.find(node => node.id === selectedConnection?.target), 
-    [nodes, selectedConnection]
+
+  const targetNode = useMemo(() =>
+    nodes.find(node => node.id === selectedConnection?.target),
+  [nodes, selectedConnection],
   );
-  
+
   // Determinar el tipo de conexión
-  const connectionType = useMemo(() => 
+  const connectionType = useMemo(() =>
     sourceNode && targetNode ? `${sourceNode.type} → ${targetNode.type}` : 'desconocido',
-    [sourceNode, targetNode]
+  [sourceNode, targetNode],
   );
 
   // Detección de cambios
@@ -271,9 +271,9 @@ const ConnectionEditor = ({
         if (hasChanges) saveConnectionChanges();
       }
     };
-    
+
     window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);  
+    return () => window.removeEventListener('keydown', handleKeyDown);
   }, [hasChanges, saveConnectionChanges, setShowConnectionEditor]);
 
   // Función para aplicar un preset de estilo con useCallback
@@ -300,7 +300,7 @@ const ConnectionEditor = ({
       'action → end': 'Acción que concluye el flujo',
       'message → end': 'Mensaje que concluye el flujo',
     };
-    
+
     return descriptions[type] || 'Conexión entre nodos del flujo';
   }, []);
 
@@ -312,7 +312,7 @@ const ConnectionEditor = ({
       'message → decision': 'Preguntar al usuario',
       'action → message': 'Después de la acción',
     };
-    
+
     return suggestions[connectionType] || '';
   }, [connectionType]);
 
@@ -337,24 +337,24 @@ const ConnectionEditor = ({
       <div className="ts-modal-content" aria-labelledby="connection-editor-title">
         <div className="ts-modal-header">
           <h3 id="connection-editor-title">Editor de Conexión</h3>
-          <button 
-            onClick={() => setShowConnectionEditor(false)} 
+          <button
+            onClick={() => setShowConnectionEditor(false)}
             className="ts-close-button"
             aria-label="Cerrar editor"
           >
             ✕
           </button>
         </div>
-        
+
         <div className="ts-connection-details">
-          <div 
-            className="ts-connection-type-badge" 
+          <div
+            className="ts-connection-type-badge"
             title={getTypeDescription(connectionType)}
             aria-label={getTypeDescription(connectionType)}
           >
             {connectionType}
           </div>
-          
+
           <div className="ts-connection-nodes">
             <div className="ts-source-node">
               <strong>Origen:</strong>{' '}
@@ -366,30 +366,30 @@ const ConnectionEditor = ({
               {targetNode?.data?.label || selectedConnection?.target}
             </div>
           </div>
-          
+
           <ConnectionPreview properties={connectionProperties} />
-          
+
           <div className="ts-style-presets">
             <div className="ts-presets-label">Estilos predefinidos:</div>
             <div className="ts-presets-container">
               {stylePresets.map((preset, index) => (
-                <StylePreset 
-                  key={index} 
-                  preset={preset} 
+                <StylePreset
+                  key={index}
+                  preset={preset}
                   onClick={applyStylePreset}
                   isActive={index === activePresetIndex}
                 />
               ))}
             </div>
           </div>
-          
-          <ConnectionForm 
+
+          <ConnectionForm
             connectionProperties={connectionProperties}
             setConnectionProperties={setConnectionProperties}
             connectionType={connectionType}
             suggestLabel={suggestLabel}
           />
-          
+
           <div className="ts-editor-actions">
             <button
               onClick={handleSave}
@@ -399,19 +399,19 @@ const ConnectionEditor = ({
             >
               Guardar Cambios
             </button>
-            
+
             {showConfirmDelete ? (
               <div className="ts-delete-confirmation">
                 <span>¿Eliminar conexión?</span>
-                <button 
-                  onClick={deleteConnection} 
+                <button
+                  onClick={deleteConnection}
                   className="ts-confirm-delete-button"
                   aria-label="Confirmar eliminación"
                 >
                   Sí, eliminar
                 </button>
-                <button 
-                  onClick={() => setShowConfirmDelete(false)} 
+                <button
+                  onClick={() => setShowConfirmDelete(false)}
                   className="ts-cancel-button"
                   aria-label="Cancelar eliminación"
                 >
@@ -419,8 +419,8 @@ const ConnectionEditor = ({
                 </button>
               </div>
             ) : (
-              <button 
-                onClick={handleDelete} 
+              <button
+                onClick={handleDelete}
                 className="ts-secondary-button"
                 aria-label="Eliminar conexión"
               >
@@ -428,7 +428,7 @@ const ConnectionEditor = ({
               </button>
             )}
           </div>
-          
+
           <div className="ts-keyboard-shortcuts" aria-label="Atajos de teclado">
             <div className="ts-shortcut"><kbd>Esc</kbd> Cerrar</div>
             <div className="ts-shortcut"><kbd>Ctrl</kbd>+<kbd>S</kbd> Guardar</div>

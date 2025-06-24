@@ -1,6 +1,6 @@
 /**
  * node-position-validator.js
- * 
+ *
  * Utilidad para validar y corregir posiciones de nodos en React Flow
  * Resuelve problemas de nodos apilados en (0,0) y errores NaN en aristas
  */
@@ -18,14 +18,14 @@ const MAX_ATTEMPTS = 100;
  */
 export const isValidPosition = (position) => {
   if (!position || typeof position !== 'object') return false;
-  
+
   const { x, y } = position;
   return (
-    x !== undefined && 
-    y !== undefined && 
-    x !== null && 
-    y !== null && 
-    !isNaN(x) && 
+    x !== undefined &&
+    y !== undefined &&
+    x !== null &&
+    y !== null &&
+    !isNaN(x) &&
     !isNaN(y) &&
     Number.isFinite(x) &&
     Number.isFinite(y)
@@ -43,7 +43,7 @@ export const generateValidPosition = (existingNodes = [], preferredPosition = nu
   if (preferredPosition && isValidPosition(preferredPosition)) {
     return preferredPosition;
   }
-  
+
   // Crear un mapa de posiciones ocupadas para verificación rápida
   const occupiedPositions = new Set();
   existingNodes.forEach(node => {
@@ -51,14 +51,14 @@ export const generateValidPosition = (existingNodes = [], preferredPosition = nu
       occupiedPositions.add(`${Math.round(node.position.x)},${Math.round(node.position.y)}`);
     }
   });
-  
+
   // Intentar posiciones incrementales hasta encontrar una libre
   let x = DEFAULT_X;
   let y = DEFAULT_Y;
   let attempts = 0;
-  
+
   while (
-    occupiedPositions.has(`${Math.round(x)},${Math.round(y)}`) && 
+    occupiedPositions.has(`${Math.round(x)},${Math.round(y)}`) &&
     attempts < MAX_ATTEMPTS
   ) {
     // Patrón en espiral para distribuir nodos
@@ -69,14 +69,14 @@ export const generateValidPosition = (existingNodes = [], preferredPosition = nu
     }
     attempts++;
   }
-  
+
   // Si agotamos los intentos, usar una posición aleatoria
   if (attempts >= MAX_ATTEMPTS) {
     x = DEFAULT_X + Math.random() * 500;
     y = DEFAULT_Y + Math.random() * 300;
 
   }
-  
+
   return { x, y };
 };
 
@@ -103,11 +103,11 @@ export const validateNodePositions = (nodes) => {
   if (isDraggingInProgress()) {
     return nodes; // Devolver los nodos sin cambios durante el arrastre
   }
-  
+
   if (!nodes || !Array.isArray(nodes)) {
     return []; // Simplemente devolver array vacío sin logging excesivo
   }
-  
+
   // Verificar si hay nodos inválidos pero SIN filtrado completo (más eficiente)
   let hasInvalidNodes = false;
   for (let i = 0; i < nodes.length; i++) {
@@ -116,12 +116,12 @@ export const validateNodePositions = (nodes) => {
       break; // Salir al primer nodo inválido encontrado
     }
   }
-  
+
   // Solo proceder si realmente hay nodos inválidos
   if (!hasInvalidNodes) {
     return nodes; // Retornar rápidamente si todo está bien
   }
-  
+
   // Optimización: Crear un conjunto de nodos válidos una sola vez.
   const validNodes = nodes.filter(n => isValidPosition(n.position));
 
@@ -141,12 +141,11 @@ export const validateNodePositions = (nodes) => {
       // Intentar recuperar valores parciales si es posible.
       node.position && typeof node.position === 'object'
         ? {
-            x: isNaN(node.position.x) ? undefined : node.position.x,
-            y: isNaN(node.position.y) ? undefined : node.position.y,
-          }
-        : null
+          x: isNaN(node.position.x) ? undefined : node.position.x,
+          y: isNaN(node.position.y) ? undefined : node.position.y,
+        }
+        : null,
     );
-
 
 
     return validatedNode;
@@ -166,24 +165,24 @@ export const createNodeValidatorMiddleware = (set, get) => (args) => {
     if (args.nodes) {
       return {
         ...args,
-        nodes: validateNodePositions(args.nodes)
+        nodes: validateNodePositions(args.nodes),
       };
     }
-    
+
     // Si es una función, ejecutarla con el estado actual y validar el resultado
     if (typeof args === 'function') {
       const result = args(state);
-      
+
       if (result.nodes) {
         return {
           ...result,
-          nodes: validateNodePositions(result.nodes)
+          nodes: validateNodePositions(result.nodes),
         };
       }
-      
+
       return result;
     }
-    
+
     return args;
   });
 };
@@ -199,10 +198,10 @@ export const sanitizeEdgePaths = () => {
   setTimeout(() => {
     const edgePaths = document.querySelectorAll('.react-flow__edge-path');
     let fixedCount = 0;
-    
+
     edgePaths.forEach(path => {
       const dAttr = path.getAttribute('d');
-      
+
       // Detectar si hay valores NaN en el path
       if (dAttr && dAttr.includes('NaN')) {
         // Extraer valores válidos (si los hay)
@@ -210,7 +209,7 @@ export const sanitizeEdgePaths = () => {
           .split(' ')
           .filter(part => !part.includes('NaN'))
           .join(' ');
-          
+
         if (validPoints) {
           // Si hay puntos válidos, intentar construir un path mínimo
           path.setAttribute('d', 'M0,0');
@@ -220,11 +219,11 @@ export const sanitizeEdgePaths = () => {
           path.setAttribute('d', 'M0,0');
           path.style.visibility = 'hidden';
         }
-        
+
         fixedCount++;
       }
     });
-    
+
     if (fixedCount > 0) {
       // Paths SVG de aristas parcheados con éxito
     }
@@ -236,5 +235,5 @@ export default {
   generateValidPosition,
   validateNodePositions,
   createNodeValidatorMiddleware,
-  sanitizeEdgePaths
+  sanitizeEdgePaths,
 };

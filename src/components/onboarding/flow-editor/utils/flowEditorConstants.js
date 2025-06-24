@@ -18,11 +18,11 @@ export const SNAP_GRID = [15, 15];
 // Teclas para eliminar elementos (ampliadas para mayor compatibilidad)
 // Incluye opciones para diferentes idiomas y distribuciones de teclado
 export const DELETE_KEYS = [
-  'Delete',  // Inglés estándar
+  'Delete', // Inglés estándar
   'Backspace', // Alternativa común
-  'Suprimir',  // Español
-  'Del',       // Abreviatura común
-  'Remove'     // Alternativa
+  'Suprimir', // Español
+  'Del', // Abreviatura común
+  'Remove', // Alternativa
 ];
 
 // Estilo por defecto para aristas

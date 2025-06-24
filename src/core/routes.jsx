@@ -1,17 +1,18 @@
-import { Routes, Route } from 'react-router-dom';
-import Home from '@pages/Home';
 import About from '@pages/About';
-import Contact from '@pages/Contact';
-import Services from '@pages/Services';
-import CaseStudies from '@pages/CaseStudies';
 import Blog from '@pages/Blog';
 import BlogPost from '@pages/BlogPost';
-import Privacy from '@pages/Privacy';
-import Terms from '@pages/Terms';
+import CaseStudies from '@pages/CaseStudies';
 import Chatbot from '@pages/Chatbot';
-import Particulas from '@pages/Particulas';
+import Contact from '@pages/Contact';
 import Dashboard from '@pages/Dashboard';
+import Home from '@pages/Home';
 import NotFound from '@pages/NotFound';
+import Privacy from '@pages/Privacy';
+import Services from '@pages/Services';
+import Terms from '@pages/Terms';
+import { Routes, Route } from 'react-router-dom';
+
+import Particulas from '@pages/Particulas';
 
 
 const AppRoutes = () => (

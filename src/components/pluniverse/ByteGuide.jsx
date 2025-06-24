@@ -1,4 +1,5 @@
 import { useState } from 'react';
+
 import byteImage from '@/assets/img/byte.png'; // Usa el alias @
 import './ByteGuide.css'; // Importar los estilos
 

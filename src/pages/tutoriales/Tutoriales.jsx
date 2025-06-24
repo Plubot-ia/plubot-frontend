@@ -1,8 +1,11 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
+
 import useWindowSize from '../../hooks/useWindowSize';
+
 import './Tutoriales.css';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
+
 import byteAvatar from '@assets/img/byte.png';
 
 const Tutoriales = () => {
@@ -16,11 +19,11 @@ const Tutoriales = () => {
 
   // Optimización: useMemo para evitar recreaciones innecesarias
   const phrases = useMemo(() => [
-    "Todo problema tiene un flujo que lo resuelve.",
-    "Las ideas no duermen. Tu Plubot tampoco.",
-    "La automatización no reemplaza, potencia.",
-    "Un flujo bien diseñado, una galaxia conquistada.",
-    "Byte está contigo. Siempre.",
+    'Todo problema tiene un flujo que lo resuelve.',
+    'Las ideas no duermen. Tu Plubot tampoco.',
+    'La automatización no reemplaza, potencia.',
+    'Un flujo bien diseñado, una galaxia conquistada.',
+    'Byte está contigo. Siempre.',
   ], []);
 
   // Cambio de frases con intervalo optimizado
@@ -42,7 +45,7 @@ const Tutoriales = () => {
         });
       }
     };
-    
+
     window.addEventListener('mousemove', handleMouseMove);
     return () => window.removeEventListener('mousemove', handleMouseMove);
   }, []);
@@ -94,14 +97,14 @@ const Tutoriales = () => {
   // Animaciones para el botón
   const buttonVariants = {
     hover: { scale: 1.08, boxShadow: '0 0 20px rgba(255, 0, 255, 0.8)' },
-    tap: { scale: 0.95 }
+    tap: { scale: 0.95 },
   };
 
   // Animaciones para el contenido expandible
   const expandableContentVariants = {
     hidden: { opacity: 0, y: 30, scale: 0.95 },
     visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.7 } },
-    exit: { opacity: 0, y: 30, scale: 0.95, transition: { duration: 0.5 } }
+    exit: { opacity: 0, y: 30, scale: 0.95, transition: { duration: 0.5 } },
   };
 
   return (
@@ -147,10 +150,10 @@ const Tutoriales = () => {
           onMouseLeave={handleMouseLeave}
         >
           {/* Esquinas de tarjeta */}
-          <div className="card-corner top-left"></div>
-          <div className="card-corner top-right"></div>
-          <div className="card-corner bottom-left"></div>
-          <div className="card-corner bottom-right"></div>
+          <div className="card-corner top-left" />
+          <div className="card-corner top-right" />
+          <div className="card-corner bottom-left" />
+          <div className="card-corner bottom-right" />
 
           {/* Avatar de Byte con efecto holograma */}
           <motion.div
@@ -172,9 +175,9 @@ const Tutoriales = () => {
                 className="byte-avatar"
               />
               <div className="avatar-rings">
-                <div className="ring ring1"></div>
-                <div className="ring ring2"></div>
-                <div className="ring ring3"></div>
+                <div className="ring ring1" />
+                <div className="ring ring2" />
+                <div className="ring ring3" />
               </div>
             </div>
 
@@ -187,10 +190,10 @@ const Tutoriales = () => {
                 exit={{ opacity: 0, y: -15 }}
                 transition={{ duration: 0.8 }}
               >
-                <div className="dialog-corner tl"></div>
-                <div className="dialog-corner tr"></div>
-                <div className="dialog-corner bl"></div>
-                <div className="dialog-corner br"></div>
+                <div className="dialog-corner tl" />
+                <div className="dialog-corner tr" />
+                <div className="dialog-corner bl" />
+                <div className="dialog-corner br" />
                 {phrases[phraseIndex]}
               </motion.div>
             </AnimatePresence>
@@ -241,7 +244,7 @@ const Tutoriales = () => {
             whileTap="tap"
             onClick={() => setShowMore((prev) => !prev)}
           >
-            <span className="button-glow"></span>
+            <span className="button-glow" />
             <span className="button-text">
               {showMore ? 'CERRAR DATA LOG' : 'ACTIVAR MISIÓN'}
             </span>
@@ -261,12 +264,12 @@ const Tutoriales = () => {
                 exit="exit"
               >
                 <div className="terminal-header">
-                  <div className="terminal-icon"></div>
+                  <div className="terminal-icon" />
                   <div className="terminal-title">BYTE.DATA.LOG</div>
                   <div className="terminal-controls">
-                    <span></span>
-                    <span></span>
-                    <span></span>
+                    <span />
+                    <span />
+                    <span />
                   </div>
                 </div>
 
@@ -282,26 +285,26 @@ const Tutoriales = () => {
 
                 <motion.div className="byte-capabilities">
                   <Link to="/tutoriales/automatizacion" className="capability">
-                    <div className="capability-icon automation"></div>
+                    <div className="capability-icon automation" />
                     <div className="capability-name">AUTOMATIZACIÓN</div>
                   </Link>
                   <Link to="/tutoriales/aprendizaje" className="capability">
-                    <div className="capability-icon learning"></div>
+                    <div className="capability-icon learning" />
                     <div className="capability-name">APRENDIZAJE</div>
                   </Link>
                   <Link to="/tutoriales/flujos" className="capability">
-                    <div className="capability-icon workflow"></div>
+                    <div className="capability-icon workflow" />
                     <div className="capability-name">FLUJOS</div>
                   </Link>
                   <Link to="/tutoriales/expansion" className="capability">
-                    <div className="capability-icon expansion"></div>
+                    <div className="capability-icon expansion" />
                     <div className="capability-name">EXPANSIÓN</div>
                   </Link>
                 </motion.div>
 
                 <motion.p className="about-text-glow">
                   <span className="code-line">{'>'} Mensaje del Pluniverse:</span>
-                  "El Pluniverse se construye con cada flujo que activas."
+                  &quot;El Pluniverse se construye con cada flujo que activas.&quot;
                 </motion.p>
 
                 {/* Botón actualizado para enlazar a FAQ */}
@@ -318,7 +321,7 @@ const Tutoriales = () => {
                       whileHover="hover"
                       whileTap="tap"
                     >
-                      <span className="button-glow"></span>
+                      <span className="button-glow" />
                       VER PREGUNTAS FRECUENTES
                       <div className="button-icon">▶</div>
                     </motion.button>
@@ -331,9 +334,9 @@ const Tutoriales = () => {
 
         {/* Elementos de interfaz */}
         <div className="interface-elements">
-          <div className="interface-dot"></div>
-          <div className="interface-dot"></div>
-          <div className="interface-dot"></div>
+          <div className="interface-dot" />
+          <div className="interface-dot" />
+          <div className="interface-dot" />
         </div>
       </div>
 

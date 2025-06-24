@@ -16,7 +16,7 @@ const ContextMenu = React.forwardRef(({ items, position, onClose, options, child
     }
   };
 
-  const isContextMenuMode = !!position;
+  const isContextMenuMode = Boolean(position);
 
   useEffect(() => {
     if (isContextMenuMode && onClose) {
@@ -25,16 +25,16 @@ const ContextMenu = React.forwardRef(({ items, position, onClose, options, child
           onClose();
         }
       };
-      
+
       const handleKeyDown = (event) => {
         if (event.key === 'Escape') {
           onClose();
         }
       };
-      
+
       document.addEventListener('mousedown', handleClickOutside);
       document.addEventListener('keydown', handleKeyDown);
-      
+
       return () => {
         document.removeEventListener('mousedown', handleClickOutside);
         document.removeEventListener('keydown', handleKeyDown);
@@ -57,7 +57,7 @@ const ContextMenu = React.forwardRef(({ items, position, onClose, options, child
   const renderMenu = () => {
     const menuItems = isContextMenuMode ? items : options;
     const pos = isContextMenuMode ? position : menuPosition;
-    
+
     if (!menuItems || menuItems.length === 0 || !pos) return null;
 
     const menuStyle = {
@@ -140,14 +140,14 @@ const ContextMenu = React.forwardRef(({ items, position, onClose, options, child
   }
 
   return (
-    <div 
+    <div
       onContextMenu={handleContextMenu}
-      style={{ 
-        display: 'flex', 
-        flexDirection: 'column', 
-        flexGrow: 1, 
-        width: '100%', 
-        height: '100%' 
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        flexGrow: 1,
+        width: '100%',
+        height: '100%',
       }}
     >
       {children}

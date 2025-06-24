@@ -1,17 +1,21 @@
-import React, { useState, useEffect, useRef } from 'react';
 import { X, Copy, Link, Code, ExternalLink, Settings, Globe, Download, Share2, Award, Zap, Gift, Heart, Star, Trophy } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+
 import useAPI from '@/hooks/useAPI';
+
 import './EmbedModal.css';
 import confetti from 'canvas-confetti';
+
 // Importar el contexto global
 import { useGlobalContext } from '../../../context/GlobalProvider';
+
 import WhatsappIntegrationPanel from './WhatsappIntegrationPanel';
 // Si no tienes canvas-confetti, puedes instalarlo con: npm install canvas-confetti
 
 const EmbedModal = ({ plubotId, plubotName, onClose, onExport, flowData }) => {
   // Usar el contexto global
   const { showNotification, closeModal } = useGlobalContext();
-  
+
   const [embedCode, setEmbedCode] = useState('');
   const [directLink, setDirectLink] = useState('');
   const [qrCode, setQrCode] = useState('');
@@ -23,46 +27,46 @@ const EmbedModal = ({ plubotId, plubotName, onClose, onExport, flowData }) => {
     width: '350px',
     height: '500px',
     primaryColor: '#4facfe',
-    welcomeMessage: '¡Hola! Soy tu asistente virtual.'
+    welcomeMessage: '¡Hola! Soy tu asistente virtual.',
   });
   const { request } = useAPI();
 
   // Referencia para el elemento donde lanzar confetti
   const confettiRef = useRef(null);
-  
+
   // Estado para gamificación
   const [shareCount, setShareCount] = useState(0);
   const [achievements, setAchievements] = useState({
     firstShare: false,
     socialMedia: false,
     embedMaster: false,
-    customizer: false
+    customizer: false,
   });
-  
+
   useEffect(() => {
     if (plubotId) {
       setIsLoading(true);
-      
+
       // Usar la URL completa para el chat
       const chatUrl = `${window.location.origin}/chat/${plubotId}`;
       setDirectLink(chatUrl);
       setEmbedCode(generateEmbedCodeFromData(plubotId, customization));
       setQrCode(`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(chatUrl)}`);
-      
+
       // Lanzar confetti cuando se genera el código
       setTimeout(() => {
         if (confettiRef.current) {
           confetti({
             particleCount: 150,
             spread: 70,
-            origin: { y: 0.6 }
+            origin: { y: 0.6 },
           });
         }
       }, 500);
-      
+
       // No mostrar notificación automática para evitar duplicados
       // La notificación ahora se maneja en EpicHeader al abrir el modal
-      
+
       setIsLoading(false);
     }
   }, [plubotId, customization]);
@@ -101,7 +105,7 @@ const EmbedModal = ({ plubotId, plubotName, onClose, onExport, flowData }) => {
     setDirectLink(`${baseUrl}/chat/${plubotId}`);
     setEmbedCode(generateEmbedCodeFromData(plubotId, customization, baseUrl));
     setQrCode(`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(baseUrl)}/chat/${plubotId}`);
-    
+
     // Mostrar notificación informativa
     showNotification('Usando ID real del Plubot para el embebido.', 'info');
   };
@@ -127,30 +131,30 @@ const EmbedModal = ({ plubotId, plubotName, onClose, onExport, flowData }) => {
         // Incrementar contador de comparticiones y usar el valor actualizado para logros
         const newCount = shareCount + 1;
         setShareCount(newCount);
-        
+
         // Verificar logros
-        const newAchievements = {...achievements};
-        
+        const newAchievements = { ...achievements };
+
         if (!newAchievements.firstShare) {
           newAchievements.firstShare = true;
           showNotification('¡Logro desbloqueado! Primera compartición', 'achievement');
-          
+
           // Lanzar confetti para celebrar el logro
           confetti({
             particleCount: 150,
             spread: 100,
             origin: { y: 0.6 },
-            colors: ['#FFD700', '#FFA500', '#FF4500']
+            colors: ['#FFD700', '#FFA500', '#FF4500'],
           });
         }
-        
+
         if (newCount >= 5 && !newAchievements.embedMaster) {
           newAchievements.embedMaster = true;
           showNotification('¡Logro desbloqueado! Maestro del Embebido', 'achievement');
         }
-        
+
         setAchievements(newAchievements);
-        
+
         showNotification(`${type} copiado al portapapeles! ¡Comparte tu creación!`, 'success');
       })
       .catch(err => {
@@ -161,7 +165,7 @@ const EmbedModal = ({ plubotId, plubotName, onClose, onExport, flowData }) => {
   const handleCustomizationChange = (key, value) => {
     setCustomization(prev => ({
       ...prev,
-      [key]: value
+      [key]: value,
     }));
   };
 
@@ -171,7 +175,7 @@ const EmbedModal = ({ plubotId, plubotName, onClose, onExport, flowData }) => {
     const renderStars = () => {
       const stars = [];
       const starCount = 100; // Cantidad de estrellas
-      
+
       for (let i = 0; i < starCount; i++) {
         // Tamaño aleatorio para las estrellas
         const size = Math.random() * 3 + 1;
@@ -179,17 +183,17 @@ const EmbedModal = ({ plubotId, plubotName, onClose, onExport, flowData }) => {
         const colors = ['#fff', '#8df9ff', '#c8f4ff', '#e6fbff', '#d9e8ff'];
         const color = colors[Math.floor(Math.random() * colors.length)];
         // Duración del parpadeo
-        const twinkleDuration = 3 + Math.random() * 7 + 's';
+        const twinkleDuration = `${3 + Math.random() * 7}s`;
         // Retraso del parpadeo
-        const twinkleDelay = Math.random() * 10 + 's';
+        const twinkleDelay = `${Math.random() * 10}s`;
         // Opacidad base
         const opacity = 0.3 + Math.random() * 0.7;
         // Tamaño del brillo
         const glowSize = size * (1 + Math.random());
-        
+
         stars.push(
-          <div 
-            key={`star-${i}`} 
+          <div
+            key={`star-${i}`}
             className="star"
             style={{
               left: `${Math.random() * 100}%`,
@@ -200,21 +204,21 @@ const EmbedModal = ({ plubotId, plubotName, onClose, onExport, flowData }) => {
               '--twinkle-delay': twinkleDelay,
               '--glow-size': `${glowSize}px`,
               '--glow-color': color,
-              backgroundColor: color
+              backgroundColor: color,
             }}
-          />
+          />,
         );
       }
-      
+
       return stars;
     };
-    
+
     return (
       <div className="stars-container">
         {renderStars()}
-        <div className="nebula nebula-1"></div>
-        <div className="nebula nebula-2"></div>
-        <div className="nebula nebula-3"></div>
+        <div className="nebula nebula-1" />
+        <div className="nebula nebula-2" />
+        <div className="nebula nebula-3" />
       </div>
     );
   };
@@ -225,8 +229,8 @@ const EmbedModal = ({ plubotId, plubotName, onClose, onExport, flowData }) => {
       <div className="embed-modal">
         <div className="embed-modal-header">
           <h2><Share2 size={24} className="share-icon" /> ¡Comparte tu Plubot!</h2>
-          <button 
-            className="embed-modal-close-button" 
+          <button
+            className="embed-modal-close-button"
             aria-label="Cerrar modal"
             onClick={() => {
               if (closeModal) {
@@ -264,7 +268,7 @@ const EmbedModal = ({ plubotId, plubotName, onClose, onExport, flowData }) => {
         </div>
 
         <div className="embed-tabs">
-          <button 
+          <button
             className={`embed-tab-button ${activeTab === 'link' ? 'active' : ''}`}
             onClick={() => {
               setActiveTab('link');
@@ -272,7 +276,7 @@ const EmbedModal = ({ plubotId, plubotName, onClose, onExport, flowData }) => {
                 confetti({
                   particleCount: 30,
                   spread: 50,
-                  origin: { y: 0.6 }
+                  origin: { y: 0.6 },
                 });
               }
             }}
@@ -280,7 +284,7 @@ const EmbedModal = ({ plubotId, plubotName, onClose, onExport, flowData }) => {
             <Link size={18} />
             Enlace Directo
           </button>
-          <button 
+          <button
             className={`embed-tab-button ${activeTab === 'embed' ? 'active' : ''}`}
             onClick={() => {
               setActiveTab('embed');
@@ -288,7 +292,7 @@ const EmbedModal = ({ plubotId, plubotName, onClose, onExport, flowData }) => {
                 confetti({
                   particleCount: 30,
                   spread: 50,
-                  origin: { y: 0.6 }
+                  origin: { y: 0.6 },
                 });
               }
             }}
@@ -296,19 +300,19 @@ const EmbedModal = ({ plubotId, plubotName, onClose, onExport, flowData }) => {
             <Code size={18} />
             Código Embebido
           </button>
-          <button 
+          <button
             className={`embed-tab-button ${activeTab === 'customize' ? 'active' : ''}`}
             onClick={() => {
               setActiveTab('customize');
               // Desbloquear logro de personalización al visitar esta pestaña
               if (!achievements.customizer) {
-                const newAchievements = {...achievements, customizer: true};
+                const newAchievements = { ...achievements, customizer: true };
                 setAchievements(newAchievements);
                 confetti({
                   particleCount: 100,
                   spread: 70,
                   origin: { y: 0.6 },
-                  colors: ['#4facfe', '#00f2fe', '#00c6fb']
+                  colors: ['#4facfe', '#00f2fe', '#00c6fb'],
                 });
               }
             }}
@@ -316,14 +320,14 @@ const EmbedModal = ({ plubotId, plubotName, onClose, onExport, flowData }) => {
             <Settings size={18} />
             Personalizar
           </button>
-          <button 
+          <button
             className={`embed-tab-button ${activeTab === 'qr' ? 'active' : ''}`}
             onClick={() => setActiveTab('qr')}
           >
             <Globe size={18} />
             Código QR
           </button>
-          <button 
+          <button
             className={`embed-tab-button ${activeTab === 'whatsapp' ? 'active' : ''}`}
             onClick={() => setActiveTab('whatsapp')}
           >
@@ -335,7 +339,7 @@ const EmbedModal = ({ plubotId, plubotName, onClose, onExport, flowData }) => {
         <div className="embed-content">
           {isLoading ? (
             <div className="embed-loading">
-              <div className="embed-spinner"></div>
+              <div className="embed-spinner" />
               <p>Generando recursos...</p>
             </div>
           ) : (
@@ -349,9 +353,9 @@ const EmbedModal = ({ plubotId, plubotName, onClose, onExport, flowData }) => {
                     padding: '10px',
                     borderRadius: '5px',
                     marginBottom: '15px',
-                    border: '1px solid #ffeeba'
+                    border: '1px solid #ffeeba',
                   }}>
-                    <p><strong>⚠️ Aviso importante:</strong> Actualmente hay un problema técnico con el acceso directo al chat embebido. 
+                    <p><strong>⚠️ Aviso importante:</strong> Actualmente hay un problema técnico con el acceso directo al chat embebido.
                     Estamos trabajando para solucionarlo. Mientras tanto, puedes acceder al chat de las siguientes maneras:</p>
                     <ul style={{ paddingLeft: '20px', marginTop: '5px' }}>
                       <li>Desde la página principal, navega a "Mis Plubots" y selecciona este Plubot</li>
@@ -360,13 +364,13 @@ const EmbedModal = ({ plubotId, plubotName, onClose, onExport, flowData }) => {
                   </div>
                   <p>Comparte este enlace para que cualquier persona pueda acceder a tu Plubot:</p>
                   <div className="embed-code-container">
-                    <input 
-                      type="text" 
-                      value={directLink} 
-                      readOnly 
+                    <input
+                      type="text"
+                      value={directLink}
+                      readOnly
                       className="embed-code-input"
                     />
-                    <button 
+                    <button
                       className="embed-copy-button"
                       onClick={() => copyToClipboard(directLink, 'Enlace')}
                     >
@@ -377,17 +381,17 @@ const EmbedModal = ({ plubotId, plubotName, onClose, onExport, flowData }) => {
                     <h4>Vista previa</h4>
                     <div className="embed-link-preview">
                       <div className="embed-preview-header">
-                        <div className="embed-preview-icon"></div>
+                        <div className="embed-preview-icon" />
                         <div className="embed-preview-title">{plubotName}</div>
                       </div>
                       <div className="embed-preview-body">
                         <p>Chatbot creado con Plubot</p>
-                        <a 
+                        <a
                           onClick={(e) => {
                             e.preventDefault();
                             // Usar window.location.href para forzar una navegación completa
                             window.location.href = directLink;
-                          }} 
+                          }}
                           style={{ cursor: 'pointer' }}
                           className="embed-preview-link"
                         >
@@ -404,12 +408,12 @@ const EmbedModal = ({ plubotId, plubotName, onClose, onExport, flowData }) => {
                   <h3>Código Embebido</h3>
                   <p>Copia este código HTML y pégalo en tu sitio web para integrar el Plubot:</p>
                   <div className="embed-code-container">
-                    <textarea 
-                      value={embedCode} 
-                      readOnly 
+                    <textarea
+                      value={embedCode}
+                      readOnly
                       className="embed-code-textarea"
                     />
-                    <button 
+                    <button
                       className="embed-copy-button"
                       onClick={() => copyToClipboard(embedCode, 'Código')}
                     >
@@ -422,7 +426,7 @@ const EmbedModal = ({ plubotId, plubotName, onClose, onExport, flowData }) => {
                       width: customization.width,
                       height: customization.height,
                       maxWidth: '100%',
-                      position: 'relative'
+                      position: 'relative',
                     }}>
                       <div className="embed-widget-header" style={{ backgroundColor: customization.primaryColor }}>
                         <div className="embed-widget-title">{plubotName}</div>
@@ -452,7 +456,7 @@ const EmbedModal = ({ plubotId, plubotName, onClose, onExport, flowData }) => {
                         <p>No se pudo generar el código QR</p>
                       </div>
                     )}
-                    <button 
+                    <button
                       className="embed-download-button"
                       onClick={() => {
                         if (qrCode) {
@@ -482,7 +486,7 @@ const EmbedModal = ({ plubotId, plubotName, onClose, onExport, flowData }) => {
                   <h3>Exportar Flujo</h3>
                   <p>Exporta tu flujo en formato JSON para respaldarlo o compartirlo con otros usuarios:</p>
                   <div className="embed-export-actions" style={{ marginTop: '20px', display: 'flex', justifyContent: 'center' }}>
-                    <button 
+                    <button
                       className="embed-action-button primary"
                       style={{ padding: '10px 20px', display: 'flex', alignItems: 'center', gap: '8px' }}
                       onClick={onExport}
@@ -510,7 +514,7 @@ const EmbedModal = ({ plubotId, plubotName, onClose, onExport, flowData }) => {
                   <div className="embed-customize-form">
                     <div className="embed-form-group">
                       <label>Tema:</label>
-                      <select 
+                      <select
                         value={customization.theme}
                         onChange={(e) => handleCustomizationChange('theme', e.target.value)}
                       >
@@ -521,7 +525,7 @@ const EmbedModal = ({ plubotId, plubotName, onClose, onExport, flowData }) => {
                     </div>
                     <div className="embed-form-group">
                       <label>Posición:</label>
-                      <select 
+                      <select
                         value={customization.position}
                         onChange={(e) => handleCustomizationChange('position', e.target.value)}
                       >
@@ -532,31 +536,31 @@ const EmbedModal = ({ plubotId, plubotName, onClose, onExport, flowData }) => {
                     </div>
                     <div className="embed-form-group">
                       <label>Ancho:</label>
-                      <input 
-                        type="text" 
+                      <input
+                        type="text"
                         value={customization.width}
                         onChange={(e) => handleCustomizationChange('width', e.target.value)}
                       />
                     </div>
                     <div className="embed-form-group">
                       <label>Alto:</label>
-                      <input 
-                        type="text" 
+                      <input
+                        type="text"
                         value={customization.height}
                         onChange={(e) => handleCustomizationChange('height', e.target.value)}
                       />
                     </div>
                     <div className="embed-form-group">
                       <label>Color Primario:</label>
-                      <input 
-                        type="color" 
+                      <input
+                        type="color"
                         value={customization.primaryColor}
                         onChange={(e) => handleCustomizationChange('primaryColor', e.target.value)}
                       />
                     </div>
                     <div className="embed-form-group">
                       <label>Mensaje de Bienvenida:</label>
-                      <textarea 
+                      <textarea
                         value={customization.welcomeMessage}
                         onChange={(e) => handleCustomizationChange('welcomeMessage', e.target.value)}
                       />
@@ -572,7 +576,7 @@ const EmbedModal = ({ plubotId, plubotName, onClose, onExport, flowData }) => {
           <button className="embed-action-button secondary" onClick={onClose}>
             Cerrar
           </button>
-          <button 
+          <button
             className="embed-action-button primary"
             onClick={() => {
               if (activeTab === 'link') {

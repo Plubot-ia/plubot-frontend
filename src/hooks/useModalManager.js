@@ -17,24 +17,24 @@ const ModalContext = createContext();
 export const ModalProvider = ({ children }) => {
   // Estado central para todos los modales de la aplicaciu00f3n
   const [modals, setModals] = useState({});
-  
+
   // Historial de modales para gestionar la navegaciu00f3n entre ellos
   const [modalHistory, setModalHistory] = useState([]);
-  
+
   // Contador para generar IDs u00fanicos para modales dinu00e1micos
   const [idCounter, setIdCounter] = useState(1);
-  
+
   // Estado para controlar si hay algu00fan modal bloqueante activo
   const [hasBlockingModal, setHasBlockingModal] = useState(false);
-  
+
   // Efecto para actualizar el estado de bloqueo basado en modales activos
   useEffect(() => {
-    const blocking = Object.values(modals).some(modal => 
-      modal.isOpen && modal.blocking
+    const blocking = Object.values(modals).some(modal =>
+      modal.isOpen && modal.blocking,
     );
     setHasBlockingModal(blocking);
   }, [modals]);
-  
+
   /**
    * Registra un nuevo modal en el sistema
    * @param {string} id - Identificador u00fanico del modal
@@ -47,7 +47,7 @@ export const ModalProvider = ({ children }) => {
    */
   const registerModal = useCallback((id = null, options = {}) => {
     const modalId = id || `modal-${idCounter}`;
-    
+
     setModals(prev => {
       // Si el modal ya existe, solo actualizar sus opciones
       if (prev[modalId]) {
@@ -56,10 +56,10 @@ export const ModalProvider = ({ children }) => {
           [modalId]: {
             ...prev[modalId],
             ...options,
-          }
+          },
         };
       }
-      
+
       // Si es un modal nuevo, crear su configuraciu00f3n completa
       return {
         ...prev,
@@ -71,18 +71,18 @@ export const ModalProvider = ({ children }) => {
           zIndex: options.zIndex || 1000,
           size: options.size || 'medium',
           onBeforeClose: options.onBeforeClose || null,
-          history: options.preserveHistory || false
-        }
+          history: options.preserveHistory || false,
+        },
       };
     });
-    
+
     if (!id) {
       setIdCounter(prev => prev + 1);
     }
-    
+
     return modalId;
   }, [idCounter]);
-  
+
   /**
    * Abre un modal especu00edfico
    * @param {string} id - ID del modal a abrir
@@ -92,23 +92,23 @@ export const ModalProvider = ({ children }) => {
     if (!modals[id]) {
       return;
     }
-    
+
     // Actualizar el modal especu00edfico
     setModals(prev => ({
       ...prev,
       [id]: {
         ...prev[id],
         isOpen: true,
-        data
-      }
+        data,
+      },
     }));
-    
+
     // Au00f1adir al historial si corresponde
     if (modals[id].history) {
       setModalHistory(prev => [...prev, { id, data }]);
     }
   }, [modals]);
-  
+
   /**
    * Cierra un modal especu00edfico
    * @param {string} id - ID del modal a cerrar
@@ -118,7 +118,7 @@ export const ModalProvider = ({ children }) => {
     if (!modals[id]) {
       return;
     }
-    
+
     // Ejecutar funciu00f3n onBeforeClose si existe
     const modal = modals[id];
     if (modal.onBeforeClose) {
@@ -132,23 +132,23 @@ export const ModalProvider = ({ children }) => {
         // Continuar con el cierre a pesar del error
       }
     }
-    
+
     // Actualizar el estado del modal
     setModals(prev => ({
       ...prev,
       [id]: {
         ...prev[id],
         isOpen: false,
-        data: null
-      }
+        data: null,
+      },
     }));
-    
+
     // Actualizar historial si corresponde
     if (modal.history) {
       setModalHistory(prev => prev.filter(item => item.id !== id));
     }
   }, [modals]);
-  
+
   /**
    * Cierra todos los modales abiertos
    */
@@ -157,16 +157,16 @@ export const ModalProvider = ({ children }) => {
     const openModalIds = Object.entries(modals)
       .filter(([_, modal]) => modal.isOpen)
       .map(([id]) => id);
-    
+
     // Cerrar cada modal abierto
     openModalIds.forEach(id => {
       closeModal(id);
     });
-    
+
     // Limpiar historial
     setModalHistory([]);
   }, [modals, closeModal]);
-  
+
   /**
    * Obtiene datos sobre el estado de un modal
    * @param {string} id - ID del modal
@@ -175,7 +175,7 @@ export const ModalProvider = ({ children }) => {
   const getModalState = useCallback((id) => {
     return modals[id] || null;
   }, [modals]);
-  
+
   // Crear el objeto de valor del contexto
   const contextValue = useMemo(() => ({
     modals,
@@ -185,9 +185,9 @@ export const ModalProvider = ({ children }) => {
     openModal,
     closeModal,
     closeAllModals,
-    getModalState
+    getModalState,
   }), [modals, modalHistory, hasBlockingModal, registerModal, openModal, closeModal, closeAllModals, getModalState]);
-  
+
   return (
     <ModalContext.Provider value={contextValue}>
       {children}

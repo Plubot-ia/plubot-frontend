@@ -1,7 +1,10 @@
 // hooks/useGoogleSheets.js
 import { useState, useEffect } from 'react';
-import useAPI from './useAPI';
+
 import useAuthStore from '@/stores/useAuthStore';
+
+import useAPI from './useAPI';
+
 
 const useGoogleSheets = () => {
   const [loading, setLoading] = useState(false);
@@ -13,13 +16,13 @@ const useGoogleSheets = () => {
   const connectGoogleSheets = async (credentials) => {
     setLoading(true);
     setError(null);
-    
+
     try {
       const response = await axiosInstance.post('integrations/google/sheets/connect', {
         user_id: user.id,
-        credentials: credentials
+        credentials,
       });
-      
+
       setLoading(false);
       return response.data;
     } catch (err) {
@@ -32,14 +35,14 @@ const useGoogleSheets = () => {
   const fetchSheetData = async (spreadsheetId, range = 'A1:Z1000') => {
     setLoading(true);
     setError(null);
-    
+
     try {
       const response = await axiosInstance.post('integrations/google/sheets/data', {
         user_id: user.id,
         spreadsheet_id: spreadsheetId,
-        range: range
+        range,
       });
-      
+
       setSheetsData(response.data);
       setLoading(false);
       return response.data;
@@ -55,7 +58,7 @@ const useGoogleSheets = () => {
     error,
     sheetsData,
     connectGoogleSheets,
-    fetchSheetData
+    fetchSheetData,
   };
 };
 

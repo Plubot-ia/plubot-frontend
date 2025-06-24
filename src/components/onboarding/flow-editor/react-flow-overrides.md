@@ -18,20 +18,7 @@ Garantizar que **todos los nodos y handles** sean visibles y clicables. Corrige 
 
 ---
 
-## 2. `fix-overflow.css`
-**Propósito:**
-Elimina scrolls y márgenes indeseados, asegurando que el editor ocupe **toda la ventana** y que ByteAssistant y otros overlays no desplazen el layout.
-
-**Reglas clave:**
-* `.flow-editor-container`, `.flow-main-wrapper` y `.reactflow-wrapper` a `width/height: 100%`, `overflow: hidden`.
-* Posiciona `.ts-byte-assistant` como `fixed` con `z-index: 9999` para no empujar contenido.
-* Obliga `overflow-x: hidden` en `body`.
-
-**Consecuencias de removerlo:** Scroll horizontal, barra superior fuera de escala y elementos como ByteAssistant moviendo el canvas.
-
----
-
-## 3. `fix-overlay.css`
+## 2. `fix-overlay.css`
 **Propósito:**
 Normaliza overlays y loaders para que no cubran ni distorsionen nodos; evita reglas destructivas que oscurecían toda la UI.
 
@@ -44,7 +31,7 @@ Normaliza overlays y loaders para que no cubran ni distorsionen nodos; evita reg
 
 ---
 
-## 4. `fix-transform-override.css`
+## 3. `fix-transform-override.css`
 **Propósito:**
 Soluciona el _apilamiento de nodos en la esquina superior izquierda_ causado por reglas que anulaban `transform` del viewport.
 

@@ -1,8 +1,11 @@
-import React, { useState, useEffect, useRef } from 'react';
-import useWindowSize from '../../hooks/useWindowSize';
 import { motion, AnimatePresence } from 'framer-motion';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+
 import byteAvatar from '@assets/img/byte.png';
+
+
+import useWindowSize from '../../hooks/useWindowSize';
 import './TutorialesExpansion.css';
 
 const TutorialesExpansion = () => {
@@ -16,11 +19,11 @@ const TutorialesExpansion = () => {
   const navigate = useNavigate();
 
   const phrases = [
-    "Expande tu Plubot al siguiente nivel.",
-    "Comparte tu visión en el PluBazaar.",
-    "Haz crecer el Pluniverse con aliados.",
-    "Compite en el Coliseo de Productividad.",
-    "Desbloquea poderes premium para tu bot."
+    'Expande tu Plubot al siguiente nivel.',
+    'Comparte tu visión en el PluBazaar.',
+    'Haz crecer el Pluniverse con aliados.',
+    'Compite en el Coliseo de Productividad.',
+    'Desbloquea poderes premium para tu bot.',
   ];
 
   const [phraseIndex, setPhraseIndex] = useState(0);
@@ -83,7 +86,7 @@ const TutorialesExpansion = () => {
     });
   };
 
-    useEffect(() => {
+  useEffect(() => {
     window.addEventListener('scroll', handleScroll);
     handleScroll(); // Llamada inicial
     return () => window.removeEventListener('scroll', handleScroll);
@@ -106,13 +109,13 @@ const TutorialesExpansion = () => {
 
   const buttonVariants = {
     hover: { scale: 1.08, boxShadow: '0 0 20px rgba(255, 0, 255, 0.8)' },
-    tap: { scale: 0.95 }
+    tap: { scale: 0.95 },
   };
 
   const expandableContentVariants = {
     hidden: { opacity: 0, y: 30, scale: 0.95 },
     visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.7 } },
-    exit: { opacity: 0, y: 30, scale: 0.95, transition: { duration: 0.5 } }
+    exit: { opacity: 0, y: 30, scale: 0.95, transition: { duration: 0.5 } },
   };
 
   return (
@@ -155,10 +158,10 @@ const TutorialesExpansion = () => {
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
         >
-          <div className="card-corner top-left"></div>
-          <div className="card-corner top-right"></div>
-          <div className="card-corner bottom-left"></div>
-          <div className="card-corner bottom-right"></div>
+          <div className="card-corner top-left" />
+          <div className="card-corner top-right" />
+          <div className="card-corner bottom-left" />
+          <div className="card-corner bottom-right" />
 
           <motion.div
             className="byte-floating hologram-effect"
@@ -175,9 +178,9 @@ const TutorialesExpansion = () => {
             <div className="avatar-container">
               <img src={byteAvatar} alt="Byte" className="byte-avatar" />
               <div className="avatar-rings">
-                <div className="ring ring1"></div>
-                <div className="ring ring2"></div>
-                <div className="ring ring3"></div>
+                <div className="ring ring1" />
+                <div className="ring ring2" />
+                <div className="ring ring3" />
               </div>
             </div>
 
@@ -190,10 +193,10 @@ const TutorialesExpansion = () => {
                 exit={{ opacity: 0, y: -15 }}
                 transition={{ duration: 0.8 }}
               >
-                <div className="dialog-corner tl"></div>
-                <div className="dialog-corner tr"></div>
-                <div className="dialog-corner bl"></div>
-                <div className="dialog-corner br"></div>
+                <div className="dialog-corner tl" />
+                <div className="dialog-corner tr" />
+                <div className="dialog-corner bl" />
+                <div className="dialog-corner br" />
                 {phrases[phraseIndex]}
               </motion.div>
             </AnimatePresence>
@@ -244,7 +247,7 @@ const TutorialesExpansion = () => {
               playActivationSound();
             }}
           >
-            <span className="button-glow"></span>
+            <span className="button-glow" />
             <span className="button-text">
               {showMore ? 'CERRAR DATOS' : 'ACTIVAR DATOS'}
             </span>
@@ -263,12 +266,12 @@ const TutorialesExpansion = () => {
                 exit="exit"
               >
                 <div className="terminal-header">
-                  <div className="terminal-icon"></div>
+                  <div className="terminal-icon" />
                   <div className="terminal-title">EXPANSION.PROTOCOL</div>
                   <div className="terminal-controls">
-                    <span></span>
-                    <span></span>
-                    <span></span>
+                    <span />
+                    <span />
+                    <span />
                   </div>
                 </div>
 
@@ -328,7 +331,7 @@ const TutorialesExpansion = () => {
                       playActivationSound();
                     }}
                   >
-                    <span className="button-glow"></span>
+                    <span className="button-glow" />
                     VISITA EL PLUBAZAAR
                     <div className="button-icon">▶</div>
                   </motion.button>
@@ -339,9 +342,9 @@ const TutorialesExpansion = () => {
         </motion.div>
 
         <div className="interface-elements">
-          <div className="interface-dot"></div>
-          <div className="interface-dot"></div>
-          <div className="interface-dot"></div>
+          <div className="interface-dot" />
+          <div className="interface-dot" />
+          <div className="interface-dot" />
         </div>
       </div>
     </div>

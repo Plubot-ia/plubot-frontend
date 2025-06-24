@@ -1,11 +1,10 @@
+import { MoreHorizontal, Edit2, X, Plus, ChevronDown, ChevronUp } from 'lucide-react';
+import PropTypes from 'prop-types';
 import React, { useState, useEffect, useRef, useCallback, useMemo, memo } from 'react';
 import { Handle, Position } from 'reactflow';
-import PropTypes from 'prop-types';
-import { MoreHorizontal, Edit2, X, Plus, ChevronDown, ChevronUp } from 'lucide-react';
 import { shallow } from 'zustand/shallow';
 
 import { usePermissions } from '@/hooks/usePermissions';
-
 import useFlowStore from '@/stores/useFlowStore';
 import './ActionNode.css';
 
@@ -82,7 +81,7 @@ const ParameterFields = memo(({ actionType, parameters, onParameterChange }) => 
         </div>
       );
     },
-    [parameters, onParameterChange]
+    [parameters, onParameterChange],
   );
 
   switch (actionType) {
@@ -210,7 +209,6 @@ ParameterFields.propTypes = {
 };
 
 
-
 const ActionNodeRoot = ({ isConnectable = true, selected = false, id }) => {
   const nodeRef = useRef(null);
   const textareaRef = useRef(null);
@@ -229,7 +227,7 @@ const ActionNodeRoot = ({ isConnectable = true, selected = false, id }) => {
         lodLevel: node?.data?.lodLevel,
       };
     },
-    [id]
+    [id],
   );
 
   const { description, actionType, parameters, isCollapsed, lodLevel } = useFlowStore(selector, shallow);
@@ -290,7 +288,7 @@ const ActionNodeRoot = ({ isConnectable = true, selected = false, id }) => {
         handleCancelEditing();
       }
     },
-    [handleSaveChanges, handleCancelEditing]
+    [handleSaveChanges, handleCancelEditing],
   );
 
   const handleParameterChange = useCallback((key, value) => {
@@ -302,7 +300,7 @@ const ActionNodeRoot = ({ isConnectable = true, selected = false, id }) => {
       e.stopPropagation();
       updateNode(id, { isCollapsed: !isCollapsed });
     },
-    [id, isCollapsed, updateNode]
+    [id, isCollapsed, updateNode],
   );
 
   const handleContextMenu = useCallback((e) => {
@@ -341,7 +339,7 @@ const ActionNodeRoot = ({ isConnectable = true, selected = false, id }) => {
         isDestructive: true,
       },
     ],
-    [startEditing, permissions.canEdit, permissions.canDelete, id, deleteNode, isEditing]
+    [startEditing, permissions.canEdit, permissions.canDelete, id, deleteNode, isEditing],
   );
 
   return (

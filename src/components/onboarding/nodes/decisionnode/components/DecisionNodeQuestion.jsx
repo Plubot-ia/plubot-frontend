@@ -3,9 +3,10 @@
  * @description Componente para editar la pregunta del nodo de decisión
  */
 
-import React, { memo, useRef, useEffect, useCallback, useState } from 'react';
-import PropTypes from 'prop-types';
 import { X, Save, Check } from 'lucide-react';
+import PropTypes from 'prop-types';
+import React, { memo, useRef, useEffect, useCallback, useState } from 'react';
+
 import Tooltip from '../../../ui/ToolTip';
 import { NODE_CONFIG } from '../DecisionNode.types';
 
@@ -26,27 +27,27 @@ const ReactMarkdown = React.lazy(() => import('../../../../../lib/simplified-mar
  * @param {boolean} props.isUltraPerformanceMode - Indica si está en modo ultra rendimiento
  * @returns {JSX.Element} - Editor de pregunta del nodo
  */
-const DecisionNodeQuestion = memo(({ 
-  question, 
-  onQuestionChange, 
-  isEditing, 
-  onStartEditing, 
-  onSave, 
+const DecisionNodeQuestion = memo(({
+  question,
+  onQuestionChange,
+  isEditing,
+  onStartEditing,
+  onSave,
   onCancel,
   isSaving = false,
   enableMarkdown = false,
   enableVariables = false, // Asegurarse de que se recibe y se usa
-  isUltraPerformanceMode = false
+  isUltraPerformanceMode = false,
 }) => {
   const textareaRef = useRef(null);
   // Usar estado local para el input para evitar problemas de renderizado
   const [localQuestion, setLocalQuestion] = useState(question);
-  
+
   // Sincronizar el estado local con el prop cuando cambia externamente
   useEffect(() => {
     setLocalQuestion(question);
   }, [question]);
-  
+
   // Ajustar altura del textarea y enfocar cuando se inicia la edición
   useEffect(() => {
     if (isEditing && textareaRef.current) {
@@ -58,22 +59,22 @@ const DecisionNodeQuestion = memo(({
       });
     }
   }, [isEditing]);
-  
+
   // Manejar cambios en el textarea usando estado local
   const handleChange = useCallback((e) => {
     const newValue = e.target.value;
     setLocalQuestion(newValue); // Actualizar estado local inmediatamente
-    
+
     // Propagar el cambio al componente padre
     onQuestionChange(newValue);
-    
+
     // Ajustar la altura del textarea dinámicamente
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto';
       textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, NODE_CONFIG.MAX_TEXTAREA_HEIGHT || 300)}px`;
     }
   }, [onQuestionChange]);
-  
+
   // Manejar teclas al editar
   const handleKeyDown = useCallback((e) => {
     if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
@@ -84,24 +85,23 @@ const DecisionNodeQuestion = memo(({
       onCancel();
     }
   }, [onSave, onCancel]);
-  
+
   // Renderizar contenido según modo
   const renderContent = () => {
     if (isEditing) {
       return (
-        <div className="decision-node__question-wrapper">
+        <div className="decision-node__question-wrapper nodrag">
           <textarea
             ref={textareaRef}
             className="decision-node__question-input"
             value={localQuestion}
             onChange={handleChange}
             onKeyDown={handleKeyDown}
-            onMouseDown={(e) => e.stopPropagation()} // Evitar que el drag del nodo interfiera con la selección de texto
             placeholder={NODE_CONFIG.DEFAULT_QUESTION}
             aria-label={NODE_CONFIG.ARIA_LABELS.question}
             disabled={isSaving}
           />
-          
+
           <div className="decision-node__actions-toolbar">
             <Tooltip content={`Cancelar (${NODE_CONFIG.KEY_SHORTCUTS.cancel.key})`} position="top">
               <button
@@ -122,7 +122,7 @@ const DecisionNodeQuestion = memo(({
                 aria-label={NODE_CONFIG.ARIA_LABELS.saveChanges}
                 aria-keyshortcuts="Control+Enter Meta+Enter"
                 disabled={isSaving}
-                type="submit" 
+                type="submit"
               >
                 <Check size={14} />
                 <span>{isSaving ? 'Guardando...' : 'Guardar'}</span>
@@ -132,14 +132,14 @@ const DecisionNodeQuestion = memo(({
         </div>
       );
     }
-    
+
     // En modo visualización
     return (
-      <div 
+      <div
         className="decision-node__question-wrapper"
         onClick={!isUltraPerformanceMode ? onStartEditing : undefined}
       >
-        <div 
+        <div
           className="decision-node__question"
           role="button"
           tabIndex={0}
@@ -161,13 +161,13 @@ const DecisionNodeQuestion = memo(({
           ) : (
             question
           )}
-          {/* Nota: Si enableMarkdown y enableVariables están activos, Markdown tiene precedencia. 
+          {/* Nota: Si enableMarkdown y enableVariables están activos, Markdown tiene precedencia.
               Para tener ambos, ReactMarkdown necesitaría un componente personalizado para los spans. */}
         </div>
       </div>
     );
   };
-  
+
   return renderContent();
 });
 
@@ -183,7 +183,7 @@ DecisionNodeQuestion.propTypes = {
   isSaving: PropTypes.bool,
   enableMarkdown: PropTypes.bool,
   enableVariables: PropTypes.bool, // Añadir a propTypes
-  isUltraPerformanceMode: PropTypes.bool
+  isUltraPerformanceMode: PropTypes.bool,
 };
 
 export default DecisionNodeQuestion;

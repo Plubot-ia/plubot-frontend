@@ -1,4 +1,5 @@
 import React from 'react';
+
 import { powers } from '@/data/powers';
 
 /**
@@ -108,7 +109,7 @@ const PlubotDetailsModal = ({ plubot, setModalPlubot, navigate }) => {
           const availablePower = getAvailablePower(plubot.powers || []);
           return availablePower ? (
             <div className="modal-available-power-container">
-              <div className="modal-available-power-bg"></div>
+              <div className="modal-available-power-bg" />
               <p className="modal-available-power-text">
                 ¡Agrega <strong className="modal-available-power-highlight">{availablePower.title}</strong> para desbloquear la capacidad de{' '}
                 {availablePower.description.toLowerCase()}!

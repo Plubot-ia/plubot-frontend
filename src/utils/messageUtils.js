@@ -20,6 +20,7 @@ export const replaceVariablesInMessage = (message, variables) => {
       // Crear una expresión regular para encontrar {{nombre_variable}} o {{ nombre_variable }}
       // Asegura que el nombre de la variable no contenga caracteres especiales de regex sin escapar
       const escapedVarName = variable.name.replace(/[.*+?^${}()|[\\]]/g, '\\$&');
+      // eslint-disable-next-line no-useless-escape
       const regex = new RegExp(`{{\s*${escapedVarName}\s*}}`, 'g');
       const replacement = typeof variable.value === 'string' ? variable.value : '';
       processedText = processedText.replace(regex, replacement);

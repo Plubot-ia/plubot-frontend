@@ -1,28 +1,29 @@
 import React, { useState, useEffect, useCallback, useRef, Suspense, lazy } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import ReactFlow from 'reactflow';
+
 import 'reactflow/dist/style.css';
 import '@/assets/css/hide-watermark.css';
-import { usePlubotCreation } from '@/context/PlubotCreationContext';
+import { shallow } from 'zustand/shallow'; // Importación agregada
+
+
 import { useGamification } from '@/context/GamificationContext';
+import { usePlubotCreation } from '@/context/PlubotCreationContext';
 import useAPI from '@/hooks/useAPI';
-import usePlubotLoader from '@/hooks/usePlubotLoader';
-import { analyzeFlowRoutes, generateNodeSuggestions } from '@/utils/flowValidation';
 import useDebounce from '@/hooks/useDebounce';
+import usePlubotLoader from '@/hooks/usePlubotLoader';
+import { useFlowMeta, useFlowNodesEdges, useUndoRedo } from '@/stores/selectors';
+import useFlowStore from '@/stores/useFlowStore';
+import useTrainingStore from '@/stores/useTrainingStore';
+import { analyzeFlowRoutes, generateNodeSuggestions } from '@/utils/flowValidation';
 import { NODE_TYPES } from '@/utils/nodeConfig'; // Importación añadida para identificar DecisionNodes
 
 // Zustand stores
-import useFlowStore from '@/stores/useFlowStore';
-import useTrainingStore from '@/stores/useTrainingStore';
 
 // NEW optimized Zustand selectors
-import { useFlowMeta, useFlowNodesEdges, useUndoRedo } from '@/stores/selectors';
-import { shallow } from 'zustand/shallow'; // Importación agregada
+
 
 // Componentes de carga inmediata
-import FlowEditor from '../flow-editor/FlowEditor.jsx';
-import EpicHeader from '../common/EpicHeader';
-import StatusBubble from '../common/StatusBubble';
 
 // Componentes con lazy loading
 const NodePalette = lazy(() => import('../common/NodePalette'));
@@ -38,13 +39,19 @@ const TemplateSelector = lazy(() => import('../modals/TemplateSelector'));
 const EmergencyRecovery = lazy(() => import('../flow-editor/components/EmergencyRecovery'));
 
 // Utilidades
-import { backupEdgesToLocalStorage } from '../flow-editor/utils/edgeFixUtil';
+
 import { EDGE_COLORS } from '@/utils/nodeConfig';
+
+import EpicHeader from '../common/EpicHeader';
+import StatusBubble from '../common/StatusBubble';
+import FlowEditor from '../flow-editor/FlowEditor.jsx';
+import { backupEdgesToLocalStorage } from '../flow-editor/utils/edgeFixUtil';
+
 
 // Componente Modal que renderiza un modal específico con envoltura consistente
 const Modal = ({ title, isOpen, onClose, children }) => {
   if (!isOpen) return null;
-  
+
   return (
     <div className="modal-overlay">
       <div className="modal-content">
@@ -59,7 +66,7 @@ const Modal = ({ title, isOpen, onClose, children }) => {
 // Componente para gestionar todos los modales de la aplicación
 const ModalManager = ({ modals, modalProps, onClose }) => {
   const closeModal = (modalName) => () => onClose(modalName);
-  
+
   return (
     <>
       {modals.showConnectionEditor && (
@@ -70,10 +77,10 @@ const ModalManager = ({ modals, modalProps, onClose }) => {
           onClose={closeModal('showConnectionEditor')}
         />
       )}
-      
-      <Modal 
-        title="Sugerencias de Nodos" 
-        isOpen={modals.showSuggestionsModal} 
+
+      <Modal
+        title="Sugerencias de Nodos"
+        isOpen={modals.showSuggestionsModal}
         onClose={closeModal('showSuggestionsModal')}
       >
         <SuggestionsModal
@@ -82,10 +89,10 @@ const ModalManager = ({ modals, modalProps, onClose }) => {
           onAddNode={modalProps.onAddSuggestedNode}
         />
       </Modal>
-      
-      <Modal 
-        title="Seleccionar Plantilla" 
-        isOpen={modals.showTemplateSelector} 
+
+      <Modal
+        title="Seleccionar Plantilla"
+        isOpen={modals.showTemplateSelector}
         onClose={closeModal('showTemplateSelector')}
       >
         <TemplateSelector
@@ -93,10 +100,10 @@ const ModalManager = ({ modals, modalProps, onClose }) => {
           onClose={closeModal('showTemplateSelector')}
         />
       </Modal>
-      
-      <Modal 
-        title="Exportar Flujo" 
-        isOpen={modals.showExportMode} 
+
+      <Modal
+        title="Exportar Flujo"
+        isOpen={modals.showExportMode}
         onClose={closeModal('showExportMode')}
       >
         <ImportExportModal
@@ -106,10 +113,10 @@ const ModalManager = ({ modals, modalProps, onClose }) => {
           onClose={closeModal('showExportMode')}
         />
       </Modal>
-      
-      <Modal 
-        title="Incrustar Plubot" 
-        isOpen={modals.showEmbedModal} 
+
+      <Modal
+        title="Incrustar Plubot"
+        isOpen={modals.showEmbedModal}
         onClose={closeModal('showEmbedModal')}
       >
         <EmbedModal
@@ -128,22 +135,22 @@ const ModalManager = ({ modals, modalProps, onClose }) => {
 const extractPlubotIdFromUrl = (searchParams, pathname) => {
   // Primero intenta obtener el ID de los parámetros de la URL
   let plubotId = searchParams.get('plubotId');
-  
+
   // Si no hay ID en los parámetros, intenta obtenerlo de la ruta
   if (!plubotId) {
     const pathParts = pathname.split('/');
     const lastSegment = pathParts[pathParts.length - 1];
-    
+
     if (lastSegment && !isNaN(parseInt(lastSegment))) {
       plubotId = lastSegment;
     }
   }
-  
+
   // Verificar si tenemos un ID válido
   if (plubotId && !isNaN(parseInt(plubotId))) {
     return plubotId;
   }
-  
+
   // ID por defecto para desarrollo
 
   return '130';
@@ -156,17 +163,17 @@ const TrainingScreen = () => {
   const navigate = useNavigate();
   const { plubotData, updatePlubotData } = usePlubotCreation();
   const { addXp, addPluCoins } = useGamification();
-    const { request } = useAPI();
-  
+  const { request } = useAPI();
+
   // Referencias y estado local
   const nodeCounters = useRef({});
   const lastSignificantChange = useRef({ nodes: [], edges: [] });
   const [hasPendingChanges, setHasPendingChanges] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  
+
   // Extraer el ID del plubot
   const plubotIdFromUrl = extractPlubotIdFromUrl(searchParams, pathname);
-  
+
   // Obtener datos y acciones refinados de los stores de Zustand
   const {
     plubotId,
@@ -194,7 +201,7 @@ const TrainingScreen = () => {
   } = useFlowNodesEdges();
 
   const { undo, redo, canUndo, canRedo } = useUndoRedo();
-  
+
   const {
     isLoading,
     error,
@@ -236,7 +243,7 @@ const TrainingScreen = () => {
     openShareModal: originalOpenShareModal,
     openSimulateModal: originalOpenSimulateModal,
     openTemplatesModal: originalOpenTemplatesModal,
-    openSettingsModal: originalOpenSettingsModal
+    openSettingsModal: originalOpenSettingsModal,
   } = useTrainingStore();
 
   // Estado local para el modal de recuperación y los datos del backup
@@ -249,15 +256,15 @@ const TrainingScreen = () => {
   const openShareModal = useCallback(() => {
 
   }, []);
-  
+
   const openSimulateModal = useCallback(() => {
 
   }, []);
-  
+
   const openTemplatesModal = useCallback(() => {
 
   }, []);
-  
+
   const openSettingsModal = useCallback(() => {
 
   }, []);
@@ -291,8 +298,8 @@ const TrainingScreen = () => {
         question: '¿Qué quieres hacer?',
         conditions: [
           { id: 'd1-cond-0', text: 'Información', optionNodeId: 'option-1' },
-          { id: 'd1-cond-1', text: 'Ayuda', optionNodeId: 'option-2' }
-        ]
+          { id: 'd1-cond-1', text: 'Ayuda', optionNodeId: 'option-2' },
+        ],
       },
     },
     {
@@ -340,8 +347,8 @@ const TrainingScreen = () => {
         question: '¿Necesitas algo más?',
         conditions: [
           { id: 'd2-cond-0', text: 'Sí', optionNodeId: 'option-3' },
-          { id: 'd2-cond-1', text: 'No', optionNodeId: 'option-4' }
-        ]
+          { id: 'd2-cond-1', text: 'No', optionNodeId: 'option-4' },
+        ],
       },
     },
     {
@@ -411,17 +418,17 @@ const TrainingScreen = () => {
     errorMessage: null,
     isDataLoaded: false,
     isGenerating: false,
-    flowStyles: { edgeStyles: { strokeWidth: 2, stroke: '#00e0ff', animated: false } }
+    flowStyles: { edgeStyles: { strokeWidth: 2, stroke: '#00e0ff', animated: false } },
   });
-  
+
   // Propiedades de conexión por defecto - extraídas para mejorar legibilidad
   const defaultConnectionProperties = {
     animated: false,
     label: '',
     style: { stroke: '#00e0ff', strokeWidth: 2, strokeDasharray: '' },
-    type: 'default'
+    type: 'default',
   };
-  
+
   // Ruta de análisis por defecto - extraída para mejorar legibilidad
   const defaultRouteAnalysis = { routes: [], errors: [] };
 
@@ -434,7 +441,7 @@ const TrainingScreen = () => {
     setByteMessage(`⚠️ Error: ${errorMsg}`);
     // Los errores de consola se silencian en producción
   }, [setByteMessage]);
-  
+
   /**
    * Verifica las precondiciones necesarias para guardar el flujo
    * @returns {boolean} true si se cumplen todas las precondiciones, false en caso contrario
@@ -444,29 +451,29 @@ const TrainingScreen = () => {
     if (isSaving) {
       return false;
     }
-    
+
     // Verificar si los datos del plubot están cargados
     const isDataLoaded = plubotData && Object.keys(plubotData).length > 0;
     if (!isDataLoaded) {
       setByteMessage('⏳ Datos aún cargando, espera un momento antes de guardar.');
       return false;
     }
-    
+
     // Verificar si hay nodos para guardar
     if (!nodes.length) {
       setByteMessage('⚠️ No hay nodos en el editor');
       return false;
     }
-    
+
     // Verificar si tenemos la función para actualizar datos y el ID del plubot
     if (!updatePlubotData || !plubotIdFromUrl) {
       setByteMessage('⚠️ Error al guardar: falta el ID del Plubot.');
       return false;
     }
-    
+
     return true;
   }, [isSaving, nodes.length, plubotData, plubotIdFromUrl, updatePlubotData, setByteMessage]);
-  
+
   /**
    * Resuelve etiquetas duplicadas en los nodos
    * @param {Array} processedNodes - Los nodos a procesar
@@ -477,63 +484,63 @@ const TrainingScreen = () => {
     const userMessages = processedNodes.map((node, index) => ({
       user_message: node.data?.label || `Nodo ${index + 1}`,
       position: index,
-      nodeId: node.id
+      nodeId: node.id,
     }));
-    
+
     // Identificar duplicados
     const duplicates = userMessages.reduce((acc, curr, index, arr) => {
       const isDuplicated = arr.some(
-        (other, otherIndex) => otherIndex !== index && other.user_message.toLowerCase() === curr.user_message.toLowerCase()
+        (other, otherIndex) => otherIndex !== index && other.user_message.toLowerCase() === curr.user_message.toLowerCase(),
       );
       if (isDuplicated) acc.push(curr.user_message);
       return acc;
     }, []);
-    
+
     // Si no hay duplicados, devolver los nodos originales
     if (duplicates.length === 0) return processedNodes;
-    
+
     // Resolver duplicados
     setByteMessage(`⚠️ Hay mensajes duplicados. Resolviendo...`);
-    
+
     const newNodes = [...processedNodes];
-    const usedLabels = new Set(processedNodes.map(n => 
-      n.data?.label ? n.data.label.toLowerCase() : `node-${n.id}`
+    const usedLabels = new Set(processedNodes.map(n =>
+      n.data?.label ? n.data.label.toLowerCase() : `node-${n.id}`,
     ));
-    
+
     // Crear etiquetas únicas para los duplicados
     duplicates.forEach(duplicate => {
       const nodeIndex = newNodes.findIndex(n => n.data?.label === duplicate);
       if (nodeIndex !== -1) {
         let newLabel = duplicate;
         let counter = 1;
-        
+
         while (usedLabels.has(newLabel.toLowerCase())) {
           newLabel = `${duplicate}-${counter}`;
           counter++;
         }
-        
+
         usedLabels.add(newLabel.toLowerCase());
-        
+
         if (newNodes[nodeIndex]) {
-          newNodes[nodeIndex] = { 
-            ...newNodes[nodeIndex], 
-            data: { ...newNodes[nodeIndex].data, label: newLabel } 
+          newNodes[nodeIndex] = {
+            ...newNodes[nodeIndex],
+            data: { ...newNodes[nodeIndex].data, label: newLabel },
           };
         }
       }
     });
-    
+
     // Actualizar nodos con nombres únicos
     onNodesChange(newNodes.map((node, index) => ({
       type: 'replace',
       item: node,
-      index
+      index,
     })));
-    
+
 
     return newNodes;
   }, [onNodesChange, setByteMessage]);
-  
+
   /**
    * Elimina nodos con IDs duplicados y asegura que las aristas sean válidas
    * @param {Array} updatedNodes - Los nodos a procesar
@@ -543,7 +550,7 @@ const TrainingScreen = () => {
     // Eliminar nodos con IDs duplicados
     const uniqueNodes = [];
     const nodeIds = new Set();
-    
+
     for (const node of updatedNodes) {
       if (!nodeIds.has(node.id)) {
         nodeIds.add(node.id);
@@ -552,16 +559,16 @@ const TrainingScreen = () => {
         // Nodo duplicado encontrado y eliminado silenciosamente
       }
     }
-    
+
     // Validar que cada arista tenga nodos fuente y destino existentes
     const validEdges = edges.filter(edge => {
       const isValid = nodeIds.has(edge.source) && nodeIds.has(edge.target);
       return isValid;
     });
-    
+
     return { uniqueNodes, validEdges };
   }, [edges]);
-  
+
   /**
    * Crea un backup local de los nodos y aristas
    * @param {Array} nodes - Los nodos a respaldar
@@ -570,13 +577,13 @@ const TrainingScreen = () => {
    */
   const createLocalBackup = useCallback((nodes, edges) => {
     const backupId = `backup_${plubotIdFromUrl}_${Date.now()}`;
-    
+
     try {
       localStorage.setItem(backupId, JSON.stringify({
         nodes,
         edges,
         flowName: flowName || 'Flujo sin título',
-        timestamp: Date.now()
+        timestamp: Date.now(),
       }));
       return backupId;
     } catch (storageError) {
@@ -584,14 +591,14 @@ const TrainingScreen = () => {
       return null;
     }
   }, [plubotIdFromUrl, flowName]);
-  
+
   // Función principal para guardar el flujo
   const handleSaveFlow = useCallback(async () => {
     // Verificar precondiciones
     if (!checkSavePrerequisites()) {
       return false;
     }
-    
+
     // Iniciar proceso de guardado
     setIsSaving(true);
     setByteMessage('💾 Guardando flujo...');
@@ -601,34 +608,34 @@ const TrainingScreen = () => {
       if (edges && edges.length > 0) {
         backupEdgesToLocalStorage(edges);
       }
-      
+
       // Copia profunda de nodos para evitar mutaciones
       const processedNodes = JSON.parse(JSON.stringify(nodes));
-      
+
       // Resolver etiquetas duplicadas
       const nodesWithUniqueLabels = resolveDuplicateLabels(processedNodes);
-      
+
       // Validar nodos y aristas
       const { uniqueNodes, validEdges } = validateNodesAndEdges(nodesWithUniqueLabels);
-      
+
       // Crear backup local
       const backupId = createLocalBackup(uniqueNodes, validEdges);
-      
+
       // Enviar datos al backend
       const response = await updatePlubotData({
         ...plubotData,
         flowData: {
           nodes: uniqueNodes,
           edges: validEdges,
-          flowName: flowName || 'Flujo sin título'
-        }
+          flowName: flowName || 'Flujo sin título',
+        },
       });
-      
+
       // Manejar la respuesta
       if (response && response.status === 'success') {
         setByteMessage('✅ Flujo guardado correctamente');
         setHasPendingChanges(false);
-        
+
         // Limpiar backup después de 1 minuto si el guardado fue exitoso
         if (backupId) {
           setTimeout(() => {
@@ -639,7 +646,7 @@ const TrainingScreen = () => {
             }
           }, 60000);
         }
-        
+
         return true;
       } else {
         setByteMessage(`❌ Error al guardar: ${response?.error || 'Error desconocido'}`);
@@ -658,60 +665,59 @@ const TrainingScreen = () => {
     createLocalBackup,
     nodes, edges, plubotData, plubotIdFromUrl, updatePlubotData,
     setByteMessage, setHasPendingChanges, setIsSaving,
-    flowName, backupEdgesToLocalStorage
+    flowName, backupEdgesToLocalStorage,
   ]);
 
   // Mantener compatibilidad con el código existente
-async function saveFlowData() {
-  return handleSaveFlow();
-}
-  
+  async function saveFlowData() {
+    return handleSaveFlow();
+  }
+
   // Función para manejar el deshacer (undo)
   const handleUndo = useCallback(() => {
     undo();
   }, [undo]);
-  
+
   // Función para manejar el rehacer (redo)
   const handleRedo = useCallback(() => {
     redo();
   }, [redo]);
-  
+
   // Función para alternar el modo ultra
   const handleToggleUltraMode = useCallback(() => {
     toggleUltraMode();
   }, [toggleUltraMode]);
-  
+
   // Función para alternar el modo de simulación
   const handleToggleSimulation = useCallback(() => {
     toggleSimulation();
   }, [toggleSimulation]);
-  
+
   // Función para manejar la importación desde el store
   const handleImportFromStore = useCallback((data) => {
     setImportData(data);
   }, [setImportData]);
-  
+
   // Función para manejar la exportación desde el store
   const handleExportFromStore = useCallback((format) => {
     setExportFormat(format);
     setShowExportMode(true);
   }, [setExportFormat, setShowExportMode]);
-  
+
   // Custom debounce hook
   const debouncedSave = useDebounce(handleSaveFlow, 10000); // 10 seconds
-  
+
   // Función para actualizar el estado del componente cuando cambian los nodos o aristas
   useEffect(() => {
     // Comprobar que nodes y edges existen y son arrays antes de acceder a length
     const hasNodes = nodes && Array.isArray(nodes) && nodes.length > 0;
     const hasEdges = edges && Array.isArray(edges) && edges.length > 0;
-    
+
     if (hasNodes || hasEdges) {
       // Guardar automáticamente cuando hay cambios significativos
       debouncedSave();
     }
   }, [nodes.length, edges, debouncedSave]);
-  
 
 
   // Componente para gestionar los modales usando el componente Modal
@@ -721,30 +727,30 @@ async function saveFlowData() {
     const modalConfigs = [
       // Estos modales son específicos de TrainingScreen y se mantienen
       {
-        title: "Editor de Conexión",
+        title: 'Editor de Conexión',
         isOpen: showConnectionEditor,
-        onClose: () => setShowConnectionEditor(false)
+        onClose: () => setShowConnectionEditor(false),
       },
       {
-        title: "Análisis de Rutas",
+        title: 'Análisis de Rutas',
         isOpen: showRouteAnalysis,
-        onClose: () => setShowRouteAnalysis(false)
+        onClose: () => setShowRouteAnalysis(false),
       },
       {
-        title: "Historial de Versiones",
+        title: 'Historial de Versiones',
         isOpen: showVersionHistoryPanel,
-        onClose: () => setShowVersionHistoryPanel(false)
-      }
-      
+        onClose: () => setShowVersionHistoryPanel(false),
+      },
+
       // Los siguientes modales NO deben incluirse aquí porque ya son
       // gestionados por GlobalProvider - esto evita los modales fantasma
     ];
-    
+
     return (
       <>
         {modalConfigs.map((config, index) => (
           config.isOpen && (
-            <Modal 
+            <Modal
               key={`modal-${index}`}
               title={config.title}
               isOpen={config.isOpen}
@@ -761,7 +767,7 @@ async function saveFlowData() {
     showVersionHistoryPanel,
     setShowConnectionEditor,
     setShowRouteAnalysis,
-    setShowVersionHistoryPanel
+    setShowVersionHistoryPanel,
   ]);
 
   const handleRecoverNodes = () => {
@@ -776,13 +782,13 @@ async function saveFlowData() {
     const currentPlubotId = useFlowStore.getState().plubotId;
     const targetFlowName = useFlowStore.getState().flowName || `Plubot ${currentPlubotId}`;
 
-    
+
     const emergencyBackupKey = `plubot-nodes-emergency-backup-${currentPlubotId}`;
     localStorage.removeItem(emergencyBackupKey);
     setEmergencyBackupData(null);
     setHadBackup(false); // Importante: actualizar el estado
 
-    // Siempre resetear a un flujo limpio (con nodos por defecto) al descartar, 
+    // Siempre resetear a un flujo limpio (con nodos por defecto) al descartar,
     // independientemente de si había un backup o no, porque el usuario eligió no restaurar o no había nada que restaurar.
 
     resetFlow({ id: currentPlubotId, name: targetFlowName, nodes: [], edges: [] }, currentPlubotId, { skipLoad: false, forceDefaultNodes: true });
@@ -808,7 +814,7 @@ async function saveFlowData() {
     const allNodes = useFlowStore.getState().nodes;
     const emergencyBackupKey = `plubot-nodes-emergency-backup-${currentPlubotId}`;
     const backupJson = localStorage.getItem(emergencyBackupKey);
-    
+
     let localEmergencyBackupData = null;
     let localHadBackup = false;
 
@@ -822,7 +828,7 @@ async function saveFlowData() {
         localStorage.removeItem(emergencyBackupKey); // Eliminar backup corrupto
       }
     }
-    
+
     setEmergencyBackupData(localEmergencyBackupData);
     setHadBackup(localHadBackup);
 
@@ -833,7 +839,7 @@ async function saveFlowData() {
       } else {
         // Si no hay backup, y se borran todos los nodos, iniciamos un nuevo flujo directamente.
         // handleDismissRecovery se encarga de resetear el flujo con nodos por defecto.
-        handleDismissRecovery(); 
+        handleDismissRecovery();
       }
     } else if (userJustDismissedModal.current) {
       userJustDismissedModal.current = false; // Resetear la bandera
@@ -842,28 +848,28 @@ async function saveFlowData() {
 
   if (state.errorMessage) {
     return (
-      <div className="ts-critical-error" style={{ 
-        display: 'flex', 
-        flexDirection: 'column', 
-        alignItems: 'center', 
-        justifyContent: 'center', 
-        height: '100vh', 
-        background: 'rgba(10, 20, 35, 0.95)', 
-        color: '#ff4444', 
-        textAlign: 'center', 
-        padding: '2rem' 
+      <div className="ts-critical-error" style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        height: '100vh',
+        background: 'rgba(10, 20, 35, 0.95)',
+        color: '#ff4444',
+        textAlign: 'center',
+        padding: '2rem',
       }}>
         <h2 style={{ fontSize: '1.5rem', marginBottom: '1rem', textShadow: '0 0 5px #ff4444' }}>Error</h2>
         <p style={{ fontSize: '1rem', marginBottom: '1.5rem', color: 'rgba(0, 224, 255, 0.8)' }}>{state.errorMessage}</p>
-        <button 
-          className="ts-training-action-btn" 
-          onClick={() => navigate('/profile')} 
-          style={{ 
-            background: 'rgba(0, 40, 80, 0.8)', 
-            border: '2px solid #00e0ff', 
-            padding: '0.8rem 1.5rem', 
-            fontSize: '1rem', 
-            color: '#e0e0ff' 
+        <button
+          className="ts-training-action-btn"
+          onClick={() => navigate('/profile')}
+          style={{
+            background: 'rgba(0, 40, 80, 0.8)',
+            border: '2px solid #00e0ff',
+            padding: '0.8rem 1.5rem',
+            fontSize: '1rem',
+            color: '#e0e0ff',
           }}>
           ← Volver al Perfil
         </button>
@@ -873,27 +879,27 @@ async function saveFlowData() {
 
   if (isLoading) {
     return (
-      <div className="ts-loading" style={{ 
-        display: 'flex', 
-        flexDirection: 'column', 
-        alignItems: 'center', 
-        justifyContent: 'center', 
-        height: '100vh', 
-        background: 'rgba(10, 20, 35, 0.95)' 
+      <div className="ts-loading" style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        height: '100vh',
+        background: 'rgba(10, 20, 35, 0.95)',
       }}>
-        <div className="loading-spinner" style={{ 
-          width: '50px', 
-          height: '50px', 
-          border: '5px solid rgba(0, 224, 255, 0.3)', 
-          borderTop: '5px solid #00e0ff', 
-          borderRadius: '50%', 
-          animation: 'spin 1s linear infinite' 
-        }}></div>
+        <div className="loading-spinner" style={{
+          width: '50px',
+          height: '50px',
+          border: '5px solid rgba(0, 224, 255, 0.3)',
+          borderTop: '5px solid #00e0ff',
+          borderRadius: '50%',
+          animation: 'spin 1s linear infinite',
+        }} />
         <p style={{ marginTop: '20px', color: '#00e0ff' }}>Cargando editor de flujos...</p>
       </div>
     );
   }
-  
+
   /**
    * Maneja el evento de soltar un nodo en el editor
    * @param {DragEvent} event - El evento de drag and drop
@@ -963,12 +969,12 @@ async function saveFlowData() {
         id: newNodeId,
         label: label || 'Nuevo nodo',
         category: category || 'default',
-        ...(powerItemData || {})
+        ...(powerItemData || {}),
       });
       setByteMessage(`✅ Nodo "${label}" añadido al editor`);
       setTimeout(handleSaveFlow, 1000);
     } catch (error) {
-      setByteMessage('❌ Error al añadir nodo: ' + error.message);
+      setByteMessage(`❌ Error al añadir nodo: ${error.message}`);
     }
   }, [setByteMessage, handleSaveFlow]);
 
@@ -991,7 +997,7 @@ async function saveFlowData() {
 
     createNodeFromData(jsonData, dropPosition);
   }, [extractDraggedData, getDropPosition, createNodeFromData, setByteMessage]);
-  
+
   /**
    * Previene el comportamiento por defecto en el dragover
    */
@@ -999,32 +1005,32 @@ async function saveFlowData() {
     event.preventDefault();
     event.dataTransfer.dropEffect = 'move';
   }, []);
-  
+
   // Renderizar componente de error si hay un mensaje de error
   if (state.errorMessage) {
     return (
-      <div className="ts-critical-error" style={{ 
-        display: 'flex', 
-        flexDirection: 'column', 
-        alignItems: 'center', 
-        justifyContent: 'center', 
-        height: '100vh', 
-        background: 'rgba(10, 20, 35, 0.95)', 
-        color: '#ff4444', 
-        textAlign: 'center', 
-        padding: '2rem' 
+      <div className="ts-critical-error" style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        height: '100vh',
+        background: 'rgba(10, 20, 35, 0.95)',
+        color: '#ff4444',
+        textAlign: 'center',
+        padding: '2rem',
       }}>
         <h2 style={{ fontSize: '1.5rem', marginBottom: '1rem', textShadow: '0 0 5px #ff4444' }}>Error</h2>
         <p style={{ fontSize: '1rem', marginBottom: '1.5rem', color: 'rgba(0, 224, 255, 0.8)' }}>{state.errorMessage}</p>
-        <button 
-          className="ts-training-action-btn" 
-          onClick={() => navigate('/profile')} 
-          style={{ 
-            background: 'rgba(0, 40, 80, 0.8)', 
-            border: '2px solid #00e0ff', 
-            padding: '0.8rem 1.5rem', 
-            fontSize: '1rem', 
-            color: '#e0e0ff' 
+        <button
+          className="ts-training-action-btn"
+          onClick={() => navigate('/profile')}
+          style={{
+            background: 'rgba(0, 40, 80, 0.8)',
+            border: '2px solid #00e0ff',
+            padding: '0.8rem 1.5rem',
+            fontSize: '1rem',
+            color: '#e0e0ff',
           }}>
           ← Volver al Perfil
         </button>
@@ -1034,27 +1040,27 @@ async function saveFlowData() {
 
   if (isLoading) {
     return (
-      <div className="ts-loading" style={{ 
-        display: 'flex', 
-        flexDirection: 'column', 
-        alignItems: 'center', 
-        justifyContent: 'center', 
-        height: '100vh', 
-        background: 'rgba(10, 20, 35, 0.95)' 
+      <div className="ts-loading" style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        height: '100vh',
+        background: 'rgba(10, 20, 35, 0.95)',
       }}>
-        <div className="loading-spinner" style={{ 
-          width: '50px', 
-          height: '50px', 
-          border: '5px solid rgba(0, 224, 255, 0.3)', 
-          borderTop: '5px solid #00e0ff', 
-          borderRadius: '50%', 
-          animation: 'spin 1s linear infinite' 
-        }}></div>
+        <div className="loading-spinner" style={{
+          width: '50px',
+          height: '50px',
+          border: '5px solid rgba(0, 224, 255, 0.3)',
+          borderTop: '5px solid #00e0ff',
+          borderRadius: '50%',
+          animation: 'spin 1s linear infinite',
+        }} />
         <p style={{ marginTop: '20px', color: '#00e0ff' }}>Cargando editor de flujos...</p>
       </div>
     );
   }
-  
+
   // Estilos comunes extraidos para mejorar legibilidad
   const screenStyles = {
     backgroundColor: 'transparent !important',
@@ -1062,9 +1068,9 @@ async function saveFlowData() {
     height: '100vh',
     width: '100%',
     overflow: 'auto',
-    zIndex: 'auto'
+    zIndex: 'auto',
   };
-  
+
   const mainContentStyles = {
     display: 'flex',
     flexDirection: 'row',
@@ -1072,24 +1078,24 @@ async function saveFlowData() {
     width: '100%',
     position: 'relative',
     overflow: 'visible',
-    backgroundColor: 'transparent'
+    backgroundColor: 'transparent',
   };
-  
+
   const editorContainerStyles = {
     flex: 1,
     height: '100%',
     position: 'relative',
     overflow: 'auto',
     backgroundColor: 'transparent',
-    zIndex: 10
+    zIndex: 10,
   };
-  
+
   // Renderizado principal del componente
   return (
     <div className="ts-training-screen" style={screenStyles}>
       <div className="ts-main-content" style={mainContentStyles}>
         <NodePalette />
-        
+
         <div className="ts-flow-editor-container" style={editorContainerStyles}>
           <FlowEditor
             nodes={nodes}
@@ -1104,7 +1110,7 @@ async function saveFlowData() {
             }}
             simulationMode={showSimulation}
             handleError={handleError}
-            hideHeader={true}
+            hideHeader
             plubotId={plubotIdFromUrl}
             name={plubotData?.name || 'Nuevo Plubot'}
             notifyByte={setByteMessage}
@@ -1114,11 +1120,11 @@ async function saveFlowData() {
           />
         </div>
       </div>
-      
+
       {/* MiniMap en la esquina inferior izquierda */}
       <div className="ts-minimap-container">
         <Suspense fallback={null}>
-          <CustomMiniMap 
+          <CustomMiniMap
             nodes={nodes}
             edges={edges}
             isExpanded={false}
@@ -1126,20 +1132,20 @@ async function saveFlowData() {
           />
         </Suspense>
       </div>
-      
+
       {renderModals()}
-      
+
       {/* ByteAssistant siempre visible */}
       <Suspense fallback={null}>
         <ByteAssistant simulationMode={showSimulation} />
       </Suspense>
-      
+
       {/* StatusBubble condicional */}
       {byteMessage && !showSimulation && <StatusBubble message={byteMessage} />}
-      
+
       {showRecoveryModal && (
         <Suspense fallback={null}>
-          <EmergencyRecovery 
+          <EmergencyRecovery
             isOpen={showRecoveryModal}
             onRecover={wrappedHandleRecoverNodes}
             onDismiss={wrappedHandleDismissRecovery} // El botón 'X' del modal llamará a esto

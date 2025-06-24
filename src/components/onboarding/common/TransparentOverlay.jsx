@@ -4,7 +4,7 @@ import './TransparentOverlay.css';
 /**
  * Componente de overlay transparente para reemplazar cualquier indicador de carga
  * que pueda estar causando un fondo negro
- * 
+ *
  * @param {Object} props - Propiedades del componente
  * @param {boolean} props.isVisible - Si el overlay debe ser visible
  * @param {string} props.message - Mensaje a mostrar

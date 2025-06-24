@@ -34,7 +34,7 @@ const UltraOptimizedEdge = ({
       targetY,
       targetPosition,
     });
-    
+
     return [path, labelX, labelY];
   }, [sourceX, sourceY, targetX, targetY, sourcePosition, targetPosition]);
 
@@ -69,7 +69,7 @@ const UltraOptimizedEdge = ({
         style={edgeStyle}
         markerEnd={markerEnd}
       />
-      
+
       {/* Área de interacción invisible pero más grande */}
       <path
         className="react-flow__edge-interaction"
@@ -79,7 +79,7 @@ const UltraOptimizedEdge = ({
         strokeWidth={interactionWidth}
         pointerEvents="stroke"
       />
-      
+
       {/* Punto de conexión de origen */}
       <circle
         cx={sourceX}
@@ -90,7 +90,7 @@ const UltraOptimizedEdge = ({
         strokeWidth={1.5}
         className="react-flow__edge-source"
       />
-      
+
       {/* Punto de conexión de destino */}
       <circle
         cx={targetX}

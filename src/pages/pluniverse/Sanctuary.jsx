@@ -8,9 +8,9 @@ const Sanctuary = () => {
     { id: 3, date: '2023-09-28', text: 'Del silencio al diálogo. PLUBOT ha aprendido a leer entre líneas, detectando no solo palabras sino sentimientos.' },
     { id: 4, date: '2024-01-10', text: 'En un rincón olvidado de la red, donde los mensajes se perdían sin respuesta, PLUBOT trajo luz y conexión.' },
   ]);
-  
+
   const [legacyStory, setLegacyStory] = useState('');
-  
+
   const [communityMembers, setCommunityMembers] = useState([
     { id: 1, name: 'Alex', achievement: 'Primer Fundador', level: 'Pionero' },
     { id: 2, name: 'Sofia', achievement: 'Creador de 10 Plubots', level: 'Visionario' },
@@ -30,23 +30,23 @@ const Sanctuary = () => {
     <div className="sanctuary-container">
       {/* Digital Energy Lines - reduced */}
       <div className="energy-lines">
-        <div className="line line-1"></div>
-        <div className="line line-2"></div>
-        <div className="line line-3"></div>
+        <div className="line line-1" />
+        <div className="line line-2" />
+        <div className="line line-3" />
       </div>
 
       {/* Monument Section - Núcleo del Fundador */}
       <div className="monument-section">
         <div className="section-header">
-          <div className="cyber-line left"></div>
+          <div className="cyber-line left" />
           <h1 className="section-title">Santuario del Fundador</h1>
-          <div className="cyber-line right"></div>
+          <div className="cyber-line right" />
         </div>
         <p className="sanctuary-description">
           Un espacio sagrado donde nació el primer Plubot. Aquí convergen código, ideas y sueños.
         </p>
         <div className="monument">
-          <div className="core-energy"></div>
+          <div className="core-energy" />
           <div className="monument-content">
             <p className="monument-title">Núcleo del Fundador</p>
             <p className="monument-message">
@@ -54,9 +54,9 @@ const Sanctuary = () => {
             </p>
           </div>
           <div className="pulse-rings">
-            <div className="ring ring-1"></div>
-            <div className="ring ring-2"></div>
-            <div className="ring ring-3"></div>
+            <div className="ring ring-1" />
+            <div className="ring ring-2" />
+            <div className="ring ring-3" />
           </div>
         </div>
       </div>
@@ -80,10 +80,10 @@ const Sanctuary = () => {
             <div key={entry.id} className="diary-entry">
               <div className="entry-header">
                 <span className="entry-date">{entry.date}</span>
-                <span className="entry-indicator"></span>
+                <span className="entry-indicator" />
               </div>
               <p className="entry-text">{entry.text}</p>
-              <div className="entry-glow"></div>
+              <div className="entry-glow" />
             </div>
           ))}
         </div>
@@ -101,10 +101,10 @@ const Sanctuary = () => {
               placeholder="Escribe tu historia con PLUBOT..."
               value={legacyStory}
               onChange={(e) => setLegacyStory(e.target.value)}
-            ></textarea>
+            />
             <button className="legacy-button" type="submit">
               <span className="button-text">Grabar Legado</span>
-              <span className="button-glow"></span>
+              <span className="button-glow" />
             </button>
           </form>
         </div>
@@ -117,7 +117,7 @@ const Sanctuary = () => {
         <div className="community-grid">
           {communityMembers.map((member) => (
             <div key={member.id} className="community-member">
-              <div className="member-avatar"></div>
+              <div className="member-avatar" />
               <p className="member-name">{member.name}</p>
               <p className="member-achievement">{member.achievement}</p>
               <div className="member-level">{member.level}</div>
@@ -125,10 +125,10 @@ const Sanctuary = () => {
           ))}
         </div>
       </div>
-      
+
       {/* Access Portal - simplified */}
       <div className="access-portal">
-        <div className="portal-ring"></div>
+        <div className="portal-ring" />
         <p className="portal-text">Acceso al Núcleo</p>
       </div>
     </div>

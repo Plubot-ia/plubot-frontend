@@ -3,20 +3,20 @@
  * @description Componente para gestionar las condiciones del nodo de decisión
  */
 
-import React, { memo, useState, useRef, useCallback, useEffect } from 'react';
-import PropTypes from 'prop-types';
-import { Handle, Position } from 'reactflow';
-import { 
-  X, 
-  Check, 
-  Circle, 
-  Plus, 
-  Pencil, 
+import {
+  X,
+  Check,
+  Circle,
+  Plus,
+  Pencil,
   // Move, ChevronUp, ChevronDown removed as move functionality UI is being removed
 } from 'lucide-react';
+import PropTypes from 'prop-types';
+import React, { memo, useState, useRef, useCallback, useEffect } from 'react';
+import { Handle, Position } from 'reactflow';
+
 import Tooltip from '../../../ui/ToolTip';
 import { NODE_CONFIG, CONDITION_TYPES, getConditionType, getConnectorColor as getGlobalConnectorColor } from '../DecisionNode.types';
-
 
 
 /**
@@ -33,14 +33,14 @@ import { NODE_CONFIG, CONDITION_TYPES, getConditionType, getConnectorColor as ge
  * @param {boolean} [props.isActive=false] - Indica si la condición está activa.
  * @returns {JSX.Element} - Componente de condición.
  */
-const ConditionItem = memo(({ 
+const ConditionItem = memo(({
   condition, // Ahora es { id: string, text: string }
   index,
   onConditionChange, // Prop para notificar cambio de texto
   onDelete, // Espera (conditionId)
   // onMove no longer needed as UI is removed
   isUltraPerformanceMode,
-  isActive = false
+  isActive = false,
   // onEdit prop is removed, editing is handled locally
 }) => {
   const [isHovered, setIsHovered] = useState(false);
@@ -48,15 +48,15 @@ const ConditionItem = memo(({
   const [isEditingThisItem, setIsEditingThisItem] = useState(false);
   const [editedText, setEditedText] = useState(condition.text);
   const inputRef = useRef(null);
-  
+
   // Determinar si la condición es verdadera o falsa para aplicar estilos
   const conditionType = getConditionType(condition.text);
   const conditionTypeClass = `decision-node__condition--${conditionType}`;
-  
+
   // Verificar si es una condición especial
   const isTrue = conditionType === CONDITION_TYPES.TRUE;
   const isFalse = conditionType === CONDITION_TYPES.FALSE;
-  
+
   // Manejar eliminación con confirmación
   const handleDelete = useCallback(() => {
     if (showDeleteConfirm) {
@@ -68,9 +68,9 @@ const ConditionItem = memo(({
       setTimeout(() => setShowDeleteConfirm(false), 3000);
     }
   }, [showDeleteConfirm, onDelete, condition.id]);
-  
+
   // Move handlers removed
-  
+
   const handleStartEditing = () => {
     setEditedText(condition.text);
     setIsEditingThisItem(true);
@@ -124,9 +124,9 @@ const ConditionItem = memo(({
         break;
     }
   }, [isEditingThisItem, handleDelete, handleStartEditing, condition.id]);
-  
+
   return (
-    <div 
+    <div
       className={`decision-node__condition ${isUltraPerformanceMode ? 'decision-node__condition--ultra' : ''} ${conditionTypeClass} ${isActive ? 'decision-node__condition--active' : ''}`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
@@ -140,7 +140,7 @@ const ConditionItem = memo(({
       onDoubleClick={!isEditingThisItem ? handleStartEditing : undefined}
     >
       {/* Marca de color para la condición */}
-      <div 
+      <div
         className="decision-node__condition-color-mark"
         style={{
           backgroundColor: getGlobalConnectorColor(condition.text, index),
@@ -150,10 +150,10 @@ const ConditionItem = memo(({
           marginRight: '8px',
           border: '1px solid white',
           boxShadow: '0 0 0 1px rgba(0, 0, 0, 0.1)',
-          flexShrink: 0
+          flexShrink: 0,
         }}
       />
-      
+
       {isEditingThisItem ? (
         <input
           ref={inputRef}
@@ -170,11 +170,11 @@ const ConditionItem = memo(({
       ) : (
         <span className="decision-node__condition-text" onClick={handleStartEditing}>{condition.text}</span>
       )}
-      
+
       {!isUltraPerformanceMode && !isEditingThisItem && (isHovered || window.matchMedia('(hover: none)').matches) && (
         <div className="decision-node__condition-actions">
           <Tooltip content="Editar condición" position="top">
-            <button 
+            <button
               className="decision-node__condition-button decision-node__condition-button--edit"
               onClick={handleStartEditing} // Now triggers in-place editing
               aria-label={NODE_CONFIG.ARIA_LABELS.editCondition}
@@ -182,9 +182,9 @@ const ConditionItem = memo(({
               <Pencil size={14} />
             </button>
           </Tooltip>
-          
-          <Tooltip content={showDeleteConfirm ? "Confirmar eliminación" : "Eliminar condición"} position="top">
-            <button 
+
+          <Tooltip content={showDeleteConfirm ? 'Confirmar eliminación' : 'Eliminar condición'} position="top">
+            <button
               className={`decision-node__condition-button ${showDeleteConfirm ? 'decision-node__condition-button--confirm' : 'decision-node__condition-button--delete'}`}
               onClick={handleDelete}
               aria-label={NODE_CONFIG.ARIA_LABELS.deleteCondition}
@@ -209,7 +209,7 @@ ConditionItem.propTypes = {
   onConditionChange: PropTypes.func.isRequired,
   onDelete: PropTypes.func.isRequired,
   isUltraPerformanceMode: PropTypes.bool,
-  isActive: PropTypes.bool
+  isActive: PropTypes.bool,
 };
 
 /**
@@ -226,24 +226,24 @@ ConditionItem.propTypes = {
  * @param {boolean} props.isEditing - Indica si está en modo edición
  * @returns {JSX.Element} - Gestor de condiciones
  */
-const DecisionNodeConditions = memo(({ 
-  conditions, 
-  onAddCondition, 
-  onConditionChange, 
-  onDeleteCondition, 
+const DecisionNodeConditions = memo(({
+  conditions,
+  onAddCondition,
+  onConditionChange,
+  onDeleteCondition,
   onMoveCondition,
   isUltraPerformanceMode,
   activeConditionId,
   setActiveConditionId,
   isEditing,
   disableAdd = false, // Default to false if not provided
-  maxConditions = Infinity // Default if not provided
+  maxConditions = Infinity, // Default if not provided
 }) => {
   const [isAddingCondition, setIsAddingCondition] = useState(false);
   const [editingConditionId, setEditingConditionId] = useState(null);
   const [editingText, setEditingText] = useState('');
   const conditionInputRef = useRef(null);
-  
+
   // Enfocar el input al añadir o editar una condición
   useEffect(() => {
     let animationId;
@@ -261,7 +261,7 @@ const DecisionNodeConditions = memo(({
   // Actualizar el estado de `disableAdd` internamente si es necesario, aunque se prefiere que venga de props
   // const internalDisableAdd = disableAdd || (conditions && conditions.length >= maxConditions);
 
-  
+
   // Iniciar adición de condición
   const startAddingCondition = useCallback(() => {
     if (disableAdd || conditions.length >= maxConditions) {
@@ -272,7 +272,7 @@ const DecisionNodeConditions = memo(({
     setIsAddingCondition(true);
     setEditingText('');
   }, [disableAdd, conditions, maxConditions]);
-  
+
   // Añadir condición
   const addCondition = useCallback(() => {
     if (editingText.trim()) {
@@ -281,12 +281,12 @@ const DecisionNodeConditions = memo(({
     }
     setIsAddingCondition(false);
   }, [editingText, onAddCondition]);
-  
+
   // Manejar cambios en el input de nueva condición
   const handleNewConditionChange = useCallback((e) => {
     setEditingText(e.target.value);
   }, []);
-  
+
   // Guardar nueva condición al presionar Enter
   const handleNewConditionKeyDown = useCallback((e) => {
     if (e.key === 'Enter' && editingText.trim()) {
@@ -299,7 +299,7 @@ const DecisionNodeConditions = memo(({
       setEditingConditionId(null);
     }
   }, [editingText, addCondition]);
-  
+
   // Iniciar edición de una condición existente
   const handleStartEdit = useCallback((conditionId) => {
     if (isUltraPerformanceMode) return; // No editar en modo ultra
@@ -307,7 +307,7 @@ const DecisionNodeConditions = memo(({
     setEditingConditionId(conditionId);
     setEditingText(conditionToEdit ? conditionToEdit.text : ''); // Derivar currentText
     setActiveConditionId(conditionId); // Notificar al padre cuál es la condición activa/editada
-    
+
     // Enfocar el input después de que se renderice
     requestAnimationFrame(() => {
       if (conditionInputRef.current) {
@@ -316,7 +316,7 @@ const DecisionNodeConditions = memo(({
       }
     });
   }, [isUltraPerformanceMode, setActiveConditionId, conditions]);
-  
+
   // Guardar condición editada
   const saveEditedCondition = useCallback(() => {
     if (editingConditionId !== null) {
@@ -326,7 +326,7 @@ const DecisionNodeConditions = memo(({
       conditionInputRef.current?.blur(); // Quitar foco del input
     }
   }, [editingConditionId, editingText, onConditionChange]);
-  
+
   // Manejar teclas al editar una condición
   const handleEditConditionKeyDown = useCallback((e) => {
     if (e.key === 'Enter' && editingText.trim()) {
@@ -338,7 +338,7 @@ const DecisionNodeConditions = memo(({
       setEditingConditionId(null);
     }
   }, [editingText, saveEditedCondition]);
-  
+
   return (
     <div className="decision-node__conditions">
       {/* Lista de condiciones */}
@@ -356,7 +356,7 @@ const DecisionNodeConditions = memo(({
           />
         ))}
       </div>
-      
+
       {/* Formulario para añadir/editar condición */}
       {isEditing && (
         <div className="decision-node__add-condition-container">
@@ -366,7 +366,7 @@ const DecisionNodeConditions = memo(({
                 ref={conditionInputRef}
                 type="text"
                 className="decision-node__condition-input"
-                  onMouseDown={(e) => e.stopPropagation()} // Evitar que el drag del nodo interfiera con la selección de texto
+                onMouseDown={(e) => e.stopPropagation()} // Evitar que el drag del nodo interfiera con la selección de texto
                 value={editingText}
                 onChange={handleNewConditionChange}
                 onKeyDown={editingConditionId !== null ? handleEditConditionKeyDown : handleNewConditionKeyDown}
@@ -398,7 +398,7 @@ const DecisionNodeConditions = memo(({
           ) : (
             <Tooltip content="Añadir nueva condición (Ctrl+A)" position="top">
               <button
-                onClick={startAddingCondition} 
+                onClick={startAddingCondition}
                 className="decision-node__add-condition-button"
                 disabled={disableAdd || conditions.length >= maxConditions}
                 aria-label={NODE_CONFIG.ARIA_LABELS.addCondition}
@@ -431,7 +431,7 @@ DecisionNodeConditions.propTypes = {
   setActiveConditionId: PropTypes.func.isRequired,
   isEditing: PropTypes.bool,
   disableAdd: PropTypes.bool,
-  maxConditions: PropTypes.number
+  maxConditions: PropTypes.number,
 };
 
 export default DecisionNodeConditions;

@@ -12,7 +12,7 @@ export const NODE_CONFIG = {
   MIN_WIDTH: 180,
   MIN_HEIGHT: 110,
   MAX_TEXTAREA_HEIGHT: 200,
-  
+
   // Valores por defecto
   DEFAULT_QUESTION: '¿Cuál es tu pregunta?',
   DEFAULT_OUTPUTS: ['Sí', 'No'],

@@ -1,32 +1,37 @@
-import { createWithEqualityFn } from 'zustand/traditional';
-import { persist, createJSONStorage } from 'zustand/middleware';
-
-import { shallow } from 'zustand/shallow';
 import isEqual from 'fast-deep-equal';
-import customZustandStorage from './customZustandStorage';
-import { applyNodeChanges, applyEdgeChanges, addEdge } from 'reactflow';
-import { preventNodeStacking } from '../components/onboarding/flow-editor/utils/fix-node-positions';
 import { debounce } from 'lodash';
-import { validateNodePositions, sanitizeEdgePaths } from '../components/onboarding/flow-editor/utils/node-position-validator';
-import { sanitizeFlowState } from '../components/onboarding/flow-editor/utils/flow-sanitizer';
+import { applyNodeChanges, applyEdgeChanges, addEdge } from 'reactflow';
+import { persist } from 'zustand/middleware';
+import { shallow } from 'zustand/shallow';
+import { createWithEqualityFn } from 'zustand/traditional';
 
-import { NODE_TYPES, EDGE_TYPES, EDGE_COLORS, NODE_LABELS } from '@/utils/nodeConfig';
+
 import { toggleUltraMode as toggleUltraModeManager } from '@/components/onboarding/flow-editor/ui/UltraModeManager';
+import { flowStateManager } from '@/components/onboarding/flow-editor/utils/flowCacheManager';
+import flowService, { generateId } from '@/services/flowService';
+import { NODE_TYPES, EDGE_TYPES, EDGE_COLORS, NODE_LABELS } from '@/utils/nodeConfig';
+
+import { preventNodeStacking } from '../components/onboarding/flow-editor/utils/fix-node-positions';
+import { sanitizeFlowState } from '../components/onboarding/flow-editor/utils/flow-sanitizer';
+import { validateNodePositions, sanitizeEdgePaths } from '../components/onboarding/flow-editor/utils/node-position-validator';
+
 
 // Configuración para dimensiones mínimas de nodos
 const NODE_CONFIG = {
   MIN_WIDTH: 150,
-  MIN_HEIGHT: 100
+  MIN_HEIGHT: 100,
 };
 
 const MAX_HISTORY_LENGTH = 50; // Definir la constante para el historial
 
-import useTrainingStore from './useTrainingStore';
-import flowService, { generateId } from '@/services/flowService';
+
 import { getConnectorColor, CONDITION_TYPES, getConditionType } from '../components/onboarding/nodes/decisionnode/DecisionNode.types.js';
-import { nodePositionCache, flowStateManager } from '@/components/onboarding/flow-editor/utils/flowCacheManager';
+
+import customZustandStorage from './customZustandStorage';
+
+
 // Importar el sistema de persistencia para respaldo adicional
-import { saveLocalBackup } from '@/components/onboarding/flow-editor/utils/persistenceManager';
+
 
 // Module-level variables to manage the position validation logic (integrated from patch)
 let positionValidatorInterval = null;
@@ -59,7 +64,7 @@ const initialState = {
   modals: {
     templateSelector: false,
     embedModal: false,
-    importExportModal: false
+    importExportModal: false,
   },
   // Historial y estado previo
   previousState: {
@@ -115,7 +120,7 @@ const _resetFlowAction = (set, get) => (flow, plubotId, options = {}) => {
       history: { past: [], future: [] },
     },
     true, // Reemplazar estado
-    'resetFlow'
+    'resetFlow',
   );
 };
 
@@ -139,8 +144,6 @@ const useFlowStore = createWithEqualityFn(
           return;
         }
 
-
-
         // Llamar al gestor del DOM para aplicar/revertir los cambios de estilo y animación.
         // El flag `userInitiated` se preserva para la lógica de guardar preferencias del usuario.
         toggleUltraModeManager(newState, userInitiated);
@@ -154,7 +157,7 @@ const useFlowStore = createWithEqualityFn(
        * @param {object} updates - Objeto con las actualizaciones de estado (ej. { nodes: newNodes }).
        * @param {boolean} [forceHistory=false] - Si es true, fuerza la creación de una entrada en el historial.
        */
-      _createHistoryEntry: (updates, forceHistory = false) => {
+      _createHistoryEntry: (updates) => {
         set(state => {
           const snapshot = {
             nodes: state.nodes,
@@ -231,7 +234,7 @@ const useFlowStore = createWithEqualityFn(
       // Acciones para el menú contextual global - implementación mejorada
       showContextMenu: (x, y, nodeId, items) => {
 
-        
+
         // Usar setTimeout para asegurar que el estado se actualice correctamente
         // Esto evita problemas de timing con ReactFlow
         setTimeout(() => {
@@ -248,14 +251,14 @@ const useFlowStore = createWithEqualityFn(
       },
       hideContextMenu: () => {
 
-        set({ 
+        set({
           contextMenuVisible: false,
           contextMenuPosition: { x: 0, y: 0 }, // Resetear a valores iniciales consistentes
-          contextMenuItems: [],    // Resetear a valores iniciales consistentes
+          contextMenuItems: [], // Resetear a valores iniciales consistentes
           contextMenuNodeId: null, // Resetear el nodeId
         });
       },
-      
+
       // Acciones de nodos
       // Sistema avanzado para manejo de nodos con optimización de rendimiento
       onNodesChange: (changes) => {
@@ -279,7 +282,7 @@ const useFlowStore = createWithEqualityFn(
           isRedoing: false,
         });
       },
-      
+
       // Implementación de setNodes para compatibilidad con componentes, ahora con rendimiento optimizado y consistencia de historial.
       setNodes: (nodes) => {
         const { nodes: currentNodes, _createHistoryEntry } = get();
@@ -300,7 +303,7 @@ const useFlowStore = createWithEqualityFn(
         // 4. Crear una entrada de historial y actualizar el estado de forma atómica.
         _createHistoryEntry({ nodes: processedNodes });
       },
-      
+
       // Acción para manejar cambios en las aristas
       onEdgesChange: (changes) => {
         set(state => ({
@@ -321,22 +324,26 @@ const useFlowStore = createWithEqualityFn(
       _createNodeFromPalette: (nodeType, position, userData) => {
         const { nodes } = get();
         const nodeId = generateNodeId(nodeType);
-        const defaultLabel = NODE_LABELS[nodeType] || nodeType;
+        // The key 'nodeType' is validated via hasOwnProperty, making this a safe access.
+
+        const defaultLabel = Object.prototype.hasOwnProperty.call(NODE_LABELS, nodeType)
+          ? NODE_LABELS[nodeType]
+          : nodeType;
 
         const newNode = {
           id: nodeId,
           type: nodeType,
-          position: position || { 
+          position: position || {
             x: 100 + (nodes.length % 3) * 200,
-            y: 100 + Math.floor(nodes.length / 3) * 150
+            y: 100 + Math.floor(nodes.length / 3) * 150,
           },
           data: {
             id: nodeId,
             label: userData?.label || defaultLabel,
-            nodeType: nodeType,
+            nodeType,
             // Anidar todos los datos de usuario dentro de metadata para mantener la consistencia.
-            metadata: { ...(userData || {}) }
-          }
+            metadata: { ...(userData || {}) },
+          },
         };
 
         if (newNode.type === NODE_TYPES.decision) {
@@ -364,7 +371,7 @@ const useFlowStore = createWithEqualityFn(
           ];
         }
 
-        const conditions = decisionNode.data.conditions;
+        const { conditions } = decisionNode.data;
         const isUltra = isUltraMode || decisionNode.data.isUltraPerformanceMode;
 
         const newOptionNodes = conditions.map((condition, index) => ({
@@ -417,37 +424,44 @@ const useFlowStore = createWithEqualityFn(
 
         return null;
       },
-      
-      updateNode: (id, dataToUpdate) => { // Renombrado 'data' a 'dataToUpdate' para claridad
+
+      updateNode: (id, dataToUpdate) => {
+        // Security: Define a blacklist of properties that should not be updated to prevent prototype pollution.
+        const propertyBlacklist = ['__proto__', 'constructor', 'prototype'];
+
         set(state => ({
           nodes: state.nodes.map(node => {
             if (node.id === id) {
-              // Crear una nueva copia del data existente del nodo
               const newNodeData = { ...node.data };
 
-              // Iterar sobre las propiedades de dataToUpdate
               for (const key in dataToUpdate) {
+                if (propertyBlacklist.includes(key)) {
+                  // eslint-disable-next-line no-console
+                  console.warn(`Security Warning: Attempted to update a restricted property: "${key}"`);
+                  continue;
+                }
+
                 if (Object.prototype.hasOwnProperty.call(dataToUpdate, key)) {
-                  if (key === 'variables' && Array.isArray(dataToUpdate[key])) {
-                    // Si la clave es 'variables' y es un array, asegurar una nueva referencia de array
-                    newNodeData[key] = [...dataToUpdate[key]];
-                  } else {
-                    // Para otras propiedades, simplemente asignar
-                    newNodeData[key] = dataToUpdate[key];
-                  }
+                  /* eslint-disable security/detect-object-injection */
+                  // The 'key' is validated against a blacklist, and the linter incorrectly
+                  // flags the right-hand side of the assignment. This is a false positive.
+                  newNodeData[key] = Array.isArray(dataToUpdate[key])
+                    ? [...dataToUpdate[key]]
+                    : dataToUpdate[key];
+                  /* eslint-enable security/detect-object-injection */
                 }
               }
-              
+
               return {
                 ...node,
-                data: newNodeData, // Usar el objeto de datos completamente nuevo
+                data: newNodeData,
               };
             }
             return node;
           }),
         }));
       },
-      
+
       // Acción para actualizar posiciones y tamaños de nodos
       updateNodeLayout: (id, layout) => {
         set(state => ({
@@ -461,11 +475,11 @@ const useFlowStore = createWithEqualityFn(
                   ...(layout.style || {}),
                   width: layout.width || node.style?.width,
                   height: layout.height || node.style?.height,
-                }
+                },
               };
             }
             return node;
-          })
+          }),
         }));
       },
       duplicateNode: (nodeIdToDuplicate) => {
@@ -480,11 +494,11 @@ const useFlowStore = createWithEqualityFn(
           x: (originalNode.position?.x || 0) + 20,
           y: (originalNode.position?.y || 0) + 20,
         };
-        
+
         const generateShortId = () => Math.random().toString(36).substring(2, 9);
 
         const newNodeId = `${originalNode.type || 'node'}-${generateShortId()}`;
-        
+
         const originalLabel = originalNode.data && originalNode.data.label ? originalNode.data.label : (originalNode.type || 'Nodo');
 
         const baseNodeProperties = { ...originalNode };
@@ -493,14 +507,14 @@ const useFlowStore = createWithEqualityFn(
         delete baseNodeProperties.dragging;
         delete baseNodeProperties.position;
         delete baseNodeProperties.data;
-        
+
         const newNode = {
           ...baseNodeProperties,
           id: newNodeId,
           position,
           data: {
             ...(originalNode.data || {}),
-            label: `${originalLabel} (Copia)`
+            label: `${originalLabel} (Copia)`,
           },
           selected: false,
           dragging: false,
@@ -519,7 +533,7 @@ const useFlowStore = createWithEqualityFn(
       deleteNode: (nodeIdToDelete) => {
         const { nodes, edges, _createHistoryEntry } = get();
         const idsToDelete = Array.isArray(nodeIdToDelete) ? nodeIdToDelete : [nodeIdToDelete];
-        
+
         if (idsToDelete.length === 0) return;
 
         const nodesToDelete = new Set(idsToDelete);
@@ -541,7 +555,6 @@ const useFlowStore = createWithEqualityFn(
       },
 
 
-      
       // Acciones específicas para DecisionNode
       updateDecisionNodeQuestion: (nodeId, newQuestion) => {
         const { updateNode } = get();
@@ -587,8 +600,8 @@ const useFlowStore = createWithEqualityFn(
               const updatedConditions = node.data.conditions.map(cond => {
                 if (cond.id === conditionId) {
                   // Cirugía 3/3: Al actualizar el texto, el color NO se recalcula. Se mantiene el original.
-                  return { 
-                    ...cond, 
+                  return {
+                    ...cond,
                     text: newText,
                     type: getConditionType(newText), // El tipo sí puede cambiar (para el ícono)
                   };
@@ -613,24 +626,24 @@ const useFlowStore = createWithEqualityFn(
           if (node.id === nodeId && node.type === NODE_TYPES.decision) {
             const oldConditions = node.data.conditions || [];
             const newConditions = oldConditions.filter(cond => cond.id !== conditionIdToDelete);
-            
-            const optionNode = nodes.find(n => 
+
+            const optionNode = nodes.find(n =>
               n.type === NODE_TYPES.option &&
               n.data &&
               n.data.sourceNode === nodeId &&
-              n.data.sourceConditionId === conditionIdToDelete
+              n.data.sourceConditionId === conditionIdToDelete,
             );
             if (optionNode) {
               optionNodeIdToDelete = optionNode.id;
             }
-            
+
             return {
               ...node,
               data: {
                 ...node.data,
                 conditions: newConditions,
                 handleIds: newConditions.map(cond => `output-${cond.id}`),
-              }
+              },
             };
           }
           return node;
@@ -649,13 +662,17 @@ const useFlowStore = createWithEqualityFn(
             if (node.id === nodeId && node.type === NODE_TYPES.decision) {
               const conditions = [...(node.data.conditions || [])];
               const index = conditions.findIndex(c => c.id === conditionId);
-              
+
               if (index === -1) return node;
 
-              let newConditions = [...conditions];
+              const newConditions = [...conditions];
               if (direction === 'up' && index > 0) {
+                // This is a standard array element swap. The linter flags it incorrectly as an object injection sink.
+                // eslint-disable-next-line security/detect-object-injection
                 [newConditions[index - 1], newConditions[index]] = [newConditions[index], newConditions[index - 1]];
               } else if (direction === 'down' && index < newConditions.length - 1) {
+                // This is a standard array element swap. The linter flags it incorrectly as an object injection sink.
+                // eslint-disable-next-line security/detect-object-injection
                 [newConditions[index], newConditions[index + 1]] = [newConditions[index + 1], newConditions[index]];
               }
               return { ...node, data: { ...node.data, conditions: newConditions } };
@@ -667,8 +684,17 @@ const useFlowStore = createWithEqualityFn(
       },
 
       toggleDecisionNodeFeature: (nodeId, featureName, enabled) => {
-        const { updateNode } = get();
-        updateNode(nodeId, { [featureName]: enabled });
+        // Whitelist of allowed features to prevent object injection vulnerabilities.
+        const ALLOWED_FEATURES = ['enableMarkdown', 'enableVariables'];
+        if (ALLOWED_FEATURES.includes(featureName)) {
+          const { updateNode } = get();
+          updateNode(nodeId, { [featureName]: enabled });
+        } else {
+          // eslint-disable-next-line no-console
+          console.error(
+            `Security: Attempted to toggle an invalid feature: "${featureName}"`,
+          );
+        }
       },
 
       // Acciones específicas para OptionNode
@@ -684,7 +710,7 @@ const useFlowStore = createWithEqualityFn(
 
           // 1. Crear un mapa del estado deseado para nodos y aristas
           const targetOptionNodes = new Map();
-          conditions.forEach((condition, index) => {
+          conditions.forEach(condition => {
             const optionNodeId = `option-${nodeId}-${condition.id}`;
             targetOptionNodes.set(optionNodeId, {
               id: optionNodeId,
@@ -782,29 +808,28 @@ const useFlowStore = createWithEqualityFn(
         });
       },
 
-      updateOptionNodeData: (nodeId, data) => {
+      updateNodeData: (nodeId, data) => {
+        set(state => ({
+          nodes: state.nodes.map(node =>
+            node.id === nodeId
+              ? { ...node, data: { ...node.data, ...data }, lastUpdated: new Date().toISOString() }
+              : node,
+          ),
+          hasChanges: true,
+        }));
+      },
+
+      updateOptionNodeText: (nodeId, newText, data) => {
         set(state => {
-          const nodes = state.nodes;
-          const optionNode = nodes.find(n => n.id === nodeId);
+          const { parentNodeId, conditionId } = data;
 
-          if (!optionNode) {
-            return state;
-          }
-
-          const newText = data.instruction;
-          const parentNodeId = optionNode.data.sourceNode;
-          const conditionId = optionNode.data.sourceConditionId;
-
-          let newNodes = nodes.map(node => {
+          let newNodes = state.nodes.map(node => {
             if (node.id === nodeId) {
               const updatedData = {
                 ...node.data,
-                ...data,
+                text: newText,
                 lastUpdated: new Date().toISOString(),
               };
-              if (typeof newText !== 'undefined') {
-                updatedData.text = newText;
-              }
               return { ...node, data: updatedData };
             }
             return node;
@@ -829,23 +854,12 @@ const useFlowStore = createWithEqualityFn(
         });
       },
 
-      updateNodeData: (nodeId, data) => {
-        set(state => ({
-          nodes: state.nodes.map(node =>
-            node.id === nodeId
-              ? { ...node, data: { ...node.data, ...data }, lastUpdated: new Date().toISOString() }
-              : node
-          ),
-          hasChanges: true,
-        }));
-      },
-      
       // Acciones específicas para ActionNode
       updateActionNodeDescription: (nodeId, description) => {
         const { updateNode } = get();
         updateNode(nodeId, { description });
       },
-      
+
       updateActionNodeType: (nodeId, actionType) => {
         const { updateNode } = get();
         const node = get().nodes.find(n => n.id === nodeId);
@@ -880,43 +894,47 @@ const useFlowStore = createWithEqualityFn(
             default:
               defaultParameters = {};
           }
-          
+
           // Mantener los parámetros actuales que coincidan con los predeterminados
           const currentParameters = node.data.parameters || {};
           const mergedParameters = { ...defaultParameters };
-          
-          // Solo conservar los parámetros que son relevantes para el nuevo tipo de acción
-          Object.keys(mergedParameters).forEach(key => {
-            if (currentParameters[key] !== undefined) {
+
+          // Security: Use a whitelist of allowed keys derived from the defaults to prevent object injection.
+          const allowedKeys = Object.keys(defaultParameters);
+
+          allowedKeys.forEach(key => {
+            if (Object.prototype.hasOwnProperty.call(currentParameters, key)) {
+              // The 'key' is validated against a whitelist, making this assignment safe.
+              // eslint-disable-next-line security/detect-object-injection
               mergedParameters[key] = currentParameters[key];
             }
           });
-          
-          updateNode(nodeId, { 
-            actionType, 
+
+          updateNode(nodeId, {
+            actionType,
             parameters: mergedParameters,
-            lastModified: new Date().toISOString() 
+            lastModified: new Date().toISOString(),
           });
         }
       },
-      
+
       updateActionNodeParameters: (nodeId, parameters) => {
         const { updateNode } = get();
         const node = get().nodes.find(n => n.id === nodeId);
         if (node && node.data) {
           const currentParameters = node.data.parameters || {};
-          updateNode(nodeId, { 
+          updateNode(nodeId, {
             parameters: { ...currentParameters, ...parameters },
-            lastModified: new Date().toISOString()
+            lastModified: new Date().toISOString(),
           });
         }
       },
-      
+
       updateActionNodeStatus: (nodeId, status) => {
         const { updateNode } = get();
         updateNode(nodeId, { status });
       },
-      
+
       toggleActionNodeCollapsed: (nodeId, isCollapsed) => {
         const { updateNode } = get();
         updateNode(nodeId, { isCollapsed });
@@ -955,7 +973,7 @@ const useFlowStore = createWithEqualityFn(
             plubotId: get().plubotId,
           },
         };
-        
+
         const newEdges = addEdge(newEdge, edges);
         _createHistoryEntry({ nodes, edges: newEdges }, true);
       },
@@ -970,13 +988,13 @@ const useFlowStore = createWithEqualityFn(
           }),
         }));
       },
-      
+
       removeEdge: (edgeId) => {
         set(state => ({
           edges: state.edges.filter(edge => edge.id !== edgeId),
         }));
       },
-      
+
       // Acciones de aristas
       setEdges: (newEdges) => {
         const { nodes, edges: currentEdges, _createHistoryEntry } = get();
@@ -1002,50 +1020,38 @@ const useFlowStore = createWithEqualityFn(
         // _createHistoryEntry se encarga de llamar a set() internamente.
         _createHistoryEntry({ nodes, edges: processedEdges });
       },
-      
+
       // Seleccionar nodos o aristas
       selectNode: (nodeId) => {
-        set({ 
+        set({
           selectedNode: nodeId,
-          selectedEdge: null // Deseleccionar arista si hay alguna
+          selectedEdge: null, // Deseleccionar arista si hay alguna
         });
       },
-      
+
       selectEdge: (edgeId) => {
-        set({ 
+        set({
           selectedEdge: edgeId,
-          selectedNode: null // Deseleccionar nodo si hay alguno
+          selectedNode: null, // Deseleccionar nodo si hay alguno
         });
       },
-      
+
       clearSelection: () => {
-        set({ 
+        set({
           selectedNode: null,
-          selectedEdge: null 
+          selectedEdge: null,
         });
       },
-      
+
       // Acción para establecer el plubotId
       setPlubotId: (id) => set({ plubotId: id }),
-      
+
       // Cambio de nombre
       setFlowName: (name) => {
         set({ flowName: name });
       },
-      
-      // Toggle modo ultra rendimiento - solo por interacción del usuario
-      toggleUltraMode: () => {
-        // Usar el valor anterior para invertirlo
-        const newUltraMode = !get().isUltraMode;
-        
-        // Primero actualizar el estado en el store
-        set({ isUltraMode: newUltraMode });
-        
-        // Luego llamar a la función del UltraModeManager con userInitiated=true
-        // para indicar que este cambio fue explicitamente por el usuario
-        toggleUltraModeManager(newUltraMode, true);
-      },
-      
+
+
       // Centrar nodos en el viewport
       centerNodes: () => {
         set({ shouldMoveToCenter: true });
@@ -1053,90 +1059,97 @@ const useFlowStore = createWithEqualityFn(
           set({ shouldMoveToCenter: false });
         }, 100); // Reset flag después de ser consumido
       },
-      
+
       // Toggle autoarrange
       toggleAutoArrange: () => {
         set(state => ({ autoArrange: !state.autoArrange }));
       },
-      
+
       // Setear viewport
       setViewport: (viewport) => {
         set({ viewport });
       },
-      
+
       // Eliminar las aristas desconectadas
       cleanUpEdges: () => {
         const { edges } = get();
         // Filtrar aristas válidas (con source y target definidos)
-        return edges.filter(edge => 
-          edge.source && edge.target && 
-          edge.source.length > 0 && edge.target.length > 0
+        return edges.filter(edge =>
+          edge.source && edge.target &&
+          edge.source.length > 0 && edge.target.length > 0,
         );
       },
-      
+
       // Gestión de modales
       openModal: (modalName) => {
         if (!modalName) return;
-        
+
         set(state => ({
           modals: {
             ...state.modals,
-            [modalName]: true
-          }
+            [modalName]: true,
+          },
         }));
       },
-      
+
       closeModal: (modalName) => {
         if (!modalName) return;
-        
+
         set(state => ({
           modals: {
             ...state.modals,
-            [modalName]: false
-          }
+            [modalName]: false,
+          },
         }));
       },
-      
+
       // Estado de backup
       setBackupLoaded: (loaded) => set({ isBackupLoaded: loaded }),
       setHasChanges: (hasChanges) => set({ hasChanges }),
-      
+
       // Sistema de respaldo con debounce para optimizar rendimiento
       backupState: debounce((plubotId, nodes, edges) => {
         if (!plubotId) return;
         try {
           const backupData = { nodes, edges, timestamp: Date.now() };
           localStorage.setItem(`plubot-backup-${plubotId}`, JSON.stringify(backupData));
-        } catch (e) {}
+        } catch {
+          /* Silenced: Local storage can fail in private browsing mode */
+        }
       }, 1000, { leading: false, trailing: true }), // Debounce de 1 segundo
-      
+
       restoreFromBackup: (plubotId) => {
         if (!plubotId) return null;
-        
+
         try {
           const backupJson = localStorage.getItem(`plubot-backup-${plubotId}`);
           if (!backupJson) return null;
-          
+
           return JSON.parse(backupJson);
-        } catch (e) {
+        } catch {
+          // Silenced error
           return null;
         }
       },
-      
+
       backupEdges: (plubotId, edges) => {
         if (!plubotId || !edges) return;
         try {
           localStorage.setItem(`plubot-edges-${plubotId}`, JSON.stringify(edges));
-        } catch (e) {}
+        } catch {
+          /* Silenced: Local storage can fail in private browsing mode */
+        }
       },
-      
+
       backupNodes: (plubotId, nodes) => {
         if (!plubotId || !nodes) return;
         try {
           localStorage.setItem(`plubot-nodes-${plubotId}`, JSON.stringify(nodes));
-        } catch (e) {}
+        } catch {
+          /* Silenced: Local storage can fail in private browsing mode */
+        }
       },
-      
+
       // Acciones de historial
       setHistory: (updater) => {
         set((state) => {
@@ -1199,27 +1212,27 @@ const useFlowStore = createWithEqualityFn(
           };
         });
       },
-      
+
       canUndo: () => get().history.past.length > 0,
       canRedo: () => get().history.future.length > 0,
-      
+
       // Acciones de persistencia
       saveState: () => {
         set({ isSaving: true });
         // Simular guardado asíncrono
         setTimeout(() => {
-          set({ 
-            isSaving: false, 
+          set({
+            isSaving: false,
             lastSaved: new Date().toISOString(),
             history: {
               ...get().history,
               past: [], // Limpiar historial después de guardar
               future: [],
-            }
+            },
           });
         }, 500);
       },
-      
+
       // Resetear al estado inicial
       reset: () => {
         set({
@@ -1228,12 +1241,12 @@ const useFlowStore = createWithEqualityFn(
             past: [],
             future: [],
             maxHistory: 50,
-          }
+          },
         });
       },
-      
+
       resetFlow: _resetFlowAction(set, get),
-      
+
       _saveFlowToServer: async (flowState) => {
         const { id: plubotId, nodes, edges, flowName } = flowState;
 
@@ -1246,13 +1259,13 @@ const useFlowStore = createWithEqualityFn(
         try {
           const stateForApi = { nodes, edges, name: flowName };
           const result = await flowService.saveFlow(plubotId, stateForApi);
-          
+
           set({
             isSaving: false,
             lastSaved: result.timestamp || new Date().toISOString(),
             hasChanges: false,
           });
-        } catch (error) {
+        } catch {
           set({ isSaving: false });
         }
       },
@@ -1261,29 +1274,29 @@ const useFlowStore = createWithEqualityFn(
         if (get().isSaving) {
           return;
         }
-      
+
         set({ isSaving: true });
-      
+
         try {
           const { nodes, edges, flowName, plubotId } = get();
-      
+
           if (!plubotId) {
             set({ isSaving: false });
             return;
           }
-      
+
           const stateToSave = { nodes, edges, flowName, id: plubotId };
           const shouldSave = flowStateManager.queueSave(stateToSave, (queuedState) => {
             get()._saveFlowToServer(queuedState);
           });
-      
+
           if (!shouldSave) {
             set({ isSaving: false });
-            return;
+
           }
-      
-          return;
-        } catch (error) {
+
+
+        } catch {
           set({ isSaving: false });
         }
       },
@@ -1300,7 +1313,7 @@ const useFlowStore = createWithEqualityFn(
         const validatedNodes = validateNodePositions(nodes);
         const finalNodes = preventNodeStacking(validatedNodes);
 
-        return { nodes: finalNodes, edges: edges, viewport };
+        return { nodes: finalNodes, edges, viewport };
       },
 
       loadFlow: async (plubotId) => {
@@ -1322,7 +1335,7 @@ const useFlowStore = createWithEqualityFn(
           if (processedData) {
             set({
               ...processedData,
-              plubotId: plubotId,
+              plubotId,
               flowName: sanitizedData.name || `Flujo de ${plubotId}`,
               isSaving: false,
               isLoaded: true,
@@ -1343,7 +1356,7 @@ const useFlowStore = createWithEqualityFn(
               nodes: [],
               edges: [],
               flowName: `Nuevo Flujo para ${plubotId}`,
-              plubotId: plubotId,
+              plubotId,
               viewport: initialState.viewport,
               isSaving: false,
               isLoaded: true,
@@ -1354,12 +1367,12 @@ const useFlowStore = createWithEqualityFn(
               selectedEdge: null,
             });
           }
-        } catch (error) {
+        } catch {
           set({
             nodes: [],
             edges: [],
             flowName: `Error al cargar ${plubotId}`,
-            plubotId: plubotId,
+            plubotId,
             viewport: initialState.viewport,
             isSaving: false,
             isLoaded: true,
@@ -1403,31 +1416,31 @@ const useFlowStore = createWithEqualityFn(
       },
     }, // Fin del objeto de configuración de persist
   ), // Fin de persist()
-  shallow
+  shallow,
 ); // Fin de createWithEqualityFn()
 
 // Selectores optimizados para el store
-export const useNode = (id) => 
+export const useNode = (id) =>
   useFlowStore(state => state.nodes.find(node => node.id === id));
 
-export const useEdge = (id) => 
+export const useEdge = (id) =>
   useFlowStore(state => state.edges.find(edge => edge.id === id));
 
-export const useConnectedEdges = (nodeId) => 
-  useFlowStore(state => 
-    state.edges.filter(edge => 
-      edge.source === nodeId || edge.target === nodeId
-    )
+export const useConnectedEdges = (nodeId) =>
+  useFlowStore(state =>
+    state.edges.filter(edge =>
+      edge.source === nodeId || edge.target === nodeId,
+    ),
   );
 
-export const useSelectedNode = () => 
-  useFlowStore(state => 
-    state.selectedNode ? 
-    state.nodes.find(n => n.id === state.selectedNode) : 
-    null
+export const useSelectedNode = () =>
+  useFlowStore(state =>
+    state.selectedNode ?
+      state.nodes.find(n => n.id === state.selectedNode) :
+      null,
   );
 
-export const useIsNodeSelected = (nodeId) => 
+export const useIsNodeSelected = (nodeId) =>
   useFlowStore(state => state.selectedNode === nodeId);
 
 // Selectores granulares para optimización de rendimiento

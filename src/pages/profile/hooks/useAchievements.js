@@ -16,7 +16,7 @@ const useAchievements = () => {
   const displayAchievement = (achievement, timeout = 5000) => {
     setRecentAchievement(achievement);
     setShowAchievementUnlocked(true);
-    
+
     setTimeout(() => {
       setShowAchievementUnlocked(false);
     }, timeout);
@@ -27,7 +27,7 @@ const useAchievements = () => {
     setShowAchievementUnlocked,
     recentAchievement,
     setRecentAchievement,
-    displayAchievement
+    displayAchievement,
   };
 };
 

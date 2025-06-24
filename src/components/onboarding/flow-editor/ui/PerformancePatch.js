@@ -7,21 +7,21 @@ import useFlowStore from '@/stores/useFlowStore';
 
 // Inicializar cuando el DOM esté listo
 if (typeof document !== 'undefined') {
-  (function() {
-  
-  // Variables globales
-  let styleElement = null;
-  let unsubscribe = null;
-  let isUltraPerformanceMode = false;
-  
-  // Crear estilos para el modo ultra rendimiento
-  function createStyles() {
-    if (styleElement) return; // Ya existe
-    
-    // Crear el elemento de estilo
-    styleElement = document.createElement('style');
-    styleElement.id = 'ultra-performance-styles';
-    styleElement.textContent = `
+  (function () {
+
+    // Variables globales
+    let styleElement = null;
+    let unsubscribe = null;
+    let isUltraPerformanceMode = false;
+
+    // Crear estilos para el modo ultra rendimiento
+    function createStyles() {
+      if (styleElement) return; // Ya existe
+
+      // Crear el elemento de estilo
+      styleElement = document.createElement('style');
+      styleElement.id = 'ultra-performance-styles';
+      styleElement.textContent = `
       /* Estilos para modo ultra rendimiento */
       
       /* Reset de estilos que pueden causar problemas de rendimiento */
@@ -145,132 +145,132 @@ if (typeof document !== 'undefined') {
         transform: none;
       }
     `;
-    
-    // Agregar los estilos al DOM
-    document.head.appendChild(styleElement);
-    
 
-  }
-  
-  // Eliminar estilos
-  function removeStyles() {
+      // Agregar los estilos al DOM
+      document.head.appendChild(styleElement);
+
+
+    }
+
+    // Eliminar estilos
+    function removeStyles() {
     // Eliminar los estilos
-    if (styleElement) {
-      styleElement.remove();
-      styleElement = null;
-    }
-    
+      if (styleElement) {
+        styleElement.remove();
+        styleElement = null;
+      }
 
-  }
-  
-  // Función para garantizar la visibilidad de los nodos y bordes en modo ultra rendimiento
-  // NO intentamos posicionar los nodos, sólo aseguramos que sean visibles
-  function updateNodePositions() {
+
+    }
+
+    // Función para garantizar la visibilidad de los nodos y bordes en modo ultra rendimiento
+    // NO intentamos posicionar los nodos, sólo aseguramos que sean visibles
+    function updateNodePositions() {
     // Si no estamos en modo ultra, o si hay un arrastre en progreso, salir
-    if (!isUltraPerformanceMode || window.__dragInProgress) return;
-    
-    // Obtener los nodos y bordes del store
-    const { nodes, edges } = useFlowStore.getState();
-    
-    // Sólo asegurar que los nodos sean visibles, SIN modificar su posición
-    // Esto evita conflictos con el sistema nativo de ReactFlow
-    nodes.forEach(node => {
-      const nodeElement = document.querySelector(`.react-flow__node[data-id="${node.id}"]`);
-      if (nodeElement) {
+      if (!isUltraPerformanceMode || window.__dragInProgress) return;
+
+      // Obtener los nodos y bordes del store
+      const { nodes, edges } = useFlowStore.getState();
+
+      // Sólo asegurar que los nodos sean visibles, SIN modificar su posición
+      // Esto evita conflictos con el sistema nativo de ReactFlow
+      nodes.forEach(node => {
+        const nodeElement = document.querySelector(`.react-flow__node[data-id="${node.id}"]`);
+        if (nodeElement) {
         // Asegurar que el nodo es visible
-        nodeElement.style.opacity = '1';
-        nodeElement.style.visibility = 'visible';
-        nodeElement.style.display = 'block';
-      }
-    });
-    
-    // Sólo asegurar que los bordes sean visibles
-    edges.forEach(edge => {
-      const edgeElement = document.querySelector(`.react-flow__edge[data-id="${edge.id}"]`);
-      if (edgeElement) {
+          nodeElement.style.opacity = '1';
+          nodeElement.style.visibility = 'visible';
+          nodeElement.style.display = 'block';
+        }
+      });
+
+      // Sólo asegurar que los bordes sean visibles
+      edges.forEach(edge => {
+        const edgeElement = document.querySelector(`.react-flow__edge[data-id="${edge.id}"]`);
+        if (edgeElement) {
         // Asegurar que el borde es visible
-        edgeElement.style.opacity = '1';
-        edgeElement.style.visibility = 'visible';
-        edgeElement.style.display = 'block';
-      }
-    });
-  }
-  
-  // Función para manejar cambios en el modo de rendimiento
-  function handlePerformanceModeChange(isUltra) {
-    isUltraPerformanceMode = isUltra;
-    
-    if (isUltraPerformanceMode) {
-      document.body.classList.add('performance-mode-active');
-      createStyles();
-      // Actualizar posiciones inmediatamente
-      updateNodePositions();
-
-    } else {
-      document.body.classList.remove('performance-mode-active');
-      removeStyles();
-
-    }
-  }
-  
-  // Suscribirse a cambios en el store
-  function subscribeToStore() {
-    if (unsubscribe) return; // Ya estamos suscritos
-    
-    // Suscribirse a cambios en isUltraMode
-    const unsubscribeUltraMode = useFlowStore.subscribe(
-      state => state.isUltraMode,
-      (isUltra) => {
-        if (isUltra !== isUltraPerformanceMode) {
-          handlePerformanceModeChange(isUltra);
+          edgeElement.style.opacity = '1';
+          edgeElement.style.visibility = 'visible';
+          edgeElement.style.display = 'block';
         }
-      },
-      { fireImmediately: true } // Ejecutar inmediatamente con el estado actual
-    );
-    
-    // Suscribirse a cambios en los nodos para actualizar sus posiciones
-    const unsubscribeNodes = useFlowStore.subscribe(
-      state => state.nodes,
-      () => {
-        if (isUltraPerformanceMode) {
+      });
+    }
+
+    // Función para manejar cambios en el modo de rendimiento
+    function handlePerformanceModeChange(isUltra) {
+      isUltraPerformanceMode = isUltra;
+
+      if (isUltraPerformanceMode) {
+        document.body.classList.add('performance-mode-active');
+        createStyles();
+        // Actualizar posiciones inmediatamente
+        updateNodePositions();
+
+      } else {
+        document.body.classList.remove('performance-mode-active');
+        removeStyles();
+
+      }
+    }
+
+    // Suscribirse a cambios en el store
+    function subscribeToStore() {
+      if (unsubscribe) return; // Ya estamos suscritos
+
+      // Suscribirse a cambios en isUltraMode
+      const unsubscribeUltraMode = useFlowStore.subscribe(
+        state => state.isUltraMode,
+        (isUltra) => {
+          if (isUltra !== isUltraPerformanceMode) {
+            handlePerformanceModeChange(isUltra);
+          }
+        },
+        { fireImmediately: true }, // Ejecutar inmediatamente con el estado actual
+      );
+
+      // Suscribirse a cambios en los nodos para actualizar sus posiciones
+      const unsubscribeNodes = useFlowStore.subscribe(
+        state => state.nodes,
+        () => {
+          if (isUltraPerformanceMode) {
           // Solo actualizar si estamos en modo ultra
-          requestAnimationFrame(updateNodePositions);
-        }
-      }
-    );
-    
-    // Combinar las funciones de cancelación de suscripción
-    unsubscribe = () => {
-      unsubscribeUltraMode();
-      unsubscribeNodes();
-    };
-  }
-  
-  // Inicializar cuando el DOM esté listo
-  function initialize() {
-    // Obtener el estado inicial del store
-    const initialState = useFlowStore.getState();
-    isUltraPerformanceMode = initialState.isUltraMode;
-    
-    // Aplicar estilos iniciales si es necesario
-    if (isUltraPerformanceMode) {
-      document.body.classList.add('performance-mode-active');
-      createStyles();
-    }
-    
-    // Suscribirse a cambios futuros
-    subscribeToStore();
-    
+            requestAnimationFrame(updateNodePositions);
+          }
+        },
+      );
 
-  }
-  
-  // Iniciar cuando el DOM esté listo
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initialize);
-  } else {
-    initialize();
-  }
-  
+      // Combinar las funciones de cancelación de suscripción
+      unsubscribe = () => {
+        unsubscribeUltraMode();
+        unsubscribeNodes();
+      };
+    }
+
+    // Inicializar cuando el DOM esté listo
+    function initialize() {
+    // Obtener el estado inicial del store
+      const initialState = useFlowStore.getState();
+      isUltraPerformanceMode = initialState.isUltraMode;
+
+      // Aplicar estilos iniciales si es necesario
+      if (isUltraPerformanceMode) {
+        document.body.classList.add('performance-mode-active');
+        createStyles();
+      }
+
+      // Suscribirse a cambios futuros
+      subscribeToStore();
+
+
+    }
+
+    // Iniciar cuando el DOM esté listo
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initialize);
+    } else {
+      initialize();
+    }
+
     // Limpiar la suscripción cuando ya no sea necesaria
     if (typeof window !== 'undefined') {
       window.addEventListener('beforeunload', () => {

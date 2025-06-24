@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+
 import { useNodeHistory } from '@/hooks/legacy-compatibility';
 
 /**
@@ -8,12 +9,12 @@ import { useNodeHistory } from '@/hooks/legacy-compatibility';
  * @param {Function} props.onRestore - Función que se ejecuta al restaurar una versión
  * @param {Function} props.onClose - Función que se ejecuta al cerrar el visor
  */
-const NodeHistoryViewer = ({ 
-  nodeId, 
-  onRestore, 
+const NodeHistoryViewer = ({
+  nodeId,
+  onRestore,
   onClose,
   preferReducedMotion = false,
-  highContrast = false 
+  highContrast = false,
 }) => {
   const [selectedVersion, setSelectedVersion] = useState(null);
   const [historyEntries, setHistoryEntries] = useState([]);
@@ -25,24 +26,24 @@ const NodeHistoryViewer = ({
       setIsLoading(true);
       // Obtener el historial del nodo
       const history = getHistory(nodeId);
-      
+
       // En un entorno real, esto sería una llamada asíncrona
       // Por ahora, simulamos algunos datos de historial
       const mockHistory = [
-        { 
-          id: '1', 
-          timestamp: new Date(Date.now() - 3600000).toISOString(), 
-          content: 'Versión anterior del contenido', 
-          author: 'Usuario' 
+        {
+          id: '1',
+          timestamp: new Date(Date.now() - 3600000).toISOString(),
+          content: 'Versión anterior del contenido',
+          author: 'Usuario',
         },
-        { 
-          id: '2', 
-          timestamp: new Date(Date.now() - 7200000).toISOString(), 
-          content: 'Versión más antigua del contenido', 
-          author: 'Usuario' 
-        }
+        {
+          id: '2',
+          timestamp: new Date(Date.now() - 7200000).toISOString(),
+          content: 'Versión más antigua del contenido',
+          author: 'Usuario',
+        },
       ];
-      
+
       setHistoryEntries(mockHistory);
       setIsLoading(false);
     }
@@ -61,7 +62,7 @@ const NodeHistoryViewer = ({
       month: '2-digit',
       year: 'numeric',
       hour: '2-digit',
-      minute: '2-digit'
+      minute: '2-digit',
     }).format(date);
   };
 
@@ -72,7 +73,7 @@ const NodeHistoryViewer = ({
     borderRadius: '8px',
     padding: '16px',
     maxHeight: '400px',
-    overflowY: 'auto'
+    overflowY: 'auto',
   };
 
   const buttonStyles = {
@@ -83,7 +84,7 @@ const NodeHistoryViewer = ({
     cursor: 'pointer',
     transition: preferReducedMotion ? 'none' : 'background-color 0.2s ease',
     backgroundColor: highContrast ? '#fff' : '#3b82f6',
-    color: highContrast ? '#000' : '#fff'
+    color: highContrast ? '#000' : '#fff',
   };
 
   const listItemStyles = {
@@ -92,19 +93,19 @@ const NodeHistoryViewer = ({
     marginBottom: '8px',
     cursor: 'pointer',
     transition: preferReducedMotion ? 'none' : 'background-color 0.2s ease',
-    backgroundColor: highContrast ? '#333' : '#f3f4f6'
+    backgroundColor: highContrast ? '#333' : '#f3f4f6',
   };
 
   const selectedItemStyles = {
     ...listItemStyles,
     backgroundColor: highContrast ? '#555' : '#e5e7eb',
-    borderLeft: `4px solid ${highContrast ? '#fff' : '#3b82f6'}`
+    borderLeft: `4px solid ${highContrast ? '#fff' : '#3b82f6'}`,
   };
 
   return (
     <div style={containerStyles}>
       <h3 style={{ marginTop: 0 }}>Historial de Versiones</h3>
-      
+
       {isLoading ? (
         <p>Cargando historial...</p>
       ) : historyEntries.length === 0 ? (
@@ -113,7 +114,7 @@ const NodeHistoryViewer = ({
         <>
           <div style={{ marginBottom: '16px' }}>
             {historyEntries.map((entry) => (
-              <div 
+              <div
                 key={entry.id}
                 style={selectedVersion?.id === entry.id ? selectedItemStyles : listItemStyles}
                 onClick={() => setSelectedVersion(entry)}
@@ -134,25 +135,25 @@ const NodeHistoryViewer = ({
               </div>
             ))}
           </div>
-          
+
           <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-            <button 
+            <button
               onClick={onClose}
               style={{
                 ...buttonStyles,
                 backgroundColor: 'transparent',
                 border: `1px solid ${highContrast ? '#fff' : '#d1d5db'}`,
-                color: highContrast ? '#fff' : '#6b7280'
+                color: highContrast ? '#fff' : '#6b7280',
               }}
             >
               Cancelar
             </button>
-            <button 
+            <button
               onClick={handleRestore}
               disabled={!selectedVersion}
               style={{
                 ...buttonStyles,
-                opacity: !selectedVersion ? 0.5 : 1
+                opacity: !selectedVersion ? 0.5 : 1,
               }}
             >
               Restaurar Versión

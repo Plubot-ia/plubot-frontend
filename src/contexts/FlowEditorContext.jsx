@@ -1,11 +1,14 @@
 import React, { createContext, useContext, useMemo, useCallback, useEffect, useRef } from 'react';
-import { useFlowStore } from '@/stores/useFlowStore';
+
 import useFlowOptimization from '@/hooks/legacy-compatibility';
 import useHistory from '@/hooks/useHistory';
-import { NODE_TYPES, EDGE_TYPES } from '@/utils/nodeConfig';
 // Importar nuevos hooks optimizados (para futuras mejoras)
-import useVirtualization from '@/hooks/useVirtualization';
 import useNodeCreator from '@/hooks/useNodeCreator';
+import { useFlowStore } from '@/stores/useFlowStore';
+import { NODE_TYPES, EDGE_TYPES } from '@/utils/nodeConfig';
+
+import useVirtualization from '@/hooks/useVirtualization';
+
 
 // Crear el contexto
 const FlowEditorContext = createContext();
@@ -17,7 +20,7 @@ const FlowEditorContext = createContext();
 export const FlowEditorProvider = ({ children }) => {
   // Usar el store de Zustand
   const flowStore = useFlowStore();
-  
+
   // Configurar historial
   const history = useHistory({
     maxHistory: 100,
@@ -41,7 +44,7 @@ export const FlowEditorProvider = ({ children }) => {
       edges: flowStore.edges,
       viewport: flowStore.viewport,
     });
-    
+
     // Configurar atajos de teclado para deshacer/rehacer
     const handleKeyDown = (e) => {
       // Ctrl+Z o Cmd+Z para deshacer
@@ -56,7 +59,7 @@ export const FlowEditorProvider = ({ children }) => {
           }
         }
       }
-      
+
       // Ctrl+Shift+Z o Cmd+Shift+Z para rehacer
       if ((e.ctrlKey || e.metaKey) && e.key === 'z' && e.shiftKey) {
         e.preventDefault();
@@ -69,7 +72,7 @@ export const FlowEditorProvider = ({ children }) => {
           }
         }
       }
-      
+
       // Ctrl+S o Cmd+S para guardar
       if ((e.ctrlKey || e.metaKey) && e.key === 's') {
         e.preventDefault();
@@ -86,7 +89,7 @@ export const FlowEditorProvider = ({ children }) => {
     return nodes.map(node => {
       const change = changes.find(c => c.id === node.id);
       if (!change) return node;
-      
+
       switch (change.type) {
         case 'select':
           return { ...node, selected: change.selected };
@@ -115,7 +118,7 @@ export const FlowEditorProvider = ({ children }) => {
       .map(edge => {
         const change = changes.find(c => c.id === edge.id);
         if (!change) return edge;
-        
+
         switch (change.type) {
           case 'select':
             return { ...edge, selected: change.selected };
@@ -131,12 +134,12 @@ export const FlowEditorProvider = ({ children }) => {
   const handleNodesChange = useCallback((changes) => {
     flowStore.setNodes(prevNodes => {
       const newNodes = applyNodeChanges(changes, prevNodes);
-      
+
       // Agregar al historial si hay cambios significativos
-      const significantChanges = changes.filter(change => 
-        change.type === 'position' && change.dragging === false
+      const significantChanges = changes.filter(change =>
+        change.type === 'position' && change.dragging === false,
       );
-      
+
       if (significantChanges.length > 0) {
         history.addToHistory({
           nodes: newNodes,
@@ -144,10 +147,10 @@ export const FlowEditorProvider = ({ children }) => {
           viewport: flowStore.viewport,
         });
       }
-      
+
       return newNodes;
     });
-    
+
     // Marcar actividad para optimizaciones de rendimiento
     optimization.markActivity();
   }, [flowStore, history, optimization, applyNodeChanges]);
@@ -156,7 +159,7 @@ export const FlowEditorProvider = ({ children }) => {
   const handleEdgesChange = useCallback((changes) => {
     flowStore.setEdges(prevEdges => {
       const newEdges = applyEdgeChanges(changes, prevEdges);
-      
+
       // Agregar al historial si hay cambios
       if (changes.some(change => change.type === 'remove')) {
         history.addToHistory({
@@ -165,10 +168,10 @@ export const FlowEditorProvider = ({ children }) => {
           viewport: flowStore.viewport,
         });
       }
-      
+
       return newEdges;
     });
-    
+
     // Marcar actividad para optimizaciones de rendimiento
     optimization.markActivity();
   }, [flowStore, history, optimization, applyEdgeChanges]);
@@ -193,17 +196,17 @@ export const FlowEditorProvider = ({ children }) => {
       edges: flowStore.edges,
       viewport: flowStore.viewport,
     };
-    
+
     // Solo guardar si hay cambios
     if (JSON.stringify(lastSavedState.current) !== JSON.stringify(currentState)) {
       flowStore.setSaving(true);
-      
+
       // Simular guardado asíncrono
       setTimeout(() => {
         lastSavedState.current = currentState;
         flowStore.setSaving(false);
         flowStore.setLastSaved(new Date().toISOString());
-        
+
         // Notificar éxito
         if (flowStore.onSave) {
           flowStore.onSave(currentState);
@@ -225,15 +228,15 @@ export const FlowEditorProvider = ({ children }) => {
   const contextValue = useMemo(() => ({
     // Estado
     ...flowStore,
-    
+
     // Historial
     canUndo: history.canUndo(),
     canRedo: history.canRedo(),
-    
+
     // Optimizaciones
     isIdle: optimization.isIdle,
     isUltraMode: optimization.isUltraMode,
-    
+
     // Métodos
     onNodesChange: handleNodesChange,
     onEdgesChange: handleEdgesChange,
@@ -245,7 +248,7 @@ export const FlowEditorProvider = ({ children }) => {
     toggleUltraMode: optimization.toggleUltraMode,
     markActivity: optimization.markActivity,
     runOnNextFrame: optimization.runOnNextFrame,
-    
+
     // Utilidades
     debounce: optimization.debounce,
     throttle: optimization.throttle,

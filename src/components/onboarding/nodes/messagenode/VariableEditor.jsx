@@ -5,20 +5,20 @@
  * @version 3.0.0
  */
 
-import React, { useState, useCallback, memo } from 'react';
-import PropTypes from 'prop-types';
 import { Plus, X, Save, CornerDownRight } from 'lucide-react';
+import PropTypes from 'prop-types';
+import React, { useState, useCallback, memo } from 'react';
 
 /**
  * Componente para editar variables de un mensaje
  */
-const VariableEditor = memo(({ 
+const VariableEditor = memo(({
   nodeId,
-  variables = [], 
+  variables = [],
   onAddVariable,
   onUpdateVariable,
   onDeleteVariable,
-  isUltraPerformanceMode = false 
+  isUltraPerformanceMode = false,
 }) => {
   // Estados locales
   const [newVarName, setNewVarName] = useState('');
@@ -32,12 +32,12 @@ const VariableEditor = memo(({
    */
   const handleAddNewVariable = useCallback(() => {
     if (!newVarName.trim()) return;
-    
+
     onAddVariable({
       name: newVarName.trim(),
-      value: newVarValue.trim()
+      value: newVarValue.trim(),
     });
-    
+
     // Reiniciar campos
     setNewVarName('');
     setNewVarValue('');
@@ -57,7 +57,7 @@ const VariableEditor = memo(({
    */
   const saveEditing = useCallback(() => {
     if (editingIndex === -1) return;
-    
+
     if (!editingName.trim()) {
       // Si el nombre está vacío, eliminamos la variable
       onDeleteVariable(editingIndex);
@@ -65,10 +65,10 @@ const VariableEditor = memo(({
       // Actualizamos la variable
       onUpdateVariable(editingIndex, {
         name: editingName.trim(),
-        value: editingValue.trim()
+        value: editingValue.trim(),
       });
     }
-    
+
     // Reiniciar estado de edición
     setEditingIndex(-1);
     setEditingName('');
@@ -125,21 +125,21 @@ const VariableEditor = memo(({
   }
 
   return (
-    <div 
+    <div
       className="message-node__variables-editor"
       role="region"
       aria-label="Editor de variables"
     >
       <h4 className="message-node__section-title">Variables</h4>
-      
+
       {/* Lista de variables existentes */}
       {variables.length > 0 && (
-        <div 
+        <div
           className="message-node__variables-list"
           role="list"
         >
           {variables.map((variable, index) => (
-            <div 
+            <div
               key={`var-${index}`}
               className="message-node__variable-item"
               role="listitem"
@@ -192,7 +192,7 @@ const VariableEditor = memo(({
               ) : (
                 // Modo visualización
                 <div className="message-node__variable-view">
-                  <div 
+                  <div
                     className="message-node__variable-info"
                     onClick={() => startEditing(index, variable)}
                   >
@@ -219,7 +219,7 @@ const VariableEditor = memo(({
           ))}
         </div>
       )}
-      
+
       {/* Formulario para agregar nueva variable */}
       <div className="message-node__add-variable">
         <div className="message-node__variable-inputs">
@@ -267,13 +267,13 @@ VariableEditor.propTypes = {
   variables: PropTypes.arrayOf(
     PropTypes.shape({
       name: PropTypes.string.isRequired,
-      value: PropTypes.string
-    })
+      value: PropTypes.string,
+    }),
   ),
   onAddVariable: PropTypes.func.isRequired,
   onUpdateVariable: PropTypes.func.isRequired,
   onDeleteVariable: PropTypes.func.isRequired,
-  isUltraPerformanceMode: PropTypes.bool
+  isUltraPerformanceMode: PropTypes.bool,
 };
 
 export default VariableEditor;

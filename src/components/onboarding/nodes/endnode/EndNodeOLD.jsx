@@ -5,29 +5,34 @@
  * @version 2.0.0
  */
 
-import React, { useState, useEffect, useRef, useCallback, memo, useMemo } from 'react';
-import { Handle, Position, useReactFlow } from 'reactflow';
-import { shallow } from 'zustand/shallow';
-import useFlowStore from '@/stores/useFlowStore';
-import { 
-  MoreHorizontal, 
-  Edit2, 
-  ChevronDown, 
+import {
+  MoreHorizontal,
+  Edit2,
+  ChevronDown,
   ChevronUp,
   X,
   Plus,
   CornerDownRight,
   Flag,
   Code,
-  Save
+  Save,
 } from 'lucide-react';
 import PropTypes from 'prop-types';
-import Tooltip from "../../ui/ToolTip";
-import ContextMenu from "../../ui/context-menu";
-import { formatDateRelative } from '@/utils/date';
+import React, { useState, useEffect, useRef, useCallback, memo, useMemo } from 'react';
+import { Handle, Position, useReactFlow } from 'reactflow';
+import { v4 as uuidv4 } from 'uuid';
+import { shallow } from 'zustand/shallow';
+
+
 import useNode from '@/hooks/useNode';
 import ReactMarkdown from '@/lib/simplified-markdown';
-import { v4 as uuidv4 } from 'uuid';
+import useFlowStore from '@/stores/useFlowStore';
+import { formatDateRelative } from '@/utils/date';
+
+import ContextMenu from '../../ui/context-menu';
+import Tooltip from '../../ui/ToolTip';
+
+
 import './EndNode.css';
 
 // Configuración del nodo
@@ -43,10 +48,10 @@ const NODE_CONFIG = {
     TEXT: '#ffffff',
     HANDLE: '#ff6b6b',
     HANDLE_HOVER: '#ff8e8e',
-  }
+  },
 };
 
-const EndNode = memo(({ 
+const EndNode = memo(({
   data = {
     label: 'Fin',
     variables: [],
@@ -70,7 +75,7 @@ const EndNode = memo(({
     removeEndNodeVariable,
     resizeEndNode,
     duplicateNode,
-    removeNode
+    removeNode,
   } = useFlowStore(state => ({
     updateEndNodeLabel: state.updateEndNodeLabel,
     updateEndNodeData: state.updateEndNodeData,
@@ -80,7 +85,7 @@ const EndNode = memo(({
     removeEndNodeVariable: state.removeEndNodeVariable,
     resizeEndNode: state.resizeEndNode,
     duplicateNode: state.duplicateNode,
-    removeNode: state.removeNode
+    removeNode: state.removeNode,
   }), shallow);
 
   // Estados locales del componente
@@ -120,13 +125,13 @@ const EndNode = memo(({
     minHeight,
     initialWidth,
     initialHeight,
-  } = useNode({ 
-    id, 
-    data, 
-    onNodesChange, 
-    isConnectable, 
+  } = useNode({
+    id,
+    data,
+    onNodesChange,
+    isConnectable,
     minWidth: 150,
-    minHeight: 100 
+    minHeight: 100,
   });
 
   // Sincronizar estados locales con props cuando sea necesario
@@ -152,14 +157,14 @@ const EndNode = memo(({
     if (showVariableEditor) {
       const handleClickOutside = (event) => {
         if (
-          variableEditorRef.current && 
+          variableEditorRef.current &&
           !variableEditorRef.current.contains(event.target) &&
           !event.target.closest('.end-node-tool-btn')
         ) {
           setShowVariableEditor(false);
         }
       };
-      
+
       document.addEventListener('mousedown', handleClickOutside);
       return () => document.removeEventListener('mousedown', handleClickOutside);
     }
@@ -193,15 +198,15 @@ const EndNode = memo(({
         label,
         variables,
       };
-      
+
       // Registrar cambios y actualizar el nodo
       trackChanges('Nodo de fin actualizado', updateData);
-      
+
       // Usar Zustand para actualizar el nodo si está disponible
       if (updateEndNodeData) {
         updateEndNodeData(id, updateData);
       }
-      
+
       // Mantener compatibilidad con implementación anterior
       if (data.onChange) {
         data.onChange(id, updateData);
@@ -222,10 +227,10 @@ const EndNode = memo(({
   // Añadir una nueva variable
   const addVariable = useCallback(() => {
     const newVar = `var_${variables.length + 1}`;
-    
+
     // Actualizar estado local para la UI
     setVariables([...variables, newVar]);
-    
+
     // Si no estamos en modo edición, actualizar también a través de Zustand
     if (!isEditing && addEndNodeVariable) {
       addEndNodeVariable(id, newVar);
@@ -236,7 +241,7 @@ const EndNode = memo(({
   const removeVariable = useCallback((index) => {
     // Actualizar estado local para la UI
     setVariables(variables.filter((_, i) => i !== index));
-    
+
     // Si no estamos en modo edición, actualizar también a través de Zustand
     if (!isEditing && removeEndNodeVariable) {
       removeEndNodeVariable(id, index);
@@ -249,7 +254,7 @@ const EndNode = memo(({
     const newVariables = [...variables];
     newVariables[index] = value;
     setVariables(newVariables);
-    
+
     // Si no estamos en modo edición, actualizar también a través de Zustand
     if (!isEditing && updateEndNodeVariable) {
       updateEndNodeVariable(id, index, value);
@@ -261,21 +266,21 @@ const EndNode = memo(({
     if (!label) return null;
 
     let formattedLabel = label;
-    
+
     // Resaltar las variables en el texto
     if (variables.length > 0) {
       variables.forEach((variable) => {
         const regex = new RegExp(`\\{\\{\\s*${variable}\\s*\\}\\}`, 'g');
         formattedLabel = formattedLabel.replace(
-          regex, 
-          `<span class="end-node-variable-highlight">${variable}</span>`
+          regex,
+          `<span class="end-node-variable-highlight">${variable}</span>`,
         );
       });
     }
-    
+
     // Aplicar markdown si está habilitado
-    return data.enableMarkdown ? 
-      <ReactMarkdown>{formattedLabel}</ReactMarkdown> : 
+    return data.enableMarkdown ?
+      <ReactMarkdown>{formattedLabel}</ReactMarkdown> :
       <span dangerouslySetInnerHTML={{ __html: formattedLabel }} />;
   }, [label, variables, data.enableMarkdown]);
 
@@ -320,38 +325,38 @@ const EndNode = memo(({
 
   // Opciones del menú contextual
   const contextMenuItems = [
-    { 
-      label: 'Editar', 
-      icon: <Edit2 size={14} />, 
-      action: handleDoubleClick, 
+    {
+      label: 'Editar',
+      icon: <Edit2 size={14} />,
+      action: handleDoubleClick,
       disabled: !canEdit,
-      shortcut: 'F2' 
+      shortcut: 'F2',
     },
-    { 
-      label: 'Ver historial', 
-      icon: <CornerDownRight size={14} />, 
+    {
+      label: 'Ver historial',
+      icon: <CornerDownRight size={14} />,
       action: () => data.onShowHistory?.(id),
-      shortcut: 'Alt+H'
+      shortcut: 'Alt+H',
     },
-    { 
-      label: 'Duplicar', 
-      icon: <Plus size={14} />, 
+    {
+      label: 'Duplicar',
+      icon: <Plus size={14} />,
       action: () => {
         const newId = uuidv4();
         const newLabel = `${data.label} (Copia)`;
-        
+
         // Usar Zustand para duplicar si está disponible
         if (duplicateNode && canEdit) {
           duplicateNode(id, { label: newLabel });
         }
-        
+
         // Mantener compatibilidad con implementación anterior
         if (data.onDuplicate) {
           data.onDuplicate(id, { ...data, id: newId, label: newLabel });
         }
-      }, 
+      },
       disabled: !canEdit,
-      shortcut: 'Ctrl+D'
+      shortcut: 'Ctrl+D',
     },
     {
       label: 'Eliminar',
@@ -362,7 +367,7 @@ const EndNode = memo(({
           if (removeNode && canDelete) {
             removeNode(id);
           }
-          
+
           // Mantener compatibilidad con implementación anterior
           if (data.onDelete) {
             data.onDelete(id);
@@ -370,21 +375,21 @@ const EndNode = memo(({
         }
       },
       disabled: !canDelete,
-      shortcut: 'Del'
+      shortcut: 'Del',
     },
   ];
 
   // Renderizar el editor de variables
   const renderVariableEditor = () => {
     if (!showVariableEditor) return null;
-    
+
     return (
       <div className="end-node-variable-editor" ref={variableEditorRef}>
         <div className="end-node-variable-editor-header">
           <h4>Variables</h4>
-          <button 
-            onClick={addVariable} 
-            className="end-node-variable-add" 
+          <button
+            onClick={addVariable}
+            className="end-node-variable-add"
             aria-label="Agregar variable"
           >
             <Plus size={14} /> Agregar
@@ -417,7 +422,7 @@ const EndNode = memo(({
           )}
         </div>
         <div className="end-node-variable-help">
-          <small>Usa {{variable}} en la etiqueta para insertar variables</small>
+          <small>Usa {{ variable }} en la etiqueta para insertar variables</small>
         </div>
       </div>
     );
@@ -431,7 +436,7 @@ const EndNode = memo(({
         nodeRef.current.style.opacity = '1';
         nodeRef.current.style.transform = 'translateY(0) scale(1) translateZ(0)';
       }, Math.random() * 100); // Pequeña variación para que no todos los nodos aparezcan exactamente al mismo tiempo
-      
+
       return () => clearTimeout(timer);
     }
   }, [isUltraPerformanceMode]);
@@ -502,9 +507,9 @@ const EndNode = memo(({
           }
         }}
       />
-      
+
       {renderNodeHeader}
-      
+
       {!isCollapsed && (
         <>
           <div className="end-node-content">
@@ -562,7 +567,7 @@ const EndNode = memo(({
               </div>
             )}
           </div>
-          
+
           {!isEditing ? (
             <div className="end-node-footer">
               {canEdit && (
@@ -592,16 +597,16 @@ const EndNode = memo(({
           ) : (
             <div className="end-node-editing-controls">
               <div className="end-node-edit-actions">
-                <button 
-                  onClick={cancelEditing} 
-                  className="end-node-cancel-btn" 
+                <button
+                  onClick={cancelEditing}
+                  className="end-node-cancel-btn"
                   aria-label="Cancelar"
                 >
                   <X size={14} /> Cancelar
                 </button>
-                <button 
-                  onClick={finishEditing} 
-                  className="end-node-save-btn" 
+                <button
+                  onClick={finishEditing}
+                  className="end-node-save-btn"
                   aria-label="Guardar"
                 >
                   <Save size={14} /> Guardar
@@ -611,7 +616,7 @@ const EndNode = memo(({
           )}
         </>
       )}
-      
+
       {!isCollapsed && !isEditing && (
         <div
           className="resize-handle"
@@ -644,27 +649,27 @@ const EndNode = memo(({
               // Calcular nuevas dimensiones
               let newWidth = initialWidth;
               let newHeight = initialHeight;
-              
+
               // Cambiar dimensiones con teclado
               if (e.key === 'ArrowRight') newWidth += 10;
               if (e.key === 'ArrowLeft') newWidth = Math.max(minWidth, newWidth - 10);
               if (e.key === 'ArrowDown') newHeight += 10;
               if (e.key === 'ArrowUp') newHeight = Math.max(minHeight, newHeight - 10);
-              
+
               // Usar Zustand para redimensionar si está disponible
               if (resizeEndNode) {
                 resizeEndNode(id, newWidth, newHeight);
               }
-              
+
               // Mantener compatibilidad con implementación anterior
               if (onNodesChange) {
                 onNodesChange([{
                   type: 'change',
                   item: {
-                    id: id,
+                    id,
                     width: newWidth,
-                    height: newHeight
-                  }
+                    height: newHeight,
+                  },
                 }]);
               }
             }
@@ -675,7 +680,7 @@ const EndNode = memo(({
           aria-label="Redimensionar nodo"
         />
       )}
-      
+
       {showContextMenu && (
         <ContextMenu
           items={contextMenuItems}

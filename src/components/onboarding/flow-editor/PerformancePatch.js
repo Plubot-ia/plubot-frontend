@@ -7,20 +7,20 @@
 const PERFORMANCE_CONFIG = {
   // Niveles de calidad (0: bajo, 1: medio, 2: alto)
   qualityLevel: 1,
-  
+
   // Habilitar/deshabilitar efectos visuales
   enableAnimations: true,
   enableShadows: true,
   enableGradients: true,
-  
+
   // Optimizaciones de renderizado
   useHardwareAcceleration: true,
   debounceResize: true,
   throttleScroll: true,
-  
+
   // Debug
   logPerformance: false,
-  measureFPS: false
+  measureFPS: false,
 };
 
 /**
@@ -28,18 +28,18 @@ const PERFORMANCE_CONFIG = {
  */
 export function applyPerformancePatches() {
   if (typeof window === 'undefined') return;
-  
+
   // Aplicar estilos CSS para optimización
   applyPerformanceStyles();
-  
+
   // Aplicar polyfills de rendimiento
   applyPerformancePolyfills();
-  
+
   // Configurar monitoreo de rendimiento
   if (PERFORMANCE_CONFIG.measureFPS) {
     setupFPSMeter();
   }
-  
+
   // Configurar el modo de rendimiento ultra
   setupUltraPerformanceMode();
 }
@@ -49,10 +49,10 @@ export function applyPerformancePatches() {
  */
 function applyPerformanceStyles() {
   const styleId = 'plubot-performance-styles';
-  
+
   // Si ya existen los estilos, no hacer nada
   if (document.getElementById(styleId)) return;
-  
+
   const style = document.createElement('style');
   style.id = styleId;
   style.textContent = `
@@ -114,7 +114,7 @@ function applyPerformanceStyles() {
       -moz-osx-font-smoothing: grayscale;
     }
   `;
-  
+
   document.head.appendChild(style);
 }
 
@@ -124,27 +124,27 @@ function applyPerformanceStyles() {
 function applyPerformancePolyfills() {
   // Polyfill para requestAnimationFrame
   if (!window.requestAnimationFrame) {
-    window.requestAnimationFrame = (function() {
+    window.requestAnimationFrame = (function () {
       return window.webkitRequestAnimationFrame ||
              window.mozRequestAnimationFrame ||
-             function(callback) {
+             function (callback) {
                window.setTimeout(callback, 1000 / 60);
              };
     })();
   }
-  
+
   // Polyfill para performance.now()
   if (!window.performance) {
     window.performance = {};
   }
-  
+
   if (!window.performance.now) {
     let nowOffset = Date.now();
-    
+
     if (performance.timing && performance.timing.navigationStart) {
       nowOffset = performance.timing.navigationStart;
     }
-    
+
     window.performance.now = function now() {
       return Date.now() - nowOffset;
     };
@@ -156,7 +156,7 @@ function applyPerformancePolyfills() {
  */
 function setupFPSMeter() {
   if (window.FPSMeter) return;
-  
+
   const fpsMeterContainer = document.createElement('div');
   fpsMeterContainer.style.position = 'fixed';
   fpsMeterContainer.style.bottom = '10px';
@@ -168,30 +168,30 @@ function setupFPSMeter() {
   fpsMeterContainer.style.borderRadius = '4px';
   fpsMeterContainer.style.fontFamily = 'monospace';
   fpsMeterContainer.style.fontSize = '12px';
-  
+
   const fpsMeter = document.createElement('div');
   fpsMeter.id = 'fps-meter';
   fpsMeter.textContent = 'FPS: --';
-  
+
   fpsMeterContainer.appendChild(fpsMeter);
   document.body.appendChild(fpsMeterContainer);
-  
+
   let lastTime = performance.now();
   let frameCount = 0;
   let lastFpsUpdate = 0;
   let fps = 0;
-  
+
   function updateFPS() {
     const now = performance.now();
     const delta = now - lastTime;
-    
+
     frameCount++;
-    
+
     // Actualizar el contador de FPS cada segundo
     if (now - lastFpsUpdate >= 1000) {
       fps = Math.round((frameCount * 1000) / (now - lastFpsUpdate));
       document.getElementById('fps-meter').textContent = `FPS: ${fps}`;
-      
+
       // Cambiar el color según el rendimiento
       const fpsMeterElement = document.getElementById('fps-meter');
       if (fpsMeterElement) {
@@ -203,15 +203,15 @@ function setupFPSMeter() {
           fpsMeterElement.style.color = '#6cff6c';
         }
       }
-      
+
       frameCount = 0;
       lastFpsUpdate = now;
     }
-    
+
     lastTime = now;
     requestAnimationFrame(updateFPS);
   }
-  
+
   requestAnimationFrame(updateFPS);
 }
 
@@ -221,7 +221,7 @@ function setupFPSMeter() {
 function setupUltraPerformanceMode() {
   // Verificar si ya existe el botón de rendimiento
   if (document.getElementById('ultra-performance-toggle')) return;
-  
+
   // Crear botón de alternar rendimiento
   const toggleButton = document.createElement('button');
   toggleButton.id = 'ultra-performance-toggle';
@@ -239,31 +239,31 @@ function setupUltraPerformanceMode() {
   toggleButton.style.fontSize = '14px';
   toggleButton.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.1)';
   toggleButton.style.transition = 'all 0.2s ease';
-  
+
   // Manejar clic en el botón
   toggleButton.addEventListener('click', () => {
     const isUltraMode = document.body.classList.toggle('performance-mode');
     toggleButton.textContent = isUltraMode ? '🎨 Calidad' : '⚡ Rendimiento';
     toggleButton.style.background = isUltraMode ? '#ff6b6b' : '#4a90e2';
-    
+
     // Guardar preferencia en localStorage
     if (isUltraMode) {
       localStorage.setItem('plubot-performance-mode', 'ultra');
     } else {
       localStorage.removeItem('plubot-performance-mode');
     }
-    
+
     // Forzar actualización de componentes
     window.dispatchEvent(new Event('resize'));
   });
-  
+
   // Aplicar estado inicial
   if (localStorage.getItem('plubot-performance-mode') === 'ultra') {
     document.body.classList.add('performance-mode');
     toggleButton.textContent = '🎨 Calidad';
     toggleButton.style.background = '#ff6b6b';
   }
-  
+
   document.body.appendChild(toggleButton);
 }
 

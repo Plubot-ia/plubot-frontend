@@ -5,6 +5,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
+
 import { openModal, closeModal, registerModalListener } from '../../utils/modal-manager';
 
 /**
@@ -85,7 +86,7 @@ const useModalManagement = () => {
   // Función genérica para abrir cualquier modal
   const openModalByName = useCallback((modalName) => {
 
-    
+
     if (modalName === 'templateSelector') openTemplateSelector();
     else if (modalName === 'embedModal') openEmbedModal();
     else if (modalName === 'importExportModal') openImportExportModal();
@@ -100,7 +101,7 @@ const useModalManagement = () => {
   // Función genérica para cerrar cualquier modal
   const closeModalByName = useCallback((modalName) => {
 
-    
+
     if (modalName === 'templateSelector') closeTemplateSelector();
     else if (modalName === 'embedModal') closeEmbedModal();
     else if (modalName === 'importExportModal') closeImportExportModal();
@@ -144,14 +145,14 @@ const useModalManagement = () => {
     showImportExportModal,
     showSimulation,
     showSyncModal,
-    
+
     // Setters para compatibilidad
     setShowTemplateSelector,
     setShowEmbedModal,
     setShowImportExportModal,
     setShowSimulation,
     setShowSyncModal,
-    
+
     // Funciones específicas
     openTemplateSelector,
     openEmbedModal,
@@ -163,10 +164,10 @@ const useModalManagement = () => {
     closeImportExportModal,
     closeSimulation,
     closeSyncModal,
-    
+
     // Funciones genéricas
     openModal: openModalByName,
-    closeModal: closeModalByName
+    closeModal: closeModalByName,
   };
 };
 

@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { applyEdgeChanges, addEdge } from 'reactflow';
+
 import { connectionExists } from '../utils/flowEditorUtils';
 import { processEdgesFromBackend } from '../utils/handleFixer';
 
@@ -91,8 +92,8 @@ const useFlowEdges = (initialEdges, setEdges, addToHistory) => {
       setTimeout(() => {
         setEdges(newEdges);
         setTimeout(() => {
-          document.dispatchEvent(new CustomEvent('elite-edge-update-required', { 
-            detail: { id: newEdge.id } 
+          document.dispatchEvent(new CustomEvent('elite-edge-update-required', {
+            detail: { id: newEdge.id },
           }));
         }, 50);
       }, 0);
@@ -104,13 +105,13 @@ const useFlowEdges = (initialEdges, setEdges, addToHistory) => {
   const removeConnectedEdges = useCallback((nodeId) => {
     setInternalEdges(edges => {
       const edgesToRemove = edges.filter(
-        edge => edge.source === nodeId || edge.target === nodeId
+        edge => edge.source === nodeId || edge.target === nodeId,
       );
 
       if (edgesToRemove.length === 0) return edges;
 
       const newEdges = edges.filter(
-        edge => edge.source !== nodeId && edge.target !== nodeId
+        edge => edge.source !== nodeId && edge.target !== nodeId,
       );
 
       edgesToRemove.forEach(edge => {

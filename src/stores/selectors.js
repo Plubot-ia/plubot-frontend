@@ -1,4 +1,5 @@
 import { shallow } from 'zustand/shallow';
+
 import useFlowStore from '@/stores/useFlowStore';
 import useTrainingStore from '@/stores/useTrainingStore';
 
@@ -21,7 +22,7 @@ export const useFlowMeta = () =>
       saveFlow: state.saveFlow,
       fitView: state.fitView,
     }),
-    shallow
+    shallow,
   );
 
 /**
@@ -46,17 +47,16 @@ export const useFlowNodesEdges = () =>
       duplicateNode: state.duplicateNode,
       updateNode: state.updateNode,
       updateNodeData: state.updateNodeData,
-      setNodes: state.setNodes,
       backupEdgesToLocalStorage: state.backupEdgesToLocalStorage,
     }),
-    shallow
+    shallow,
   );
 
 // Selector para obtener el objeto completo del nodo seleccionado
 // Se recalculará solo cuando cambie el array de nodos o el ID del nodo seleccionado
 export const useSelectedNode = () =>
   useFlowStore((state) =>
-    state.nodes.find((n) => n.id === state.selectedNode)
+    state.nodes.find((n) => n.id === state.selectedNode),
   );
 
 // Selector para obtener solo el objeto `data` de un nodo específico por ID
@@ -80,7 +80,7 @@ export const useParentNodeInfo = (id) =>
         parentHandleColor: parentNode.data?.style?.backgroundColor,
       };
     },
-    shallow
+    shallow,
   );
 
 /**
@@ -99,7 +99,7 @@ export const useContextMenu = () =>
       showContextMenu: state.showContextMenu,
       hideContextMenu: state.hideContextMenu,
     }),
-    shallow
+    shallow,
   );
 
 export const useUndoRedo = () =>
@@ -110,7 +110,7 @@ export const useUndoRedo = () =>
       canUndo: state.history.past.length > 0,
       canRedo: state.history.future.length > 0,
     }),
-    shallow
+    shallow,
   );
 
 /**
@@ -128,5 +128,5 @@ export const useUIFlags = () =>
       showSuggestionsModal: state.showSuggestionsModal,
       showEmbedModal: state.showEmbedModal,
     }),
-    shallow
+    shallow,
   );

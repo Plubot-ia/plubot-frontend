@@ -14,13 +14,13 @@ import { useState, useCallback, useMemo, useRef } from 'react';
 const useVisualState = (options = {}) => {
   // Estado para posiciones visuales (no afecta al estado lógico)
   const [visualPositions, setVisualPositions] = useState({});
-  
+
   // Referencia para almacenar estilos visuales temporales (hover, selección, etc.)
   const visualStylesRef = useRef(new Map());
-  
+
   // Referencia para almacenar el estado de animación
   const animationStateRef = useRef(new Map());
-  
+
   /**
    * Actualiza la posición visual de un nodo sin afectar su estado lógico
    * @param {string} nodeId - ID del nodo
@@ -29,10 +29,10 @@ const useVisualState = (options = {}) => {
   const updateVisualPosition = useCallback((nodeId, position) => {
     setVisualPositions(prev => ({
       ...prev,
-      [nodeId]: position
+      [nodeId]: position,
     }));
   }, []);
-  
+
   /**
    * Actualiza el estilo visual de un nodo o arista
    * @param {string} elementId - ID del elemento (nodo o arista)
@@ -43,10 +43,10 @@ const useVisualState = (options = {}) => {
     const currentStyles = visualStylesRef.current.get(elementId) || {};
     visualStylesRef.current.set(elementId, {
       ...currentStyles,
-      [styleType]: value
+      [styleType]: value,
     });
   }, []);
-  
+
   /**
    * Obtiene el estilo visual actual de un elemento
    * @param {string} elementId - ID del elemento
@@ -55,7 +55,7 @@ const useVisualState = (options = {}) => {
   const getVisualStyle = useCallback((elementId) => {
     return visualStylesRef.current.get(elementId) || {};
   }, []);
-  
+
   /**
    * Actualiza el estado de animación de un elemento
    * @param {string} elementId - ID del elemento
@@ -66,10 +66,10 @@ const useVisualState = (options = {}) => {
     const currentState = animationStateRef.current.get(elementId) || {};
     animationStateRef.current.set(elementId, {
       ...currentState,
-      [animationType]: isActive
+      [animationType]: isActive,
     });
   }, []);
-  
+
   /**
    * Obtiene el estado de animación de un elemento
    * @param {string} elementId - ID del elemento
@@ -78,7 +78,7 @@ const useVisualState = (options = {}) => {
   const getAnimationState = useCallback((elementId) => {
     return animationStateRef.current.get(elementId) || {};
   }, []);
-  
+
   /**
    * Aplica estilos visuales a un nodo basado en su estado visual
    * @param {Object} node - Nodo a procesar
@@ -86,37 +86,37 @@ const useVisualState = (options = {}) => {
    */
   const applyVisualStyles = useCallback((node) => {
     if (!node) return node;
-    
+
     const visualStyle = getVisualStyle(node.id);
     const animationState = getAnimationState(node.id);
     const visualPosition = visualPositions[node.id];
-    
+
     // Crear una copia del nodo para no modificar el original
     const styledNode = { ...node };
-    
+
     // Aplicar posición visual si existe
     if (visualPosition) {
       styledNode.position = visualPosition;
     }
-    
+
     // Aplicar estilos visuales
     if (visualStyle) {
       styledNode.style = {
         ...styledNode.style,
         // Aplicar estilos según el estado visual
         ...(visualStyle.hover ? { boxShadow: '0 0 10px rgba(255, 0, 255, 0.7)' } : {}),
-        ...(visualStyle.selected ? { borderColor: '#ff00ff', borderWidth: 2 } : {})
+        ...(visualStyle.selected ? { borderColor: '#ff00ff', borderWidth: 2 } : {}),
       };
     }
-    
+
     // Aplicar estados de animación
     if (animationState && Object.keys(animationState).length > 0) {
       styledNode.animated = Object.values(animationState).some(Boolean);
     }
-    
+
     return styledNode;
   }, [visualPositions, getVisualStyle, getAnimationState]);
-  
+
   /**
    * Aplica estilos visuales a una arista basado en su estado visual
    * @param {Object} edge - Arista a procesar
@@ -124,31 +124,31 @@ const useVisualState = (options = {}) => {
    */
   const applyEdgeVisualStyles = useCallback((edge) => {
     if (!edge) return edge;
-    
+
     const visualStyle = getVisualStyle(edge.id);
     const animationState = getAnimationState(edge.id);
-    
+
     // Crear una copia de la arista para no modificar la original
     const styledEdge = { ...edge };
-    
+
     // Aplicar estilos visuales
     if (visualStyle) {
       styledEdge.style = {
         ...styledEdge.style,
         // Aplicar estilos según el estado visual
         ...(visualStyle.hover ? { strokeWidth: 3 } : {}),
-        ...(visualStyle.selected ? { stroke: '#ff00ff' } : {})
+        ...(visualStyle.selected ? { stroke: '#ff00ff' } : {}),
       };
     }
-    
+
     // Aplicar estados de animación
     if (animationState && Object.keys(animationState).length > 0) {
       styledEdge.animated = Object.values(animationState).some(Boolean);
     }
-    
+
     return styledEdge;
   }, [getVisualStyle, getAnimationState]);
-  
+
   /**
    * Procesa todos los nodos para aplicar estilos visuales
    * @param {Array} nodes - Nodos a procesar
@@ -158,7 +158,7 @@ const useVisualState = (options = {}) => {
     if (!Array.isArray(nodes)) return nodes;
     return nodes.map(applyVisualStyles);
   }, [applyVisualStyles]);
-  
+
   /**
    * Procesa todas las aristas para aplicar estilos visuales
    * @param {Array} edges - Aristas a procesar
@@ -168,23 +168,23 @@ const useVisualState = (options = {}) => {
     if (!Array.isArray(edges)) return edges;
     return edges.map(applyEdgeVisualStyles);
   }, [applyEdgeVisualStyles]);
-  
+
   // Exportar métodos y estado
   return {
     // Métodos para actualizar el estado visual
     updateVisualPosition,
     updateVisualStyle,
     updateAnimationState,
-    
+
     // Métodos para obtener el estado visual
     getVisualStyle,
     getAnimationState,
-    
+
     // Métodos para procesar elementos con estilos visuales
     applyVisualStyles,
     applyEdgeVisualStyles,
     processNodesWithVisualStyles,
-    processEdgesWithVisualStyles
+    processEdgesWithVisualStyles,
   };
 };
 

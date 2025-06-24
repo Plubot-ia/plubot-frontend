@@ -1,6 +1,7 @@
+import { motion, useScroll, useTransform, useInView } from 'framer-motion';
 import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { motion, useScroll, useTransform, useInView } from 'framer-motion';
+
 import './AboutPlubot.css';
 import epicImage from '@assets/img/plubot-core-full.webp';
 
@@ -9,21 +10,21 @@ const AboutPlubot = () => {
   const heroRef = useRef(null);
   const textRef = useRef(null);
   const isInView = useInView(textRef, { once: false, threshold: 0.2 });
-  
+
   // Parallax effect
   const { scrollYProgress } = useScroll({
     target: heroRef,
-    offset: ["start start", "end start"]
+    offset: ['start start', 'end start'],
   });
-  
+
   const imageY = useTransform(scrollYProgress, [0, 1], [0, 100]);
-  
+
   useEffect(() => {
     // Load optimization
     const img = new Image();
     img.src = epicImage;
     img.onload = () => setIsLoaded(true);
-    
+
     // Add intersection observer for lazy loading
     const observer = new IntersectionObserver(
       (entries) => {
@@ -32,13 +33,13 @@ const AboutPlubot = () => {
           observer.disconnect();
         }
       },
-      { threshold: 0.1 }
+      { threshold: 0.1 },
     );
-    
+
     if (heroRef.current) {
       observer.observe(heroRef.current);
     }
-    
+
     return () => observer.disconnect();
   }, []);
 
@@ -48,26 +49,26 @@ const AboutPlubot = () => {
         <motion.div
           initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: isLoaded ? 1 : 0, y: isLoaded ? 0 : 50 }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
+          transition={{ duration: 0.8, ease: 'easeOut' }}
           style={{ y: imageY }}
           className="image-container"
         >
-          <img 
-            src={epicImage} 
-            alt="Plubot potencial" 
+          <img
+            src={epicImage}
+            alt="Plubot potencial"
             className="about-image"
             loading="lazy"
           />
-          <div className="image-glow"></div>
+          <div className="image-glow" />
         </motion.div>
-        
-        <motion.div 
+
+        <motion.div
           ref={textRef}
           className="about-text"
           initial={{ opacity: 0, x: 20 }}
-          animate={{ 
-            opacity: isInView ? 1 : 0, 
-            x: isInView ? 0 : 20 
+          animate={{
+            opacity: isInView ? 1 : 0,
+            x: isInView ? 0 : 20,
           }}
           transition={{ duration: 0.6, delay: 0.2 }}
         >
@@ -78,7 +79,7 @@ const AboutPlubot = () => {
           >
             ¿Qué es <span className="text-gradient">Plubot</span>?
           </motion.h1>
-          
+
           {paragraphs.map((paragraph, index) => (
             <motion.p
               key={index}
@@ -89,7 +90,7 @@ const AboutPlubot = () => {
               {paragraph}
             </motion.p>
           ))}
-          
+
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: isInView ? 1 : 0, scale: isInView ? 1 : 0.9 }}
@@ -110,10 +111,10 @@ const AboutPlubot = () => {
 
 // Content moved to a constant for better maintainability
 const paragraphs = [
-  "En un mundo donde las tareas repetitivas nos consumen, PLUBOT nació para liberar. No es solo un chatbot: es tu asistente digital inteligente, creado por vos, a tu estilo. Automatiza tareas, responde en WhatsApp, conecta con tus clientes y evoluciona cada día.",
-  "Desde su origen en el Pluniverse, PLUBOT crece con cada conversación. Es tu aliado 24/7, tu clon digital, tu compañero incansable.",
-  "Crear uno es tan fácil como arrastrar y soltar. Tan poderoso como una mente enfocada. Y tan único como vos.",
-  "PLUBOT. Tu asistente, tu estilo, tu universo."
+  'En un mundo donde las tareas repetitivas nos consumen, PLUBOT nació para liberar. No es solo un chatbot: es tu asistente digital inteligente, creado por vos, a tu estilo. Automatiza tareas, responde en WhatsApp, conecta con tus clientes y evoluciona cada día.',
+  'Desde su origen en el Pluniverse, PLUBOT crece con cada conversación. Es tu aliado 24/7, tu clon digital, tu compañero incansable.',
+  'Crear uno es tan fácil como arrastrar y soltar. Tan poderoso como una mente enfocada. Y tan único como vos.',
+  'PLUBOT. Tu asistente, tu estilo, tu universo.',
 ];
 
 export default AboutPlubot;

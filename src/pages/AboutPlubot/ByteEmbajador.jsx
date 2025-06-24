@@ -1,14 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react';
+
 import './ByteEmbajador.css';
-import byteNormal from '@/assets/img/byte-normal.png';
 import byteHappy from '@/assets/img/byte-happy.png';
+import byteNormal from '@/assets/img/byte-normal.png';
 import byteSad from '@/assets/img/byte-sad.png';
 import byteThinking from '@/assets/img/byte-thinking.png';
 import byteWarning from '@/assets/img/byte-warning.png';
 
 const AboutChatByte = () => {
   const [messages, setMessages] = useState([
-    { text: '¡Hola! Soy Byte, tu guía en Plubot. Pregúntame sobre qué es Plubot o cómo crear asistentes digitales.', sender: 'byte', type: 'info', id: Date.now() }
+    { text: '¡Hola! Soy Byte, tu guía en Plubot. Pregúntame sobre qué es Plubot o cómo crear asistentes digitales.', sender: 'byte', type: 'info', id: Date.now() },
   ]);
   const [userInput, setUserInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -37,21 +38,21 @@ const AboutChatByte = () => {
   // Canvas animation for cyber particles
   useEffect(() => {
     if (!canvasRef.current) return;
-    
+
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
     const particles = [];
-    
+
     // Set canvas to full container size
     const resizeCanvas = () => {
       const container = canvas.parentElement;
       canvas.width = container.offsetWidth;
       canvas.height = container.offsetHeight;
     };
-    
+
     resizeCanvas();
     window.addEventListener('resize', resizeCanvas);
-    
+
     class Particle {
       constructor(x, y, color) {
         this.x = x;
@@ -64,19 +65,19 @@ const AboutChatByte = () => {
         this.life = 0;
         this.opacity = 1;
       }
-      
+
       update() {
         this.x += this.speedX;
         this.y += this.speedY;
         this.life++;
-        
+
         if (this.life > this.ttl * 0.7) {
           this.opacity = 1 - (this.life - this.ttl * 0.7) / (this.ttl * 0.3);
         }
-        
+
         return this.life < this.ttl;
       }
-      
+
       draw() {
         ctx.globalAlpha = this.opacity;
         ctx.fillStyle = this.color;
@@ -86,37 +87,37 @@ const AboutChatByte = () => {
         ctx.globalAlpha = 1;
       }
     }
-    
+
     const generateParticles = (x, y, color, count = 8) => {
       for (let i = 0; i < count; i++) {
         particles.push(new Particle(x, y, color));
       }
     };
-    
+
     const lastMessageType = messages[messages.length - 1]?.type || 'info';
     const color = getTypeColor(lastMessageType);
-    
+
     let animationId;
     const animate = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      
+
       // Generate particles around the byte image
       if (showParticles && particlesRef.current) {
         const rect = particlesRef.current.getBoundingClientRect();
         const canvasRect = canvas.getBoundingClientRect();
-        
+
         const centerX = rect.left + rect.width / 2 - canvasRect.left;
         const centerY = rect.top + rect.height / 2 - canvasRect.top;
-        
+
         if (Math.random() > 0.7) {
           generateParticles(
             centerX + (Math.random() * 80 - 40),
             centerY + (Math.random() * 80 - 40),
-            color
+            color,
           );
         }
       }
-      
+
       // Update and draw particles
       for (let i = 0; i < particles.length; i++) {
         if (!particles[i].update()) {
@@ -126,12 +127,12 @@ const AboutChatByte = () => {
         }
         particles[i].draw();
       }
-      
+
       animationId = requestAnimationFrame(animate);
     };
-    
+
     animate();
-    
+
     return () => {
       cancelAnimationFrame(animationId);
       window.removeEventListener('resize', resizeCanvas);
@@ -171,8 +172,8 @@ const AboutChatByte = () => {
     setShowParticles(true);
 
     try {
-          const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:5000/api';
-          const response = await fetch(`${API_BASE_URL}/byte-embajador`, {
+      const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:5000/api';
+      const response = await fetch(`${API_BASE_URL}/byte-embajador`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -180,7 +181,7 @@ const AboutChatByte = () => {
         body: JSON.stringify({
           message: userMessage,
           context: 'Providing information about Plubot, its features, and how to create digital assistants.',
-          history: messages.slice(-10)
+          history: messages.slice(-10),
         }),
       });
 
@@ -198,7 +199,7 @@ const AboutChatByte = () => {
       setTimeout(() => {
         addMessage(data.message, 'byte', 'info');
         setByteState(data.sentiment || 'happy');
-        
+
         // Keep particles for a moment after response
         setTimeout(() => {
           setShowParticles(false);
@@ -227,17 +228,17 @@ const AboutChatByte = () => {
     if (btn) {
       const circle = document.createElement('span');
       const diameter = Math.max(btn.clientWidth, btn.clientHeight);
-      
+
       circle.style.width = circle.style.height = `${diameter}px`;
       circle.style.left = `${e.clientX - btn.getBoundingClientRect().left - diameter / 2}px`;
       circle.style.top = `${e.clientY - btn.getBoundingClientRect().top - diameter / 2}px`;
       circle.classList.add('ripple');
-      
+
       const ripple = btn.getElementsByClassName('ripple')[0];
       if (ripple) {
         ripple.remove();
       }
-      
+
       btn.appendChild(circle);
     }
 
@@ -248,10 +249,10 @@ const AboutChatByte = () => {
 
   return (
     <div className={`about-chat-byte-container ${byteActive ? 'active' : ''}`}>
-      <canvas ref={canvasRef} className="particle-canvas"></canvas>
+      <canvas ref={canvasRef} className="particle-canvas" />
       <div className="byte-image-column">
         <div className="byte-image-wrapper" ref={particlesRef}>
-          <div className="byte-hologram-effect"></div>
+          <div className="byte-hologram-effect" />
           <img
             src={getByteImage()}
             alt="Byte Assistant"
@@ -260,16 +261,16 @@ const AboutChatByte = () => {
           <div
             className={`byte-glow ${showParticles ? 'glow-active' : ''}`}
             style={{
-              boxShadow: `0 0 15px ${getTypeColor(messages[messages.length - 1]?.type)}, 0 0 30px ${getTypeColor(messages[messages.length - 1]?.type)}`
+              boxShadow: `0 0 15px ${getTypeColor(messages[messages.length - 1]?.type)}, 0 0 30px ${getTypeColor(messages[messages.length - 1]?.type)}`,
             }}
-          ></div>
+          />
         </div>
       </div>
       <div className="chat-column">
-        <div className="digital-noise"></div>
+        <div className="digital-noise" />
         <div className="chat-header">
           <div className="header-decoration">
-            <span></span><span></span><span></span>
+            <span /><span /><span />
           </div>
           <h2>Chatea con Byte</h2>
           <p>¡Pregunta sobre Plubot y cómo crear tus propios asistentes digitales!</p>
@@ -281,11 +282,11 @@ const AboutChatByte = () => {
               className={`message-bubble message-${msg.sender} message-type-${msg.type}`}
               style={{
                 borderColor: msg.sender === 'byte' ? getTypeColor(msg.type) : undefined,
-                boxShadow: msg.sender === 'byte' ? `0 0 8px ${getTypeColor(msg.type)}` : undefined
+                boxShadow: msg.sender === 'byte' ? `0 0 8px ${getTypeColor(msg.type)}` : undefined,
               }}
             >
               <p>{msg.text}</p>
-              <div className="message-glow"></div>
+              <div className="message-glow" />
             </div>
           ))}
           <div ref={messagesEndRef} />
@@ -305,9 +306,9 @@ const AboutChatByte = () => {
             disabled={isLoading || !userInput.trim()}
           >
             {isLoading ? (
-              <span className="loader"></span>
+              <span className="loader" />
             ) : (
-              <>Enviar<span className="btn-glow"></span></>
+              <>Enviar<span className="btn-glow" /></>
             )}
           </button>
         </form>

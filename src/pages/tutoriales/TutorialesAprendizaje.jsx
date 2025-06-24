@@ -1,7 +1,10 @@
-import React, { useState, useEffect, useRef } from 'react';
-import useWindowSize from '../../hooks/useWindowSize';
 import { motion, AnimatePresence } from 'framer-motion';
+import React, { useState, useEffect, useRef } from 'react';
+
 import byteAvatar from '@assets/img/byte.png';
+
+
+import useWindowSize from '../../hooks/useWindowSize';
 import './TutorialesAprendizaje.css';
 
 const TutorialesAprendizaje = () => {
@@ -14,11 +17,11 @@ const TutorialesAprendizaje = () => {
   const audioRef = useRef(null);
 
   const phrases = [
-    "En el Pluniverse, aprender es evolucionar.",
-    "Entrena a tu Plubot y crece con él.",
-    "Descubre la Academia de Automatización.",
-    "Conecta con la comunidad en el PluForum.",
-    "Obtén certificaciones y destaca."
+    'En el Pluniverse, aprender es evolucionar.',
+    'Entrena a tu Plubot y crece con él.',
+    'Descubre la Academia de Automatización.',
+    'Conecta con la comunidad en el PluForum.',
+    'Obtén certificaciones y destaca.',
   ];
 
   const [phraseIndex, setPhraseIndex] = useState(0);
@@ -81,7 +84,7 @@ const TutorialesAprendizaje = () => {
     });
   };
 
-    useEffect(() => {
+  useEffect(() => {
     window.addEventListener('scroll', handleScroll);
     handleScroll(); // Llamada inicial
     return () => window.removeEventListener('scroll', handleScroll);
@@ -104,13 +107,13 @@ const TutorialesAprendizaje = () => {
 
   const buttonVariants = {
     hover: { scale: 1.08, boxShadow: '0 0 20px rgba(255, 0, 255, 0.8)' },
-    tap: { scale: 0.95 }
+    tap: { scale: 0.95 },
   };
 
   const expandableContentVariants = {
     hidden: { opacity: 0, y: 30, scale: 0.95 },
     visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.7 } },
-    exit: { opacity: 0, y: 30, scale: 0.95, transition: { duration: 0.5 } }
+    exit: { opacity: 0, y: 30, scale: 0.95, transition: { duration: 0.5 } },
   };
 
   return (
@@ -153,10 +156,10 @@ const TutorialesAprendizaje = () => {
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
         >
-          <div className="card-corner top-left"></div>
-          <div className="card-corner top-right"></div>
-          <div className="card-corner bottom-left"></div>
-          <div className="card-corner bottom-right"></div>
+          <div className="card-corner top-left" />
+          <div className="card-corner top-right" />
+          <div className="card-corner bottom-left" />
+          <div className="card-corner bottom-right" />
 
           <motion.div
             className="byte-floating hologram-effect"
@@ -173,9 +176,9 @@ const TutorialesAprendizaje = () => {
             <div className="avatar-container">
               <img src={byteAvatar} alt="Byte" className="byte-avatar" />
               <div className="avatar-rings">
-                <div className="ring ring1"></div>
-                <div className="ring ring2"></div>
-                <div className="ring ring3"></div>
+                <div className="ring ring1" />
+                <div className="ring ring2" />
+                <div className="ring ring3" />
               </div>
             </div>
 
@@ -188,10 +191,10 @@ const TutorialesAprendizaje = () => {
                 exit={{ opacity: 0, y: -15 }}
                 transition={{ duration: 0.8 }}
               >
-                <div className="dialog-corner tl"></div>
-                <div className="dialog-corner tr"></div>
-                <div className="dialog-corner bl"></div>
-                <div className="dialog-corner br"></div>
+                <div className="dialog-corner tl" />
+                <div className="dialog-corner tr" />
+                <div className="dialog-corner bl" />
+                <div className="dialog-corner br" />
                 {phrases[phraseIndex]}
               </motion.div>
             </AnimatePresence>
@@ -242,7 +245,7 @@ const TutorialesAprendizaje = () => {
               playActivationSound();
             }}
           >
-            <span className="button-glow"></span>
+            <span className="button-glow" />
             <span className="button-text">
               {showMore ? 'CERRAR DATOS' : 'ACTIVAR DATOS'}
             </span>
@@ -261,12 +264,12 @@ const TutorialesAprendizaje = () => {
                 exit="exit"
               >
                 <div className="terminal-header">
-                  <div className="terminal-icon"></div>
+                  <div className="terminal-icon" />
                   <div className="terminal-title">LEARNING.PROTOCOL</div>
                   <div className="terminal-controls">
-                    <span></span>
-                    <span></span>
-                    <span></span>
+                    <span />
+                    <span />
+                    <span />
                   </div>
                 </div>
 
@@ -306,7 +309,7 @@ const TutorialesAprendizaje = () => {
                       playActivationSound();
                     }}
                   >
-                    <span className="button-glow"></span>
+                    <span className="button-glow" />
                     EXPLORA LA ACADEMIA
                     <div className="button-icon">▶</div>
                   </motion.button>
@@ -317,9 +320,9 @@ const TutorialesAprendizaje = () => {
         </motion.div>
 
         <div className="interface-elements">
-          <div className="interface-dot"></div>
-          <div className="interface-dot"></div>
-          <div className="interface-dot"></div>
+          <div className="interface-dot" />
+          <div className="interface-dot" />
+          <div className="interface-dot" />
         </div>
       </div>
     </div>

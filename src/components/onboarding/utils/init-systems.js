@@ -11,13 +11,13 @@ import { registerNotificationCallback, showVisualNotification } from './notifica
  */
 export const initAllSystems = () => {
 
-  
+
   // Inicializar sistema de modales
   initModalManager();
-  
+
   // Configurar captura de errores globales para setByteMessage
   setupErrorHandling();
-  
+
 
 };
 
@@ -31,14 +31,14 @@ const setupErrorHandling = () => {
       // Mostrar notificación visual como fallback
       const errorMessage = event.error?.message || 'Error en la operación';
       showVisualNotification(errorMessage, 'error');
-      
+
       // window.setByteMessage redefinition removed.
       // Evitar que el error se propague
       event.preventDefault();
       return true;
     }
   });
-  
+
   // Escuchar eventos globales de notificación como respaldo
   window.addEventListener('plubot-notification', (event) => {
     const { message, type } = event.detail;
@@ -50,5 +50,5 @@ const setupErrorHandling = () => {
 initAllSystems();
 
 export default {
-  initAllSystems
+  initAllSystems,
 };

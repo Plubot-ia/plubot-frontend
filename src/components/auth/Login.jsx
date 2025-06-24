@@ -1,11 +1,15 @@
-import React, { useState, useEffect } from 'react';
-import useWindowSize from '../../hooks/useWindowSize';
-import { useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+
+import useWindowSize from '../../hooks/useWindowSize';
+
 import './Login.css';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
-import useAuthStore from '@/stores/useAuthStore';
+
 import GoogleAuthButton from './GoogleAuthButton';
+
+import useAuthStore from '@/stores/useAuthStore';
 
 const Login = () => {
   const { width, height } = useWindowSize();
@@ -23,7 +27,7 @@ const Login = () => {
     if (authError) {
       setMessage({ text: authError, type: 'error' });
     }
-    
+
     // Procesar parámetros de la URL
     const searchParams = new URLSearchParams(location.search);
     const sessionExpired = searchParams.get('session_expired');
@@ -93,7 +97,7 @@ const Login = () => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-    
+
     // Guardar el email para usarlo en la autenticación con Google
     if (name === 'email' && value) {
       localStorage.setItem('last_email_used', value);
@@ -121,27 +125,27 @@ const Login = () => {
     try {
       // Asegurarse de que los datos se envían correctamente estructurados
       const email = formData.email.trim();
-      const password = formData.password;
-      
+      const { password } = formData;
+
       await login(email, password);
-      
+
       // Si llegamos aquí, el login fue exitoso
       showMessage('¡Inicio de sesión exitoso! Redirigiendo...', 'success');
-      
+
       // Efecto visual de éxito
       const card = document.querySelector('.login-login-card');
       if (card) {
         card.style.boxShadow =
           '0 0 50px rgba(0, 255, 150, 0.7), 0 0 120px rgba(0, 0, 0, 0.8), inset 0 0 25px rgba(0, 255, 150, 0.4)';
       }
-      
+
       // Redirigir después de un breve retraso
       setTimeout(() => {
         localStorage.removeItem('loginFormData');
         const from = location.state?.from || '/pluniverse';
         navigate(from, { replace: true });
       }, 1500);
-      
+
     } catch (error) {
       const errorMessage = error.response?.data?.message || error.message || 'Error de conexión. Verifica tu conexión a internet.';
       showMessage(errorMessage, 'error');
@@ -170,10 +174,8 @@ const Login = () => {
         if (card) {
           card.style.transform = `perspective(1000px) rotateY(${xAxis}deg) rotateX(${yAxis}deg)`;
         }
-      } else {
-        if (card) {
-          card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0)';
-        }
+      } else if (card) {
+        card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0)';
       }
     };
     const handleMouseLeave = () => {
@@ -199,13 +201,13 @@ const Login = () => {
       transition={{ duration: 0.8, ease: 'easeOut' }}
     >
       <div className="login-cosmic-lights">
-        <div className="login-light-beam login-light-beam-1"></div>
-        <div className="login-light-beam login-light-beam-2"></div>
-        <div className="login-light-beam login-light-beam-3"></div>
+        <div className="login-light-beam login-light-beam-1" />
+        <div className="login-light-beam login-light-beam-2" />
+        <div className="login-light-beam login-light-beam-3" />
       </div>
       <div className="login-particles">
         {[...Array(6)].map((_, i) => (
-          <div key={i} className={`login-particle login-particle-${i + 1}`}></div>
+          <div key={i} className={`login-particle login-particle-${i + 1}`} />
         ))}
       </div>
       <motion.div
@@ -283,13 +285,13 @@ const Login = () => {
             Entrar
           </motion.button>
         </form>
-        
+
         <div className="login-separator">
           <span className="login-separator-text">o</span>
         </div>
-        
+
         <GoogleAuthButton text="Iniciar sesión con Google" className="futuristic" />
-        
+
         <div className="login-form-footer">
           <p>
             ¿No tenés cuenta?{' '}

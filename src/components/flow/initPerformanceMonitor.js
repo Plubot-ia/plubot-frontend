@@ -1,6 +1,6 @@
 /**
  * initPerformanceMonitor.js
- * 
+ *
  * Este archivo se encarga de inicializar el monitor de rendimiento.
  * Puede ser importado en el punto de entrada de la aplicación (main.jsx o index.js)
  * para activar el monitor de rendimiento sin tener que modificar los componentes existentes.
@@ -28,17 +28,16 @@ export function initPerformanceMonitor() {
 function initIfInEditor() {
   // Verificar si estamos en la página del editor de flujos
   // Podemos verificar la URL o la presencia de elementos específicos del editor
-  const isInEditor = window.location.pathname.includes('/flow-editor') || 
+  const isInEditor = window.location.pathname.includes('/flow-editor') ||
                     document.querySelector('.flow-editor-container') !== null;
-  
+
   if (isInEditor) {
     performanceMonitor.init();
   } else {
     // No estamos en el editor, no se inicializa el monitor
   }
-  
 
-  
+
   return performanceMonitor;
 }
 

@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+
 import useFlowStore from '@/stores/useFlowStore';
 
 /**
@@ -45,11 +46,11 @@ const ForceNodePositioning = () => {
 
     // Aplicar los estilos globales
     createGlobalStyles();
-    
+
     // IMPORTANTE: Deshabilitar cualquier CSS anterior que pueda estar interfiriendo
     const disablePreviousFixes = () => {
       // Buscar y desactivar hojas de estilo que puedan estar interfiriendo
-      const styleSheets = document.styleSheets;
+      const { styleSheets } = document;
       for (let i = 0; i < styleSheets.length; i++) {
         try {
           const sheet = styleSheets[i];
@@ -62,7 +63,7 @@ const ForceNodePositioning = () => {
         }
       }
     };
-    
+
     // Desactivar fixes anteriores
     disablePreviousFixes();
 
@@ -77,14 +78,14 @@ const ForceNodePositioning = () => {
       nodes.forEach(node => {
         nodeMap[node.id] = node; // Incluimos todos los nodos, incluso si no tienen posición válida
       });
-      
+
       // NUEVO: Preparar los nodos para actualización en el store para que ReactFlow los maneje bien
       const updatedNodes = nodes.map(node => ({
         ...node,
         // Asegurar que tenga una posición válida
         position: {
           x: Math.round(node.position?.x || 200 + Math.random() * 200),
-          y: Math.round(node.position?.y || 200 + Math.random() * 200)
+          y: Math.round(node.position?.y || 200 + Math.random() * 200),
         },
         // Habilitar interactividad
         draggable: true,
@@ -94,10 +95,10 @@ const ForceNodePositioning = () => {
         style: {
           ...node.style,
           visibility: 'visible',
-          opacity: 1
-        }
+          opacity: 1,
+        },
       }));
-      
+
       // Actualizar los nodos en el store
       useFlowStore.getState().setNodes(updatedNodes);
 
@@ -124,7 +125,7 @@ const ForceNodePositioning = () => {
             el.style.opacity = '1';
             el.style.pointerEvents = 'all';
             el.style.zIndex = '5';
-            
+
             // Marcar como posicionado por esta utilidad
             el.classList.add('node-force-positioned');
           }
@@ -136,12 +137,12 @@ const ForceNodePositioning = () => {
           el.style.visibility = 'visible';
           el.style.opacity = '1';
         });
-        
+
         // RESTAURAR LA INTERACTIVIDAD DE REACTFLOW
         try {
-          const reactFlowInstance = useFlowStore.getState().reactFlowInstance;
+          const { reactFlowInstance } = useFlowStore.getState();
           if (reactFlowInstance) {
-            
+
             // Restaurar el viewport para que funcione el zoom
             const viewport = document.querySelector('.react-flow__viewport');
             if (viewport) {
@@ -150,13 +151,13 @@ const ForceNodePositioning = () => {
               if (!currentTransform || currentTransform === 'none') {
                 viewport.style.transform = 'translate(0px, 0px) scale(1)';
               }
-              
+
               // Propiedades críticas para que funcione la interactividad
               viewport.style.transformOrigin = '0 0';
               viewport.style.willChange = 'transform';
               viewport.style.pointerEvents = 'none';
             }
-            
+
             // IMPORTANTE: Arreglar el sistema de drag & drop
             const pane = document.querySelector('.react-flow__pane');
             if (pane) {
@@ -164,7 +165,7 @@ const ForceNodePositioning = () => {
               pane.style.pointerEvents = 'all';
               pane.style.zIndex = '1';
             }
-            
+
             // Habilitar los controles de zoom
             const controls = document.querySelector('.react-flow__controls');
             if (controls) {
@@ -173,7 +174,7 @@ const ForceNodePositioning = () => {
               controls.style.pointerEvents = 'all';
               controls.style.zIndex = '10';
             }
-            
+
             // Intentar ejecutar un zoom suave para re-inicializar el viewport
             try {
               // No usamos fitView() para no alterar posiciones, solo un zoom suave
@@ -199,7 +200,7 @@ const ForceNodePositioning = () => {
           // Esperar un poco para que ReactFlow procese primero los cambios
           setTimeout(forcePositionNodes, 50);
         }
-      }
+      },
     );
 
     // Aplicar cada 2 segundos para asegurar que las posiciones se mantengan
@@ -209,7 +210,7 @@ const ForceNodePositioning = () => {
     return () => {
       clearInterval(interval);
       unsubscribe();
-      
+
       // Eliminar estilos globales al desmontar
       const styleElement = document.getElementById('force-node-positioning-styles');
       if (styleElement) {

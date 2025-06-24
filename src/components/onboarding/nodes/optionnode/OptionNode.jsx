@@ -5,28 +5,30 @@
  * @version 2.0.0 - Refactorizado para integración directa con Zustand
  */
 
-import React, { useState, useCallback, useMemo, useRef, useEffect, memo } from 'react';
-
-import { useUpdateNodeInternals } from 'reactflow';
-import PropTypes from 'prop-types';
-import { Position, Handle } from 'reactflow';
-import { 
-  Check, 
-  X, 
+import { debounce } from 'lodash';
+import {
+  Check,
+  X,
   HelpCircle,
   Circle,
-  Edit2, 
-  CornerDownRight
+  Edit2,
+  CornerDownRight,
 } from 'lucide-react';
+import PropTypes from 'prop-types';
+import React, { useState, useCallback, useMemo, useRef, useEffect, memo } from 'react';
+import { useUpdateNodeInternals, Position, Handle } from 'reactflow';
 import { shallow } from 'zustand/shallow';
-import useFlowStore from '@/stores/useFlowStore';
-import { debounce } from 'lodash';
-import Tooltip from '../../ui/ToolTip';
-import { formatDateRelative } from '@/utils/date';
-import { useNodeData } from '@/stores/selectors';
-import { getConnectorColor } from '../decisionnode/DecisionNode.types';
-import './OptionNode.css';
 
+
+import { useNodeData } from '@/stores/selectors';
+import useFlowStore from '@/stores/useFlowStore';
+import { formatDateRelative } from '@/utils/date';
+
+import Tooltip from '../../ui/ToolTip';
+import { getConnectorColor } from '../decisionnode/DecisionNode.types';
+
+
+import './OptionNode.css';
 
 
 // Constantes y configuración
@@ -38,19 +40,19 @@ const NODE_CONFIG = {
 /**
  * Componente para el ícono del nodo de opción
  */
-const OptionNodeIcon = React.memo(({ 
-  label, 
-  isUltraPerformanceMode = false 
+const OptionNodeIcon = React.memo(({
+  label,
+  isUltraPerformanceMode = false,
 }) => {
-  const iconProps = { 
-    size: isUltraPerformanceMode ? 14 : 16, 
+  const iconProps = {
+    size: isUltraPerformanceMode ? 14 : 16,
     strokeWidth: isUltraPerformanceMode ? 2 : 1.75,
-    className: isUltraPerformanceMode ? '' : 'option-node__icon-svg'
+    className: isUltraPerformanceMode ? '' : 'option-node__icon-svg',
   };
-  
+
   const renderIcon = useCallback(() => {
     const currentLabelText = label?.toLowerCase() || '';
-    
+
     // Comparaciones más robustas para los labels
     if (['sí', 'si', 'yes', 'true'].some(term => currentLabelText.includes(term))) {
       return <Check {...iconProps} aria-hidden="true" />;
@@ -62,9 +64,9 @@ const OptionNodeIcon = React.memo(({
       return <Circle {...iconProps} aria-hidden="true" />;
     }
   }, [label, iconProps]);
-  
+
   return (
-    <div 
+    <div
       className={`option-node__icon ${isUltraPerformanceMode ? 'option-node__icon--ultra' : ''}`}
       role="img"
       aria-label={`Opción: ${label}`}
@@ -78,17 +80,17 @@ OptionNodeIcon.displayName = 'OptionNodeIcon';
 
 OptionNodeIcon.propTypes = {
   label: PropTypes.string,
-  isUltraPerformanceMode: PropTypes.bool
+  isUltraPerformanceMode: PropTypes.bool,
 };
 
 /**
  * Componente OptionNodeHandle - Maneja los handles de conexión
  */
-const OptionNodeHandle = React.memo(({ 
-  type, 
-  position, 
-  id: handleId, 
-  isConnectable, 
+const OptionNodeHandle = React.memo(({
+  type,
+  position,
+  id: handleId,
+  isConnectable,
   isEditing,
   isUltraPerformanceMode,
   style,
@@ -97,21 +99,21 @@ const OptionNodeHandle = React.memo(({
 }) => {
   // Garantizar que position siempre sea un objeto Position
   const positionObj = position instanceof Object ? position :
-    (position === 'top' ? Position.Top : 
-     position === 'right' ? Position.Right : 
-     position === 'bottom' ? Position.Bottom : 
-     position === 'left' ? Position.Left : Position.Bottom);
-    
-    const baseStyle = {
+    (position === 'top' ? Position.Top :
+      position === 'right' ? Position.Right :
+        position === 'bottom' ? Position.Bottom :
+          position === 'left' ? Position.Left : Position.Bottom);
+
+  const baseStyle = {
     zIndex: 50,
     '--option-node-handle-bg-color': handleColor || '#3b82f6',
-    ...style
+    ...style,
   };
 
   // Los efectos visuales de hover ahora se manejan puramente con CSS.
-  
+
   return (
-    <Handle 
+    <Handle
       type={type}
       position={positionObj}
       id={handleId}
@@ -119,7 +121,7 @@ const OptionNodeHandle = React.memo(({
       className={`option-node__handle option-node__handle--${type} ${isUltraPerformanceMode ? 'option-node__handle--ultra' : ''} ${isEditing ? 'option-node__handle--editing' : ''}`}
       style={baseStyle}
       tabIndex={0}
-      aria-label={type === "source" ? "Salida del nodo de opción" : "Entrada del nodo de opción"}
+      aria-label={type === 'source' ? 'Salida del nodo de opción' : 'Entrada del nodo de opción'}
       {...rest}
     />
   );
@@ -131,24 +133,24 @@ OptionNodeHandle.propTypes = {
   type: PropTypes.string.isRequired,
   position: PropTypes.oneOfType([
     PropTypes.object,
-    PropTypes.string  // Permitimos string para posiciones como 'top', 'right', etc.
+    PropTypes.string, // Permitimos string para posiciones como 'top', 'right', etc.
   ]).isRequired,
   id: PropTypes.string.isRequired,
   isConnectable: PropTypes.bool,
   isEditing: PropTypes.bool,
   isUltraPerformanceMode: PropTypes.bool,
   style: PropTypes.object,
-  handleColor: PropTypes.string
+  handleColor: PropTypes.string,
 };
 
 /**
  * Componente principal OptionNode - Refactorizado para integración directa y granular con Zustand
  */
-const OptionNodeComponent = ({ 
-  id, 
-  selected = false, 
+const OptionNodeComponent = ({
+  id,
+  selected = false,
   isConnectable = true,
-  lodLevel // <-- Prop recibida del HOC para que React.memo la detecte
+  lodLevel, // <-- Prop recibida del HOC para que React.memo la detecte
 }) => {
   // --- REFS ---
   const textareaRef = useRef(null);
@@ -157,7 +159,7 @@ const OptionNodeComponent = ({
 
   // --- ZUSTAND STORE (SELECTORS & ACTIONS) ---
   // Selectors are granular to prevent unnecessary re-renders.
-  
+
   // 1. Get node-specific data and editing state from a dedicated selector
   const nodeData = useNodeData(id);
   const {
@@ -214,7 +216,7 @@ const OptionNodeComponent = ({
     `option-node--${isUltraPerformanceMode ? 'ultra' : 'normal'}-mode`,
     selected ? 'option-node--selected' : '',
     isEditing ? 'option-node--editing' : '',
-    `option-node--border-color--${borderColor.replace('#', '')}`
+    `option-node--border-color--${borderColor.replace('#', '')}`,
   ].filter(Boolean).join(' '), [selected, isEditing, isUltraPerformanceMode, borderColor]);
 
   const nodeStyle = useMemo(() => ({
@@ -304,14 +306,12 @@ const OptionNodeComponent = ({
         e.preventDefault();
         cancelEditing();
       }
-    } else {
-      if (e.key === 'Enter' && !e.ctrlKey && !e.metaKey) {
-        e.preventDefault();
-        startEditing();
-      } else if (e.key === 'p' && e.ctrlKey && sourceNode) {
-        e.preventDefault();
-        navigateToParent();
-      }
+    } else if (e.key === 'Enter' && !e.ctrlKey && !e.metaKey) {
+      e.preventDefault();
+      startEditing();
+    } else if (e.key === 'p' && e.ctrlKey && sourceNode) {
+      e.preventDefault();
+      navigateToParent();
     }
   }, [isEditing, finishEditing, cancelEditing, startEditing, navigateToParent, sourceNode]);
 
@@ -347,9 +347,9 @@ const OptionNodeComponent = ({
             <OptionNodeIcon label={label} isUltraPerformanceMode={isUltraPerformanceMode} />
             <span className="option-node__label-text">{label || 'Opción'}</span>
           </div>
-          
+
           {!isUltraPerformanceMode && sourceNode && (
-            <Tooltip content={`Ir a nodo padre: ${sourceNode.substring(0,8)}...`} position="top">
+            <Tooltip content={`Ir a nodo padre: ${sourceNode.substring(0, 8)}...`} position="top">
               <button
                 onClick={navigateToParent}
                 className="option-node__parent-link"
@@ -366,7 +366,7 @@ const OptionNodeComponent = ({
             <textarea
               ref={textareaRef}
               className="option-node__instruction-textarea"
-              value={currentInstruction} 
+              value={currentInstruction}
               onChange={handleInstructionChange}
               onBlur={finishEditing}
               onKeyDown={handleKeyDown}
@@ -374,8 +374,8 @@ const OptionNodeComponent = ({
               aria-label="Instrucciones para esta opción"
             />
           ) : (
-            <p 
-              className="option-node__instruction-text" 
+            <p
+              className="option-node__instruction-text"
               onClick={startEditing}
             >
               {instruction}
@@ -428,9 +428,9 @@ const OptionNodeComponent = ({
       />
 
       <span className="sr-only" id={`option-node-description-${id}`}>
-        Nodo de opción: {label || 'Opción sin etiqueta'}. 
-        Instrucción: {instruction || NODE_CONFIG.DEFAULT_INSTRUCTION}. 
-        Deriva del nodo de decisión: {sourceNode ? sourceNode.substring(0,8) + '...' : 'Desconocido'}.
+        Nodo de opción: {label || 'Opción sin etiqueta'}.
+        Instrucción: {instruction || NODE_CONFIG.DEFAULT_INSTRUCTION}.
+        Deriva del nodo de decisión: {sourceNode ? `${sourceNode.substring(0, 8)}...` : 'Desconocido'}.
         {lastUpdated && ` Última actualización: ${formatDateRelative(lastUpdated)}.`}
       </span>
     </div>
@@ -441,7 +441,7 @@ OptionNodeComponent.propTypes = {
   id: PropTypes.string.isRequired,
   selected: PropTypes.bool,
   isConnectable: PropTypes.bool,
-  lodLevel: PropTypes.string
+  lodLevel: PropTypes.string,
 };
 
 const OptionNode = memo(OptionNodeComponent);

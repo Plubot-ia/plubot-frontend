@@ -15,19 +15,19 @@ const recoveryThrottleMs = 60000; // Limitar a una recuperación cada 60 segundo
 
 export const recoverEdgesFromLocalStorage = (plubotId) => {
   if (!plubotId) return [];
-  
+
   // Limitar la frecuencia de recuperación
   const now = Date.now();
   if (now - lastRecoveryAttempt < recoveryThrottleMs) {
     return [];
   }
-  
+
   lastRecoveryAttempt = now;
-  
+
   try {
     // Intentar primero el formato estándar de localStorage
     let recoveredEdges = [];
-    
+
     // Probar primero con la clave genérica de respaldo
     const genericStoredEdges = localStorage.getItem('plubot-flow-edges');
     if (genericStoredEdges) {
@@ -39,12 +39,12 @@ export const recoverEdgesFromLocalStorage = (plubotId) => {
       } catch (e) {
       }
     }
-    
+
     // Si no se encontraron aristas, intentar con la clave específica del plubot
     if (recoveredEdges.length === 0) {
       const keyFormat = `plubot-edges-${plubotId}`;
       const storedEdges = localStorage.getItem(keyFormat);
-      
+
       if (storedEdges) {
         try {
           const parsedEdges = JSON.parse(storedEdges);
@@ -55,20 +55,20 @@ export const recoverEdgesFromLocalStorage = (plubotId) => {
         }
       }
     }
-    
+
     // Si se encontraron aristas, filtrarlas y corregir sus handles
     if (recoveredEdges.length > 0) {
       // Filtrar aristas válidas (que tengan id, source y target)
-      const filteredEdges = recoveredEdges.filter(edge => 
-        edge && edge.id && edge.source && edge.target
+      const filteredEdges = recoveredEdges.filter(edge =>
+        edge && edge.id && edge.source && edge.target,
       );
-      
+
       // Corregir los handles de las aristas filtradas
       const fixedEdges = fixAllEdgeHandles(filteredEdges);
-      
+
       return fixedEdges;
     }
-    
+
     return [];
   } catch (error) {
     return [];
@@ -86,16 +86,16 @@ const saveThrottleMs = 10000; // Limitar a un guardado cada 10 segundos
 
 export const saveEdgesToLocalStorage = (plubotId, edges) => {
   if (!plubotId || !edges || !Array.isArray(edges)) return;
-  
+
   // Limitar la frecuencia de guardado
   const now = Date.now();
   if (now - lastSaveAttempt < saveThrottleMs) {
     // No mostrar mensaje para evitar spam en la consola
     return;
   }
-  
+
   lastSaveAttempt = now;
-  
+
   try {
     // Filtrar aristas cuyos nodos no existen en el DOM
     const validEdges = edges.filter(edge => {
@@ -104,16 +104,16 @@ export const saveEdgesToLocalStorage = (plubotId, edges) => {
       }
       return exists;
     });
-    
+
     if (validEdges.length !== edges.length) {
     }
-    
+
     // Corregir los handles de las aristas válidas antes de guardarlas
     const fixedEdges = fixAllEdgeHandles(validEdges);
-    
+
     // Convertir a JSON
     const edgesJSON = JSON.stringify(fixedEdges);
-    
+
     // Guardar en ambos formatos para mayor compatibilidad
     localStorage.setItem(`plubot-edges-${plubotId}`, edgesJSON);
     localStorage.setItem('plubot-flow-edges', edgesJSON);
@@ -141,9 +141,9 @@ export const forceEdgeVisualUpdate = (edges) => {
   if (now - lastVisualUpdate < visualUpdateThrottleMs) {
     return; // Evitar actualizaciones demasiado frecuentes
   }
-  
+
   lastVisualUpdate = now;
-  
+
   // Si se proporcionaron aristas, filtrar las válidas y corregir sus handles antes de emitir el evento
   let fixedHandles = false;
   if (edges && Array.isArray(edges) && edges.length > 0) {
@@ -155,44 +155,44 @@ export const forceEdgeVisualUpdate = (edges) => {
         }
         return exists;
       });
-      
+
       if (validEdges.length !== edges.length) {
       }
-      
+
       // Intentar corregir los handles de las aristas válidas
       const fixedEdges = fixAllEdgeHandles(validEdges);
       fixedHandles = true;
-      
+
       // Si hay diferencias, emitir un evento para actualizar las aristas en el estado
       if (JSON.stringify(fixedEdges) !== JSON.stringify(edges)) {
-        document.dispatchEvent(new CustomEvent('edges-fixed', { 
-          detail: { 
+        document.dispatchEvent(new CustomEvent('edges-fixed', {
+          detail: {
             edges: fixedEdges,
             timestamp: now,
-            validEdgesOnly: true
-          } 
+            validEdgesOnly: true,
+          },
         }));
       }
     } catch (error) {
     }
   }
-  
+
   // Emitir un evento para EliteEdge
-  document.dispatchEvent(new CustomEvent('elite-edge-update-required', { 
-    detail: { 
+  document.dispatchEvent(new CustomEvent('elite-edge-update-required', {
+    detail: {
       allEdges: true,
       timestamp: now,
       forced: true,
-      fixedHandles: fixedHandles
-    } 
+      fixedHandles,
+    },
   }));
-  
+
   // Forzar un repintado del viewport con una ligera transformación
   // pero solo una vez cada 5 segundos
   setTimeout(() => {
     const reactFlowViewport = document.querySelector('.react-flow__viewport');
     if (reactFlowViewport) {
-      const transform = reactFlowViewport.style.transform;
+      const { transform } = reactFlowViewport.style;
       if (transform) {
         // Aplicar una transformación mínima para forzar repintado
         reactFlowViewport.style.transform = `${transform} scale(0.9999)`;
@@ -219,13 +219,13 @@ export const restoreAndApplyEdges = (plubotId, setEdges) => {
   if (now - lastRestoreAttempt < restoreThrottleMs) {
     return false;
   }
-  
+
   lastRestoreAttempt = now;
-  
+
   const recoveredEdges = recoverEdgesFromLocalStorage(plubotId);
-  
+
   if (recoveredEdges.length > 0) {
-    
+
     // Verificar si setEdges está disponible
     if (setEdges) {
       // Usar un timeout para dar tiempo al sistema a estabilizarse
@@ -234,9 +234,9 @@ export const restoreAndApplyEdges = (plubotId, setEdges) => {
       }, 100);
     } else {
     }
-    
+
     return true;
   }
-  
+
   return false;
 };

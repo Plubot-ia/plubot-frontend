@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
 import { Zap, AlertTriangle } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+
 import './PerformanceModeButton.css';
 import { useFlowMeta } from '@/stores/selectors';
 
@@ -14,20 +15,20 @@ const PerformanceModeButton = () => {
   const [showFeedback, setShowFeedback] = useState(false);
   const [hasError, setHasError] = useState(false);
   const [showTooltip, setShowTooltip] = useState(false);
-  
+
   // Manejar el clic con feedback visual
   const handleClick = () => {
     try {
       // Mostrar feedback visual
       setShowFeedback(true);
       setHasError(false);
-      
+
       // Llamar a la función toggleUltraMode del store
       toggleUltraMode();
-      
+
       // La manipulación del DOM ahora es responsabilidad exclusiva del UltraModeManager,
       // orquestado por el store, para mantener una única fuente de verdad.
-      
+
       // Ocultar el feedback después de un tiempo
       setTimeout(() => {
         setShowFeedback(false);
@@ -40,11 +41,11 @@ const PerformanceModeButton = () => {
       }, 3000);
     }
   };
-  
+
   // Mostrar/ocultar tooltip
   const handleMouseEnter = () => setShowTooltip(true);
   const handleMouseLeave = () => setShowTooltip(false);
-  
+
   // Limpiar estados al desmontar
   useEffect(() => {
     return () => {
@@ -63,7 +64,7 @@ const PerformanceModeButton = () => {
           <path d="M13 2L3 14H12L11 22L21 10H12L13 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
         </svg>
       </div>
-      <div className="feedback-indicator"></div>
+      <div className="feedback-indicator" />
       <div className="button-tooltip">
         {isUltraMode ? 'Desactivar modo Ultra Rendimiento' : 'Activar modo Ultra Rendimiento'}
       </div>

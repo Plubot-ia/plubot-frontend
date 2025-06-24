@@ -1,9 +1,10 @@
+import PropTypes from 'prop-types';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useReactFlow } from 'reactflow';
-import { useAnalytics } from '@/hooks/useAnalytics';
+
 import { useNodeHistory } from '@/hooks/legacy-compatibility';
+import { useAnalytics } from '@/hooks/useAnalytics';
 import { usePermissions } from '@/hooks/usePermissions';
-import PropTypes from 'prop-types';
 
 const useNode = ({ id, data = {}, onNodesChange, isConnectable = true, minWidth = 120, minHeight = 80 }) => {
   const [isResizing, setIsResizing] = useState(false);
@@ -46,10 +47,10 @@ const useNode = ({ id, data = {}, onNodesChange, isConnectable = true, minWidth 
             onNodesChange([{
               type: 'change',
               item: {
-                id: id,
+                id,
                 width: Math.max(width, minWidth),
-                height: Math.max(height, minHeight)
-              }
+                height: Math.max(height, minHeight),
+              },
             }]);
           }, 0);
         }
@@ -68,10 +69,10 @@ const useNode = ({ id, data = {}, onNodesChange, isConnectable = true, minWidth 
       onNodesChange([{
         type: 'change',
         item: {
-          id: id,
+          id,
           width: Math.max(minWidth, (getNode(id)?.width || initialWidth) + e.movementX),
-          height: Math.max(minHeight, (getNode(id)?.height || initialHeight) + e.movementY)
-        }
+          height: Math.max(minHeight, (getNode(id)?.height || initialHeight) + e.movementY),
+        },
       }]);
     };
 
@@ -105,12 +106,12 @@ const useNode = ({ id, data = {}, onNodesChange, isConnectable = true, minWidth 
       onNodesChange([{
         type: 'change',
         item: {
-          id: id,
-          data: { ...getNode(id)?.data, isCollapsed: newCollapsed }
-        }
+          id,
+          data: { ...getNode(id)?.data, isCollapsed: newCollapsed },
+        },
       }]);
     },
-    [isCollapsed, id, onNodesChange, getNode]
+    [isCollapsed, id, onNodesChange, getNode],
   );
 
   const handleContextMenu = useCallback((e) => {
@@ -126,7 +127,7 @@ const useNode = ({ id, data = {}, onNodesChange, isConnectable = true, minWidth 
         data.onSelect();
       }
     },
-    [data]
+    [data],
   );
 
   const handleMouseDown = useCallback(
@@ -138,7 +139,7 @@ const useNode = ({ id, data = {}, onNodesChange, isConnectable = true, minWidth 
       }
       setIsResizing(true);
     },
-    [canEdit]
+    [canEdit],
   );
 
   const handleDoubleClick = useCallback(() => {
@@ -155,9 +156,9 @@ const useNode = ({ id, data = {}, onNodesChange, isConnectable = true, minWidth 
       onNodesChange([{
         type: 'change',
         item: {
-          id: id,
-          data: { ...getNode(id)?.data, ...updateData }
-        }
+          id,
+          data: { ...getNode(id)?.data, ...updateData },
+        },
       }]);
       // Llamar a trackNodeEdit y addToHistory directamente
       trackNodeEdit(id, nodeType, updateData);
@@ -170,7 +171,7 @@ const useNode = ({ id, data = {}, onNodesChange, isConnectable = true, minWidth 
       });
       setIsEditing(false);
     },
-    [id, onNodesChange, getNode, trackNodeEdit, addToHistory, data.currentUser]
+    [id, onNodesChange, getNode, trackNodeEdit, addToHistory, data.currentUser],
   );
 
   const trackChanges = useCallback(
@@ -184,7 +185,7 @@ const useNode = ({ id, data = {}, onNodesChange, isConnectable = true, minWidth 
         newValue,
       });
     },
-    [id, trackNodeEdit, addToHistory, data.currentUser]
+    [id, trackNodeEdit, addToHistory, data.currentUser],
   );
 
   const showError = useCallback((message) => {

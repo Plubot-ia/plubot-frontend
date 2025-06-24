@@ -1,4 +1,5 @@
 import React, { memo } from 'react';
+
 import EliteEdge from './EliteEdge';
 
 /**
@@ -9,7 +10,7 @@ const SafeEdgeWrapper = (props) => {
   // Asegurar que todas las propiedades requeridas estén disponibles
   const safeProps = {
     // Propiedades básicas con valores por defecto
-    id: props.id || 'edge-' + Math.random().toString(36).substr(2, 9),
+    id: props.id || `edge-${Math.random().toString(36).substr(2, 9)}`,
     source: props.source || '',
     target: props.target || '',
     sourceX: props.sourceX || 0,
@@ -21,13 +22,13 @@ const SafeEdgeWrapper = (props) => {
     style: props.style || {},
     markerEnd: props.markerEnd || undefined,
     data: props.data || {},
-    selected: !!props.selected,
+    selected: Boolean(props.selected),
     label: props.label || '',
     sourceHandle: props.sourceHandle || null,
     targetHandle: props.targetHandle || null,
     className: props.className || '',
     // Resto de propiedades que puedan llegar
-    ...props
+    ...props,
   };
 
   // Intentar renderizar EliteEdge con propiedades seguras

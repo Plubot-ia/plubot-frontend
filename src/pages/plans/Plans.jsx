@@ -1,6 +1,8 @@
-import React, { useRef, useEffect, useState, useMemo } from 'react';
-import useWindowSize from '../../hooks/useWindowSize';
 import { motion } from 'framer-motion';
+import React, { useRef, useEffect, useState, useMemo } from 'react';
+
+import useWindowSize from '../../hooks/useWindowSize';
+
 import './Plans.css';
 import logo from '@assets/img/logo.svg';
 
@@ -17,7 +19,7 @@ export default function Plans() {
       ([entry]) => {
         setIsVisible(entry.isIntersecting);
       },
-      { threshold: 0.2, rootMargin: '50px' } // Aumentado threshold y añadido rootMargin
+      { threshold: 0.2, rootMargin: '50px' }, // Aumentado threshold y añadido rootMargin
     );
 
     if (plansSectionRef.current) {
@@ -37,7 +39,7 @@ export default function Plans() {
 
     // Limitar a max 3 partículas para rendimiento
     const particleCount = (width || 0) < 768 ? 2 : 3;
-    
+
     for (let i = 0; i < particleCount; i++) {
       const particle = document.createElement('div');
       particle.classList.add('interactive-particle');
@@ -46,7 +48,7 @@ export default function Plans() {
       const rect = particlesContainerRef.current.getBoundingClientRect();
       const relX = Math.max(0, Math.min(x - rect.left, rect.width));
       const relY = Math.max(0, Math.min(y - rect.top, rect.height));
-      
+
       particle.style.left = `${relX}px`;
       particle.style.top = `${relY}px`;
 
@@ -106,7 +108,7 @@ export default function Plans() {
         'Editor visual de flujos',
         'Estadísticas simples',
         'Acceso básico al Pluniverse',
-      ]
+      ],
     },
     {
       name: 'Plan Poder Inicial',
@@ -122,7 +124,7 @@ export default function Plans() {
         '3 Integraciones (WhatsApp, Notion, Calendly)',
         'Estadísticas avanzadas',
         'Pluniverse completo hasta nivel 5',
-      ]
+      ],
     },
     {
       name: 'Plan Maestro',
@@ -138,7 +140,7 @@ export default function Plans() {
         'Todas las integraciones (Stripe, Shopify, Trello, Gmail)',
         'Reportes avanzados exportables',
         'Zonas exclusivas del Pluniverse',
-      ]
+      ],
     },
     {
       name: 'Plan Legendario',
@@ -154,35 +156,35 @@ export default function Plans() {
         'Funcionalidad white-label',
         'API de reportes',
         'Soporte VIP y consultoría mensual',
-      ]
-    }
+      ],
+    },
   ];
 
   // Animaciones optimizadas
   const containerVariants = {
     hidden: { opacity: 0 },
-    visible: { 
+    visible: {
       opacity: 1,
-      transition: { 
+      transition: {
         staggerChildren: 0.07,
-        delayChildren: 0.2
-      }
-    }
+        delayChildren: 0.2,
+      },
+    },
   };
 
   const itemVariants = {
     hidden: { y: 20, opacity: 0 },
-    visible: { 
-      y: 0, 
+    visible: {
+      y: 0,
       opacity: 1,
-      transition: { type: 'spring', stiffness: 100, damping: 12 }
-    }
+      transition: { type: 'spring', stiffness: 100, damping: 12 },
+    },
   };
 
   // Detectar dispositivos de menor rendimiento de forma reactiva
   const isLowPerfDevice = useMemo(() => {
     return (
-      (width || 0) < 768 || 
+      (width || 0) < 768 ||
       /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
       (navigator.hardwareConcurrency && navigator.hardwareConcurrency < 4)
     );
@@ -200,25 +202,25 @@ export default function Plans() {
         {/* Efectos de fondo condicionales */}
         {!isLowPerfDevice && (
           <div className="cosmic-lights">
-            <div className="light-beam light-beam-1"></div>
-            <div className="light-beam light-beam-2"></div>
-            <div className="light-beam light-beam-3"></div>
+            <div className="light-beam light-beam-1" />
+            <div className="light-beam light-beam-2" />
+            <div className="light-beam light-beam-3" />
           </div>
         )}
-        
+
         <div className="particles" ref={particlesContainerRef}>
           {isVisible && [...Array(isLowPerfDevice ? 3 : 6)].map((_, i) => (
-            <div key={i} className={`particle particle-${i + 1}`}></div>
+            <div key={i} className={`particle particle-${i + 1}`} />
           ))}
         </div>
-        
+
         <motion.div
           className="plans-container"
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: 'easeOut' }}
         >
-          <motion.div 
+          <motion.div
             className="plans-header"
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -232,15 +234,15 @@ export default function Plans() {
               <p className="plans-subtitle">
                 Elige el plan que mejor se adapte a tus necesidades
               </p>
-              <div className="plans-subtitle-line"></div>
+              <div className="plans-subtitle-line" />
             </div>
           </motion.div>
-          
-          <motion.div 
+
+          <motion.div
             className="plans-grid"
             variants={containerVariants}
             initial="hidden"
-            animate={isVisible ? "visible" : "hidden"}
+            animate={isVisible ? 'visible' : 'hidden'}
           >
             {plans.map((plan, index) => (
               <motion.div
@@ -249,10 +251,10 @@ export default function Plans() {
                 variants={itemVariants}
                 onMouseEnter={() => handlePlanHover(index)}
                 onMouseLeave={() => handlePlanHover(null)}
-                whileHover={{ 
-                  scale: isLowPerfDevice ? 1.01 : 1.03, 
+                whileHover={{
+                  scale: isLowPerfDevice ? 1.01 : 1.03,
                   y: isLowPerfDevice ? -2 : -5,
-                  transition: { type: 'spring', stiffness: 400, damping: 17 }
+                  transition: { type: 'spring', stiffness: 400, damping: 17 },
                 }}
                 whileTap={{ scale: 0.98 }}
               >
@@ -266,7 +268,7 @@ export default function Plans() {
                   <h2 className="plan-name">{plan.name}</h2>
                   <p className="plan-price">{plan.price}</p>
                 </div>
-                
+
                 <ul className="plan-features">
                   {plan.features.map((feature, idx) => (
                     <li key={idx} className="plan-feature">
@@ -274,16 +276,16 @@ export default function Plans() {
                     </li>
                   ))}
                 </ul>
-                
+
                 {plan.idealFor && (
                   <p className="plan-ideal-for">{plan.idealFor}</p>
                 )}
-                
+
                 <motion.button
                   className="plan-button"
-                  whileHover={{ 
+                  whileHover={{
                     scale: 1.05,
-                    boxShadow: "0 0 15px rgba(0, 224, 255, 0.8)"
+                    boxShadow: '0 0 15px rgba(0, 224, 255, 0.8)',
                   }}
                   whileTap={{ scale: 0.97 }}
                 >
@@ -292,7 +294,7 @@ export default function Plans() {
               </motion.div>
             ))}
           </motion.div>
-          
+
           <motion.div
             className="plans-cta"
             initial={{ opacity: 0, y: 20 }}
@@ -303,7 +305,7 @@ export default function Plans() {
             <p className="plans-cta-text">
               Actualiza, cambia o cancela en cualquier momento. Sin compromisos.
             </p>
-            <motion.button 
+            <motion.button
               className="plans-cta-button"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.97 }}
@@ -311,7 +313,7 @@ export default function Plans() {
               Iniciar prueba gratuita
             </motion.button>
           </motion.div>
-          
+
           <motion.div
             className="plans-notes"
             initial={{ opacity: 0, y: 10 }}

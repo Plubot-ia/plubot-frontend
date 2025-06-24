@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
 import { formatDistanceToNow } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { History, X, RotateCcw, Info } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+
 import useFlowStore from '@/stores/useFlowStore';
 import './BackupManager.css';
 
@@ -17,80 +18,80 @@ const BackupManager = ({ plubotId }) => {
   const [restoring, setRestoring] = useState(false);
   const [selectedBackup, setSelectedBackup] = useState(null);
   const [error, setError] = useState(null);
-  
+
   // Obtener funciones del store
   const listBackups = useFlowStore(state => state.listBackups);
   const restoreBackup = useFlowStore(state => state.restoreBackup);
   const setPlubotId = useFlowStore(state => state.setPlubotId);
-  
+
   // Establecer el ID del plubot en el store cuando cambie
   useEffect(() => {
     if (plubotId) {
       setPlubotId(plubotId);
     }
   }, [plubotId, setPlubotId]);
-  
+
   // Cargar las copias de seguridad al abrir el diálogo
   const handleOpen = () => {
     setOpen(true);
     loadBackups();
   };
-  
+
   // Cerrar el diálogo
   const handleClose = () => {
     setOpen(false);
     setSelectedBackup(null);
     setError(null);
   };
-  
+
   // Cargar la lista de copias de seguridad
   const loadBackups = async () => {
     if (!plubotId) {
       setError('No se ha especificado un ID de plubot válido');
       return;
     }
-    
+
     setLoading(true);
     setError(null);
-    
+
     try {
       const backupList = await listBackups();
       setBackups(backupList || []);
     } catch (err) {
 
-      setError('No se pudieron cargar las copias de seguridad: ' + (err.message || 'Error desconocido'));
+      setError(`No se pudieron cargar las copias de seguridad: ${err.message || 'Error desconocido'}`);
     } finally {
       setLoading(false);
     }
   };
-  
+
   // Restaurar una copia de seguridad
   const handleRestore = async (backupId) => {
     if (!plubotId || !backupId) {
       setError('No se puede restaurar: Información incompleta');
       return;
     }
-    
+
     setRestoring(true);
     setError(null);
-    
+
     try {
       const result = await restoreBackup(backupId);
-      
+
       if (result.success) {
         // Cerrar el diálogo después de restaurar exitosamente
         handleClose();
       } else {
-        setError('Error al restaurar: ' + (result.message || 'Error desconocido'));
+        setError(`Error al restaurar: ${result.message || 'Error desconocido'}`);
       }
     } catch (err) {
 
-      setError('Error al restaurar: ' + (err.message || 'Error desconocido'));
+      setError(`Error al restaurar: ${err.message || 'Error desconocido'}`);
     } finally {
       setRestoring(false);
     }
   };
-  
+
   // Formatear la fecha para mostrarla
   const formatDate = (dateString) => {
     try {
@@ -100,13 +101,13 @@ const BackupManager = ({ plubotId }) => {
       return 'Fecha desconocida';
     }
   };
-  
+
   return (
     <>
       <div className="backup-manager-trigger" onClick={handleOpen} title="Gestionar copias de seguridad">
         <History size={16} />
       </div>
-      
+
       {open && (
         <div className="backup-manager-overlay" onClick={handleClose}>
           <div className="backup-manager-dialog" onClick={e => e.stopPropagation()}>
@@ -119,13 +120,13 @@ const BackupManager = ({ plubotId }) => {
                 <X size={18} />
               </button>
             </div>
-            
-            <div className="backup-manager-divider"></div>
-            
+
+            <div className="backup-manager-divider" />
+
             <div className="backup-manager-content">
               {loading ? (
                 <div className="backup-manager-loading">
-                  <div className="backup-manager-spinner"></div>
+                  <div className="backup-manager-spinner" />
                 </div>
               ) : error ? (
                 <div className="backup-manager-error">
@@ -139,7 +140,7 @@ const BackupManager = ({ plubotId }) => {
               ) : (
                 <div className="backup-manager-list">
                   {backups.map((backup) => (
-                    <div 
+                    <div
                       key={backup.id}
                       className={`backup-manager-item ${selectedBackup?.id === backup.id ? 'selected' : ''}`}
                       onClick={() => setSelectedBackup(backup)}
@@ -160,12 +161,12 @@ const BackupManager = ({ plubotId }) => {
                 </div>
               )}
             </div>
-            
-            <div className="backup-manager-divider"></div>
-            
+
+            <div className="backup-manager-divider" />
+
             <div className="backup-manager-actions">
-              <button 
-                className="backup-manager-cancel-btn" 
+              <button
+                className="backup-manager-cancel-btn"
                 onClick={handleClose}
               >
                 Cancelar
@@ -177,7 +178,7 @@ const BackupManager = ({ plubotId }) => {
               >
                 {restoring ? (
                   <>
-                    <div className="backup-manager-spinner-small"></div>
+                    <div className="backup-manager-spinner-small" />
                     <span>Restaurando...</span>
                   </>
                 ) : (

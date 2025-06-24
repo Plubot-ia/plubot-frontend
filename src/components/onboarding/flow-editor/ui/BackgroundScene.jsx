@@ -1,6 +1,10 @@
 import React, { useRef, useCallback, useEffect, useMemo } from 'react';
+
 import useFlowStore from '@/stores/useFlowStore'; // Importar store de Zustand
+
 import useWindowSize from '../../../../hooks/useWindowSize';
+
+
 import './BackgroundScene.css';
 
 const CONFIG = {
@@ -30,7 +34,7 @@ const BackgroundScene = () => {
   const animationRef = useRef(null);
   const mousePosition = useRef({ x: null, y: null });
 
-  
+
   // Efecto para el modo normal con partículas animadas
   useEffect(() => {
     // La animación solo se ejecuta si NO estamos en modo ultra.
@@ -42,12 +46,11 @@ const BackgroundScene = () => {
       }
       return;
     }
-    
+
     // Usar la referencia global en lugar de una variable local
     animationRef.current = null;
-    
 
-    
+
     const canvas = canvasRef.current;
     const staticCanvas = staticCanvasRef.current;
     const ctx = canvas?.getContext('2d');
@@ -67,7 +70,7 @@ const BackgroundScene = () => {
 
       const w = width || 0;
       const h = height || 0;
-      
+
       canvas.width = w * pixelRatio;
       canvas.height = h * pixelRatio;
       canvas.style.width = `${w}px`;
@@ -89,8 +92,8 @@ const BackgroundScene = () => {
     const drawStaticElements = () => {
       staticCtx.clearRect(0, 0, staticCanvas.width, staticCanvas.height);
 
-      const width = staticCanvas.width;
-      const height = staticCanvas.height;
+      const { width } = staticCanvas;
+      const { height } = staticCanvas;
 
       // Aplicar un fondo más oscuro primero
       staticCtx.fillStyle = CONFIG.backgroundColor;
@@ -99,7 +102,7 @@ const BackgroundScene = () => {
       // Gradiente en la esquina superior izquierda (más reducido y sutil)
       const gradient1 = staticCtx.createRadialGradient(
         width * 0.05, height * 0.1, 0, // Posición más cercana a la esquina
-        width * 0.05, height * 0.1, width * 0.2 // Radio significativamente reducido
+        width * 0.05, height * 0.1, width * 0.2, // Radio significativamente reducido
       );
       gradient1.addColorStop(0, `rgba(0, 224, 255, ${CONFIG.staticGradientOpacity * 0.4})`);
       gradient1.addColorStop(1, 'transparent');
@@ -107,7 +110,7 @@ const BackgroundScene = () => {
       // Restaurar el gradiente magenta en la parte inferior derecha
       const gradient2 = staticCtx.createRadialGradient(
         width * 0.9, height * 0.8, 0,
-        width * 0.9, height * 0.8, width * 0.4
+        width * 0.9, height * 0.8, width * 0.4,
       );
       gradient2.addColorStop(0, `rgba(255, 0, 255, ${CONFIG.staticGradientOpacity})`);
       gradient2.addColorStop(1, 'transparent');
@@ -138,14 +141,14 @@ const BackgroundScene = () => {
           const dx = this.x - mousePosition.current.x;
           const dy = this.y - mousePosition.current.y;
           const distance = Math.sqrt(dx * dx + dy * dy);
-          
+
           if (distance < CONFIG.mouseRadius) {
             const force = (CONFIG.mouseRadius - distance) / CONFIG.mouseRadius;
             this.speedX += dx * force * 0.02;
             this.speedY += dy * force * 0.02;
           }
         }
-        
+
         this.x += this.speedX;
         this.y += this.speedY;
 
@@ -174,17 +177,17 @@ const BackgroundScene = () => {
       // Optimización: Usar un buffer de líneas y dibujarlas todas juntas
       const lines = [];
       ctx.lineWidth = 0.4;
-      
+
       // Limitar el número de conexiones para mejorar el rendimiento
       const maxConnections = 100; // Límite de conexiones a dibujar
       let connectionCount = 0;
-      
+
       for (let i = 0; i < particles.length; i++) {
         // Optimización: Solo comprobar partículas cercanas
         // Usar un paso más grande para saltarse algunas partículas
         for (let j = i + 2; j < particles.length; j += 2) {
           if (connectionCount >= maxConnections) break;
-          
+
           const dx = particles[i].x - particles[j].x;
           const dy = particles[i].y - particles[j].y;
           const distanceSq = dx * dx + dy * dy;
@@ -199,13 +202,13 @@ const BackgroundScene = () => {
               y1: particles[i].y,
               x2: particles[j].x,
               y2: particles[j].y,
-              opacity: universeOpacity
+              opacity: universeOpacity,
             });
             connectionCount++;
           }
         }
       }
-      
+
       // Dibujar todas las líneas de una vez
       for (const line of lines) {
         ctx.strokeStyle = `rgba(0, 224, 255, ${line.opacity})`;
@@ -220,20 +223,20 @@ const BackgroundScene = () => {
     let lastFrameTime = 0;
     const targetFPS = 30; // Limitamos a 30 FPS para ahorrar recursos
     const frameInterval = 1000 / targetFPS;
-    
+
     const animate = (timestamp) => {
       // Limitar la tasa de frames para optimizar rendimiento
       const elapsed = timestamp - lastFrameTime;
-      
+
       if (elapsed > frameInterval) {
         lastFrameTime = timestamp - (elapsed % frameInterval);
-        
+
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         particles.forEach(p => p.update());
         drawConnections();
         particles.forEach(p => p.draw());
       }
-      
+
       animationRef.current = requestAnimationFrame(animate);
     };
 
@@ -291,7 +294,7 @@ const BackgroundScene = () => {
           height: '100%',
           backgroundColor: 'rgba(0, 0, 0, 0.96)',
           zIndex: 0,
-          pointerEvents: 'none'
+          pointerEvents: 'none',
         }} />
         <div style={{
           position: 'absolute',
@@ -312,7 +315,7 @@ const BackgroundScene = () => {
           `,
           opacity: 0.9,
           zIndex: 1,
-          pointerEvents: 'none'
+          pointerEvents: 'none',
         }} />
       </div>
 
@@ -330,7 +333,7 @@ const BackgroundScene = () => {
             width: '100%',
             height: '100%',
             zIndex: 1,
-            pointerEvents: 'none'
+            pointerEvents: 'none',
           }}
         />
         <canvas
@@ -343,7 +346,7 @@ const BackgroundScene = () => {
             height: '100%',
             zIndex: 0,
             pointerEvents: 'none',
-            backgroundColor: CONFIG.backgroundColor
+            backgroundColor: CONFIG.backgroundColor,
           }}
         />
       </div>

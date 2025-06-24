@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+
 import useAPI from '@hooks/useAPI';
+
 import './Blog.css';
 
 const badgeLevels = [
@@ -8,7 +10,7 @@ const badgeLevels = [
   'Aprendiz',
   'Constructor',
   'Mentor IA',
-  'Maestro del Pluniverse'
+  'Maestro del Pluniverse',
 ];
 
 const getRandomBadge = () => {
@@ -27,38 +29,38 @@ const Blog = () => {
           {
             slug: 'whatsapp-ventas',
             title: '5 Formas de Usar WhatsApp para Aumentar tus Ventas',
-            excerpt: 'Aprende a transformar tus chats en oportunidades de negocio con un chatbot.'
+            excerpt: 'Aprende a transformar tus chats en oportunidades de negocio con un chatbot.',
           },
           {
             slug: 'automatizacion-emprendedores',
             title: 'Automatización para Emprendedores: Cómo Ahorrar Tiempo',
-            excerpt: 'Consejos clave para emprendedores que buscan optimizar su rutina con IA.'
+            excerpt: 'Consejos clave para emprendedores que buscan optimizar su rutina con IA.',
           },
           {
             slug: 'futuro-atencion-cliente',
             title: 'El Futuro de la Atención al Cliente: IA y Chatbots',
-            excerpt: 'Descubre cómo la IA redefine la atención al cliente con chatbots.'
+            excerpt: 'Descubre cómo la IA redefine la atención al cliente con chatbots.',
           },
           {
             slug: 'transformar-negocio-chatbots',
             title: 'Cómo la IA Puede Transformar tu Negocio con Chatbots: 5 Beneficios Clave',
-            excerpt: 'Descubre cómo los chatbots de IA creados con Plubot pueden optimizar tu negocio.'
+            excerpt: 'Descubre cómo los chatbots de IA creados con Plubot pueden optimizar tu negocio.',
           },
           {
             slug: 'eficiencia-negocio-plubot',
             title: 'Automatización con IA: 5 Formas de Hacer tu Negocio Más Eficiente con Plubot',
-            excerpt: 'Explora 5 formas en que la IA y los chatbots de Plubot optimizan la eficiencia de tu negocio.'
-          }
+            excerpt: 'Explora 5 formas en que la IA y los chatbots de Plubot optimizan la eficiencia de tu negocio.',
+          },
         ];
 
         const postsWithBadges = staticPosts.map((post) => ({
           ...post,
-          badge: getRandomBadge()
+          badge: getRandomBadge(),
         }));
 
         setPosts(postsWithBadges);
       } catch (err) {
-
+        console.error('Error al procesar las publicaciones del blog:', err);
       }
     };
     fetchPosts();

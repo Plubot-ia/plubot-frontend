@@ -17,12 +17,12 @@ const StatusBubble = ({ message }) => {
   // Función para cerrar manualmente el mensaje actual
   const closeMessage = () => {
     setIsVisible(false);
-    
+
     // Esperar a que termine la animación de salida antes de procesar el siguiente mensaje
     setTimeout(() => {
       processMessageQueue();
     }, 500); // 500ms para la animación de salida
-    
+
     // Limpiar el timer si existe
     if (timerRef.current) {
       clearTimeout(timerRef.current);
@@ -37,20 +37,20 @@ const StatusBubble = ({ message }) => {
       processingRef.current = false;
       return;
     }
-    
+
     // Marcar como procesando y obtener el siguiente mensaje
     processingRef.current = true;
     const nextMessage = messageQueueRef.current.shift();
-    
+
     // Actualizar el estado con el nuevo mensaje y hacerlo visible
     setCurrentMessage(nextMessage);
     setIsVisible(true);
-    
+
     // Limpiar cualquier timer previo
     if (timerRef.current) {
       clearTimeout(timerRef.current);
     }
-    
+
     // Configurar el timer para ocultar automáticamente
     timerRef.current = setTimeout(() => {
       closeMessage();
@@ -73,31 +73,31 @@ const StatusBubble = ({ message }) => {
       /actualizado/i,
       /eliminado/i,
       /creado/i,
-      /¡listo!/i
+      /¡listo!/i,
     ];
-    
+
     // Verificar si el mensaje coincide con alguno de los patrones de StatusBubble
     return statusPatterns.some(pattern => pattern.test(msg));
   };
-  
+
   useEffect(() => {
     // No procesar mensajes vacíos
     if (!message || message.trim() === '') return;
-    
+
     // Verificar si este mensaje debe mostrarse en StatusBubble
     if (!shouldShowInStatusBubble(message)) {
       // Si no debe mostrarse en StatusBubble, ignorarlo (se mostrará en ByteAssistant)
       return;
     }
-    
+
     // Evitar mensajes duplicados o superpuestos
     // Si es un mensaje de bienvenida, limpiar la cola y mostrar solo este
     if (message.includes('Bienvenido') || message.includes('Hola') || message.includes('Editor listo')) {
       // Verificar si ya hay un mensaje similar en la cola
-      const hasSimilarMessage = messageQueueRef.current.some(m => 
-        m.includes('Bienvenido') || m.includes('Hola') || m.includes('Editor listo')
+      const hasSimilarMessage = messageQueueRef.current.some(m =>
+        m.includes('Bienvenido') || m.includes('Hola') || m.includes('Editor listo'),
       );
-      
+
       if (!hasSimilarMessage) {
         // Si no hay mensajes similares, limpiar la cola y agregar este
         messageQueueRef.current = [];
@@ -111,24 +111,24 @@ const StatusBubble = ({ message }) => {
       const isDuplicate = messageQueueRef.current.some(m => {
         // Verificar duplicados exactos
         if (m === message) return true;
-        
+
         // Verificar mensajes muy similares (sin emojis o con pequeñas diferencias)
         const cleanMsg = message.replace(/[\u{1F300}-\u{1F6FF}\u{2700}-\u{27BF}\u{E000}-\u{F8FF}\u{2600}-\u{26FF}\u{2300}-\u{23FF}\u{2B50}\u{2B06}\u{2934}\u{2935}]/gu, '').trim();
         const cleanM = m.replace(/[\u{1F300}-\u{1F6FF}\u{2700}-\u{27BF}\u{E000}-\u{F8FF}\u{2600}-\u{26FF}\u{2300}-\u{23FF}\u{2B50}\u{2B06}\u{2934}\u{2935}]/gu, '').trim();
-        
+
         return cleanMsg === cleanM;
       });
-      
+
       if (!isDuplicate) {
         messageQueueRef.current.push(message);
       }
     }
-    
+
     // Si no estamos procesando mensajes, iniciar el proceso
     if (!processingRef.current) {
       processMessageQueue();
     }
-    
+
     return () => {
       if (timerRef.current) {
         clearTimeout(timerRef.current);
@@ -145,8 +145,8 @@ const StatusBubble = ({ message }) => {
     <div className="status-bubble">
       <div className="status-bubble-content">
         {currentMessage}
-        <button 
-          className="status-bubble-close" 
+        <button
+          className="status-bubble-close"
           onClick={(e) => {
             e.stopPropagation(); // Evitar propagación del evento
             closeMessage();
@@ -158,7 +158,7 @@ const StatusBubble = ({ message }) => {
           ×
         </button>
       </div>
-      <div className="status-bubble-arrow"></div>
+      <div className="status-bubble-arrow" />
     </div>
   );
 };

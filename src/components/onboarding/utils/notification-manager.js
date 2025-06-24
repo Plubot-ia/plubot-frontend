@@ -17,10 +17,10 @@ export const registerNotificationCallback = (callback) => {
 
     return () => {}; // Devolver una función vacía
   }
-  
+
   notificationCallbacks.push(callback);
 
-  
+
   // Devolver función para cancelar registro
   return () => {
     notificationCallbacks = notificationCallbacks.filter(cb => cb !== callback);
@@ -35,16 +35,16 @@ export const registerNotificationCallback = (callback) => {
  */
 export const sendNotification = (message, type = 'info') => {
 
-  
+
   // Disparar evento global para cualquier componente que escuche
   try {
     window.dispatchEvent(new CustomEvent('plubot-notification', {
-      detail: { message, type, timestamp: Date.now() }
+      detail: { message, type, timestamp: Date.now() },
     }));
   } catch (e) {
 
   }
-  
+
   // Notificar a todos los callbacks registrados
   notificationCallbacks.forEach(callback => {
     try {
@@ -53,7 +53,7 @@ export const sendNotification = (message, type = 'info') => {
 
     }
   });
-  
+
   // Fallback para mostrar notificaciones si no hay callbacks
   if (notificationCallbacks.length === 0) {
     showVisualNotification(message, type);
@@ -72,7 +72,7 @@ export const showVisualNotification = (message, type = 'info') => {
     if (existingNotification && existingNotification.textContent === message) {
       return;
     }
-    
+
     const notification = document.createElement('div');
     notification.className = `notification-${type}`;
     notification.textContent = message;
@@ -85,7 +85,7 @@ export const showVisualNotification = (message, type = 'info') => {
     notification.style.boxShadow = '0 2px 5px rgba(0,0,0,0.2)';
     notification.style.fontFamily = 'Arial, sans-serif';
     notification.style.fontSize = '14px';
-    
+
     // Establecer colores según el tipo
     switch (type) {
       case 'success':
@@ -106,7 +106,7 @@ export const showVisualNotification = (message, type = 'info') => {
         notification.style.color = 'white';
         break;
     }
-    
+
     // Botón para cerrar la notificación
     const closeButton = document.createElement('span');
     closeButton.textContent = '×';
@@ -119,10 +119,10 @@ export const showVisualNotification = (message, type = 'info') => {
         notification.parentNode.removeChild(notification);
       }
     };
-    
+
     notification.appendChild(closeButton);
     document.body.appendChild(notification);
-    
+
     // Auto-eliminar después de 5 segundos
     setTimeout(() => {
       if (notification.parentNode) {
@@ -145,5 +145,5 @@ export default {
   registerNotificationCallback,
   sendNotification,
   showVisualNotification,
-  setByteMessage
+  setByteMessage,
 };

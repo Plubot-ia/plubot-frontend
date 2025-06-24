@@ -1,7 +1,3 @@
-import { useState, useEffect, useContext } from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
-import { GamificationContext } from '../../context/GamificationContext';
-import useAuthStore from '../../stores/useAuthStore';
 import {
   Home,
   Bot,
@@ -11,10 +7,17 @@ import {
   Users,
   MessageCircle,
   Menu,
-  X
+  X,
 } from 'lucide-react';
+import { useState, useEffect, useContext } from 'react';
+import { NavLink, useNavigate } from 'react-router-dom';
 
 import logo from '@assets/img/logo.header.svg';
+
+
+import { GamificationContext } from '../../context/GamificationContext';
+import useAuthStore from '../../stores/useAuthStore';
+
 import './Header.css';
 
 const Header = () => {
@@ -25,7 +28,7 @@ const Header = () => {
   const { user, isAuthenticated, logout } = useAuthStore();
   const { pluCoins, level } = useContext(GamificationContext);
   const navigate = useNavigate();
-  
+
   // Cargar el logo
   useEffect(() => {
     const img = new Image();
@@ -52,14 +55,14 @@ const Header = () => {
   const handleLogout = () => {
     // Cerrar el perfil desplegable inmediatamente para feedback visual
     setIsProfileOpen(false);
-    
+
     // Ejecutar el logout de forma síncrona para garantizar que se limpien los datos
     // La función logout ha sido mejorada para ser rápida y no bloqueante
     logout();
-    
+
     // Redirigir a la página de inicio
     navigate('/', { replace: true });
-    
+
     // Forzar recarga de la página para limpiar completamente el estado
     // Esto garantiza que no queden residuos de la sesión anterior
     setTimeout(() => {
@@ -83,7 +86,7 @@ const Header = () => {
       document.querySelector('div[style*="overflow-y"]'),
       document.querySelector('.container'),
       document.body,
-      window
+      window,
     ].filter(Boolean);
 
     let scrollTarget = null;
@@ -93,7 +96,7 @@ const Header = () => {
         container.scrollHeight > container.clientHeight &&
         (getComputedStyle(container).overflowY === 'auto' ||
           getComputedStyle(container).overflowY === 'scroll');
-      
+
       if (container === window || isScrollable) {
         scrollTarget = container;
         break;

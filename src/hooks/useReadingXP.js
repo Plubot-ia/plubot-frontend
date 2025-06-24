@@ -45,7 +45,7 @@ const useReadingXP = (postId) => {
           }
         });
       },
-      { threshold: 0.8 }
+      { threshold: 0.8 },
     );
 
     XP_STEPS.forEach((step) => {

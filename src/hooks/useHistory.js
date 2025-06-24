@@ -28,7 +28,7 @@ const useHistory = ({ maxHistory = 100 } = {}) => {
 
     // Agregar el nuevo estado al historial
     history.current.push(JSON.parse(JSON.stringify(state)));
-    
+
     // Limitar el tamaño del historial
     if (history.current.length > maxHistory) {
       history.current.shift();
@@ -43,7 +43,7 @@ const useHistory = ({ maxHistory = 100 } = {}) => {
    */
   const undo = useCallback(() => {
     if (historyIndex.current <= 0) return null;
-    
+
     isUndoRedo.current = true;
     historyIndex.current -= 1;
     return history.current[historyIndex.current];
@@ -55,7 +55,7 @@ const useHistory = ({ maxHistory = 100 } = {}) => {
    */
   const redo = useCallback(() => {
     if (historyIndex.current >= history.current.length - 1) return null;
-    
+
     isUndoRedo.current = true;
     historyIndex.current += 1;
     return history.current[historyIndex.current];

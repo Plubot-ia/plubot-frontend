@@ -1,6 +1,8 @@
-import { useEffect } from 'react';
 import { gsap } from 'gsap';
+import { useEffect } from 'react';
+
 import ByteGuide from '@components/pluniverse/ByteGuide.jsx';
+
 import './Tower.css';
 
 const Tower = () => {

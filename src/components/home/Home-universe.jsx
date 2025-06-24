@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import universeImage from "../../assets/img/home/universo.webp";
+
+import universeImage from '../../assets/img/home/universo.webp';
 import './Home-universe.css';
 
 const HomeUniverse = () => {
@@ -24,8 +25,8 @@ const HomeUniverse = () => {
         threshold: 0.2,
         // Añadir margen para que la animación comience un poco antes
         // de que la sección sea completamente visible
-        rootMargin: '0px 0px -10% 0px'
-      }
+        rootMargin: '0px 0px -10% 0px',
+      },
     );
 
     // Observar la sección
@@ -45,10 +46,10 @@ const HomeUniverse = () => {
     <section
       ref={sectionRef}
       className={`plubot-universe ${isVisible ? 'visible' : ''}`}
-      style={{ 
+      style={{
         // Establecer la variable CSS --bg-image directamente
         '--bg-image': `url(${universeImage})`,
-        backgroundImage: `url(${universeImage})`
+        backgroundImage: `url(${universeImage})`,
       }}
     >
       <div className="universe-content">

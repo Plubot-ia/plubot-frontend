@@ -1,6 +1,6 @@
 /**
  * Utilidad para solucionar el problema con el campo edge_type en las aristas
- * 
+ *
  * El backend muestra el error: 'FlowEdge' object has no attribute 'edge_type'
  * Esta utilidad elimina el campo edge_type de las aristas antes de enviarlas al backend
  * y asegura que el campo type esté presente
@@ -13,11 +13,11 @@
  */
 export const prepareEdgesForBackend = (edges) => {
   if (!edges || !Array.isArray(edges)) return [];
-  
+
   return edges.map(edge => {
     // Crear una copia sin el campo edge_type
     const { edge_type, ...edgeWithoutEdgeType } = edge;
-    
+
     // Asegurarse de que type esté presente (el backend usará este campo)
     return {
       ...edgeWithoutEdgeType,
@@ -27,7 +27,7 @@ export const prepareEdgesForBackend = (edges) => {
       target: String(edge.target),
       // Mantener los IDs originales para futuras operaciones
       sourceOriginal: edge.sourceOriginal || edge.source,
-      targetOriginal: edge.targetOriginal || edge.target
+      targetOriginal: edge.targetOriginal || edge.target,
     };
   });
 };
@@ -40,19 +40,19 @@ export const prepareEdgesForBackend = (edges) => {
  */
 export const validateEdges = (edges, nodeMap = {}) => {
   if (!edges || !Array.isArray(edges)) return [];
-  
+
   return edges.filter(edge => {
     // Verificar que source y target existen
     const source = String(edge.source);
     const target = String(edge.target);
-    
+
     const sourceExists = nodeMap[source];
     const targetExists = nodeMap[target];
-    
+
     if (!sourceExists || !targetExists) {
       return false;
     }
-    
+
     return true;
   });
 };

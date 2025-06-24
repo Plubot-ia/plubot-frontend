@@ -76,27 +76,27 @@ export const ensureNodeInBounds = (node) => {
   const maxX = 2000;
   const minY = -2000;
   const maxY = 2000;
-  
+
   if (!node.position) {
     // Si el nodo no tiene posición, devolverlo sin cambios o asignar una por defecto.
     // Por consistencia con preventNodeStacking, lo devolvemos tal cual.
     return node;
   }
-  
+
   let { x, y } = node.position;
-  
+
   // Corregir posición si está fuera de límites, moviéndolo al borde dentro del área permitida.
   if (x < minX) x = minX;
   if (x > maxX) x = maxX;
   if (y < minY) y = minY;
   if (y > maxY) y = maxY;
-  
+
   if (x !== node.position.x || y !== node.position.y) {
     return {
       ...node,
-      position: { x, y }
+      position: { x, y },
     };
   }
-  
+
   return node; // Devolver nodo sin cambios si está dentro de límites
 };

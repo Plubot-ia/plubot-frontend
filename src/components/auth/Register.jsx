@@ -1,10 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import useWindowSize from '../../hooks/useWindowSize';
 import { useNavigate } from 'react-router-dom';
+
+import useWindowSize from '../../hooks/useWindowSize';
+
 import './Register.css';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
-import useAuthStore from '@/stores/useAuthStore';
+
 import GoogleAuthButton from './GoogleAuthButton';
+
+import useAuthStore from '@/stores/useAuthStore';
 
 const Register = () => {
   const { width, height } = useWindowSize();
@@ -32,12 +36,12 @@ const Register = () => {
     setMessage({ text, type });
     setTimeout(() => setMessage({ text: '', type: '' }), 5000);
   };
-  
+
   // Función para manejar cambios en el campo de email
   const handleEmailChange = (e) => {
-    const value = e.target.value;
+    const { value } = e.target;
     setEmail(value);
-    
+
     // Guardar el email para usarlo en la autenticación con Google
     if (value) {
       localStorage.setItem('last_email_used', value);
@@ -85,7 +89,7 @@ const Register = () => {
       setIsSubmitting(false);
       return;
     }
-    
+
     // Guardar el email para usarlo en la autenticación con Google
     if (email) {
       localStorage.setItem('last_email_used', email);
@@ -162,10 +166,8 @@ const Register = () => {
         if (card) {
           card.style.transform = `perspective(1000px) rotateY(${xAxis}deg) rotateX(${yAxis}deg)`;
         }
-      } else {
-        if (card) {
-          card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0)';
-        }
+      } else if (card) {
+        card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0)';
       }
     };
 
@@ -187,17 +189,17 @@ const Register = () => {
   return (
     <div className="register-register-container">
       <div className="register-cosmic-lights">
-        <div className="register-light-beam register-light-beam-1"></div>
-        <div className="register-light-beam register-light-beam-2"></div>
-        <div className="register-light-beam register-light-beam-3"></div>
+        <div className="register-light-beam register-light-beam-1" />
+        <div className="register-light-beam register-light-beam-2" />
+        <div className="register-light-beam register-light-beam-3" />
       </div>
       <div className="register-particles">
-        <div className="register-particle register-particle-1"></div>
-        <div className="register-particle register-particle-2"></div>
-        <div className="register-particle register-particle-3"></div>
-        <div className="register-particle register-particle-4"></div>
-        <div className="register-particle register-particle-5"></div>
-        <div className="register-particle register-particle-6"></div>
+        <div className="register-particle register-particle-1" />
+        <div className="register-particle register-particle-2" />
+        <div className="register-particle register-particle-3" />
+        <div className="register-particle register-particle-4" />
+        <div className="register-particle register-particle-5" />
+        <div className="register-particle register-particle-6" />
       </div>
       <div className="register-register-card">
         <div className="register-card-header">
@@ -265,7 +267,7 @@ const Register = () => {
                 id="strength-meter"
                 className="register-strength-meter"
                 style={{ width: `${strength.width}%`, backgroundColor: strength.color }}
-              ></div>
+              />
             </div>
             <div id="strength-text" className="register-strength-text">Seguridad: {strength.text}</div>
           </div>
@@ -292,17 +294,17 @@ const Register = () => {
           </div>
           <button type="submit" className="register-btn" disabled={isSubmitting}>
             {isSubmitting ? 'Procesando...' : 'REGISTRARSE'}
-            <span className="register-btn-glow"></span>
+            <span className="register-btn-glow" />
           </button>
-          
+
           <div className="register-separator">
             <span>o</span>
           </div>
-          
-          <GoogleAuthButton 
-            text="Registrarse con Google" 
+
+          <GoogleAuthButton
+            text="Registrarse con Google"
             className="futuristic"
-            isRegister={true}
+            isRegister
           />
         </form>
         <div className="register-form-footer">

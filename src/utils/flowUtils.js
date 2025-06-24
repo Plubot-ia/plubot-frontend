@@ -1,5 +1,6 @@
 // flowUtils.js
 import { MarkerType } from 'reactflow';
+
 import { NODE_TYPES, EDGE_TYPES, EDGE_COLORS, NODE_DEFAULT_SIZES } from './nodeConfig';
 
 /**
@@ -9,14 +10,14 @@ import { NODE_TYPES, EDGE_TYPES, EDGE_COLORS, NODE_DEFAULT_SIZES } from './nodeC
  */
 export const validateNode = (node) => {
   const errors = [];
-  let validatedNode = { ...node };
+  const validatedNode = { ...node };
 
   // Validar que el nodo tenga un ID
   if (!node.id) {
 
     validatedNode.id = `node-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
   }
-  
+
   // Verificar si el tipo de nodo es válido (debe estar entre los valores de NODE_TYPES)
   // Permitimos tipos personalizados para mayor flexibilidad
   const validNodeTypes = Object.values(NODE_TYPES);
@@ -24,7 +25,7 @@ export const validateNode = (node) => {
 
     // No lo marcamos como error para permitir tipos personalizados
   }
-  
+
   // Validar posición
   if (!node.position || typeof node.position.x !== 'number' || typeof node.position.y !== 'number') {
 
@@ -36,7 +37,7 @@ export const validateNode = (node) => {
 
     validatedNode.data = {};
   }
-  
+
   // Asegurar que tenga una etiqueta
   if (!validatedNode.data.label) {
     const nodeTypeLabel = node.type.charAt(0).toUpperCase() + node.type.slice(1).replace(/([A-Z])/g, ' $1');

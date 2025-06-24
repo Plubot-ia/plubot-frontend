@@ -13,7 +13,6 @@ export const LOD_LEVELS = {
 };
 
 
-
 /**
  * Determina el nivel de detalle (LOD) apropiado basado en el nivel de zoom actual.
  * Esta es una función pura, lo que la hace predecible y fácil de testear.

@@ -1,18 +1,34 @@
-const listeners = {};
+// Using a Map is safer than a plain object for listeners, as it prevents prototype pollution.
+const listeners = new Map();
 
 export const emitEvent = (eventName, data) => {
-  if (listeners[eventName]) {
-    listeners[eventName].forEach((callback) => callback(data));
+  if (listeners.has(eventName)) {
+    // Get the array of callbacks and execute each one.
+    listeners.get(eventName).forEach((callback) => callback(data));
   }
 };
 
 export const onEvent = (eventName, callback) => {
-  if (!listeners[eventName]) {
-    listeners[eventName] = [];
+  // If no listeners for this event exist, create a new array.
+  if (!listeners.has(eventName)) {
+    listeners.set(eventName, []);
   }
-  listeners[eventName].push(callback);
 
+  // Add the new callback to the array of listeners for this event.
+  listeners.get(eventName).push(callback);
+
+  // Return a function to unsubscribe the listener.
   return () => {
-    listeners[eventName] = listeners[eventName].filter((cb) => cb !== callback);
+    if (listeners.has(eventName)) {
+      const currentListeners = listeners.get(eventName);
+      const filteredListeners = currentListeners.filter((cb) => cb !== callback);
+
+      // If there are still listeners, update the array. Otherwise, remove the event entry.
+      if (filteredListeners.length > 0) {
+        listeners.set(eventName, filteredListeners);
+      } else {
+        listeners.delete(eventName);
+      }
+    }
   };
 };

@@ -32,13 +32,13 @@ const Chatbot = () => {
         <div className="chatbot-mobile-column">
           <div className="large-mobile-frame">
             <div className="mobile-device">
-              <div className="mobile-notch"></div>
+              <div className="mobile-notch" />
               <div className="mobile-screen">
                 <div className="chatbot-widget active">
                   <div className="chatbot-header whatsapp-header">
                     <div className="whatsapp-contact">
                       <div className="whatsapp-avatar">
-                        <i className="fab fa-whatsapp"></i>
+                        <i className="fab fa-whatsapp" />
                       </div>
                       <div className="whatsapp-info">
                         <span className="whatsapp-name">Plubot</span>
@@ -53,7 +53,7 @@ const Chatbot = () => {
                         <span className="message-meta">
                           <span className="message-time">{msg.time}</span>
                           <span className="message-status">
-                            <i className="fas fa-check-double"></i>
+                            <i className="fas fa-check-double" />
                           </span>
                         </span>
                       </div>
@@ -61,7 +61,7 @@ const Chatbot = () => {
                   </div>
                   <div className="chatbot-input whatsapp-input">
                     <div className="input-wrapper">
-                      <i className="fas fa-smile input-icon" aria-label="Añadir emoji"></i>
+                      <i className="fas fa-smile input-icon" aria-label="Añadir emoji" />
                       <input
                         type="text"
                         placeholder="Escribe un mensaje..."
@@ -71,7 +71,7 @@ const Chatbot = () => {
                       />
                     </div>
                     <button onClick={handleSend}>
-                      <i className="fas fa-paper-plane"></i>
+                      <i className="fas fa-paper-plane" />
                     </button>
                   </div>
                 </div>

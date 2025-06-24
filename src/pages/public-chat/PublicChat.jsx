@@ -1,6 +1,7 @@
+import { Send, Loader, MessageCircle, ArrowLeft, Zap } from 'lucide-react';
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
-import { Send, Loader, MessageCircle, ArrowLeft, Zap } from 'lucide-react';
+
 import './PublicChat.css';
 import instance from '../../utils/axiosConfig';
 
@@ -31,9 +32,8 @@ const PublicChat = () => {
           throw new Error('El ID del chatbot debe ser un número');
         }
 
-        // Usar la instancia de Axios centralizada. La URL se resuelve automáticamente.
         const response = await instance.get(`/plubots/chat/${publicId}`);
-        const data = response.data;
+        const { data } = response;
 
         if (data.status === 'success') {
           setBotInfo(data.data);
@@ -41,27 +41,26 @@ const PublicChat = () => {
             id: 'welcome',
             text: data.data.initialMessage,
             sender: 'bot',
-            timestamp: new Date().toISOString()
+            timestamp: new Date().toISOString(),
           };
           setMessages([welcomeMessage]);
         } else {
           throw new Error(data.message || 'No se pudo cargar la información del chatbot');
         }
-
-      } catch (error) {
+      } catch (e) {
         let errorMessage = 'Error de conexión. Por favor, intenta más tarde.';
-        if (error.response) {
-          if (error.response.status === 404) {
+        if (e.response) {
+          if (e.response.status === 404) {
             errorMessage = 'El chatbot que buscas no existe o ha sido movido.';
-          } else if (error.response.status >= 500) {
+          } else if (e.response.status >= 500) {
             errorMessage = 'Estamos experimentando problemas en el servidor. Intenta de nuevo en unos minutos.';
           } else {
-            errorMessage = error.response.data?.message || 'Error al contactar al servidor.';
+            errorMessage = e.response.data?.message || 'Error al contactar al servidor.';
           }
-        } else if (error.request) {
+        } else if (e.request) {
           errorMessage = 'No se pudo conectar con el servidor. Revisa tu conexión a internet.';
         } else {
-          errorMessage = error.message || 'Ocurrió un error inesperado.';
+          errorMessage = e.message || 'Ocurrió un error inesperado.';
         }
         setError(errorMessage);
       } finally {
@@ -86,7 +85,7 @@ const PublicChat = () => {
       id: `user-${Date.now()}`,
       text: inputMessage,
       sender: 'user',
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
 
     setMessages(prev => [...prev, userMessage]);
@@ -99,12 +98,11 @@ const PublicChat = () => {
       const payload = {
         message: inputMessage,
         conversation_history: newConversationHistory,
-        flow_id: currentFlowId
+        flow_id: currentFlowId,
       };
 
-      // Usar la instancia de Axios centralizada. La URL se resuelve automáticamente.
       const response = await instance.post(`/plubots/chat/${publicId}/message`, payload);
-      const data = response.data;
+      const { data } = response;
 
       if (data.status === 'success') {
         const botResponse = {
@@ -112,7 +110,7 @@ const PublicChat = () => {
           text: data.data.response,
           sender: 'bot',
           timestamp: new Date().toISOString(),
-          options: data.data.options || []
+          options: data.data.options || [],
         };
         setMessages(prev => [...prev, botResponse]);
         setConversationHistory(prev => [...prev, { role: 'assistant', content: data.data.response }]);
@@ -120,20 +118,16 @@ const PublicChat = () => {
       } else {
         throw new Error(data.message || 'Error en la respuesta del bot');
       }
-    } catch (error) {
-      const errorMessageText = error.response?.data?.message || 'No se pudo obtener una respuesta. Inténtalo de nuevo.';
-
-      // Eliminar indicador de escritura
+    } catch (e) {
       setIsTyping(false);
       setMessages(prev => prev.filter(msg => msg.id !== 'typing'));
 
-      // Añadir mensaje de error
       const errorMessage = {
         id: `error-${Date.now()}`,
         text: 'Lo siento, ha ocurrido un error al procesar tu mensaje. Por favor, intenta de nuevo más tarde.',
         sender: 'bot',
         isError: true,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
 
       setMessages(prev => [...prev, errorMessage]);
@@ -141,9 +135,7 @@ const PublicChat = () => {
   };
 
   const handleOptionClick = (option) => {
-    // Establecer el mensaje de la opción seleccionada como mensaje de entrada
     setInputMessage(option.message);
-    // Enviar el mensaje automáticamente
     handleSendMessage();
   };
 
@@ -162,10 +154,10 @@ const PublicChat = () => {
 
   // Función para formatear la hora
   const formatTime = (timestamp) => {
-    return new Date(timestamp).toLocaleTimeString([], { 
-      hour: '2-digit', 
+    return new Date(timestamp).toLocaleTimeString([], {
+      hour: '2-digit',
       minute: '2-digit',
-      hour12: true 
+      hour12: true,
     });
   };
 
@@ -197,10 +189,10 @@ const PublicChat = () => {
 
   return (
     <div className={`public-chat-container ${botInfo?.embedConfig?.theme || 'light'}`}>
-      <div className="chat-header" style={{ 
-        background: botInfo?.color 
-          ? `linear-gradient(135deg, ${botInfo.color} 0%, ${adjustColor(botInfo.color, 30)} 100%)` 
-          : 'var(--primary-gradient)' 
+      <div className="chat-header" style={{
+        background: botInfo?.color
+          ? `linear-gradient(135deg, ${botInfo.color} 0%, ${adjustColor(botInfo.color, 30)} 100%)`
+          : 'var(--primary-gradient)',
       }}>
         <div className="chat-header-avatar">
           {botInfo?.avatar ? (
@@ -211,15 +203,15 @@ const PublicChat = () => {
         </div>
         <h2>{botInfo?.name || 'Chat'}</h2>
         <div className="chat-header-status">
-          <span className="status-dot"></span>
+          <span className="status-dot" />
           <span>En línea</span>
         </div>
       </div>
-      
+
       <div className="chat-messages">
         {messages.map(message => (
-          <div 
-            key={message.id} 
+          <div
+            key={message.id}
             className={`message ${message.sender} ${message.isTyping ? 'typing' : ''} ${message.isError ? 'error' : ''}`}
           >
             {message.sender === 'bot' && !message.isTyping && (
@@ -231,9 +223,9 @@ const PublicChat = () => {
               <div className="message-content">
                 {message.isTyping ? (
                   <>
-                    <div className="dot"></div>
-                    <div className="dot"></div>
-                    <div className="dot"></div>
+                    <div className="dot" />
+                    <div className="dot" />
+                    <div className="dot" />
                   </>
                 ) : (
                   message.text
@@ -243,13 +235,13 @@ const PublicChat = () => {
                 {formatTime(message.timestamp)}
               </div>
             </div>
-            
+
             {/* Mostrar opciones si el mensaje es del bot y tiene opciones */}
             {message.sender === 'bot' && message.options && message.options.length > 0 && (
               <div className="message-options">
                 {message.options.map(option => (
-                  <button 
-                    key={option.id} 
+                  <button
+                    key={option.id}
                     className="option-button"
                     onClick={() => handleOptionClick(option)}
                   >
@@ -262,7 +254,7 @@ const PublicChat = () => {
         ))}
         <div ref={messagesEndRef} />
       </div>
-      
+
       <div className="chat-input">
         <textarea
           value={inputMessage}
@@ -271,20 +263,20 @@ const PublicChat = () => {
           placeholder="Escribe un mensaje..."
           rows={1}
         />
-        <button 
+        <button
           onClick={handleSendMessage}
           disabled={!inputMessage.trim() || isTyping}
           className="send-button"
-          style={{ 
-            background: botInfo?.color 
-              ? `linear-gradient(135deg, ${botInfo.color} 0%, ${adjustColor(botInfo.color, 30)} 100%)` 
-              : 'var(--primary-gradient)' 
+          style={{
+            background: botInfo?.color
+              ? `linear-gradient(135deg, ${botInfo.color} 0%, ${adjustColor(botInfo.color, 30)} 100%)`
+              : 'var(--primary-gradient)',
           }}
         >
           <Send size={20} />
         </button>
       </div>
-      
+
       <div className="chat-powered-by">
         <span>Powered by</span>
         <strong>Plubot</strong>
@@ -298,20 +290,20 @@ const PublicChat = () => {
 function adjustColor(color, amount) {
   // Si no hay color, devolver el color por defecto
   if (!color) return '#00f2fe';
-  
+
   // Eliminar el # si existe
   color = color.replace('#', '');
-  
+
   // Convertir a valores RGB
   let r = parseInt(color.substring(0, 2), 16);
   let g = parseInt(color.substring(2, 4), 16);
   let b = parseInt(color.substring(4, 6), 16);
-  
+
   // Ajustar los valores
   r = Math.min(255, Math.max(0, r + amount));
   g = Math.min(255, Math.max(0, g + amount));
   b = Math.min(255, Math.max(0, b + amount));
-  
+
   // Convertir de nuevo a hexadecimal
   return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
 }

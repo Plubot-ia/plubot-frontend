@@ -1,45 +1,47 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import './NodePalette.css';
-import { 
-  CloudLightning, Database, Link, Brain, Filter, MessageCircle, 
-  PlayCircle, StopCircle, GitBranch, CornerUpRight, Zap, Star, 
-  Settings2, PlugZap, Languages, FileText, AlertTriangle, ChevronDown, ChevronRight
-} from 'lucide-react';
 import {
-  NODE_TYPES, 
-  NODE_LABELS,
-  NODE_DESCRIPTIONS,
-  NODE_CATEGORIES, 
-  getNodeInitialData
-} from '@/utils/nodeConfig';
+  CloudLightning, Database, Link, Brain, Filter, MessageCircle,
+  PlayCircle, StopCircle, GitBranch, CornerUpRight, Zap, Star,
+  Settings2, PlugZap, Languages, FileText, AlertTriangle, ChevronDown, ChevronRight,
+} from 'lucide-react';
+import { v4 as uuidv4 } from 'uuid'; // Importar para generar IDs únicos
+
 import { powers as powerNodesDataList } from '@/data/powers.js';
 // Importar los stores de Zustand
 import useFlowStore from '@/stores/useFlowStore';
 import useTrainingStore from '@/stores/useTrainingStore';
-import { v4 as uuidv4 } from 'uuid'; // Importar para generar IDs únicos
+import {
+  NODE_TYPES,
+  NODE_LABELS,
+  NODE_DESCRIPTIONS,
+  NODE_CATEGORIES,
+  getNodeInitialData,
+} from '@/utils/nodeConfig';
+
 
 const getNodeIcon = (iconIdentifier) => {
-  if (typeof iconIdentifier === 'object' && iconIdentifier !== null && typeof iconIdentifier.type === 'function') { 
-    return iconIdentifier; 
+  if (typeof iconIdentifier === 'object' && iconIdentifier !== null && typeof iconIdentifier.type === 'function') {
+    return iconIdentifier;
   }
-  if (typeof iconIdentifier === 'string' && iconIdentifier.length <= 2 && /\p{Emoji}/u.test(iconIdentifier)) { 
-    return <span className="emoji-icon">{iconIdentifier}</span>; 
+  if (typeof iconIdentifier === 'string' && iconIdentifier.length <= 2 && /\p{Emoji}/u.test(iconIdentifier)) {
+    return <span className="emoji-icon">{iconIdentifier}</span>;
   }
   switch (iconIdentifier) {
     case 'fas fa-play': return <PlayCircle size={20} />;
     case 'fas fa-comment-alt': return <MessageCircle size={20} />;
     case 'fas fa-code-branch': return <GitBranch size={20} />;
     case 'fas fa-stop': return <StopCircle size={20} />;
-    case 'fas fa-bolt': return <Settings2 size={20} />; 
-    case 'fas fa-list-ul': return <CornerUpRight size={20} />; 
-    case 'fas fa-filter': return <Filter size={20} />; 
-    case 'fas fa-globe': return <Zap size={20} />; 
-    case 'fas fa-link': return <Link size={20} />; 
-    case 'fas fa-database': return <Database size={20} />; 
-    case 'fas fa-plug': return <PlugZap size={20} />; 
+    case 'fas fa-bolt': return <Settings2 size={20} />;
+    case 'fas fa-list-ul': return <CornerUpRight size={20} />;
+    case 'fas fa-filter': return <Filter size={20} />;
+    case 'fas fa-globe': return <Zap size={20} />;
+    case 'fas fa-link': return <Link size={20} />;
+    case 'fas fa-database': return <Database size={20} />;
+    case 'fas fa-plug': return <PlugZap size={20} />;
     case 'fas fa-brain': return <Brain size={20} />;
-    case 'emotionDetection': return <Brain size={20} color="#e9829b" />; 
-    case 'fas fa-language': return <Languages size={20} />; 
+    case 'emotionDetection': return <Brain size={20} color="#e9829b" />;
+    case 'fas fa-language': return <Languages size={20} />;
     case 'start': return <PlayCircle size={20} />;
     case 'message': return <MessageCircle size={20} />;
     case 'decision': return <GitBranch size={20} />;
@@ -47,8 +49,8 @@ const getNodeIcon = (iconIdentifier) => {
     case 'httpRequest': return <Zap size={20} />;
     case 'option': return <CornerUpRight size={20} />;
     default:
-      if (typeof iconIdentifier === 'string') return <FileText size={20} title={iconIdentifier} />; 
-      return <AlertTriangle size={20} title="Icono Desconocido" />; 
+      if (typeof iconIdentifier === 'string') return <FileText size={20} title={iconIdentifier} />;
+      return <AlertTriangle size={20} title="Icono Desconocido" />;
   }
 };
 
@@ -56,8 +58,8 @@ const basicNodesConfig = NODE_CATEGORIES.find(cat => cat.id === 'basic');
 const basicNodeDefinitions = basicNodesConfig ? basicNodesConfig.nodes.map(node => ({
   type: node.type,
   label: node.label,
-  icon: node.icon, 
-  description: NODE_DESCRIPTIONS[node.type] || `Nodo ${node.label}`
+  icon: node.icon,
+  description: NODE_DESCRIPTIONS[node.type] || `Nodo ${node.label}`,
 })) : [];
 
 const advancedNodeDefinitions = [];
@@ -73,7 +75,7 @@ advancedCategories.forEach(category => {
         icon: node.icon,
         description: NODE_DESCRIPTIONS[node.type] || `Nodo ${node.label}`,
         // Se restaura la propagación de la categoría, que es necesaria para la lógica de drag-and-drop.
-        category: category.id
+        category: category.id,
       });
     }
   });
@@ -81,7 +83,7 @@ advancedCategories.forEach(category => {
 
 const NodePalette = () => {
 
-  
+
   // Funciones seguras que verifican disponibilidad antes de ejecutar
   const addNode = useCallback((nodeData) => {
     try {
@@ -96,7 +98,7 @@ const NodePalette = () => {
       return null;
     }
   }, []);
-  
+
   const onNodesChange = useCallback((changes) => {
     try {
       const state = useFlowStore.getState();
@@ -107,24 +109,24 @@ const NodePalette = () => {
 
     }
   }, []);
-  
+
   // Obtener funciones del store de Training
   const setByteMessage = useTrainingStore(state => {
     return state && typeof state.setByteMessage === 'function' ? state.setByteMessage : () => {};
   });
-  
+
   // Referencia al store completo para acceso directo en handlers
   const flowStoreRef = useRef(null);
-  
+
   // Inicializar de forma segura
   useEffect(() => {
     try {
       flowStoreRef.current = useFlowStore.getState();
-      
+
       const unsubscribe = useFlowStore.subscribe(state => {
         flowStoreRef.current = state;
       });
-      
+
       return () => {
         if (typeof unsubscribe === 'function') {
           unsubscribe();
@@ -134,13 +136,13 @@ const NodePalette = () => {
 
     }
   }, []);
-  
+
   // Asegurarse de que el store esté inicializado correctamente
   useEffect(() => {
     // Verificar que las funciones críticas estén disponibles
     if (!addNode || !onNodesChange) {
 
-      return;
+
     }
   }, [addNode, onNodesChange]);
   const [isPaletteExpanded, setIsPaletteExpanded] = useState(true);
@@ -163,18 +165,17 @@ const NodePalette = () => {
   // Función optimizada para manejar el inicio de arrastre
   const onDragStart = useCallback((event, nodeType, nodeLabel, category, powerItemData = null) => {
     event.stopPropagation(); // Evitar propagación para evitar conflictos
-    
 
-    
+
     // Generar un ID único para el nodo
     const nodeId = `${nodeType}-${uuidv4().slice(0, 8)}`;
-    
+
     // Determinar el tipo y la etiqueta correctos para el nodo
     const isAdvancedAiPowerNode = powerItemData && powerItemData.id === 'advancedAiPower';
     const finalNodeType = isAdvancedAiPowerNode ? NODE_TYPES.ADVANCED_AI_NODE : nodeType;
-    const finalNodeLabel = isAdvancedAiPowerNode 
-                             ? (powerItemData.title || NODE_LABELS.ADVANCED_AI_NODE) 
-                             : (nodeLabel || NODE_LABELS[nodeType] || 'Nuevo Nodo');
+    const finalNodeLabel = isAdvancedAiPowerNode
+      ? (powerItemData.title || NODE_LABELS.ADVANCED_AI_NODE)
+      : (nodeLabel || NODE_LABELS[nodeType] || 'Nuevo Nodo');
 
     // Crear objeto completo con la información del nodo
     const nodeInfo = {
@@ -188,9 +189,9 @@ const NodePalette = () => {
         label: finalNodeLabel, // Asegurar que data.label también tenga la etiqueta correcta
         // Asegurar que tengamos handle IDs si son nodos que necesitan aristas
         ...(nodeType === 'decision' ? {
-          handleIds: ['output-0', 'output-1']
+          handleIds: ['output-0', 'output-1'],
         } : {}),
-        ...(powerItemData || {})
+        ...(powerItemData || {}),
       },
       // Posición temporal - será actualizada al soltar
       position: { x: 0, y: 0 },
@@ -223,7 +224,7 @@ const NodePalette = () => {
       const serializedNodeInfo = JSON.stringify(nodeInfo);
       event.dataTransfer.setData('application/reactflow', serializedNodeInfo);
       event.dataTransfer.effectAllowed = 'move';
-      
+
       // Drag image logic for visual feedback during drag
       const targetElement = event.target.closest('.node-palette-item');
       if (targetElement) {
@@ -252,7 +253,7 @@ const NodePalette = () => {
           }
         });
       }
-      
+
       // Mostrar mensaje de ayuda
       setByteMessage('🔄 Arrastra el nodo al editor');
     } catch (error) {
@@ -260,11 +261,11 @@ const NodePalette = () => {
       // Fallback MUY improbable: si nodeInfo es tan corrupto que no se puede serializar,
       // intentamos con un objeto mínimo. FlowEditor aún podría fallar si esto sucede.
       try {
-        const minimalNodeData = JSON.stringify({ 
-          id: nodeId, 
-          type: finalNodeType, 
-          label: finalNodeLabel, 
-          data: { id: nodeId, label: finalNodeLabel, ...(powerItemData || {}) } 
+        const minimalNodeData = JSON.stringify({
+          id: nodeId,
+          type: finalNodeType,
+          label: finalNodeLabel,
+          data: { id: nodeId, label: finalNodeLabel, ...(powerItemData || {}) },
         });
         event.dataTransfer.setData('application/reactflow', minimalNodeData);
       } catch (fallbackSerializeError) {
@@ -288,8 +289,8 @@ const NodePalette = () => {
     if (!term) return items;
     return items.filter(item => {
       const label = isPower ? item.title : item.label;
-      const desc = isPower ? item.description : item.description; 
-      return label.toLowerCase().includes(term.toLowerCase()) || 
+      const desc = isPower ? item.description : item.description;
+      return label.toLowerCase().includes(term.toLowerCase()) ||
              (desc && desc.toLowerCase().includes(term.toLowerCase()));
     });
   };
@@ -310,14 +311,14 @@ const NodePalette = () => {
     const label = isPower ? item.title : item.label;
     const icon = isPower ? item.icon : getNodeIcon(item.icon || item.type); // getNodeIcon is a helper
     const isFavorite = favoriteNodes.includes(isPower ? `power-${item.id}` : item.type);
-    
+
     // Determine the correct nodeType for React Flow
     // For power nodes, use their specific ID (e.g., 'discord')
     // For other nodes, use their defined type (e.g., 'message')
     const nodeType = isPower ? item.id : item.type;
-    
+
     const nodeRef = useRef(null);
-    
+
     const handleDragStart = useCallback((e) => {
       if (nodeRef.current) {
         nodeRef.current.classList.add('dragging');
@@ -337,7 +338,7 @@ const NodePalette = () => {
       <div
         ref={nodeRef}
         className="ts-draggable-node"
-        draggable={true}
+        draggable
         onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
         data-node-type={nodeType} // This data attribute now holds the correct type
@@ -370,7 +371,7 @@ const NodePalette = () => {
         <h4>Biblioteca de Nodos</h4>
         <span className="ts-toggle-icon">{isPaletteExpanded ? '◀' : '▶'}</span>
       </div>
-      
+
       {isPaletteExpanded && (
         <>
           <div className="ts-palette-search">
@@ -385,7 +386,7 @@ const NodePalette = () => {
               <button className="ts-clear-search" onClick={() => setSearchTerm('')}>✕</button>
             )}
           </div>
-          
+
           <div className="ts-palette-nodes-sections">
             {/* Basic Nodes Section */}
             <div className="ts-node-section">
@@ -427,7 +428,7 @@ const NodePalette = () => {
               </button>
               {expandedSections.power && filteredPowerNodes.length > 0 && (
                 <div className="ts-section-nodes">
-                  {filteredPowerNodes.map(powerNode => <NodeListItem key={powerNode.id} item={powerNode} isPower={true} />)}
+                  {filteredPowerNodes.map(powerNode => <NodeListItem key={powerNode.id} item={powerNode} isPower />)}
                 </div>
               )}
               {expandedSections.power && filteredPowerNodes.length === 0 && searchTerm && (

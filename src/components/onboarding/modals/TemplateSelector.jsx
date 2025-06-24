@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
 import { X, Zap, Star, Award, Cpu, XCircle } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
 import './TemplateSelector.css';
 
 // Importar fuentes para el estilo cyberpunk
@@ -9,7 +9,7 @@ import '@fontsource/orbitron/700.css';
 const TemplateSelector = ({ onSelectTemplate, onClose, className }) => {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [animateItems, setAnimateItems] = useState(false);
-  
+
   useEffect(() => {
     // Activar la animación de entrada de los elementos después de un breve retraso
     const timer = setTimeout(() => setAnimateItems(true), 100);
@@ -20,7 +20,7 @@ const TemplateSelector = ({ onSelectTemplate, onClose, className }) => {
     { id: 'all', name: 'Todos' },
     { id: 'basic', name: 'Básicos' },
     { id: 'advanced', name: 'Avanzados' },
-    { id: 'ai', name: 'IA' }
+    { id: 'ai', name: 'IA' },
   ];
 
   const templates = [
@@ -411,7 +411,7 @@ const TemplateSelector = ({ onSelectTemplate, onClose, className }) => {
         <div className="ts-header">
           <h2>Selecciona una plantilla</h2>
         </div>
-        
+
         <div className="ts-categories">
           {categories.map(category => (
             <button
@@ -423,7 +423,7 @@ const TemplateSelector = ({ onSelectTemplate, onClose, className }) => {
             </button>
           ))}
         </div>
-        
+
         <div className="ts-content">
           <div className={`ts-template-list ${animateItems ? 'animate' : ''}`}>
             {filteredTemplates.map((template) => (

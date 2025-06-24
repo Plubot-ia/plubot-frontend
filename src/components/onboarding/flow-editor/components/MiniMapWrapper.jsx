@@ -1,4 +1,5 @@
 import React from 'react';
+
 import CustomMiniMap from '../ui/CustomMiniMap';
 
 /**
@@ -9,7 +10,7 @@ const MiniMapWrapper = ({ nodes, edges, isExpanded, isUltraMode, viewport, setBy
   // Bandera global para controlar si el mapa ya se ha renderizado
   if (typeof window !== 'undefined' && !window._miniMapRendered) {
     window._miniMapRendered = true;
-    
+
     return (
       <CustomMiniMap
         nodes={nodes}
@@ -21,7 +22,7 @@ const MiniMapWrapper = ({ nodes, edges, isExpanded, isUltraMode, viewport, setBy
       />
     );
   }
-  
+
   return null;
 };
 

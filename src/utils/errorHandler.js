@@ -6,14 +6,14 @@
 
 // Constantes para tipos de errores
 export const ERROR_TYPES = {
-  AUTH: 'auth',              // Errores de autenticación
-  NETWORK: 'network',        // Errores de red
-  VALIDATION: 'validation',  // Errores de validación de datos
-  API: 'api',                // Errores de API
-  FLOW: 'flow',              // Errores específicos del editor de flujos
-  RENDERING: 'rendering',    // Errores de renderizado
-  STORAGE: 'storage',        // Errores de almacenamiento
-  GENERAL: 'general'         // Errores generales
+  AUTH: 'auth', // Errores de autenticación
+  NETWORK: 'network', // Errores de red
+  VALIDATION: 'validation', // Errores de validación de datos
+  API: 'api', // Errores de API
+  FLOW: 'flow', // Errores específicos del editor de flujos
+  RENDERING: 'rendering', // Errores de renderizado
+  STORAGE: 'storage', // Errores de almacenamiento
+  GENERAL: 'general', // Errores generales
 };
 
 /**
@@ -25,7 +25,7 @@ export const ERROR_TYPES = {
 export function captureError(error, context = 'unknown') {
   // Registrar en consola para debugging
 
-  
+
   // Información básica del error
   const errorInfo = {
     originalError: error,
@@ -33,16 +33,16 @@ export function captureError(error, context = 'unknown') {
     context,
     timestamp: Date.now(),
     type: ERROR_TYPES.GENERAL, // Tipo por defecto
-    data: {}
+    data: {},
   };
-  
+
   // Clasificar error según sus características
   if (error.response) {
     // Error de respuesta HTTP
-    const status = error.response.status;
+    const { status } = error.response;
     errorInfo.data.status = status;
     errorInfo.data.responseData = error.response.data;
-    
+
     // Clasificar por código de estado
     if (status === 401 || status === 403) {
       errorInfo.type = ERROR_TYPES.AUTH;
@@ -68,10 +68,10 @@ export function captureError(error, context = 'unknown') {
     // Error de almacenamiento
     errorInfo.type = ERROR_TYPES.STORAGE;
   }
-  
+
   // Guardar en histórico de errores
   saveErrorToLog(errorInfo);
-  
+
   return errorInfo;
 }
 
@@ -86,16 +86,16 @@ export function handleError(errorInfo, notifyUser) {
   if (typeof notifyUser === 'function') {
     notifyUser(errorInfo.message, 'error');
   }
-  
+
   // Determinar acciones según el tipo de error
   const actions = {
     shouldRedirect: false,
     shouldRetry: false,
     shouldRecover: false,
     shouldClearCache: false,
-    path: null
+    path: null,
   };
-  
+
   switch (errorInfo.type) {
     case ERROR_TYPES.AUTH:
       // Limpiar token y redirigir a login
@@ -103,37 +103,37 @@ export function handleError(errorInfo, notifyUser) {
       actions.shouldRedirect = true;
       actions.path = '/login';
       break;
-      
+
     case ERROR_TYPES.NETWORK:
       // Sugerir reintentar
       actions.shouldRetry = true;
       break;
-      
+
     case ERROR_TYPES.VALIDATION:
       // Mostrar detalles de validación si están disponibles
       if (errorInfo.data.responseData?.errors) {
         const detailedMessage = Object.entries(errorInfo.data.responseData.errors)
           .map(([field, msgs]) => `${field}: ${msgs.join(', ')}`)
           .join('\n');
-          
+
         if (notifyUser) {
           notifyUser(`Datos no válidos:\n${detailedMessage}`, 'error');
         }
       }
       break;
-      
+
     case ERROR_TYPES.FLOW:
       // Intentar recuperación automática
       actions.shouldRecover = true;
       break;
-      
+
     case ERROR_TYPES.STORAGE:
       // Limpiar caché y reintentar
       actions.shouldClearCache = true;
       actions.shouldRetry = true;
       break;
   }
-  
+
   return actions;
 }
 
@@ -145,24 +145,24 @@ function saveErrorToLog(errorInfo) {
   try {
     // Obtener log existente
     const errorLog = JSON.parse(localStorage.getItem('flow_error_log') || '[]');
-    
+
     // Añadir nuevo error (sin el objeto de error original para evitar ciclos)
     const logEntry = {
       ...errorInfo,
       originalError: undefined,
-      stackTrace: errorInfo.originalError?.stack
+      stackTrace: errorInfo.originalError?.stack,
     };
-    
+
     // Limitar a los últimos 20 errores
     errorLog.push(logEntry);
     if (errorLog.length > 20) {
       errorLog.shift();
     }
-    
+
     // Guardar log actualizado
     localStorage.setItem('flow_error_log', JSON.stringify(errorLog));
   } catch (e) {
-
+    console.error('Failed to save error to log:', e);
   }
 }
 
@@ -178,7 +178,7 @@ export function recoverFromBackup(backupId) {
       return JSON.parse(backup);
     }
   } catch (e) {
-
+    console.error(`Failed to parse backup ${backupId}:`, e);
   }
   return null;
 }
@@ -191,7 +191,7 @@ export function generateErrorReport() {
   try {
     const errorLog = JSON.parse(localStorage.getItem('flow_error_log') || '[]');
     const backups = [];
-    
+
     // Buscar respaldos existentes
     Object.keys(localStorage).forEach(key => {
       if (key.startsWith('flow_backup_')) {
@@ -201,20 +201,22 @@ export function generateErrorReport() {
             id: key,
             timestamp: backup.timestamp,
             nodesCount: backup.nodes?.length || 0,
-            edgesCount: backup.edges?.length || 0
+            edgesCount: backup.edges?.length || 0,
           });
-        } catch {}
+        } catch (e) {
+          console.error(`Failed to parse backup data for key: ${key}`, e);
+        }
       }
     });
-    
+
     return {
       errors: errorLog,
       backups,
       browser: navigator.userAgent,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     };
   } catch (e) {
-
+    console.error('Failed to generate error report:', e);
     return { error: 'No se pudo generar el reporte' };
   }
 }

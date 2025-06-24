@@ -37,10 +37,10 @@ export const generateNodeId = (nodeType) => {
 export const throttle = (func) => {
   let rafId = null;
   let lastArgs = null;
-  
+
   return function throttled(...args) {
     lastArgs = args;
-    
+
     if (rafId === null) {
       rafId = requestAnimationFrame(() => {
         func(...lastArgs);
@@ -58,12 +58,12 @@ export const throttle = (func) => {
  */
 export const optimizeDragFunction = (func, options = {}) => {
   const { useThrottle = true } = options;
-  
+
   // Usar throttle para limitar a 60fps (usando requestAnimationFrame)
   if (useThrottle) {
     return throttle(func);
   }
-  
+
   return func;
 };
 
@@ -76,28 +76,28 @@ export const optimizeDragFunction = (func, options = {}) => {
  */
 export const connectionExists = (edges, params) => {
   if (!edges || !Array.isArray(edges) || !params) return false;
-  
+
   // Extraer propiedades de la conexión
   const { source, target, sourceHandle, targetHandle } = params;
-  
+
   // Si falta alguna propiedad esencial, no podemos validar
   if (!source || !target) return false;
-  
+
   // Verificar si existe una conexión con los mismos source y target
   return edges.some(edge => {
     // Comparar source y target (propiedades obligatorias)
     const sourceMatch = edge.source === source;
     const targetMatch = edge.target === target;
-    
+
     // Si no coinciden source y target, no es la misma conexión
     if (!sourceMatch || !targetMatch) return false;
-    
+
     // Comparar sourceHandle y targetHandle (con valores por defecto)
     const edgeSourceHandle = edge.sourceHandle || 'default';
     const edgeTargetHandle = edge.targetHandle || 'default';
     const paramSourceHandle = sourceHandle || 'default';
     const paramTargetHandle = targetHandle || 'default';
-    
+
     return edgeSourceHandle === paramSourceHandle && edgeTargetHandle === paramTargetHandle;
   });
 };

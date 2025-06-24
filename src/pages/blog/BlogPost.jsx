@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import useReadingXP from '@hooks/useReadingXP';
+
 import XPTracker from '@components/common/XPTracker';
+import useReadingXP from '@hooks/useReadingXP';
+
 import './Blog.css';
 
 const BlogPost = () => {
@@ -145,7 +147,7 @@ const BlogPost = () => {
           setPost(selectedPost);
         }
       } catch (error) {
-
+        console.error('Error al cargar la publicación del blog:', error);
       }
     };
     fetchPost();

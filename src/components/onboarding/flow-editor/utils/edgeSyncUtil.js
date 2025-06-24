@@ -11,24 +11,24 @@ export const checkEdgeConsistency = (edges) => {
   if (!edges || !Array.isArray(edges)) {
     return { consistent: false, missingCount: 0, edgesInState: 0, edgesInDOM: 0 };
   }
-  
+
   // Contar aristas en el estado
   const edgesInState = edges.length;
-  
+
   // Contar aristas en el DOM
   const edgeElements = document.querySelectorAll('.react-flow__edge');
   const edgesInDOM = edgeElements.length;
-  
+
   // Verificar si hay discrepancias
   const consistent = edgesInState === edgesInDOM;
   const missingCount = Math.max(0, edgesInState - edgesInDOM);
-  
+
   return {
     consistent,
     missingCount,
     edgesInState,
     edgesInDOM,
-    timestamp: Date.now()
+    timestamp: Date.now(),
   };
 };
 
@@ -39,20 +39,20 @@ export const checkEdgeConsistency = (edges) => {
  */
 export const identifyMissingEdges = (edges) => {
   if (!edges || !Array.isArray(edges)) return [];
-  
+
   const missingEdges = [];
-  
+
   // Verificar cada arista en el estado
   edges.forEach(edge => {
     if (!edge || !edge.id) return;
-    
+
     // Buscar la arista en el DOM
     const edgeElement = document.querySelector(`[data-testid="rf__edge-${edge.id}"]`);
     if (!edgeElement) {
       missingEdges.push(edge);
     }
   });
-  
+
   return missingEdges;
 };
 
@@ -62,13 +62,13 @@ export const identifyMissingEdges = (edges) => {
  */
 export const forceUpdateSpecificEdges = (edgeIds) => {
   if (!edgeIds || !Array.isArray(edgeIds) || edgeIds.length === 0) return;
-  
+
   // Emitir evento para forzar la actualizaciu00f3n de aristas especu00edficas
-  document.dispatchEvent(new CustomEvent('force-specific-edges-update', { 
-    detail: { 
+  document.dispatchEvent(new CustomEvent('force-specific-edges-update', {
+    detail: {
       edgeIds,
-      timestamp: Date.now() 
-    } 
+      timestamp: Date.now(),
+    },
   }));
 };
 
@@ -82,40 +82,40 @@ export const forceUpdateSpecificEdges = (edgeIds) => {
 export const verifyAndFixEdgeConsistency = (edges, setEdges, plubotId) => {
   // Verificar consistencia
   const consistencyCheck = checkEdgeConsistency(edges);
-  
+
   // Si hay discrepancias, intentar corregirlas
   if (!consistencyCheck.consistent && consistencyCheck.missingCount > 0) {
 
-    
+
     // Identificar aristas faltantes
     const missingEdges = identifyMissingEdges(edges);
-    
+
     if (missingEdges.length > 0) {
 
-      
+
       // Forzar actualizaciu00f3n de aristas especu00edficas
       forceUpdateSpecificEdges(missingEdges.map(e => e.id));
-      
+
       // Si hay demasiadas aristas faltantes, intentar una actualizaciu00f3n completa del estado
       if (missingEdges.length > edges.length / 3) {
 
-        
+
         // Crear una copia profunda de las aristas para forzar una actualización completa
         const edgesCopy = JSON.parse(JSON.stringify(edges));
-        
+
         // Verificar si setEdges está disponible
         if (setEdges) {
           setEdges(edgesCopy);
         } else {
 
           // Emitir evento para que otros componentes puedan manejar la actualización
-          document.dispatchEvent(new CustomEvent('edges-fix-required-no-setter', { 
-            detail: { edges: edgesCopy, timestamp: Date.now() }
+          document.dispatchEvent(new CustomEvent('edges-fix-required-no-setter', {
+            detail: { edges: edgesCopy, timestamp: Date.now() },
           }));
         }
       }
     }
   }
-  
+
   return consistencyCheck;
 };

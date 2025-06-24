@@ -13,7 +13,7 @@ const initialState = {
     language: 'es',
     theme: 'dark',
     soundEffects: true,
-  }
+  },
 };
 
 function simulationReducer(state, action) {
@@ -30,7 +30,7 @@ function simulationReducer(state, action) {
 
 export const SimulationProvider = ({ children }) => {
   const [state, dispatch] = useReducer(simulationReducer, initialState);
-  
+
   // Persistencia
   useEffect(() => {
     const savedState = localStorage.getItem('simulation-state');
@@ -42,11 +42,11 @@ export const SimulationProvider = ({ children }) => {
       }
     }
   }, []);
-  
+
   useEffect(() => {
     localStorage.setItem('simulation-state', JSON.stringify(state));
   }, [state]);
-  
+
   return (
     <SimulationContext.Provider value={{ state, dispatch }}>
       {children}

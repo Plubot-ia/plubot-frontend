@@ -12,16 +12,16 @@ export const ultraPerformanceLabels = {
     error: 'Error',
     warning: 'Advertencia',
     info: 'Información',
-    question: 'Pregunta'
+    question: 'Pregunta',
   },
-  
+
   // Conectores
   connectors: {
     input: 'Conector de entrada',
     output: 'Conector de salida',
     connectFrom: 'Conectar desde otro nodo',
-    connectTo: 'Conectar a otro nodo'
-  }
+    connectTo: 'Conectar a otro nodo',
+  },
 };
 
 export default ultraPerformanceLabels;

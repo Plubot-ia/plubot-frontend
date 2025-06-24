@@ -1,10 +1,10 @@
-import React, { memo, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
+import React, { memo, useEffect, useRef } from 'react';
 import './ContextMenu.css';
 
 /**
  * Componente de menú contextual para nodos
- * 
+ *
  * @component
  * @param {Object} props - Propiedades del componente
  * @param {Array} props.items - Elementos del menú
@@ -13,7 +13,7 @@ import './ContextMenu.css';
  */
 const ContextMenu = memo(({ items, onClose }) => {
   const menuRef = useRef(null);
-  
+
   // Cerrar el menú al hacer clic fuera
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -21,14 +21,14 @@ const ContextMenu = memo(({ items, onClose }) => {
         onClose();
       }
     };
-    
+
     document.addEventListener('mousedown', handleClickOutside);
-    
+
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [onClose]);
-  
+
   // Cerrar el menú al presionar Escape
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -36,16 +36,16 @@ const ContextMenu = memo(({ items, onClose }) => {
         onClose();
       }
     };
-    
+
     document.addEventListener('keydown', handleKeyDown);
-    
+
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
     };
   }, [onClose]);
-  
+
   return (
-    <div 
+    <div
       ref={menuRef}
       className="context-menu"
       role="menu"
@@ -98,7 +98,7 @@ ContextMenu.propTypes = {
       onClick: PropTypes.func,
       disabled: PropTypes.bool,
       shortcut: PropTypes.string,
-    })
+    }),
   ).isRequired,
   onClose: PropTypes.func.isRequired,
 };

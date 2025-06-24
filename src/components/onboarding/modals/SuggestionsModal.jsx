@@ -1,4 +1,5 @@
 import React from 'react';
+
 import './SuggestionsModal.css';
 // Importar el contexto global
 import { useGlobalContext } from '../../../context/GlobalProvider';
@@ -6,7 +7,7 @@ import { useGlobalContext } from '../../../context/GlobalProvider';
 const SuggestionsModal = ({ suggestions, onApplySuggestion, onClose }) => {
   // Usar el contexto global
   const { closeModal } = useGlobalContext();
-  
+
   // Función para cerrar el modal utilizando el contexto global o la prop onClose
   const handleClose = () => {
     if (closeModal) {

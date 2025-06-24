@@ -4,45 +4,47 @@
  * @version 5.0.0 - Refactorización con selectores granulares para eliminar ciclos de renderizado.
  */
 
-import React, { useState, useEffect, useMemo, useCallback, useRef, Suspense } from 'react';
-import PropTypes from 'prop-types';
-import { Position, Handle, useUpdateNodeInternals } from 'reactflow';
 import { GitBranch, Edit2, PlusCircle, Copy, Trash2 } from 'lucide-react';
+import PropTypes from 'prop-types';
+import React, { useState, useEffect, useMemo, useCallback, useRef, Suspense } from 'react';
+import { Position, Handle, useUpdateNodeInternals } from 'reactflow';
 import { shallow } from 'zustand/shallow';
 
 
 import './DecisionNode.css';
+
 import useFlowStore from '@/stores/useFlowStore';
+
+import DecisionNodeHandles from './components/DecisionNodeHandles';
 import { getConnectorColor } from './DecisionNode.types';
+
 
 // Carga diferida de componentes para optimización
 const DecisionNodeHeader = React.lazy(() => import('./components/DecisionNodeHeader'));
 const DecisionNodeQuestion = React.lazy(() => import('./components/DecisionNodeQuestion'));
 const DecisionNodeConditions = React.lazy(() => import('./components/DecisionNodeConditions'));
 const DecisionNodeOptions = React.lazy(() => import('./components/DecisionNodeOptions'));
-import DecisionNodeHandles from './components/DecisionNodeHandles';
 
 const MAX_CONDITIONS = 5;
 
 const isValidQuestion = (question) => question?.trim().length > 0 && question.trim().length <= 500;
 
 
-
 const DecisionNodeInternal = ({ id, selected, isConnectable }) => {
   // --- 1. Hooks de React y Zustand (TODOS INCONDICIONALES) ---
   const updateNodeInternals = useUpdateNodeInternals();
 
-  const { 
-    updateNodeData, 
-    addDecisionNodeCondition, 
-    updateDecisionNodeConditionText, 
-    deleteDecisionNodeCondition, 
-    generateOptionNodes, 
-    duplicateNode, 
-    deleteNode, 
-    showContextMenu, 
-    isUltraPerformanceModeGlobal 
-  } = useFlowStore(state => ({ 
+  const {
+    updateNodeData,
+    addDecisionNodeCondition,
+    updateDecisionNodeConditionText,
+    deleteDecisionNodeCondition,
+    generateOptionNodes,
+    duplicateNode,
+    deleteNode,
+    showContextMenu,
+    isUltraPerformanceModeGlobal,
+  } = useFlowStore(state => ({
     updateNodeData: state.updateNodeData,
     addDecisionNodeCondition: state.addDecisionNodeCondition,
     updateDecisionNodeConditionText: state.updateDecisionNodeConditionText,
@@ -77,9 +79,8 @@ const DecisionNodeInternal = ({ id, selected, isConnectable }) => {
   const [variablesEnabled, setVariablesEnabled] = useState(nodeData?.enableVariables || false);
 
 
-
   const prevIsEditing = useRef(nodeData?.isEditing);
-  
+
   const defaultConditions = useMemo(() => [
     { id: `cond-${id}-default-yes`, text: 'Sí', color: getConnectorColor('Sí', 0) },
     { id: `cond-${id}-default-no`, text: 'No', color: getConnectorColor('No', 1) },
@@ -89,7 +90,7 @@ const DecisionNodeInternal = ({ id, selected, isConnectable }) => {
   // La optimización anterior estaba causando que la lista de handles no se actualizara.
   const currentConditions = (nodeData?.conditions && nodeData.conditions.length > 0) ? nodeData.conditions : defaultConditions;
   const isUltraMode = useMemo(() => nodeData?.isUltraPerformanceMode || isUltraPerformanceModeGlobal, [nodeData?.isUltraPerformanceMode, isUltraPerformanceModeGlobal]);
-  const nodeClasses = useMemo(() => 
+  const nodeClasses = useMemo(() =>
     ['decision-node', selected && 'selected', nodeData?.isEditing && 'editing', isUltraMode && 'ultra-performance'].filter(Boolean).join(' '),
   [selected, nodeData?.isEditing, isUltraMode]);
 
@@ -106,11 +107,11 @@ const DecisionNodeInternal = ({ id, selected, isConnectable }) => {
 
   const finishEditing = useCallback(() => {
     if (isValidQuestion(currentQuestion)) {
-      updateNodeData(id, { 
+      updateNodeData(id, {
         question: currentQuestion,
         enableMarkdown: markdownEnabled,
         enableVariables: variablesEnabled,
-        isEditing: false 
+        isEditing: false,
       });
     } else {
       cancelEditing();
@@ -153,7 +154,6 @@ const DecisionNodeInternal = ({ id, selected, isConnectable }) => {
   const conditionsKey = useMemo(() => JSON.stringify(currentConditions), [currentConditions]);
 
 
-
   useEffect(() => {
     // Si el estado de edición ha cambiado (de true a false o de false a true),
     // es crucial forzar una actualización de los "internals" del nodo.
@@ -176,12 +176,12 @@ const DecisionNodeInternal = ({ id, selected, isConnectable }) => {
     }
   }, [isUltraMode, id, updateNodeInternals]);
 
-  // --- Guarda de renderizado --- 
+  // --- Guarda de renderizado ---
   // Se ejecuta DESPUÉS de todos los hooks para cumplir las reglas de React.
   if (!nodeData) {
     return null;
   }
-  
+
   // --- Renderizado del Componente ---
   const {
     question,
@@ -194,11 +194,11 @@ const DecisionNodeInternal = ({ id, selected, isConnectable }) => {
   return (
     <div className={nodeClasses} onContextMenu={handleContextMenu} onDoubleClick={!isEditing ? startEditing : undefined}>
       <Handle type="target" position={Position.Top} className="decision-node__handle decision-node__handle--target" isConnectable={isConnectable} />
-      <Suspense fallback={<div className="suspense-loader">Cargando...</div>}> 
-        <DecisionNodeHeader 
+      <Suspense fallback={<div className="suspense-loader">Cargando...</div>}>
+        <DecisionNodeHeader
           title={isEditing ? 'Editando Decisión' : (question || '...')}
-          isEditing={isEditing} 
-          isUltraPerformanceMode={isUltraMode} 
+          isEditing={isEditing}
+          isUltraPerformanceMode={isUltraMode}
           onStartEdit={startEditing}
         />
         <div className="decision-node__content">
@@ -252,7 +252,7 @@ const DecisionNodeInternal = ({ id, selected, isConnectable }) => {
           )}
         </div>
       </Suspense>
-      
+
       <DecisionNodeHandles nodeId={id} outputs={currentConditions} isConnectable={isConnectable} />
     </div>
   );

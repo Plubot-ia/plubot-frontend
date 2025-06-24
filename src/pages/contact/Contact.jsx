@@ -1,7 +1,10 @@
-import React, { useState, useEffect, useRef, useMemo, useCallback, memo } from 'react';
-import useWindowSize from '../../hooks/useWindowSize';
 import { motion, useAnimation, AnimatePresence } from 'framer-motion';
+import React, { useState, useEffect, useRef, useMemo, useCallback, memo } from 'react';
+
 import axiosInstance from '@/utils/axiosConfig';
+
+import useWindowSize from '../../hooks/useWindowSize';
+
 import './Contact.css';
 import LazyImage from '@/components/common/LazyImage';
 
@@ -9,15 +12,14 @@ import LazyImage from '@/components/common/LazyImage';
 const Particle = memo(({ index }) => {
   // Valores pre-calculados para evitar cálculos en cada renderizado
   const { width, height } = useWindowSize();
-  const { controls } = useAnimation();
   const initialX = useMemo(() => Math.random() * (width || 0), [width]);
   const initialY = useMemo(() => Math.random() * (height || 0), [height]);
   const targetX = useMemo(() => Math.random() * (width || 0), [width]);
   const targetY = useMemo(() => Math.random() * (height || 0), [height]);
   const duration = useMemo(() => Math.random() * 15 + 20, []);
   const initialOpacity = useMemo(() => Math.random() * 0.4 + 0.2, []);
-  const bgColor = useMemo(() => 
-    `rgb(${Math.random() * 80}, ${Math.random() * 200}, ${Math.random() * 255 + 180})`, 
+  const bgColor = useMemo(() =>
+    `rgb(${Math.random() * 80}, ${Math.random() * 200}, ${Math.random() * 255 + 180})`,
   []);
   const shadowSize = useMemo(() => Math.random() * 8 + 4, []);
   const size = useMemo(() => Math.random() * 8 + 2, []);
@@ -51,6 +53,8 @@ const Particle = memo(({ index }) => {
   );
 });
 
+Particle.displayName = 'Particle';
+
 const NeuralNode = memo(({ index }) => {
   const duration = useMemo(() => Math.random() * 3 + 2, []);
   const delay = useMemo(() => Math.random() * 1.5, []);
@@ -78,25 +82,27 @@ const NeuralNode = memo(({ index }) => {
   );
 });
 
-const InputField = memo(({ 
-  type = 'text', 
-  name, 
-  placeholder, 
-  value, 
-  onChange, 
-  onFocus, 
-  onBlur, 
-  isActive 
+NeuralNode.displayName = 'NeuralNode';
+
+const InputField = memo(({
+  type = 'text',
+  name,
+  placeholder,
+  value,
+  onChange,
+  onFocus,
+  onBlur,
+  isActive,
 }) => {
   const InputComponent = type === 'textarea' ? 'textarea' : 'input';
-  
+
   return (
-    <motion.div 
-      className={`input-wrapper ${isActive ? 'active' : ''}`} 
+    <motion.div
+      className={`input-wrapper ${isActive ? 'active' : ''}`}
       variants={itemVariants}
     >
       <div className="input-icon">
-        <div className="icon-circle"></div>
+        <div className="icon-circle" />
       </div>
       <InputComponent
         type={type !== 'textarea' ? type : undefined}
@@ -109,10 +115,12 @@ const InputField = memo(({
         required
         className="contact-input"
       />
-      <div className="input-line"></div>
+      <div className="input-line" />
     </motion.div>
   );
 });
+
+InputField.displayName = 'InputField';
 
 // Variantes para animaciones (definidas fuera del componente para evitar recreaciones)
 const containerVariants = {
@@ -211,7 +219,7 @@ const Contact = () => {
     const timeoutId = setTimeout(() => {
       setConnectionStrength(calculateStrength());
     }, 300);
-    
+
     return () => clearTimeout(timeoutId);
   }, [calculateStrength]);
 
@@ -263,9 +271,9 @@ const Contact = () => {
           'Content-Type': 'multipart/form-data',
         },
       });
-      setFormMessage({ 
-        text: response.data.message || '¡Mensaje recibido en el Pluniverse!', 
-        status: 'success' 
+      setFormMessage({
+        text: response.data.message || '¡Mensaje recibido en el Pluniverse!',
+        status: 'success',
       });
       setFormData({ nombre: '', email: '', mensaje: '' });
       setTimeout(() => setFormMessage({ text: '', status: '' }), 5000);
@@ -347,7 +355,7 @@ const Contact = () => {
               }}
               exit={{ opacity: 0, y: -50 }}
             >
-              <div className="holographic-overlay"></div>
+              <div className="holographic-overlay" />
 
               <motion.form
                 onSubmit={handleSubmit}
@@ -402,9 +410,9 @@ const Contact = () => {
                     />
                     <div className="connection-nodes">
                       {[...Array(5)].map((_, i) => (
-                        <div 
-                          key={i} 
-                          className={`connection-node ${connectionStrength >= (i + 1) * 20 ? 'active' : ''}`} 
+                        <div
+                          key={i}
+                          className={`connection-node ${connectionStrength >= (i + 1) * 20 ? 'active' : ''}`}
                         />
                       ))}
                     </div>
@@ -430,7 +438,7 @@ const Contact = () => {
                       transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
                     />
                   )}
-                  <div className="btn-glow"></div>
+                  <div className="btn-glow" />
                 </motion.button>
               </motion.form>
 

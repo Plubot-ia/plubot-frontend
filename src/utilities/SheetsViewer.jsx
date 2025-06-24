@@ -1,52 +1,56 @@
-import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { useState } from 'react';
+
 import useGoogleSheets from '@/hooks/useGoogleSheets';
 import './SheetsViewer.css';
 
-const SheetsViewer = ({ plubotId }) => {
+const SheetsViewer = () => {
   const [spreadsheetId, setSpreadsheetId] = useState('');
   const [range, setRange] = useState('A1:Z100');
   const [isConnected, setIsConnected] = useState(false);
   const [credentialsJson, setCredentialsJson] = useState('');
   const [showCredentialsInput, setShowCredentialsInput] = useState(false);
-  
+  const [uiError, setUiError] = useState(null);
+
   const { loading, error, sheetsData, connectGoogleSheets, fetchSheetData } = useGoogleSheets();
 
   const handleConnect = async () => {
+    setUiError(null);
     try {
       let credentials;
       try {
         credentials = JSON.parse(credentialsJson);
-      } catch (e) {
-        alert('El formato JSON de las credenciales no es válido');
+      } catch {
+        setUiError('El formato JSON de las credenciales no es válido.');
         return;
       }
-      
+
       await connectGoogleSheets(credentials);
       setIsConnected(true);
       setShowCredentialsInput(false);
-    } catch (err) {
-
+    } catch {
+      // The useGoogleSheets hook handles and exposes the error state
     }
   };
 
   const handleFetchData = async () => {
+    setUiError(null);
     if (!spreadsheetId) {
-      alert('Por favor, ingresa el ID de la hoja de cálculo');
+      setUiError('Por favor, ingresa el ID de la hoja de cálculo.');
       return;
     }
-    
+
     try {
       await fetchSheetData(spreadsheetId, range);
-    } catch (err) {
-
+    } catch {
+      // The useGoogleSheets hook handles and exposes the error state
     }
   };
 
   return (
     <div className="sheets-viewer-container">
       <h2 className="section-title">Integración con Google Sheets</h2>
-      
+
       {!isConnected ? (
         <div className="connection-section">
           <motion.button
@@ -57,17 +61,32 @@ const SheetsViewer = ({ plubotId }) => {
           >
             Conectar con Google Sheets
           </motion.button>
-          
+
           {showCredentialsInput && (
-            <motion.div 
+            <motion.div
               className="credentials-input-container"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3 }}
             >
               <p className="instruction-text">
-                Para conectar con Google Sheets, necesitas crear un proyecto en Google Cloud Platform 
-                y obtener credenciales de cuenta de servicio. Pega el JSON de credenciales a continuación:
+                Para conectar con Google Sheets, necesitas crear un proyecto en Google Cloud Platform
+              </p>
+              <p>
+                Para conectar, necesitas las credenciales de una cuenta de servicio de
+                Google Cloud con la API de Google Sheets habilitada. Pega el contenido
+                del archivo JSON de credenciales a continuación.
+              </p>
+              <p>
+                Si no tienes credenciales, sigue la{' '}
+                <a
+                  href="https://developers.google.com/workspace/guides/create-credentials"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  guía de Google
+                </a>{' '}
+                para crearlas.
               </p>
               <textarea
                 className="credentials-textarea"
@@ -133,13 +152,14 @@ const SheetsViewer = ({ plubotId }) => {
               {loading ? 'Cargando datos...' : 'Cargar datos'}
             </motion.button>
           </div>
-          
+
+          {uiError && <div className="error-message">{uiError}</div>}
           {error && (
             <div className="error-message">
               Error: {error}
             </div>
           )}
-          
+
           {sheetsData && sheetsData.success && (
             <div className="data-display">
               <h3>Datos de la hoja</h3>
@@ -147,23 +167,27 @@ const SheetsViewer = ({ plubotId }) => {
                 <table className="sheets-table">
                   <thead>
                     <tr>
-                      {sheetsData.headers.map((header, index) => (
-                        <th key={index}>{header}</th>
+                      {sheetsData.headers.map((header) => (
+                        <th key={header}>{header}</th>
                       ))}
                     </tr>
                   </thead>
                   <tbody>
                     {sheetsData.raw_data.slice(1).map((row, rowIndex) => (
+                      // eslint-disable-next-line react/no-array-index-key
                       <tr key={rowIndex}>
                         {row.map((cell, cellIndex) => (
+                          // eslint-disable-next-line react/no-array-index-key
                           <td key={cellIndex}>{cell}</td>
                         ))}
                         {/* Rellenar celdas vacías si la fila es más corta que los encabezados */}
-                        {sheetsData.headers.length > row.length && 
-                          Array(sheetsData.headers.length - row.length).fill().map((_, i) => (
-                            <td key={`empty-${rowIndex}-${i}`}></td>
-                          ))
-                        }
+                        {sheetsData.headers.length > row.length &&
+                          Array(sheetsData.headers.length - row.length)
+                            .fill(null)
+                            .map((_, i) => (
+                              // eslint-disable-next-line react/no-array-index-key
+                              <td key={`empty-cell-${i}`} />
+                            ))}
                       </tr>
                     ))}
                   </tbody>

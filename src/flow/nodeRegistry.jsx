@@ -1,24 +1,25 @@
 import React, { Suspense } from 'react';
-import useFlowStore from '@/stores/useFlowStore';
-import EliteEdge from '@/components/onboarding/flow-editor/ui/EliteEdge.jsx';
+
 
 // --- Global LOD System ---
-import GlobalLODNode from '@/components/onboarding/flow-editor/lod/GlobalLODNode';
 import GenericCompactNode from '@/components/onboarding/flow-editor/lod/GenericCompactNode';
 import GenericMiniNode from '@/components/onboarding/flow-editor/lod/GenericMiniNode';
+import GlobalLODNode from '@/components/onboarding/flow-editor/lod/GlobalLODNode';
+import EliteEdge from '@/components/onboarding/flow-editor/ui/EliteEdge.jsx';
 
 // --- Full Detail Node Components (LOD 0) ---
-import StartNode from '@/components/onboarding/nodes/startnode/StartNode';
-import EndNode from '@/components/onboarding/nodes/endnode/EndNode';
-import DecisionNode from '@/components/onboarding/nodes/decisionnode/DecisionNode.jsx';
 import ActionNode from '@/components/onboarding/nodes/actionnode/ActionNode.jsx';
-import OptionNode from '@/components/onboarding/nodes/optionnode/OptionNode.jsx';
-import HttpRequestNode from '@/components/onboarding/nodes/httprequestnode/HttpRequestNode.jsx';
-import PowerNode from '@/components/onboarding/nodes/powernode/PowerNode.jsx';
-import DiscordNode from '@/components/onboarding/nodes/discordnode/DiscordNode.tsx';
 import AiNode from '@/components/onboarding/nodes/ainode/AiNode';
-import EmotionDetectionNode from '@/components/onboarding/nodes/emotiondetectionnode';
 import AiNodePro from '@/components/onboarding/nodes/ainodepro';
+import DecisionNode from '@/components/onboarding/nodes/decisionnode/DecisionNode.jsx';
+import DiscordNode from '@/components/onboarding/nodes/discordnode/DiscordNode.tsx';
+import EmotionDetectionNode from '@/components/onboarding/nodes/emotiondetectionnode';
+import EndNode from '@/components/onboarding/nodes/endnode/EndNode';
+import HttpRequestNode from '@/components/onboarding/nodes/httprequestnode/HttpRequestNode.jsx';
+import OptionNode from '@/components/onboarding/nodes/optionnode/OptionNode.jsx';
+import PowerNode from '@/components/onboarding/nodes/powernode/PowerNode.jsx';
+import StartNode from '@/components/onboarding/nodes/startnode/StartNode';
+import useFlowStore from '@/stores/useFlowStore';
 
 // --- Message Node Specific LOD Components ---
 const MessageNode = React.lazy(() => import('@/components/onboarding/nodes/messagenode/MessageNode'));
@@ -79,7 +80,7 @@ export const createNodeTypes = (isUltraPerformanceMode = false) => {
     message: {
       Full: MessageNode,
       Compact: CompactMessageNode, // Specific implementation
-      Mini: MiniMessageNode,      // Specific implementation
+      Mini: MiniMessageNode, // Specific implementation
     },
     decision: {
       Full: DecisionNode,

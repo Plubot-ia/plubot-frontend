@@ -1,6 +1,6 @@
 /**
  * Utilidad para corregir los handles de las aristas
- * 
+ *
  * Este archivo contiene funciones para asegurar que los handles de las aristas
  * sean consistentes entre el frontend y el backend.
  */
@@ -13,12 +13,12 @@
  */
 const isValidHandle = (nodeId, handleId) => {
   if (!nodeId || !handleId) return false;
-  
+
   try {
     // Buscar el nodo en el DOM
     const nodeElement = document.querySelector(`[data-id="${nodeId}"]`);
     if (!nodeElement) return false;
-    
+
     // Verificar si el handle existe en el nodo
     const handleElement = nodeElement.querySelector(`[data-handleid="${handleId}"]`);
     return handleElement !== null;
@@ -37,18 +37,18 @@ const getValidHandle = (nodeId, preferredHandle) => {
   if (isValidHandle(nodeId, preferredHandle)) {
     return preferredHandle;
   }
-  
+
   // Si el handle preferido no es válido, buscar cualquier handle disponible
   try {
     const nodeElement = document.querySelector(`[data-id="${nodeId}"]`);
     if (!nodeElement) return 'default';
-    
+
     const handles = nodeElement.querySelectorAll('[data-handleid]');
     if (handles.length > 0) {
       return handles[0].getAttribute('data-handleid');
     }
   } catch (error) {}
-  
+
   return 'default';
 };
 
@@ -73,25 +73,25 @@ export const normalizeEdgeHandles = (edge) => {
   if (edge.sourceHandle && edge.targetHandle) {
     return edge;
   }
-  
+
   // Crear nuevo objeto solo cuando sea necesario
   const newEdge = { ...edge };
-  
+
   // Asignar handles por defecto solo cuando faltan
   if (!newEdge.sourceHandle) newEdge.sourceHandle = 'output';
   if (!newEdge.targetHandle) newEdge.targetHandle = 'input';
-  
+
   // Si es una arista de bucle (source = target), asegurar handles diferentes
   if (newEdge.source === newEdge.target && newEdge.sourceHandle === newEdge.targetHandle) {
     newEdge.targetHandle = `${newEdge.targetHandle}-alt`;
   }
-  
+
   // Eliminar log excesivo para mejorar rendimiento
   // Solo loguear en desarrollo y con nivel de detalle bajo
   if (process.env.NODE_ENV === 'development' && Math.random() < 0.05) { // Solo 5% de las veces
 
   }
-  
+
   return newEdge;
 };
 
@@ -104,13 +104,13 @@ export const fixAllEdgeHandles = (edges) => {
   if (!edges || !Array.isArray(edges)) {
     return [];
   }
-  
+
   // Normalizar todas las aristas y filtrar las nulas
   const fixedEdges = edges.map(edge => normalizeEdgeHandles(edge)).filter(Boolean);
-  
+
   // Si se perdieron aristas en el proceso, registrarlo
 
-  
+
   return fixedEdges;
 };
 
@@ -122,16 +122,16 @@ export const forceEdgesUpdate = (rfInstance) => {
   if (!rfInstance) {
     return;
   }
-  
+
   try {
     // Obtener las aristas actuales
     const currentEdges = rfInstance.getEdges() || [];
-    
+
     if (currentEdges.length === 0) {
 
       return;
     }
-    
+
     // Filtrar aristas cuyos nodos existen en el DOM
     const validEdges = currentEdges.filter(edge => {
       const exists = nodesExistInDOM(edge);
@@ -140,43 +140,42 @@ export const forceEdgesUpdate = (rfInstance) => {
       }
       return exists;
     });
-    
+
     if (validEdges.length !== currentEdges.length) {
 
     }
-    
+
     // Forzar explicitamente el uso de handles 'default' para todas las aristas
     const forcedEdges = validEdges.map(edge => ({
       ...edge,
       sourceHandle: 'default',
-      targetHandle: 'default'
+      targetHandle: 'default',
     }));
-    
+
     // Actualizar las aristas en ReactFlow
     rfInstance.setEdges(forcedEdges);
-    
 
-    
+
     // Emitir un evento para notificar que se actualizaron las aristas
-    document.dispatchEvent(new CustomEvent('edges-updated', { 
-      detail: { 
+    document.dispatchEvent(new CustomEvent('edges-updated', {
+      detail: {
         count: forcedEdges.length,
         timestamp: Date.now(),
-        forcedHandles: true
-      } 
+        forcedHandles: true,
+      },
     }));
-    
+
     // Emitir un evento adicional para forzar la actualización visual de las aristas
-    document.dispatchEvent(new CustomEvent('elite-edge-update-required', { 
-      detail: { 
+    document.dispatchEvent(new CustomEvent('elite-edge-update-required', {
+      detail: {
         allEdges: true,
         timestamp: Date.now(),
         forced: true,
         fixedHandles: true,
-        validEdgesOnly: true
-      } 
+        validEdgesOnly: true,
+      },
     }));
-    
+
     // Programar una segunda actualización después de un breve retraso
     // para asegurar que los cambios se apliquen correctamente
     setTimeout(() => {
@@ -194,41 +193,41 @@ const hasValidHandles = (edge) => {
   if (!edge) {
     return false;
   }
-  
+
   // Verificar que la arista tenga los campos mínimos requeridos
   if (!edge.id) {
     return false;
   }
-  
+
   if (!edge.source || !edge.target) {
     return false;
   }
-  
+
   // Convertir a string para asegurar consistencia
   edge.source = String(edge.source);
   edge.target = String(edge.target);
-  
+
   // Asegurar que los handles sean strings
   if (edge.sourceHandle === undefined || edge.sourceHandle === null) {
     edge.sourceHandle = 'default';
   } else {
     edge.sourceHandle = String(edge.sourceHandle);
   }
-  
+
   if (edge.targetHandle === undefined || edge.targetHandle === null) {
     edge.targetHandle = 'default';
   } else {
     edge.targetHandle = String(edge.targetHandle);
   }
-  
+
   // Verificar que los nodos existan en el DOM
   const sourceExists = document.querySelector(`[data-id="${edge.source}"]`) !== null;
   const targetExists = document.querySelector(`[data-id="${edge.target}"]`) !== null;
-  
+
   if (!sourceExists || !targetExists) {
     return false;
   }
-  
+
   return true;
 };
 
@@ -239,12 +238,12 @@ const hasValidHandles = (edge) => {
  */
 export const nodesExistInDOM = (edge) => {
   if (!edge || !edge.source || !edge.target) return false;
-  
+
   // Verificar si los nodos existen en el DOM
   const sourceExists = document.querySelector(`.react-flow__node[data-id="${edge.source}"]`);
   const targetExists = document.querySelector(`.react-flow__node[data-id="${edge.target}"]`);
-  
-  return !!sourceExists && !!targetExists;
+
+  return Boolean(sourceExists) && Boolean(targetExists);
 };
 
 /**
@@ -254,21 +253,21 @@ export const nodesExistInDOM = (edge) => {
  */
 export const prepareEdgesForBackend = (edges) => {
   if (!edges || !Array.isArray(edges)) return [];
-  
+
   return edges.map(edge => {
     if (!edge) return null;
-    
+
     // Crear una copia para no modificar el original
     const preparedEdge = { ...edge };
-    
+
     // Asegurar que sourceHandle y targetHandle tengan valores válidos
     preparedEdge.sourceHandle = preparedEdge.sourceHandle || 'default';
     preparedEdge.targetHandle = preparedEdge.targetHandle || 'default';
-    
+
     // Guardar los IDs originales para referencia
     preparedEdge.sourceOriginal = preparedEdge.sourceOriginal || preparedEdge.source;
     preparedEdge.targetOriginal = preparedEdge.targetOriginal || preparedEdge.target;
-    
+
     return preparedEdge;
   }).filter(Boolean);
 };
@@ -280,20 +279,20 @@ export const prepareEdgesForBackend = (edges) => {
  */
 export const processEdgesFromBackend = (edges) => {
   if (!edges || !Array.isArray(edges)) return [];
-  
+
   return edges.map(edge => {
     if (!edge) return null;
-    
+
     // Crear una copia para no modificar el original
     const processedEdge = { ...edge };
-    
+
     // Asegurar que sourceHandle y targetHandle tengan valores válidos
     processedEdge.sourceHandle = processedEdge.sourceHandle || 'default';
     processedEdge.targetHandle = processedEdge.targetHandle || 'default';
-    
+
     // Asegurar que type sea 'default' si no está definido
     processedEdge.type = processedEdge.type || 'default';
-    
+
     return processedEdge;
   }).filter(Boolean);
 };

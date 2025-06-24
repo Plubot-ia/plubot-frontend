@@ -3,9 +3,10 @@
  * @description Componente para los conectores del nodo de decisión
  */
 
-import React, { useMemo, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
+import React, { useMemo, useEffect, useRef } from 'react';
 import { Handle, Position, useUpdateNodeInternals } from 'reactflow';
+
 import { NODE_CONFIG, getConnectorColor } from '../DecisionNode.types';
 
 // Constantes para el posicionamiento de los handles
@@ -15,13 +16,13 @@ const NODE_PADDING = 20; // padding del nodo en px
 /**
  * Componente para los conectores del nodo de decisión
  */
-const DecisionNodeHandles = ({ 
-  nodeId, 
-  outputs = [], 
-  isConnectable = true, 
+const DecisionNodeHandles = ({
+  nodeId,
+  outputs = [],
+  isConnectable = true,
   isUltraPerformanceMode = false,
   isEditing = false,
-  activeOutputs = []
+  activeOutputs = [],
 }) => {
   const updateNodeInternals = useUpdateNodeInternals();
 
@@ -74,7 +75,7 @@ const DecisionNodeHandles = ({
       // Algoritmo de distribución matemáticamente perfecto.
       const numHandles = outputs.length;
       const positionPercent = (index + 1) * (100 / (numHandles + 1));
-      
+
       // El color se toma directamente de la propiedad 'color' persistente.
       const finalColor = output.color;
 
@@ -92,7 +93,7 @@ const DecisionNodeHandles = ({
       // Estilo para el HANDLE, neutralizando su propio posicionamiento.
       const handleStyle = {
         position: 'relative', // Clave: anula el 'absolute' por defecto de React Flow
-        transform: 'none',    // Clave: anula el 'translate' por defecto
+        transform: 'none', // Clave: anula el 'translate' por defecto
         top: 'auto',
         left: 'auto',
         right: 'auto',
@@ -131,10 +132,10 @@ const DecisionNodeHandles = ({
       );
     });
   }, [outputs, isConnectable, isEditing, isUltraPerformanceMode, activeOutputs]);
-  
+
   return (
-    <div 
-      className="decision-node__handles-container" 
+    <div
+      className="decision-node__handles-container"
       data-testid="decision-node-source-handles"
       style={{
         position: 'absolute !important',
@@ -150,7 +151,7 @@ const DecisionNodeHandles = ({
         transformOrigin: 'center center !important',
         alignItems: 'center',
         margin: 0,
-        padding: 0
+        padding: 0,
       }}
     >
       {renderSourceHandles}

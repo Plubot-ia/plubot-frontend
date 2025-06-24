@@ -1,4 +1,5 @@
 import React from 'react';
+
 import './ImportExportModal.css';
 // Importar el contexto global
 import { useGlobalContext } from '../../../context/GlobalProvider';
@@ -20,17 +21,17 @@ const ImportExportModal = ({
 }) => {
   // Usar el contexto global para notificaciones y gestión de modales
   const { showNotification, setByteMessage: globalSetByteMessage, closeModal } = useGlobalContext();
-  
+
   // Función para mostrar mensajes utilizando múltiples métodos disponibles
   const notifyMessage = (message, type = 'info') => {
     // Priorizar el contexto global
     if (globalSetByteMessage) {
       globalSetByteMessage(message);
     }
-    
+
     // Usar la función de notificación global
     showNotification(message, type);
-    
+
     // Usar la prop para retrocompatibilidad
     if (propSetByteMessage) {
       try {
@@ -58,7 +59,7 @@ const ImportExportModal = ({
         })),
         edges,
       };
-      let exportString = JSON.stringify(flowData, null, 2);
+      const exportString = JSON.stringify(flowData, null, 2);
       const blob = new Blob([exportString], { type: 'text/plain;charset=utf-8' });
       const url = URL.createObjectURL(blob);
       const downloadLink = document.createElement('a');
@@ -97,7 +98,7 @@ const ImportExportModal = ({
           typeof node.position.x === 'number' &&
           typeof node.position.y === 'number' &&
           node.data &&
-          typeof node.data.label === 'string'
+          typeof node.data.label === 'string',
       );
       const validNodeIds = validNodes.map((node) => node.id);
       const validEdges = parsedData.edges.filter(
@@ -107,14 +108,14 @@ const ImportExportModal = ({
           edge.source &&
           edge.target &&
           validNodeIds.includes(edge.source) &&
-          validNodeIds.includes(edge.target)
+          validNodeIds.includes(edge.target),
       );
       if (validNodes.length < parsedData.nodes.length || validEdges.length < parsedData.edges.length) {
         if (
           !confirm(
             `Advertencia: ${parsedData.nodes.length - validNodes.length} nodos y ${
               parsedData.edges.length - validEdges.length
-            } conexiones son inválidos y serán ignorados. ¿Deseas continuar?`
+            } conexiones son inválidos y serán ignorados. ¿Deseas continuar?`,
           )
         ) {
           return;
@@ -126,7 +127,7 @@ const ImportExportModal = ({
       setImportData('');
       notifyMessage(
         `¡Flujo importado con éxito! Se cargaron ${validNodes.length} nodos y ${validEdges.length} conexiones.`,
-        'success'
+        'success',
       );
       notifyMessage('Flujo importado con éxito. ¡Bienvenido de vuelta!', 'success');
       closeModal('importExportModal'); // Cierra el modal al importar con éxito
@@ -150,20 +151,20 @@ const ImportExportModal = ({
       <div className="ts-modal-content">
         <div className="ts-modal-header">
           <h3>{importData ? 'Importar Flujo' : 'Exportar Flujo'}</h3>
-          <button 
+          <button
             onClick={() => {
               if (closeModal) {
                 closeModal('importExportModal');
               } else if (typeof onClose === 'function') {
                 onClose();
               }
-            }} 
+            }}
             className="ts-close-button"
           >
             ✕
           </button>
         </div>
-        
+
         <div className="ts-modal-tabs">
           <button
             className={importData ? '' : 'active'}
@@ -178,7 +179,7 @@ const ImportExportModal = ({
             Importar
           </button>
         </div>
-        
+
         {!importData ? (
           <div className="ts-export-section">
             <div className="ts-export-options">
@@ -198,7 +199,7 @@ const ImportExportModal = ({
             </div>
             <div className="ts-import-actions">
               <button onClick={exportFlow} className="ts-primary-button">
-                <i className="fas fa-download"></i> Exportar Flujo
+                <i className="fas fa-download" /> Exportar Flujo
               </button>
             </div>
           </div>
@@ -215,7 +216,7 @@ const ImportExportModal = ({
                   id="flow-file-input"
                 />
                 <label htmlFor="flow-file-input" className="ts-file-input-label">
-                  <i className="fas fa-file-upload"></i> Seleccionar archivo
+                  <i className="fas fa-file-upload" /> Seleccionar archivo
                 </label>
               </div>
               <textarea
@@ -227,7 +228,7 @@ const ImportExportModal = ({
               />
             </div>
             <div className="ts-warning-message">
-              <i className="fas fa-exclamation-triangle"></i>
+              <i className="fas fa-exclamation-triangle" />
               <p>
                 La importación reemplazará tu flujo actual. Asegúrate de hacer una copia de seguridad
                 si no quieres perder tu trabajo actual.
@@ -238,7 +239,7 @@ const ImportExportModal = ({
                 Cancelar
               </button>
               <button onClick={importFlow} className="ts-primary-button">
-                <i className="fas fa-file-import"></i> Importar Flujo
+                <i className="fas fa-file-import" /> Importar Flujo
               </button>
             </div>
           </div>

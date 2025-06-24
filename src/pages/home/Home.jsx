@@ -1,7 +1,9 @@
 import { useEffect, lazy, Suspense } from 'react';
-import HomeHero from '../../components/home/Home-hero';
+
 import HomeAboutPlubot from '../../components/home/Home-about-plubot';
+import HomeHero from '../../components/home/Home-hero';
 import useAOS from '../../hooks/useAOS';
+
 const HomePluniverseMap = lazy(() => import('../../components/home/Home-pluniverse-map'));
 const HomeForge = lazy(() => import('../../components/home/Home-forge'));
 const HomeArsenal = lazy(() => import('../../components/home/Home-arsenal'));

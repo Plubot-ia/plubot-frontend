@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import ReactDOM from 'react-dom';
+
 import ReactMarkdown from '@/lib/simplified-markdown';
 import './ToolTip.css'; // Asegúrate de que los estilos de ToolTip.css sean compatibles
 
@@ -102,7 +103,7 @@ const Tooltip = ({ content, children, position = 'top', delay = 500 }) => {
           : content
         }
       </div>,
-      portalRoot
+      portalRoot,
     )
   ) : null;
 

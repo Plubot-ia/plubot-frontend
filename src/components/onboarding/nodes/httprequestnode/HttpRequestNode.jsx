@@ -1,24 +1,26 @@
-import React, { useState, useEffect, useCallback, memo } from 'react';
-
-import { Handle, Position } from 'reactflow';
 import {
-  Network, 
+  Network,
   ChevronDown,
   ChevronUp,
   Trash2,
   Copy,
   AlertCircle,
-  CheckCircle, 
-  XCircle 
+  CheckCircle,
+  XCircle,
 } from 'lucide-react';
 import PropTypes from 'prop-types';
-import Tooltip from '../../ui/ToolTip'; 
-import ContextMenu from '../../ui/context-menu'; 
-import useNode from '@/hooks/useNode';
-import { NODE_TYPES } from '@/utils/nodeConfig'; 
-import { v4 as uuidv4 } from 'uuid'; 
-import './HttpRequestNode.css';
+import React, { useState, useEffect, useCallback, memo } from 'react';
+import { Handle, Position } from 'reactflow';
+import { v4 as uuidv4 } from 'uuid';
 
+import useNode from '@/hooks/useNode';
+import { NODE_TYPES } from '@/utils/nodeConfig';
+
+import ContextMenu from '../../ui/context-menu';
+import Tooltip from '../../ui/ToolTip';
+
+
+import './HttpRequestNode.css';
 
 
 const arePropsEqual = (prevProps, nextProps) => {
@@ -60,7 +62,7 @@ const arePropsEqual = (prevProps, nextProps) => {
 
 const HttpRequestNode = React.memo(
   ({
-    data = {}, 
+    data = {},
     isConnectable = true,
     selected = false,
     id,
@@ -78,11 +80,11 @@ const HttpRequestNode = React.memo(
       type: NODE_TYPES.httpRequest,
       method: 'GET',
       url: 'https://api.example.com/data',
-      headers: [], 
-      bodyType: 'none', 
-      bodyString: '', 
-      bodyFormData: [], 
-      responseMapping: [], 
+      headers: [],
+      bodyType: 'none',
+      bodyString: '',
+      bodyFormData: [],
+      responseMapping: [],
       status: '',
       isCollapsed: false,
       lastModified: new Date().toISOString(),
@@ -94,13 +96,13 @@ const HttpRequestNode = React.memo(
     const [url, setUrl] = useState(data.url || defaultData.url);
     const [headers, setHeaders] = useState(data.headers || defaultData.headers);
     const [bodyType, setBodyType] = useState(data.bodyType || defaultData.bodyType);
-    const [bodyString, setBodyString] = useState(data.bodyString || defaultData.bodyString); 
-    const [bodyFormData, setBodyFormData] = useState(data.bodyFormData || defaultData.bodyFormData); 
+    const [bodyString, setBodyString] = useState(data.bodyString || defaultData.bodyString);
+    const [bodyFormData, setBodyFormData] = useState(data.bodyFormData || defaultData.bodyFormData);
     const initialResponseMapping = (data.responseMapping || defaultData.responseMapping).map(entry => ({
       ...entry,
-      defaultValue: entry.defaultValue === undefined ? '' : entry.defaultValue
+      defaultValue: entry.defaultValue === undefined ? '' : entry.defaultValue,
     }));
-    const [responseMapping, setResponseMapping] = useState(initialResponseMapping); 
+    const [responseMapping, setResponseMapping] = useState(initialResponseMapping);
     const [isTesting, setIsTesting] = useState(false); // Nuevo estado para prueba
     const [testResult, setTestResult] = useState(null); // Nuevo estado para resultado de prueba
 
@@ -115,12 +117,12 @@ const HttpRequestNode = React.memo(
       }
       const newResponseMappingFromData = (data.responseMapping || []).map(entry => ({
         ...entry,
-        defaultValue: entry.defaultValue === undefined ? '' : entry.defaultValue
+        defaultValue: entry.defaultValue === undefined ? '' : entry.defaultValue,
       }));
-      if (JSON.stringify(newResponseMappingFromData) !== JSON.stringify(responseMapping)) { 
+      if (JSON.stringify(newResponseMappingFromData) !== JSON.stringify(responseMapping)) {
         setResponseMapping(newResponseMappingFromData);
       }
-    }, [data]); 
+    }, [data]);
 
     const {
       isCollapsed,
@@ -128,7 +130,7 @@ const HttpRequestNode = React.memo(
       contextMenuPosition,
       errorMessage,
       isHovered,
-      nodeRef, 
+      nodeRef,
       toggleCollapse,
       handleContextMenu,
       handleClick,
@@ -137,74 +139,74 @@ const HttpRequestNode = React.memo(
       showError,
       getStatusClass,
       trackChanges,
-      canEdit, 
-      canDelete, 
+      canEdit,
+      canDelete,
     } = useNode({
       id,
-      data, 
+      data,
       onNodesChange,
       isConnectable,
-      minWidth: 280, 
-      minHeight: 150, 
+      minWidth: 280,
+      minHeight: 150,
     });
 
     const handleConfigurationChange = useCallback((field, value) => {
-        const oldDataForLog = { ...data }; 
-        let newLocalStateUpdates = {}; 
-    
-        if (field === 'method') {
-            setMethod(value);
-            newLocalStateUpdates.method = value;
-        } else if (field === 'url') {
-            setUrl(value);
-            newLocalStateUpdates.url = value;
-        } else if (field === 'headers') {
-            setHeaders(value); 
-            newLocalStateUpdates.headers = value;
-        } else if (field === 'bodyType') {
-            setBodyType(value);
-            newLocalStateUpdates.bodyType = value;
-            if (value === 'none') {
-                setBodyString('');
-                setBodyFormData([]);
-                newLocalStateUpdates.bodyString = '';
-                newLocalStateUpdates.bodyFormData = [];
-            } else if (value === 'json' || value === 'text') {
-                setBodyFormData([]); 
-                newLocalStateUpdates.bodyFormData = [];
-            } else if (value === 'form-data') {
-                setBodyString(''); 
-                newLocalStateUpdates.bodyString = '';
-            }
-        } else if (field === 'bodyString') { 
-            setBodyString(value);
-            newLocalStateUpdates.bodyString = value;
-        } else if (field === 'bodyFormData') { 
-            setBodyFormData(value); 
-            newLocalStateUpdates.bodyFormData = value;
-        } else if (field === 'responseMapping') {
-            setResponseMapping(value);
-            newLocalStateUpdates.responseMapping = value;
+      const oldDataForLog = { ...data };
+      const newLocalStateUpdates = {};
+
+      if (field === 'method') {
+        setMethod(value);
+        newLocalStateUpdates.method = value;
+      } else if (field === 'url') {
+        setUrl(value);
+        newLocalStateUpdates.url = value;
+      } else if (field === 'headers') {
+        setHeaders(value);
+        newLocalStateUpdates.headers = value;
+      } else if (field === 'bodyType') {
+        setBodyType(value);
+        newLocalStateUpdates.bodyType = value;
+        if (value === 'none') {
+          setBodyString('');
+          setBodyFormData([]);
+          newLocalStateUpdates.bodyString = '';
+          newLocalStateUpdates.bodyFormData = [];
+        } else if (value === 'json' || value === 'text') {
+          setBodyFormData([]);
+          newLocalStateUpdates.bodyFormData = [];
+        } else if (value === 'form-data') {
+          setBodyString('');
+          newLocalStateUpdates.bodyString = '';
         }
-    
-        const updatedNodeData = {
-            ...data, 
-            ...newLocalStateUpdates, 
-            lastModified: new Date().toISOString(),
-        };
-        
-        trackChanges('configuration', updatedNodeData, oldDataForLog, newLocalStateUpdates);
-    
-        setNodes((nds) =>
-            nds.map((n) =>
-                n.id === id ? { ...n, data: updatedNodeData } : n
-            )
-        );
-    }, [id, data, setNodes, trackChanges]); 
+      } else if (field === 'bodyString') {
+        setBodyString(value);
+        newLocalStateUpdates.bodyString = value;
+      } else if (field === 'bodyFormData') {
+        setBodyFormData(value);
+        newLocalStateUpdates.bodyFormData = value;
+      } else if (field === 'responseMapping') {
+        setResponseMapping(value);
+        newLocalStateUpdates.responseMapping = value;
+      }
+
+      const updatedNodeData = {
+        ...data,
+        ...newLocalStateUpdates,
+        lastModified: new Date().toISOString(),
+      };
+
+      trackChanges('configuration', updatedNodeData, oldDataForLog, newLocalStateUpdates);
+
+      setNodes((nds) =>
+        nds.map((n) =>
+          n.id === id ? { ...n, data: updatedNodeData } : n,
+        ),
+      );
+    }, [id, data, setNodes, trackChanges]);
 
     const handleHeaderChange = (index, field, value) => {
-      const newHeaders = headers.map((header, i) => 
-        i === index ? { ...header, [field]: value } : header
+      const newHeaders = headers.map((header, i) =>
+        i === index ? { ...header, [field]: value } : header,
       );
       handleConfigurationChange('headers', newHeaders);
     };
@@ -221,26 +223,26 @@ const HttpRequestNode = React.memo(
     };
 
     const handleFormDataEntryChange = (index, field, value) => {
-        const newFormData = bodyFormData.map((entry, i) =>
-          i === index ? { ...entry, [field]: value } : entry
-        );
-        handleConfigurationChange('bodyFormData', newFormData);
+      const newFormData = bodyFormData.map((entry, i) =>
+        i === index ? { ...entry, [field]: value } : entry,
+      );
+      handleConfigurationChange('bodyFormData', newFormData);
     };
-  
+
     const addFormDataEntry = () => {
-        const newEntry = { id: uuidv4(), key: '', value: '' };
-        const newFormData = [...bodyFormData, newEntry];
-        handleConfigurationChange('bodyFormData', newFormData);
+      const newEntry = { id: uuidv4(), key: '', value: '' };
+      const newFormData = [...bodyFormData, newEntry];
+      handleConfigurationChange('bodyFormData', newFormData);
     };
-  
+
     const removeFormDataEntry = (index) => {
-        const newFormData = bodyFormData.filter((_, i) => i !== index);
-        handleConfigurationChange('bodyFormData', newFormData);
+      const newFormData = bodyFormData.filter((_, i) => i !== index);
+      handleConfigurationChange('bodyFormData', newFormData);
     };
 
     const handleResponseMapEntryChange = (index, field, value) => {
       const newResponseMapping = responseMapping.map((entry, i) =>
-        i === index ? { ...entry, [field]: value } : entry
+        i === index ? { ...entry, [field]: value } : entry,
       );
       // Si cambia la fuente y es 'status_code', limpiar pathOrKey
       if (field === 'source' && value === 'status_code') {
@@ -250,12 +252,12 @@ const HttpRequestNode = React.memo(
     };
 
     const addResponseMapEntry = () => {
-      const newEntry = { 
-        id: uuidv4(), 
-        source: 'status_code', 
-        pathOrKey: '', 
-        targetVariable: '', 
-        defaultValue: '' 
+      const newEntry = {
+        id: uuidv4(),
+        source: 'status_code',
+        pathOrKey: '',
+        targetVariable: '',
+        defaultValue: '',
       };
       const newResponseMapping = [...responseMapping, newEntry];
       handleConfigurationChange('responseMapping', newResponseMapping);
@@ -285,7 +287,7 @@ const HttpRequestNode = React.memo(
 
     const handleTestRequest = async () => {
       setIsTesting(true);
-      setTestResult(null); 
+      setTestResult(null);
 
       const nodeConfig = {
         method,
@@ -297,7 +299,7 @@ const HttpRequestNode = React.memo(
       };
 
       try {
-        
+
         // TODO: Reemplazar con la llamada real al API del backend
         // const response = await fetch('/api/flows/test-http-request', { // Endpoint de ejemplo
         //   method: 'POST',
@@ -310,55 +312,55 @@ const HttpRequestNode = React.memo(
         // }
         // const result = await response.json();
 
-        await new Promise(resolve => setTimeout(resolve, 1500)); 
-        const mockResult = Math.random() > 0.3 
-          ? { 
-              success: true, 
-              statusCode: 200, 
-              responseBodyPreview: JSON.stringify({ message: 'Éxito desde el mock!', data: { id: 123, user: 'TestUser' } }, null, 2),
-              headersPreview: { 'Content-Type': 'application/json', 'X-Test-Header': 'Plubot' },
-            }
-          : { 
-              success: false, 
-              statusCode: 404,
-              message: 'Recurso no encontrado (mock).',
-              errorDetails: 'La URL especificada no devolvió datos.'
-            };
-        
+        await new Promise(resolve => setTimeout(resolve, 1500));
+        const mockResult = Math.random() > 0.3
+          ? {
+            success: true,
+            statusCode: 200,
+            responseBodyPreview: JSON.stringify({ message: 'Éxito desde el mock!', data: { id: 123, user: 'TestUser' } }, null, 2),
+            headersPreview: { 'Content-Type': 'application/json', 'X-Test-Header': 'Plubot' },
+          }
+          : {
+            success: false,
+            statusCode: 404,
+            message: 'Recurso no encontrado (mock).',
+            errorDetails: 'La URL especificada no devolvió datos.',
+          };
+
         setTestResult(mockResult);
 
-        const statusUpdate = mockResult.success 
-            ? `Prueba OK: ${mockResult.statusCode}` 
-            : `Prueba Fallida: ${mockResult.statusCode || 'Error'}`;
-        
+        const statusUpdate = mockResult.success
+          ? `Prueba OK: ${mockResult.statusCode}`
+          : `Prueba Fallida: ${mockResult.statusCode || 'Error'}`;
+
         const oldDataForLog = { ...data };
         const newLocalStateUpdates = {
-            status: statusUpdate,
-            lastModified: new Date().toISOString(),
+          status: statusUpdate,
+          lastModified: new Date().toISOString(),
         };
         const updatedNodeData = { ...data, ...newLocalStateUpdates };
         trackChanges('test_result', updatedNodeData, oldDataForLog, newLocalStateUpdates);
         setNodes((nds) =>
-            nds.map((n) =>
-                n.id === id ? { ...n, data: updatedNodeData } : n
-            )
+          nds.map((n) =>
+            n.id === id ? { ...n, data: updatedNodeData } : n,
+          ),
         );
 
       } catch (error) {
 
         setTestResult({ success: false, message: 'Error al contactar el servicio de prueba.', errorDetails: error.message });
-        
+
         const oldDataForLog = { ...data };
         const newLocalStateUpdates = {
-            status: 'Prueba Error: Cliente',
-            lastModified: new Date().toISOString(),
+          status: 'Prueba Error: Cliente',
+          lastModified: new Date().toISOString(),
         };
         const updatedNodeData = { ...data, ...newLocalStateUpdates };
         trackChanges('test_result_error', updatedNodeData, oldDataForLog, newLocalStateUpdates);
         setNodes((nds) =>
-            nds.map((n) =>
-                n.id === id ? { ...n, data: updatedNodeData } : n
-            )
+          nds.map((n) =>
+            n.id === id ? { ...n, data: updatedNodeData } : n,
+          ),
         );
       } finally {
         setIsTesting(false);
@@ -381,17 +383,17 @@ const HttpRequestNode = React.memo(
         aria-label={data.label || 'Nodo HTTP'}
       >
         <Handle type="target" position={Position.Top} isConnectable={isConnectable} className="ts-handle-target" />
-        
+
         <div className="ts-node-header" onDoubleClick={canEdit ? toggleCollapse : undefined}>
           <Network size={16} className="ts-node-icon" />
           <span className="ts-node-title">{data.label || defaultData.label}</span>
           <div className="ts-node-header-actions">
             {canEdit && (
-                <Tooltip content={isCollapsed ? 'Expandir' : 'Colapsar'}>
-                    <button onClick={toggleCollapse} className="ts-node-action-button">
-                        {isCollapsed ? <ChevronDown size={14} /> : <ChevronUp size={14} />}
-                    </button>
-                </Tooltip>
+              <Tooltip content={isCollapsed ? 'Expandir' : 'Colapsar'}>
+                <button onClick={toggleCollapse} className="ts-node-action-button">
+                  {isCollapsed ? <ChevronDown size={14} /> : <ChevronUp size={14} />}
+                </button>
+              </Tooltip>
             )}
           </div>
         </div>
@@ -399,12 +401,12 @@ const HttpRequestNode = React.memo(
         {!isCollapsed && (
           <div className="ts-node-content">
             {errorMessage && <div className="ts-node-error-message"><AlertCircle size={14} /> {errorMessage}</div>}
-            
+
             <div className="ts-node-setting">
               <label htmlFor={`method-${id}`}>Método:</label>
-              <select 
-                id={`method-${id}`} 
-                value={method} 
+              <select
+                id={`method-${id}`}
+                value={method}
                 onChange={(e) => handleConfigurationChange('method', e.target.value)}
                 disabled={!canEdit}
               >
@@ -418,10 +420,10 @@ const HttpRequestNode = React.memo(
 
             <div className="ts-node-setting">
               <label htmlFor={`url-${id}`}>URL:</label>
-              <input 
-                type="text" 
-                id={`url-${id}`} 
-                value={url} 
+              <input
+                type="text"
+                id={`url-${id}`}
+                value={url}
                 onChange={(e) => handleConfigurationChange('url', e.target.value)}
                 placeholder="https://api.example.com/data"
                 disabled={!canEdit}
@@ -483,26 +485,26 @@ const HttpRequestNode = React.memo(
                 <label htmlFor={`bodyString-${id}`}>Cuerpo ({bodyType === 'json' ? 'JSON' : 'Texto Plano'}):</label>
                 <textarea
                   id={`bodyString-${id}`}
-                  value={bodyString} 
-                  onChange={(e) => handleConfigurationChange('bodyString', e.target.value)} 
+                  value={bodyString}
+                  onChange={(e) => handleConfigurationChange('bodyString', e.target.value)}
                   placeholder={bodyType === 'json' ? '{ \"clave\": \"valor\" }' : 'Contenido del cuerpo...'}
-                  rows={4} 
+                  rows={4}
                   disabled={!canEdit}
                   className="ts-body-textarea"
                 />
               </div>
             )}
-            
+
             {bodyType === 'form-data' && (
               <div className="ts-formdata-section">
                 {bodyFormData.map((entry, index) => (
-                  <div key={entry.id} className="ts-formdata-item ts-key-value-item"> 
+                  <div key={entry.id} className="ts-formdata-item ts-key-value-item">
                     <input
                       type="text"
                       placeholder="Clave"
                       value={entry.key}
                       onChange={(e) => handleFormDataEntryChange(index, 'key', e.target.value)}
-                      className="ts-formdata-input ts-key-value-input-key" 
+                      className="ts-formdata-input ts-key-value-input-key"
                       disabled={!canEdit}
                     />
                     <input
@@ -510,14 +512,14 @@ const HttpRequestNode = React.memo(
                       placeholder="Valor"
                       value={entry.value}
                       onChange={(e) => handleFormDataEntryChange(index, 'value', e.target.value)}
-                      className="ts-formdata-input ts-key-value-input-value" 
+                      className="ts-formdata-input ts-key-value-input-value"
                       disabled={!canEdit}
                     />
                     {canEdit && (
                       <Tooltip content="Eliminar Campo">
-                        <button 
-                          onClick={() => removeFormDataEntry(index)} 
-                          className="ts-remove-formdata-button ts-icon-button" 
+                        <button
+                          onClick={() => removeFormDataEntry(index)}
+                          className="ts-remove-formdata-button ts-icon-button"
                         >
                           <Trash2 size={14} />
                         </button>
@@ -532,7 +534,7 @@ const HttpRequestNode = React.memo(
                 )}
               </div>
             )}
-            
+
             {/* Sección de Mapeo de Respuesta */}
             <div className="ts-node-section-title">Mapeo de Respuesta</div>
             {responseMapping.map((entry, index) => (
@@ -593,8 +595,8 @@ const HttpRequestNode = React.memo(
                 </div>
                 {canEdit && (
                   <Tooltip content="Eliminar Mapeo">
-                    <button 
-                      onClick={() => removeResponseMapEntry(index)} 
+                    <button
+                      onClick={() => removeResponseMapEntry(index)}
                       className="ts-remove-map-entry-button ts-icon-button"
                     >
                       <Trash2 size={14} />
@@ -613,13 +615,13 @@ const HttpRequestNode = React.memo(
             {canEdit && (
               <div className="ts-node-section ts-test-section">
                 <div className="ts-node-section-title">Probar Solicitud</div>
-                <button 
-                  onClick={handleTestRequest} 
+                <button
+                  onClick={handleTestRequest}
                   disabled={isTesting || !url.trim()} // Deshabilitar si no hay URL o está probando
                   className="ts-test-button ts-add-button" // Reutilizar estilo de ts-add-button o crear uno nuevo
                 >
                   {isTesting ? (
-                    <><span className="ts-loading-spinner"></span>Probando...</> 
+                    <><span className="ts-loading-spinner" />Probando...</>
                   ) : 'Ejecutar Prueba'}
                 </button>
                 {testResult && (
@@ -627,7 +629,7 @@ const HttpRequestNode = React.memo(
                     <strong>Resultado de la Prueba:</strong>
                     <p>Estado: {testResult.statusCode || 'N/A'} {testResult.success ? <CheckCircle size={14} className="ts-icon-success" /> : <XCircle size={14} className="ts-icon-error" />}</p>
                     {testResult.message && <p>Mensaje: {testResult.message}</p>}
-                    
+
                     {testResult.responseBodyPreview && (
                       <div>
                         <p>Preview Body Respuesta:</p>
@@ -649,7 +651,7 @@ const HttpRequestNode = React.memo(
             {data.notes && <div className="ts-node-notes">Notas: {data.notes}</div>}
           </div>
         )}
-        
+
         {showContextMenu && (
           <ContextMenu
             x={contextMenuPosition.x}
@@ -659,33 +661,33 @@ const HttpRequestNode = React.memo(
           />
         )}
 
-        <Handle 
-          type="source" 
-          position={Position.Bottom} 
-          id="onSuccess" 
-          isConnectable={isConnectable} 
+        <Handle
+          type="source"
+          position={Position.Bottom}
+          id="onSuccess"
+          isConnectable={isConnectable}
           className="ts-handle-source ts-handle-success"
         >
-           <Tooltip content="En caso de éxito" placement="bottom"><CheckCircle size={12} /></Tooltip>
+          <Tooltip content="En caso de éxito" placement="bottom"><CheckCircle size={12} /></Tooltip>
         </Handle>
-        <Handle 
-          type="source" 
-          position={Position.Bottom} 
-          id="onError" 
-          isConnectable={isConnectable} 
+        <Handle
+          type="source"
+          position={Position.Bottom}
+          id="onError"
+          isConnectable={isConnectable}
           className="ts-handle-source ts-handle-error"
-          style={{ left: 'auto', right: '15px' }} 
+          style={{ left: 'auto', right: '15px' }}
         >
           <Tooltip content="En caso de error" placement="bottom"><XCircle size={12} /></Tooltip>
         </Handle>
       </div>
     );
-  }
+  },
 );
 
 HttpRequestNode.propTypes = {
   isUltraPerformanceMode: PropTypes.bool,
-  data: PropTypes.object.isRequired, 
+  data: PropTypes.object.isRequired,
   isConnectable: PropTypes.bool,
   selected: PropTypes.bool,
   id: PropTypes.string.isRequired,

@@ -1,7 +1,8 @@
-import { useState, useEffect, useRef, useCallback, memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import useAPI from '@/hooks/useAPI';
+import { useState, useEffect, useRef, useCallback, memo } from 'react';
+
 import { usePlubotCreation } from '@/context/PlubotCreationContext.jsx';
+import useAPI from '@/hooks/useAPI';
 import './PreviewChat.css';
 
 // Componente de mensaje memoizado para evitar re-renderizados innecesarios
@@ -59,7 +60,7 @@ const PreviewChat = ({ plubotId }) => {
       try {
         const data = await request('post', `/api/conversations/${plubotId}/chat`, {
           message: '',
-          user_phone: userPhone
+          user_phone: userPhone,
         });
         setMessages([{ role: 'bot', content: data.response, timestamp: new Date() }]);
         setButtons(data.buttons || []);
@@ -84,7 +85,7 @@ const PreviewChat = ({ plubotId }) => {
     try {
       const data = await request('post', `/api/conversations/${plubotId}/chat`, {
         message,
-        user_phone: userPhone
+        user_phone: userPhone,
       });
       setMessages(prev => [...prev, { role: 'bot', content: data.response, timestamp: new Date() }]);
       setButtons(data.buttons || []);
@@ -130,11 +131,11 @@ const PreviewChat = ({ plubotId }) => {
       <div className="chat-buttons">
         <AnimatePresence>
           {buttons.map((button, index) => (
-            <ChatButton 
-              key={index} 
-              button={button} 
-              onClick={handleButtonClick} 
-              color={buttonColor} 
+            <ChatButton
+              key={index}
+              button={button}
+              onClick={handleButtonClick}
+              color={buttonColor}
             />
           ))}
         </AnimatePresence>

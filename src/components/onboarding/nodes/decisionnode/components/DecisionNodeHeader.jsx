@@ -3,14 +3,15 @@
  * @description Componente de cabecera para el nodo de decisión
  */
 
-import React, { memo, useMemo } from 'react';
-import PropTypes from 'prop-types';
-import { 
-  GitBranch, 
+import {
+  GitBranch,
   HelpCircle,
   ArrowUpDown,
-  ExternalLink
+  ExternalLink,
 } from 'lucide-react';
+import PropTypes from 'prop-types';
+import React, { memo, useMemo } from 'react';
+
 import Tooltip from '../../../ui/ToolTip';
 import { NODE_CONFIG } from '../DecisionNode.types';
 
@@ -23,12 +24,12 @@ import { NODE_CONFIG } from '../DecisionNode.types';
  */
 export const DecisionNodeIcon = memo(({ isUltraPerformanceMode = false, type = 'default' }) => {
   // Tamaño y grosor optimizados para legibilidad y rendimiento
-  const iconProps = useMemo(() => ({ 
-    size: isUltraPerformanceMode ? 16 : 18, 
+  const iconProps = useMemo(() => ({
+    size: isUltraPerformanceMode ? 16 : 18,
     strokeWidth: isUltraPerformanceMode ? 2 : 1.75,
-    className: isUltraPerformanceMode ? '' : 'decision-node__icon-svg'
+    className: isUltraPerformanceMode ? '' : 'decision-node__icon-svg',
   }), [isUltraPerformanceMode]);
-  
+
   // Seleccionar el ícono adecuado según el tipo
   const renderIcon = () => {
     switch (type) {
@@ -43,9 +44,9 @@ export const DecisionNodeIcon = memo(({ isUltraPerformanceMode = false, type = '
         return <GitBranch {...iconProps} aria-hidden="true" />;
     }
   };
-  
+
   return (
-    <div 
+    <div
       className={`decision-node__icon ${isUltraPerformanceMode ? 'decision-node__icon--ultra' : ''}`}
       role="img"
       aria-label={NODE_CONFIG.ARIA_LABELS.node}
@@ -59,7 +60,7 @@ DecisionNodeIcon.displayName = 'DecisionNodeIcon';
 
 DecisionNodeIcon.propTypes = {
   isUltraPerformanceMode: PropTypes.bool,
-  type: PropTypes.oneOf(['default', 'question', 'condition', 'flow'])
+  type: PropTypes.oneOf(['default', 'question', 'condition', 'flow']),
 };
 
 // Eliminamos defaultProps y usamos parámetros por defecto en la definición de la función arriba
@@ -75,28 +76,28 @@ DecisionNodeIcon.propTypes = {
  * @param {Object} props.metadata - Metadatos adicionales
  * @returns {JSX.Element} - Cabecera del nodo de decisión
  */
-const DecisionNodeHeader = memo(({ 
-  title, 
-  iconType = 'default', 
-  isUltraPerformanceMode, 
-  isCollapsed, 
+const DecisionNodeHeader = memo(({
+  title,
+  iconType = 'default',
+  isUltraPerformanceMode,
+  isCollapsed,
   onToggleCollapse,
-  metadata
+  metadata,
 }) => {
   return (
-    <div 
+    <div
       className="decision-node__header"
       role="heading"
       aria-level={3}
     >
       <div className="decision-node__title">
-        <DecisionNodeIcon 
-          type={iconType} 
-          isUltraPerformanceMode={isUltraPerformanceMode} 
+        <DecisionNodeIcon
+          type={iconType}
+          isUltraPerformanceMode={isUltraPerformanceMode}
         />
         <span className="decision-node__title-text">Nodo de Decisión</span>
       </div>
-      
+
       {!isUltraPerformanceMode && metadata && (
         <div className="decision-node__metadata">
           {metadata.date && (
@@ -127,8 +128,8 @@ DecisionNodeHeader.propTypes = {
   onToggleCollapse: PropTypes.func,
   metadata: PropTypes.shape({
     date: PropTypes.string,
-    owner: PropTypes.string
-  })
+    owner: PropTypes.string,
+  }),
 };
 
 export default DecisionNodeHeader;

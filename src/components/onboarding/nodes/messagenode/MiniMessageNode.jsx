@@ -6,9 +6,10 @@
  * @description_of_changes Se ha refactorizado para eliminar el acceso directo al store de Zustand (antipatrón). Ahora, todos los datos se reciben exclusivamente a través de `props`, garantizando un flujo de datos unidireccional y predecible.
  */
 
+import PropTypes from 'prop-types';
 import React, { memo } from 'react';
 import { Handle, Position } from 'reactflow';
-import PropTypes from 'prop-types';
+
 import { MessageNodeIcon } from './MessageNodeIcon';
 import './MessageNode.css';
 
@@ -52,7 +53,7 @@ const MiniMessageNode = memo(({ data, selected }) => {
   return (
     <div className={nodeClasses} style={nodeStyle}>
       <Handle type="target" position={Position.Top} className="message-node__handle" />
-      <MessageNodeIcon type={messageType} isUltraPerformanceMode={true} />
+      <MessageNodeIcon type={messageType} isUltraPerformanceMode />
       <Handle type="source" position={Position.Bottom} className="message-node__handle" />
     </div>
   );

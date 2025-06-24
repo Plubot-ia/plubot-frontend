@@ -21,7 +21,7 @@ export const saveLocalBackup = (plubotId, nodes, edges, name = 'Flujo') => {
       nodes,
       edges,
       name,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     }));
   } catch (error) {
   }
@@ -34,14 +34,14 @@ export const saveLocalBackup = (plubotId, nodes, edges, name = 'Flujo') => {
  */
 export const loadLocalBackup = (plubotId) => {
   if (!plubotId) return null;
-  
+
   try {
     const backupJson = localStorage.getItem(`plubot-flow-backup-${plubotId}`);
     if (!backupJson) return null;
-    
+
     const backup = JSON.parse(backupJson);
     if (!backup || !backup.nodes) return null;
-    
+
     return backup;
   } catch (error) {
     return null;
@@ -55,10 +55,10 @@ export const loadLocalBackup = (plubotId) => {
  */
 export const isRecentBackup = (backup) => {
   if (!backup || !backup.timestamp) return false;
-  
+
   const backupTime = new Date(backup.timestamp);
   const hoursAgo = (Date.now() - backupTime.getTime()) / (1000 * 60 * 60);
-  
+
   return hoursAgo < 24;
 };
 
@@ -72,14 +72,14 @@ export const setupAutoBackup = (getState, onAutoSave) => {
   const intervalId = setInterval(() => {
     const state = getState();
     if (!state || !state.plubotId || !state.nodes || state.nodes.length === 0) return;
-    
+
     saveLocalBackup(state.plubotId, state.nodes, state.edges, state.flowName);
-    
+
     if (typeof onAutoSave === 'function') {
       onAutoSave();
     }
   }, 30000); // Guardar cada 30 segundos
-  
+
   return () => clearInterval(intervalId);
 };
 
@@ -87,5 +87,5 @@ export default {
   saveLocalBackup,
   loadLocalBackup,
   isRecentBackup,
-  setupAutoBackup
+  setupAutoBackup,
 };

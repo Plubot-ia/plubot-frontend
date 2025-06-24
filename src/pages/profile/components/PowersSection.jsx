@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import axiosInstance from '@/utils/axiosConfig';
+
 import { powers } from '@/data/powers';
+import axiosInstance from '@/utils/axiosConfig';
 
 /**
  * Componente que gestiona la sección de poderes del usuario
@@ -32,12 +33,12 @@ const PowersSection = ({ user, setUser, showNotification, navigate }) => {
             ...prev,
             [key]: { ...prev[key], active: true },
           }));
-        }, index * 300 + 500)
+        }, index * 300 + 500),
       );
 
       return () => timeouts.forEach(clearTimeout);
     }
-  }, [user?.powers]);
+  }, [user]);
 
   const handlePowerHover = (powerId) => {
     setShowPowerTooltip(powerId);
@@ -61,9 +62,9 @@ const PowersSection = ({ user, setUser, showNotification, navigate }) => {
       if (response.data.status === 'success') {
         setUser({ ...user, powers: response.data.powers });
         setNewPower('');
-        
+
         showNotification('¡Poder adquirido con éxito!', 'success');
-        
+
         setPowerAnimations((prev) => ({
           ...prev,
           [newPower]: { delay: 0, active: true },
@@ -78,7 +79,7 @@ const PowersSection = ({ user, setUser, showNotification, navigate }) => {
         showNotification('Sesión expirada. Por favor, inicia sesión nuevamente.', 'error');
         navigate('/login');
       } else {
-        showNotification('Error al agregar el poder: ' + error.message, 'error');
+        showNotification(`Error al agregar el poder: ${error.message}`, 'error');
       }
     }
   };
@@ -95,7 +96,7 @@ const PowersSection = ({ user, setUser, showNotification, navigate }) => {
           ...prev,
           [powerId]: { ...prev[powerId], active: false, removing: true },
         }));
-        
+
         setTimeout(() => {
           setUser({ ...user, powers: response.data.powers });
           showNotification('Poder eliminado correctamente', 'success');
@@ -110,7 +111,7 @@ const PowersSection = ({ user, setUser, showNotification, navigate }) => {
         showNotification('Sesión expirada. Por favor, inicia sesión nuevamente.', 'error');
         navigate('/login');
       } else {
-        showNotification('Error al eliminar el poder: ' + error.message, 'error');
+        showNotification(`Error al eliminar el poder: ${error.message}`, 'error');
       }
     }
   };
@@ -129,7 +130,7 @@ const PowersSection = ({ user, setUser, showNotification, navigate }) => {
             const { title, icon, description } = getPowerDetails(power);
             const isActive = powerAnimations[power]?.active;
             const isRemoving = powerAnimations[power]?.removing;
-            
+
             return (
               <div
                 key={power}
@@ -167,7 +168,7 @@ const PowersSection = ({ user, setUser, showNotification, navigate }) => {
           </div>
         )}
       </div>
-      
+
       <form className="power-form-container" onSubmit={handleAddPower}>
         <select
           value={newPower}
@@ -188,5 +189,7 @@ const PowersSection = ({ user, setUser, showNotification, navigate }) => {
     </div>
   );
 };
+
+PowersSection.displayName = 'PowersSection';
 
 export default PowersSection;

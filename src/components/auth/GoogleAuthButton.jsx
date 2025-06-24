@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+
 import useAuthStore from '@/stores/useAuthStore';
 import './GoogleAuthButton.css';
 
@@ -12,54 +13,54 @@ const GoogleAuthButton = ({ text = 'Continuar con Google', className = '', onSuc
   const handleGoogleLogin = async () => {
     try {
 
-      
+
       // Detectar automáticamente el entorno
       // En desarrollo: usar simulación
       // En producción: usar autenticación real con Google
       const isDevelopment = import.meta.env.DEV || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-      
+
       // Configuración para determinar el modo de autenticación
       // En desarrollo: usar simulación
       // En producción: usar autenticación real con Google
-      const forceSimulation = isDevelopment ? true : false;
-      
+      const forceSimulation = Boolean(isDevelopment);
+
       // Determinar si usamos autenticación simulada o real
       // En desarrollo: simulación
       // En producción: autenticación real con Google
       const useSimulatedAuth = forceSimulation; // Ya está configurado como true para desarrollo y false para producción
-      
+
       // Modo de desarrollo: simular autenticación con Google
       if (useSimulatedAuth) {
         // Mensaje diferente según el entorno y si es registro o login
         const entorno = isDevelopment ? 'desarrollo' : 'producción';
         const accion = isRegister ? 'registro' : 'autenticación';
-        
+
         // Mostrar un indicador de carga para simular el proceso
         setStatus && setStatus('loading');
-        
+
         // Mensaje más informativo según el contexto
         if (!isDevelopment) {
           setMessage && setMessage(`Simulando ${accion} con Google (modo temporal)...`);
         } else {
           setMessage && setMessage(`Simulando ${accion} con Google...`);
         }
-        
+
         // Crear un usuario de prueba
         const mockUser = {
           name: 'Usuario de Prueba',
           email: 'test@example.com',
-          picture: 'https://ui-avatars.com/api/?name=Test+User&background=0D8ABC&color=fff'
+          picture: 'https://ui-avatars.com/api/?name=Test+User&background=0D8ABC&color=fff',
         };
-        
+
         // Simular un retraso para que parezca real
         setTimeout(() => {
           // Guardar en localStorage para simular una sesión
           localStorage.setItem('mock_google_user', JSON.stringify(mockUser));
-          
+
           // Simular un token JWT
           const mockToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwibmFtZSI6IlVzdWFyaW8gZGUgUHJ1ZWJhIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c';
           localStorage.setItem('access_token', mockToken);
-          
+
           // Actualizar el estado de autenticación
           const { setUser, setIsAuthenticated } = useAuthStore.getState();
           setUser({
@@ -68,49 +69,49 @@ const GoogleAuthButton = ({ text = 'Continuar con Google', className = '', onSuc
             email: mockUser.email,
             profile_picture: mockUser.picture,
             is_verified: true,
-            role: 'user'
+            role: 'user',
           });
           setIsAuthenticated(true);
-          
+
           // Mostrar mensaje de éxito
           setStatus && setStatus('success');
-          
+
           // Mensaje diferente según el entorno
           if (!isDevelopment) {
             setMessage && setMessage(`¡Hola ${mockUser.name}! Autenticación simulada exitosa (modo temporal).`);
           } else {
             setMessage && setMessage(`¡Hola ${mockUser.name}! Autenticación exitosa.`);
           }
-          
+
           // Redirigir a la página principal después de un tiempo
           setTimeout(() => navigate('/pluniverse'), 1500);
         }, 1000);
-        
+
         // No redirigir inmediatamente, esperar al timeout
         return;
       }
-      
+
       // Modo producción: autenticación real con Google
       const response = await getGoogleAuthUrl();
-      
+
       if (response?.success && response.authUrl) {
         // Redirigir al usuario a la URL de autenticación de Google
         // Añadir parámetro para indicar si es registro o login
         const authUrl = new URL(response.authUrl);
-        
+
         // Preparar el estado como un objeto JSON y codificarlo en base64
         // Esto evita el problema de múltiples valores en el parámetro state
         const stateObj = {
-          isRegister: isRegister,
-          email: localStorage.getItem('last_email_used') || 'plubot@gmail.com'
+          isRegister,
+          email: localStorage.getItem('last_email_used') || 'plubot@gmail.com',
         };
-        
+
         // Convertir a string JSON y luego a base64
         const stateData = btoa(JSON.stringify(stateObj));
-        
+
         // Añadir el estado a la URL como un único valor codificado
         authUrl.searchParams.set('state', stateData);
-        
+
         // Redirigir a la URL con los parámetros adicionales
         window.location.href = authUrl.toString();
       } else {
@@ -126,13 +127,13 @@ const GoogleAuthButton = ({ text = 'Continuar con Google', className = '', onSuc
     return (
       <div className={`google-auth-loading ${className}`}>
         <div className="loading-spinner">
-          <div className="spinner-inner"></div>
+          <div className="spinner-inner" />
         </div>
         <span className="loading-text">{message || 'Procesando...'}</span>
       </div>
     );
   }
-  
+
   if (status === 'success') {
     return (
       <div className={`google-auth-success ${className}`}>
@@ -145,12 +146,12 @@ const GoogleAuthButton = ({ text = 'Continuar con Google', className = '', onSuc
       </div>
     );
   }
-  
+
   // Botón normal
   return (
-    <button 
-      type="button" 
-      className={`google-auth-button ${className}`} 
+    <button
+      type="button"
+      className={`google-auth-button ${className}`}
       onClick={handleGoogleLogin}
       disabled={status === 'loading'}
     >

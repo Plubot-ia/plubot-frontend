@@ -31,10 +31,10 @@ export const sanitizeNumber = (value, defaultValue = 0) => {
  */
 export const sanitizeCoords = (coords, defaultCoords = { x: 0, y: 0 }) => {
   if (!coords || typeof coords !== 'object') return { ...defaultCoords };
-  
+
   return {
     x: sanitizeNumber(coords.x, defaultCoords.x),
-    y: sanitizeNumber(coords.y, defaultCoords.y)
+    y: sanitizeNumber(coords.y, defaultCoords.y),
   };
 };
 
@@ -47,12 +47,12 @@ export const sanitizeViewport = (viewport) => {
   if (!viewport || typeof viewport !== 'object') {
     return { x: 0, y: 0, zoom: 1 };
   }
-  
+
   return {
     x: sanitizeNumber(viewport.x, 0),
     y: sanitizeNumber(viewport.y, 0),
     zoom: sanitizeNumber(viewport.zoom, 1),
-    setViewport: viewport.setViewport
+    setViewport: viewport.setViewport,
   };
 };
 
@@ -65,28 +65,28 @@ export const sanitizeBounds = (bounds) => {
   if (!bounds || typeof bounds !== 'object') {
     return {
       minX: 0, maxX: 100, minY: 0, maxY: 100,
-      centerX: 50, centerY: 50
+      centerX: 50, centerY: 50,
     };
   }
-  
+
   const sanitized = {
     minX: sanitizeNumber(bounds.minX, 0),
     maxX: sanitizeNumber(bounds.maxX, 100),
     minY: sanitizeNumber(bounds.minY, 0),
     maxY: sanitizeNumber(bounds.maxY, 100),
     centerX: sanitizeNumber(bounds.centerX, 50),
-    centerY: sanitizeNumber(bounds.centerY, 50)
+    centerY: sanitizeNumber(bounds.centerY, 50),
   };
-  
+
   // Asegurar coherencia entre los valores
   if (sanitized.minX >= sanitized.maxX) {
     sanitized.maxX = sanitized.minX + 100;
   }
-  
+
   if (sanitized.minY >= sanitized.maxY) {
     sanitized.maxY = sanitized.minY + 100;
   }
-  
+
   return sanitized;
 };
 
@@ -97,12 +97,12 @@ export const sanitizeBounds = (bounds) => {
  */
 export const sanitizeNode = (node) => {
   if (!node || typeof node !== 'object') return null;
-  
+
   return {
     ...node,
     position: sanitizeCoords(node.position),
     width: sanitizeNumber(node.width, 150),
-    height: sanitizeNumber(node.height, 40)
+    height: sanitizeNumber(node.height, 40),
   };
 };
 
@@ -112,5 +112,5 @@ export default {
   sanitizeCoords,
   sanitizeViewport,
   sanitizeBounds,
-  sanitizeNode
+  sanitizeNode,
 };

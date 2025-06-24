@@ -4,11 +4,12 @@
  * utilizando actualizaciones incrementales y persistencia de IDs.
  */
 import { v4 as uuidv4 } from 'uuid';
+
 import instance from '@/utils/axiosConfig';
 // Importar utilidades de optimización de flujo
+import { captureError, handleError, recoverFromBackup, ERROR_TYPES } from '@/utils/errorHandler';
 import { calculateFlowDiff, optimizeFlow, validateFlow } from '@/utils/flowOptimizer';
 // Importar sistema centralizado de manejo de errores
-import { captureError, handleError, recoverFromBackup, ERROR_TYPES } from '@/utils/errorHandler';
 
 /**
  * Genera un ID único para un nodo o arista.
@@ -35,80 +36,14 @@ export const computeFlowDiff = (oldState, newState) => {
       edges_to_create: [],
       edges_to_update: [],
       edges_to_delete: [],
-      stats: { total: { nodes: 0, edges: 0 }, changes: {} }
+      stats: { total: { nodes: 0, edges: 0 }, changes: {} },
     };
   }
-  
+
   // Utilizar la implementación optimizada del flowOptimizer
   return calculateFlowDiff(oldState, newState);
 };
 
-/**
- * Determina si un nodo ha cambiado comparando sus propiedades relevantes.
- * @param {Object} oldNode - Nodo en estado anterior
- * @param {Object} newNode - Nodo en nuevo estado
- * @returns {boolean} True si el nodo ha cambiado, False en caso contrario
- */
-const hasNodeChanged = (oldNode, newNode) => {
-  // Comparar posición
-  const oldPos = oldNode.position || {};
-  const newPos = newNode.position || {};
-  
-  if (oldPos.x !== newPos.x || oldPos.y !== newPos.y) {
-    return true;
-  }
-  
-  // Comparar datos
-  const oldData = oldNode.data || {};
-  const newData = newNode.data || {};
-  
-  if (oldData.label !== newData.label || oldData.message !== newData.message) {
-    return true;
-  }
-  
-  // Comparar tipo
-  if (oldNode.type !== newNode.type) {
-    return true;
-  }
-  
-  return false;
-};
-
-/**
- * Determina si una arista ha cambiado comparando sus propiedades relevantes.
- * @param {Object} oldEdge - Arista en estado anterior
- * @param {Object} newEdge - Arista en nuevo estado
- * @returns {boolean} True si la arista ha cambiado, False en caso contrario
- */
-const hasEdgeChanged = (oldEdge, newEdge) => {
-  // Comparar conexiones
-  if (oldEdge.source !== newEdge.source ||
-      oldEdge.target !== newEdge.target ||
-      oldEdge.sourceHandle !== newEdge.sourceHandle ||
-      oldEdge.targetHandle !== newEdge.targetHandle) {
-    return true;
-  }
-  
-  // Comparar etiqueta
-  if (oldEdge.label !== newEdge.label) {
-    return true;
-  }
-  
-  // Comparar tipo
-  if (oldEdge.type !== newEdge.type) {
-    return true;
-  }
-  
-  // Comparar estilo (simplificado)
-  const oldStyle = oldEdge.style || {};
-  const newStyle = newEdge.style || {};
-  
-  if (oldStyle.stroke !== newStyle.stroke || oldStyle.strokeWidth !== newStyle.strokeWidth) {
-    return true;
-  }
-  
-  return false;
-};
 
 /**
  * Servicio para manejar operaciones de flujo.
@@ -169,7 +104,7 @@ const flowService = {
    */
   async saveFlow(plubotId, currentState) {
     const backupId = `flow_backup_${Date.now()}`;
-    
+
     try {
       if (!plubotId || !currentState || !Array.isArray(currentState.nodes) || !Array.isArray(currentState.edges)) {
         throw new Error('Parámetros de entrada inválidos para saveFlow');
@@ -185,7 +120,7 @@ const flowService = {
       try {
         localStorage.setItem(backupId, JSON.stringify({ plubotId, ...optimizedState }));
       } catch (e) {
-        // No bloquear si falla el guardado en localStorage
+        console.error('Error al guardar backup local en saveFlow:', e);
       }
 
       const adaptNodes = (nodes) => nodes.map(node => {
@@ -249,7 +184,7 @@ const flowService = {
             return { success: false, recovered: true, error: error.message, backupId, recoveredData };
           }
         } catch (recoveryError) {
-          // La recuperación falló, se propagará el error original
+          console.error('Fallo la recuperación desde el backup:', recoveryError);
         }
       }
       throw error;
@@ -320,9 +255,10 @@ const flowService = {
       const response = await instance.post(`/flow/${plubotId}/backup/${backupId}`);
       return response.data;
     } catch (error) {
+      captureError(error, `restoreBackup:${plubotId}:${backupId}`);
       throw error;
     }
-  }
+  },
 };
 
 export default flowService;

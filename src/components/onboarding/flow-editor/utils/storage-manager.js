@@ -28,7 +28,6 @@ export function cleanupStorage(maxEntries = 50, maxAgeMs = 60 * 60 * 1000) {
     }
 
 
-
     // Eliminar entradas antiguas basadas en timestamp
     const now = Date.now();
     const keysWithTimestamps = keys.map(key => {
@@ -71,18 +70,18 @@ export function safeSetItem(key, value, addTimestamp = true) {
   try {
     // Añadir prefijo a la clave
     const prefixedKey = key.startsWith(STORAGE_PREFIX) ? key : `${STORAGE_PREFIX}${key}`;
-    
+
     // Añadir timestamp si es necesario
     let processedValue = value;
     if (addTimestamp && typeof value === 'object') {
       processedValue = { ...value, timestamp: Date.now() };
     }
-    
+
     // Convertir a string si es necesario
-    const stringValue = typeof processedValue === 'string' 
-      ? processedValue 
+    const stringValue = typeof processedValue === 'string'
+      ? processedValue
       : JSON.stringify(processedValue);
-    
+
     // Intentar guardar
     localStorage.setItem(prefixedKey, stringValue);
     return true;
@@ -90,7 +89,7 @@ export function safeSetItem(key, value, addTimestamp = true) {
     // Si se excede la cuota, limpiar y reintentar
     if (error.name === 'QuotaExceededError' || error.code === 22 || error.code === 1014) {
       cleanupStorage();
-      
+
       try {
         // Reintentar después de limpiar
         localStorage.setItem(key, JSON.stringify(value));
@@ -98,7 +97,7 @@ export function safeSetItem(key, value, addTimestamp = true) {
       } catch (retryError) {}
     } else {}
 
-    
+
     return false;
   }
 }
@@ -113,12 +112,12 @@ export function safeGetItem(key, defaultValue = null) {
   try {
     // Añadir prefijo a la clave si no está presente
     const prefixedKey = key.startsWith(STORAGE_PREFIX) ? key : `${STORAGE_PREFIX}${key}`;
-    
+
     const value = localStorage.getItem(prefixedKey);
     if (value === null) {
       return defaultValue;
     }
-    
+
     try {
       return JSON.parse(value);
     } catch (parseError) {
@@ -135,5 +134,5 @@ export default {
   cleanupStorage,
   safeSetItem,
   safeGetItem,
-  prefix: STORAGE_PREFIX
+  prefix: STORAGE_PREFIX,
 };

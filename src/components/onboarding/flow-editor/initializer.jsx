@@ -5,6 +5,7 @@
  */
 
 import React, { useEffect } from 'react';
+
 import '../utils/init-systems';
 import { setByteMessage } from '../utils/notification-manager';
 
@@ -19,7 +20,7 @@ const SystemInitializer = ({ children }) => {
     // Los logs de inicialización y el interceptor de errores
     // se han eliminado para limpiar el código de producción.
   }, []);
-  
+
   return <>{children}</>;
 };
 

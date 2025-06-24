@@ -15,12 +15,12 @@ const useNotification = () => {
    */
   const showNotification = useCallback((message, type, timeout = 3000) => {
     setNotification({ message, type });
-    
+
     // Limpiar notificación después del tiempo especificado
     const timer = setTimeout(() => {
       setNotification(null);
     }, timeout);
-    
+
     // Limpiar el temporizador si el componente se desmonta
     return () => clearTimeout(timer);
   }, []);
@@ -28,7 +28,7 @@ const useNotification = () => {
   return {
     notification,
     setNotification,
-    showNotification
+    showNotification,
   };
 };
 

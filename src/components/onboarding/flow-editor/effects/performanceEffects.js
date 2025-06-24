@@ -16,10 +16,10 @@ export const usePerformanceMonitoring = (nodes, edges, startMonitoring, getStats
   useEffect(() => {
     // No monitorear si alguna dependencia falta
     if (!nodes || !edges || !startMonitoring || !getStats) return;
-    
+
     // Iniciar monitoreo con los nodos y aristas actuales
     const cleanup = startMonitoring(nodes, edges, getStats);
-    
+
     // Limpieza cuando el componente se desmonte o cambien las dependencias
     return cleanup;
   }, [nodes, edges, startMonitoring, getStats]);
@@ -34,7 +34,7 @@ export const usePerformanceMonitoring = (nodes, edges, startMonitoring, getStats
 export const useOptimizationClassesEffect = (optimizationLevel, isUltraMode, applyOptimizationClasses) => {
   useEffect(() => {
     if (!applyOptimizationClasses) return;
-    
+
     // Aplicar clases seguu00fan el nivel actual
     applyOptimizationClasses(isUltraMode);
   }, [optimizationLevel, isUltraMode, applyOptimizationClasses]);
@@ -52,11 +52,11 @@ export const useAdaptiveRenderingSystem = ({
   isUltraMode,
   startMonitoring,
   applyOptimizationClasses,
-  getStats
+  getStats,
 }) => {
   // Activar monitoreo
   usePerformanceMonitoring(nodes, edges, startMonitoring, getStats);
-  
+
   // Aplicar clases CSS
   useOptimizationClassesEffect(optimizationLevel, isUltraMode, applyOptimizationClasses);
 };

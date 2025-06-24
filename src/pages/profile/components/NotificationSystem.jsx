@@ -7,7 +7,7 @@ import React from 'react';
  */
 const NotificationSystem = ({ notification }) => {
   if (!notification) return null;
-  
+
   return (
     <div className={`notification notification-${notification.type} notification-position`}>
       {typeof notification.message === 'string' ? notification.message : 'Notification message is not a string.'}

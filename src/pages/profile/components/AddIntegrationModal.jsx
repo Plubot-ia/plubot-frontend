@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
+
 import instance from '@/utils/axiosConfig';
 import '../styles/AddIntegrationModal.css'; // Asegúrate de crear este archivo CSS
 
 const AddIntegrationModal = ({ isOpen, onClose, onIntegrationAdded, onIntegrationUpdated, integrationToEdit, showNotification }) => {
-  const isEditMode = !!integrationToEdit;
+  const isEditMode = Boolean(integrationToEdit);
   const [botName, setBotName] = useState(isEditMode ? integrationToEdit.integration_name : '');
   const [botToken, setBotToken] = useState(''); // Token is not pre-filled for editing, but can be updated
   const [isLoading, setIsLoading] = useState(false);
@@ -75,7 +76,7 @@ const AddIntegrationModal = ({ isOpen, onClose, onIntegrationAdded, onIntegratio
               id="botName"
               value={botName}
               onChange={(e) => setBotName(e.target.value)}
-              placeholder={isEditMode ? integrationToEdit.integration_name : "Mi Bot Increíble"}
+              placeholder={isEditMode ? integrationToEdit.integration_name : 'Mi Bot Increíble'}
               className="cyber-input"
               required
             />
@@ -87,7 +88,7 @@ const AddIntegrationModal = ({ isOpen, onClose, onIntegrationAdded, onIntegratio
               id="botToken"
               value={botToken}
               onChange={(e) => setBotToken(e.target.value)}
-              placeholder={isEditMode ? "Ingresa un nuevo token para actualizar (opcional)" : "Token de Bot de Discord"}
+              placeholder={isEditMode ? 'Ingresa un nuevo token para actualizar (opcional)' : 'Token de Bot de Discord'}
               className="cyber-input"
               required={!isEditMode}
             />

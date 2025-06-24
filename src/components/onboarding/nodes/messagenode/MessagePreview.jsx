@@ -5,10 +5,11 @@
  * @version 3.0.0
  */
 
-import React, { memo, useMemo } from 'react';
-import { replaceVariablesInMessage } from '@/utils/messageUtils';
 import PropTypes from 'prop-types';
+import React, { memo, useMemo } from 'react';
+
 import ReactMarkdown from '@/lib/simplified-markdown';
+import { replaceVariablesInMessage } from '@/utils/messageUtils';
 
 // Constantes
 const MAX_PREVIEW_LINES = 2;
@@ -16,10 +17,10 @@ const MAX_PREVIEW_LINES = 2;
 /**
  * Componente que renderiza la vista previa de un mensaje con procesamiento de variables
  */
-const MessagePreview = memo(({ 
-  message = '', 
-  variables = [], 
-  isUltraPerformanceMode = false 
+const MessagePreview = memo(({
+  message = '',
+  variables = [],
+  isUltraPerformanceMode = false,
 }) => {
   /**
    * Procesa el mensaje reemplazando las variables
@@ -35,8 +36,8 @@ const MessagePreview = memo(({
     if (!processedMessage) return '';
     if (isUltraPerformanceMode) {
       // En modo ultra rendimiento, simplemente truncamos el texto
-      return processedMessage.length > 100 
-        ? `${processedMessage.substring(0, 100)}...` 
+      return processedMessage.length > 100
+        ? `${processedMessage.substring(0, 100)}...`
         : processedMessage;
     }
 
@@ -45,7 +46,7 @@ const MessagePreview = memo(({
     if (lines.length > MAX_PREVIEW_LINES) {
       return `${lines.slice(0, MAX_PREVIEW_LINES).join('\n')}...`;
     }
-    
+
     return processedMessage;
   }, [processedMessage, isUltraPerformanceMode]);
 
@@ -63,7 +64,7 @@ const MessagePreview = memo(({
 
   // En modo normal, usamos ReactMarkdown para formato enriquecido
   return (
-    <div 
+    <div
       className="message-node__preview"
       data-testid="message-preview"
     >
@@ -83,10 +84,10 @@ MessagePreview.propTypes = {
   variables: PropTypes.arrayOf(
     PropTypes.shape({
       name: PropTypes.string.isRequired,
-      value: PropTypes.string
-    })
+      value: PropTypes.string,
+    }),
   ),
-  isUltraPerformanceMode: PropTypes.bool
+  isUltraPerformanceMode: PropTypes.bool,
 };
 
 export default MessagePreview;

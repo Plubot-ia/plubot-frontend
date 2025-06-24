@@ -18,19 +18,7 @@
 
 ---
 
-## 2. `fix-overflow.css`
-| Selector | Referencias encontradas | Componentes/Ficheros |
-|----------|-----------------------|----------------------|
-| `.flow-editor-container` | JSX `FlowEditor.jsx`, CSS `FlowEditor.css`, `VerticalButtons.css` | Contenedor principal del editor. |
-| `.flow-main-wrapper` | JSX `FlowEditor.jsx` | Envuelve ReactFlow para gestionar dimensiones. |
-| `.reactflow-wrapper` | CSS `ensure-node-visibility.css`, otros parches | Wrapper adicional usado en **FlowMain.jsx**. |
-| `.ts-byte-assistant` | `ByteAssistant.jsx`, varios CSS (`responsive.css`, `UltraMode.css`, `fix-overflow.css`) | Widget de ayuda flotante. |
-| `.vertical-buttons-container` | JSX `FlowMain.jsx`, CSS `VerticalButtons.css`, `UltraMode.css` | Botones flotantes de acciones. |
-| `body { overflow-x: hidden }` | Global | Previene scroll horizontal. |
-
----
-
-## 3. `fix-overlay.css`
+## 2. `fix-overlay.css`
 | Selector | Referencias encontradas | Componentes |
 |----------|-----------------------|-------------|
 | `.loading-overlay` | `fix-global.css` (genérico) | Overlays de carga globales. |
@@ -42,7 +30,7 @@
 
 ---
 
-## 4. `fix-transform-override.css`
+## 3. `fix-transform-override.css`
 | Selector | Referencias encontradas | Notas |
 |----------|-----------------------|-------|
 | `.react-flow__pane`, `.react-flow__viewport` | React Flow runtime | No anular `transform`.

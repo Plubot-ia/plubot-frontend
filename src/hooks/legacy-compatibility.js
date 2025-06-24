@@ -7,6 +7,7 @@
  */
 
 import { useCallback, useRef } from 'react';
+
 import useAdaptivePerformance from '../components/onboarding/flow-editor/hooks/useAdaptivePerformance';
 
 /**
@@ -18,18 +19,18 @@ export const useNodeHistory = () => {
   const addToHistory = useCallback((nodeId, historyEntry) => {
 
   }, []);
-  
+
   const getHistory = useCallback((nodeId) => {
 
     return [];
   }, []);
-  
+
   return { addToHistory, getHistory };
 };
 
 /**
  * Versiu00f3n compatible de useFlowOptimization para FlowEditorContext
- * @param {Object} options - Opciones de configuraciu00f3n 
+ * @param {Object} options - Opciones de configuraciu00f3n
  * @returns {Object} - API compatible con el hook anterior
  */
 const useFlowOptimization = ({
@@ -39,33 +40,33 @@ const useFlowOptimization = ({
   onIdleChange = null,
 } = {}) => {
   // Utilizar nuestro sistema unificado de rendimiento
-  const { 
-    updatePerformance, 
+  const {
+    updatePerformance,
     throttledUpdatePerformance,
     optimizationLevel,
-    fpsRef
+    fpsRef,
   } = useAdaptivePerformance({
     lowThreshold: 30,
     mediumThreshold: 60,
     highThreshold: 100,
-    monitoringInterval: throttle * 30
+    monitoringInterval: throttle * 30,
   });
-  
+
   // Referencia para trackear el estado de idle
   const idleStateRef = useRef({ isIdle: false, lastActivityTime: Date.now() });
-  
+
   // Proporcionar API compatible
   return {
     // Estado
     isIdle: idleStateRef.current.isIdle,
     isUltraMode: optimizationLevel === 'ultra',
-    
+
     // Métodos con nombres compatibles
     markActivity: useCallback((viewport) => {
       // Actualizar tiempo de actividad
       idleStateRef.current.lastActivityTime = Date.now();
       idleStateRef.current.isIdle = false;
-      
+
       // Pasar a la función de actualización
       throttledUpdatePerformance();
     }, [throttledUpdatePerformance]),
@@ -83,7 +84,7 @@ const useFlowOptimization = ({
       return measures[0]?.duration || 0;
     }, []),
     getPerfMeasures: useCallback(() => [], []),
-    
+
     // Utilidades
     debounce: useCallback((fn, wait) => {
       let timeout;
@@ -101,7 +102,7 @@ const useFlowOptimization = ({
           fn(...args);
         }
       };
-    }, [])
+    }, []),
   };
 };
 

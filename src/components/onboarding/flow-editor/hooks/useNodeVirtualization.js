@@ -1,7 +1,6 @@
-import { useState, useEffect, useRef } from 'react';
-
-import { useMemo } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { useReactFlow } from 'reactflow';
+
 import { nodeEstimatedDimensions } from '@/flow/nodeDimensions';
 
 const OVERSCAN_PX = 400; // Aumentar el área de overscan para una experiencia más fluida
@@ -76,10 +75,10 @@ const useNodeVirtualization = ({ nodes: allNodes, edges: allEdges, viewport, con
     });
 
     const nodesInViewIds = new Set(nodesInView.map(n => n.id));
-    
+
     // 2. Find all edges that are connected to at least one of the visible nodes.
     const edgesToRender = allEdges.filter(edge =>
-      nodesInViewIds.has(edge.source) || nodesInViewIds.has(edge.target)
+      nodesInViewIds.has(edge.source) || nodesInViewIds.has(edge.target),
     );
 
     // 3. Create a set of all nodes that need to be rendered.
@@ -92,7 +91,6 @@ const useNodeVirtualization = ({ nodes: allNodes, edges: allEdges, viewport, con
     });
 
     const nodesToRender = allNodes.filter(node => requiredNodeIds.has(node.id));
-
 
 
     return { visibleNodes: nodesToRender, visibleEdges: edgesToRender };

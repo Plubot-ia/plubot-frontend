@@ -1,8 +1,9 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
-import WelcomeSequence from '@/components/onboarding/screens/WelcomeSequence';
+
 import FactoryScreen from '@/components/onboarding/screens/FactoryScreen';
 import PersonalizationForm from '@/components/onboarding/screens/PersonalizationForm';
 import TrainingScreen from '@/components/onboarding/screens/TrainingScreen';
+import WelcomeSequence from '@/components/onboarding/screens/WelcomeSequence';
 
 const CreatePlubot = () => {
   return (

@@ -1,14 +1,17 @@
-import { NavLink } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import { NavLink } from 'react-router-dom';
+
 import logo from '/src/assets/img/logo.svg';
 import axiosInstance from '../../utils/axiosConfig';
-import './Footer.css';
-import { useState } from 'react';
 
-import instagramIcon from '@assets/img/social/instagram.svg';
+import './Footer.css';
+
 import facebookIcon from '@assets/img/social/facebook.svg';
+import instagramIcon from '@assets/img/social/instagram.svg';
 import threadsIcon from '@assets/img/social/threads.svg';
 import xIcon from '@assets/img/social/x.svg';
+
+import { useState } from 'react';
 
 const Footer = () => {
   const [formData, setFormData] = useState({ builderEmail: '' });
@@ -176,7 +179,7 @@ const Footer = () => {
             }}
           >
             <div className="message-background">
-              <div className="message-circle"></div>
+              <div className="message-circle" />
             </div>
             <div className="message-content">
               <p id="form-message-text">{formMessage.text}</p>

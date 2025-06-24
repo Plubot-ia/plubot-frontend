@@ -60,7 +60,7 @@ const EmergencyRecovery = ({ isOpen, onRecover, onDismiss, hasBackup }) => {
           fontWeight: 'bold',
           cursor: 'pointer',
           padding: '0',
-          lineHeight: '1'
+          lineHeight: '1',
         }}
         aria-label="Cerrar"
       >
@@ -88,8 +88,8 @@ const EmergencyRecovery = ({ isOpen, onRecover, onDismiss, hasBackup }) => {
       >
         Recuperar Continuidad Nodal
       </button>
-      {/* Podríamos añadir un botón "Empezar de Nuevo" aquí si quisiéramos que este modal maneje ambos casos 
-          pero por ahora, lo mantenemos simple y dejamos que TrainingScreen decida si mostrar este u otro mensaje/acción 
+      {/* Podríamos añadir un botón "Empezar de Nuevo" aquí si quisiéramos que este modal maneje ambos casos
+          pero por ahora, lo mantenemos simple y dejamos que TrainingScreen decida si mostrar este u otro mensaje/acción
           cuando no hay backup. El botón de cerrar (X) llamará a onDismiss. */}
     </div>
   );

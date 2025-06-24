@@ -1,29 +1,18 @@
-import React, { useState, useEffect } from 'react';
 import { gsap } from 'gsap';
+import { useState, useEffect } from 'react';
+
 import './Marketplace.css';
-import ByteGuide from '@components/pluniverse/ByteGuide.jsx';
-import { usePlubotCreation } from '@/context/PlubotCreationContext.jsx';
 import { useNavigate } from 'react-router-dom';
-import { powers } from '@/data/powers';
+
 import LazyImage from '@/components/common/LazyImage';
+import { usePlubotCreation } from '@/context/PlubotCreationContext.jsx';
+import { powers } from '@/data/powers';
+import ByteGuide from '@components/pluniverse/ByteGuide.jsx';
 
 const categories = [
-  'todos',
-  'comunicacion',
-  'ecommerce',
-  'pagos',
-  'reservas',
-  'productividad',
-  'automatizacion',
-  'analiticas',
-  'inteligencia',
-  'marketing',
-  'desarrollo',
-  'crm',
-  'finanzas',
-  'soporte',
-  'encuestas',
-  'diseno',
+  'todos', 'comunicacion', 'ecommerce', 'pagos', 'reservas', 'productividad',
+  'automatizacion', 'analiticas', 'inteligencia', 'marketing', 'desarrollo',
+  'crm', 'finanzas', 'soporte', 'encuestas', 'diseno',
 ];
 
 const Marketplace = () => {
@@ -46,7 +35,7 @@ const Marketplace = () => {
 
   const handleAddPower = (powerId) => {
     const currentPowers = Array.isArray(plubotData.powers) ? [...plubotData.powers] : [];
-    
+
     if (currentPowers.includes(powerId)) {
       setNotification({ type: 'error', message: 'Este poder ya está agregado.' });
       setTimeout(() => setNotification(null), 3000);
@@ -84,7 +73,7 @@ const Marketplace = () => {
       particleContainer.style.pointerEvents = 'none';
       document.querySelector('.marketplace').appendChild(particleContainer);
     }
-    
+
     let script;
     if (window.particlesJS) {
       initParticles();
@@ -94,9 +83,11 @@ const Marketplace = () => {
       script.async = true;
       document.body.appendChild(script);
       script.onload = initParticles;
-      script.onerror = () => {};
+      script.onerror = (e) => {
+        console.error('Failed to load particles.js', e);
+      };
     }
-    
+
     function initParticles() {
       if (window.particlesJS && document.getElementById('marketplace-particles')) {
         window.particlesJS('marketplace-particles', {
@@ -128,7 +119,9 @@ const Marketplace = () => {
 
     return () => {
       const loadedScript = document.querySelector('script[src="/particles.min.js"]');
-      if (loadedScript) document.body.removeChild(loadedScript);
+      if (loadedScript) {
+        document.body.removeChild(loadedScript);
+      }
     };
   }, []);
 
@@ -136,36 +129,39 @@ const Marketplace = () => {
     const animateElements = () => {
       const titleElement = document.querySelector('.marketplace-title');
       const subtitleElement = document.querySelector('.marketplace-subtitle');
+      const filterButtons = document.querySelectorAll('.filter-button');
       const cardElements = document.querySelectorAll('.extension-card');
 
       if (titleElement) {
         gsap.fromTo(
           titleElement,
           { opacity: 0, y: 50 },
-          { opacity: 1, y: 0, duration: 1.5, ease: 'power3.out' }
+          { opacity: 1, y: 0, duration: 1.5, ease: 'power3.out' },
         );
-      } else {
-
       }
 
       if (subtitleElement) {
         gsap.fromTo(
           subtitleElement,
           { opacity: 0, y: 30 },
-          { opacity: 1, y: 0, duration: 1.5, ease: 'power3.out', delay: 0.3 }
+          { opacity: 1, y: 0, duration: 1.5, ease: 'power3.out', delay: 0.3 },
         );
-      } else {
+      }
 
+      if (filterButtons.length > 0) {
+        gsap.fromTo(
+          filterButtons,
+          { opacity: 0, y: 20 },
+          { opacity: 1, y: 0, duration: 0.8, stagger: 0.1, ease: 'power3.out', delay: 0.3 },
+        );
       }
 
       if (cardElements.length > 0) {
         gsap.fromTo(
           cardElements,
           { opacity: 0, y: 50 },
-          { opacity: 1, y: 0, duration: 1, stagger: 0.2, ease: 'power3.out', delay: 0.5 }
+          { opacity: 1, y: 0, duration: 1, stagger: 0.2, ease: 'power3.out', delay: 0.5 },
         );
-      } else {
-
       }
     };
 
@@ -204,7 +200,7 @@ const Marketplace = () => {
         <div className="extensions-grid">
           {filteredModules.length > 0 ? (
             filteredModules.map((extension, index) => (
-              <div className="extension-card" key={index} onClick={() => setSelectedModule(extension)} style={{ opacity: 1 }}>
+              <div className="extension-card" key={extension.id} onClick={() => setSelectedModule(extension)} style={{ opacity: 1 }}>
                 <LazyImage
                   src={extension.image}
                   alt={extension.name}
@@ -263,12 +259,14 @@ const Marketplace = () => {
         </div>
       )}
 
-      <ByteGuide 
-        message="¡Bienvenido al Mercado! Aquí puedes encontrar herramientas para hacer tu Plubot aún más poderoso."
+      <ByteGuide
+        message="¡Bienvenido al Mercado! Aquí puedes encontrar &quot;herramientas&quot; para hacer tu Plubot aún más poderoso."
         position="bottom-right"
       />
     </div>
   );
 };
+
+Marketplace.displayName = 'Marketplace';
 
 export default Marketplace;

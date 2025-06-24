@@ -1,8 +1,9 @@
 import React from 'react';
-import { FiSave, FiZoomIn, FiZoomOut, FiMap, FiMaximize2, FiMinimize2, FiRefreshCw } from 'react-icons/fi';
-import useFlowStore from '@/stores/useFlowStore';
 import { BiReset } from 'react-icons/bi';
 import { BsLightningFill } from 'react-icons/bs';
+import { FiSave, FiZoomIn, FiZoomOut, FiMap, FiMaximize2, FiMinimize2, FiRefreshCw } from 'react-icons/fi';
+
+import useFlowStore from '@/stores/useFlowStore';
 
 /**
  * Controles para el editor de flujo
@@ -22,7 +23,7 @@ const FlowControls = ({
   minimapOpen,
   isUltraMode,
   hasAutoOptimized,
-  optimizationLevel
+  optimizationLevel,
 }) => {
   const fitView = useFlowStore(state => state.reactFlowInstance?.fitView);
 
@@ -34,26 +35,26 @@ const FlowControls = ({
   return (
     <div className="flow-controls">
       {/* Controles de guardado */}
-      <button 
-        className="control-button save-button" 
+      <button
+        className="control-button save-button"
         onClick={onSave}
         title="Guardar flujo"
       >
         <FiSave />
       </button>
-      
+
       {/* Controles de minimapa */}
-      <button 
-        className={`control-button ${minimapOpen ? 'active' : ''}`} 
+      <button
+        className={`control-button ${minimapOpen ? 'active' : ''}`}
         onClick={toggleMiniMap}
         title="Mostrar/ocultar minimapa"
       >
         <FiMap />
       </button>
-      
+
       {/* Control de modo ultra rendimiento */}
-      <button 
-        className={`control-button perf-button ${isUltraMode ? 'ultra-active' : ''}`} 
+      <button
+        className={`control-button perf-button ${isUltraMode ? 'ultra-active' : ''}`}
         onClick={toggleUltraMode}
         title="Activar/desactivar modo ultra rendimiento"
       >
@@ -62,10 +63,10 @@ const FlowControls = ({
           <span className="auto-optimized-indicator">Auto</span>
         )}
       </button>
-      
+
       {/* Botón de diagnóstico temporal */}
-      <button 
-        className="control-button diagnostic-button" 
+      <button
+        className="control-button diagnostic-button"
         onClick={handleForceFitView}
         title="Forzar FitView (Diagnóstico)"
         style={{ backgroundColor: 'orange', color: 'black' }} // Estilo temporal para visibilidad

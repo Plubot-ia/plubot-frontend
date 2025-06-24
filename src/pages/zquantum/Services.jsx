@@ -1,6 +1,6 @@
+import { gsap } from 'gsap';
 import { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { gsap } from 'gsap';
 
 const Services = () => {
   const services = [
@@ -54,7 +54,7 @@ const Services = () => {
         root: null,
         rootMargin: '100px 0px',
         threshold: 0.2,
-      }
+      },
     );
 
     if (servicesDetails) {

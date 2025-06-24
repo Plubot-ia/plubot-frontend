@@ -1,4 +1,5 @@
 import React from 'react';
+
 import DataBackupPanel from '../../../components/sync/DataBackupPanel';
 import '../styles/BackupSection.css';
 
@@ -16,9 +17,9 @@ const BackupSection = () => {
           Esto te permite proteger tu trabajo y transferirlo entre dispositivos o cuentas si es necesario.
         </p>
       </div>
-      
+
       <DataBackupPanel />
-      
+
       <div className="backup-info">
         <h3>¿Por qué es importante hacer respaldos?</h3>
         <ul>

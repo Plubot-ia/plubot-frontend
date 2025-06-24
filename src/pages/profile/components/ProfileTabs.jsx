@@ -13,15 +13,15 @@ const ProfileTabs = ({ activeTab, setActiveTab }) => {
     { id: 'powers', label: 'PODERES' },
     { id: 'activity', label: 'ACTIVIDAD' },
     { id: 'integrations', label: 'INTEGRACIONES' },
-    { id: 'backup', label: 'RESPALDO' }
+    { id: 'backup', label: 'RESPALDO' },
   ];
 
   return (
     <div className="profile-tabs">
       {tabs.map(tab => (
-        <button 
+        <button
           key={tab.id}
-          className={`profile-tab ${activeTab === tab.id ? 'active' : ''}`} 
+          className={`profile-tab ${activeTab === tab.id ? 'active' : ''}`}
           onClick={() => setActiveTab(tab.id)}
         >
           {tab.label}

@@ -15,20 +15,20 @@ const ANIMATION_TARGETS = [
   // Partículas y fondos
   '.particles-container', '.background-scene',
   // Iconos animados
-  '.sync-icon', '.sync-pulse'
+  '.sync-icon', '.sync-pulse',
 ];
 
 // Lista de clases CSS que contienen animaciones
 const ANIMATION_CLASSES = [
   'ts-byte-animating', 'ts-byte-thinking', 'ts-neonPulse', 'ts-neonGlow',
-  'pulse', 'glow', 'fade', 'blink', 'rotate', 'spin', 'bounce'
+  'pulse', 'glow', 'fade', 'blink', 'rotate', 'spin', 'bounce',
 ];
 
 // Lista de propiedades CSS de animación
 const ANIMATION_PROPERTIES = [
   'animation', 'transition', 'animation-duration', 'animation-delay',
   'transition-duration', 'transition-delay', 'animation-iteration-count',
-  'backdrop-filter', 'box-shadow'
+  'backdrop-filter', 'box-shadow',
 ];
 
 /**
@@ -37,9 +37,8 @@ const ANIMATION_PROPERTIES = [
  */
 export function stopAllAnimations(isUltraMode) {
   if (!isUltraMode) return; // Solo hacemos esto cuando activamos modo ultra
-  
 
-  
+
   try {
     // 1. Detener animaciones en elementos específicos usando selectores directos
     ANIMATION_TARGETS.forEach(selector => {
@@ -49,34 +48,34 @@ export function stopAllAnimations(isUltraMode) {
         ANIMATION_PROPERTIES.forEach(prop => {
           el.style[prop] = 'none';
         });
-        
+
         // Eliminar clases de animación
         ANIMATION_CLASSES.forEach(className => {
           el.classList.remove(className);
         });
-        
+
         // Aplicar a todos los elementos hijos
         Array.from(el.querySelectorAll('*')).forEach(child => {
           ANIMATION_PROPERTIES.forEach(prop => {
             child.style[prop] = 'none';
           });
-          
+
           ANIMATION_CLASSES.forEach(className => {
             child.classList.remove(className);
           });
         });
       });
     });
-    
+
     // 2. Buscar y detener TODAS las animaciones CSS activas en la página
     const allAnimatedElements = document.querySelectorAll('*');
     allAnimatedElements.forEach(el => {
       // Verificar si el elemento tiene alguna animación o transición
       const computedStyle = window.getComputedStyle(el);
-      const hasAnimation = 
-        computedStyle.animation !== 'none' || 
+      const hasAnimation =
+        computedStyle.animation !== 'none' ||
         computedStyle.transition !== 'none';
-      
+
       // Si tiene animación, detenerla
       if (hasAnimation) {
         ANIMATION_PROPERTIES.forEach(prop => {
@@ -84,7 +83,7 @@ export function stopAllAnimations(isUltraMode) {
         });
       }
     });
-    
+
     // 3. Detener animaciones de pseudo-elementos (::before, ::after)
     const style = document.createElement('style');
     style.id = 'ultra-mode-animation-killer';
@@ -103,10 +102,10 @@ export function stopAllAnimations(isUltraMode) {
       }
     `;
     document.head.appendChild(style);
-    
+
     // 4. Forzar un reflow para aplicar cambios inmediatamente
     document.body.offsetHeight;
-    
+
   } catch (err) {
   }
 }
@@ -116,14 +115,14 @@ export function stopAllAnimations(isUltraMode) {
  */
 export function restoreAnimations() {
 
-  
+
   try {
     // Eliminar estilos temporales
     const styleElement = document.getElementById('ultra-mode-animation-killer');
     if (styleElement) {
       styleElement.remove();
     }
-    
+
     // Restaurar estilos inline
     ANIMATION_TARGETS.forEach(selector => {
       const elements = document.querySelectorAll(selector);
@@ -131,7 +130,7 @@ export function restoreAnimations() {
         ANIMATION_PROPERTIES.forEach(prop => {
           el.style[prop] = '';
         });
-        
+
         // Restaurar a los hijos también
         Array.from(el.querySelectorAll('*')).forEach(child => {
           ANIMATION_PROPERTIES.forEach(prop => {
@@ -140,7 +139,7 @@ export function restoreAnimations() {
         });
       });
     });
-    
+
   } catch (err) {
   }
 }
@@ -170,7 +169,7 @@ function saveUserPreference(enabled) {
     const preference = {
       enabled,
       timestamp: Date.now(),
-      userSet: true
+      userSet: true,
     };
     localStorage.setItem(USER_PREFERENCE_KEY, JSON.stringify(preference));
 
@@ -207,5 +206,5 @@ export function toggleUltraMode(enable, userInitiated = false) {
 export default {
   stopAllAnimations,
   restoreAnimations,
-  toggleUltraMode
+  toggleUltraMode,
 };

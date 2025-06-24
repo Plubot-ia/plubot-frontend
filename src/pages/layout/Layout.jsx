@@ -1,26 +1,28 @@
-import { useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
 import AOS from 'aos';
 import { gsap } from 'gsap';
+import { useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import 'aos/dist/aos.css';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ScrollToPlugin } from 'gsap/ScrollToPlugin';
+
+import Footer from '@components/common/Footer.jsx';
+import Header from '@components/common/Header';
+
+import SyncStatusIndicator from '../../components/sync/SyncStatusIndicator';
 import { useSyncService } from '../../services/syncService';
 
 gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
 
-import Header from '@components/common/Header';
 import WhatsAppButton from '@components/common/WhatsAppButton.jsx';
-import Footer from '@components/common/Footer.jsx';
-import SyncStatusIndicator from '../../components/sync/SyncStatusIndicator';
 import './Layout.css';
 
 const Layout = ({ children, hideHeaderFooter }) => {
   const location = useLocation();
-  
+
   // Inicializar el servicio de sincronizaciu00f3n
-  const { syncState } = useSyncService();
+  useSyncService();
 
   useEffect(() => {
     // Temporalmente deshabilitar AOS para depuración
@@ -52,7 +54,7 @@ const Layout = ({ children, hideHeaderFooter }) => {
           duration: 1.2,
           ease: 'power4.out',
           delay: 0.2,
-        }
+        },
       );
 
       // Animación inicial del texto: efecto de "escaneo digital"
@@ -76,7 +78,7 @@ const Layout = ({ children, hideHeaderFooter }) => {
               ease: 'sine.inOut',
             });
           },
-        }
+        },
       );
     }
 
@@ -94,7 +96,7 @@ const Layout = ({ children, hideHeaderFooter }) => {
             navbar.style.willChange = 'auto';
             navbar.style.transform = 'translateZ(0)';
           },
-        }
+        },
       );
     }
 
@@ -112,7 +114,7 @@ const Layout = ({ children, hideHeaderFooter }) => {
       <main>{children}</main>
       {/* <WhatsAppButton /> */}
       {!hideHeaderFooter && <Footer />}
-      
+
       {/* Indicador de sincronizaciu00f3n flotante eliminado para evitar que tape a ByteAssistant */}
     </div>
   );

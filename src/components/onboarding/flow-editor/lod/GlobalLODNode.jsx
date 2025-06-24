@@ -7,8 +7,9 @@
  * @version 1.0.0
  */
 
-import React, { memo } from 'react';
 import PropTypes from 'prop-types';
+import React, { memo } from 'react';
+
 import { LOD_LEVELS } from '@/components/onboarding/flow-editor/utils/lodUtils';
 
 /**

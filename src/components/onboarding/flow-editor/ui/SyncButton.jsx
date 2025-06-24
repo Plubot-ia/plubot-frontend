@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { useSyncService, getSyncState } from '@/services/syncService';
 import { motion, AnimatePresence } from 'framer-motion';
+import React, { useState, useEffect } from 'react';
+
+import { useSyncService, getSyncState } from '@/services/syncService';
 import './SyncButton.css';
 
 /**
@@ -11,29 +12,29 @@ import './SyncButton.css';
 const SyncButton = () => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [syncDetails, setSyncDetails] = useState(null);
-  
+
   // Usar el servicio de sincronización
   const { syncState, syncAllPlubots } = useSyncService();
-  
+
   // Actualizar estado cada segundo para mantener la UI actualizada
   useEffect(() => {
     const updateInterval = setInterval(() => {
       setSyncDetails(getSyncState());
     }, 1000);
-    
+
     return () => clearInterval(updateInterval);
   }, []);
-  
+
   // Inicializar detalles de sincronizaciu00f3n
   useEffect(() => {
     setSyncDetails(getSyncState());
   }, []);
-  
+
   // Manejar clic en el botón
   const handleClick = () => {
     setIsExpanded(!isExpanded);
   };
-  
+
   // Forzar sincronización manual con notificación
   const handleSync = (e) => {
     e.stopPropagation();
@@ -46,7 +47,7 @@ const SyncButton = () => {
       </div>
     `;
     document.body.appendChild(statusBubbleElement);
-    
+
     // Iniciar sincronización
     syncAllPlubots()
       .then(result => {
@@ -56,7 +57,7 @@ const SyncButton = () => {
             ✅ ${result.success ? 'Sincronización completada' : 'Error de sincronización'}
           </div>
         `;
-        
+
         // Eliminar StatusBubble despuu00e9s de 3 segundos
         setTimeout(() => {
           if (document.body.contains(statusBubbleElement)) {
@@ -71,7 +72,7 @@ const SyncButton = () => {
             ❌ Error: ${error.message || 'Error de sincronización'}
           </div>
         `;
-        
+
         // Eliminar StatusBubble despuu00e9s de 3 segundos
         setTimeout(() => {
           if (document.body.contains(statusBubbleElement)) {
@@ -80,20 +81,20 @@ const SyncButton = () => {
         }, 3000);
       });
   };
-  
+
   // Determinar el icono según el estado
   const getStatusIcon = () => {
     if (!syncDetails) return '⏳';
-    
+
     // Siempre mostrar el checkmark para un diseño más limpio
     return '✓'; // Checkmark simple y moderno
   };
-  
+
   // Siempre usar el color verde neón para un diseño más limpio
   const getStatusColor = () => {
     return '#00FF66'; // Verde neón brillante
   };
-  
+
   // Si no hay detalles de sincronización, mostrar indicador de carga
   if (!syncDetails) {
     return (
@@ -103,29 +104,29 @@ const SyncButton = () => {
       </button>
     );
   }
-  
+
   return (
     <div className="sync-button-container">
-      <button 
+      <button
         className={`sync-control-button ${syncDetails.syncStatus}`}
         onClick={handleClick}
         style={{ animation: 'subtle-pulse-green 2s infinite' }}
       >
-        <span 
-          className="sync-icon" 
-          style={{ 
+        <span
+          className="sync-icon"
+          style={{
             animation: syncDetails.isSyncing ? 'spin 1s linear infinite' : 'none',
-            color: getStatusColor()
+            color: getStatusColor(),
           }}
         >
           {getStatusIcon()}
         </span>
         <div className="button-tooltip">Sincronizado</div>
       </button>
-      
+
       <AnimatePresence>
         {isExpanded && (
-          <motion.div 
+          <motion.div
             className="sync-details-panel"
             initial={{ opacity: 0, scale: 0.9, x: -10 }}
             animate={{ opacity: 1, scale: 1, x: 0 }}
@@ -134,25 +135,25 @@ const SyncButton = () => {
           >
             <div className="sync-panel-header">
               <h4>Estado de sincronización</h4>
-              <span 
-                className="sync-icon" 
+              <span
+                className="sync-icon"
                 style={{ color: syncDetails.syncStatus === 'synced' ? '#34A853' : '#FF5722' }}
               >
                 {syncDetails.syncStatus === 'synced' ? '✓' : '⟳'}
               </span>
             </div>
-            
+
             <div className="sync-details">
               <p>Última sincronización: {syncDetails.lastSync ? new Date(syncDetails.lastSync).toLocaleString() : 'Nunca'}</p>
-              <p>Estado: {syncDetails.isSyncing ? 'Sincronizando...' : 
-                        syncDetails.syncStatus === 'success' ? 'Sincronizado' :
-                        syncDetails.syncStatus === 'error' ? 'Error' :
-                        'Listo'}</p>
+              <p>Estado: {syncDetails.isSyncing ? 'Sincronizando...' :
+                syncDetails.syncStatus === 'success' ? 'Sincronizado' :
+                  syncDetails.syncStatus === 'error' ? 'Error' :
+                    'Listo'}</p>
               {syncDetails.syncStatus === 'error' && (
                 <p className="error-message">Error: {syncDetails.errorMessage || 'Error de sincronización'}</p>
               )}
             </div>
-            
+
             {syncDetails.syncErrors.length > 0 && (
               <div className="sync-errors">
                 <h4>Errores ({syncDetails.syncErrors.length}):</h4>
@@ -166,10 +167,10 @@ const SyncButton = () => {
                 </ul>
               </div>
             )}
-            
+
             <div className="sync-controls">
-              <button 
-                className="sync-now-btn" 
+              <button
+                className="sync-now-btn"
                 onClick={handleSync}
                 disabled={syncDetails.isSyncing}
               >

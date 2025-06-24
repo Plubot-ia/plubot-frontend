@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
+
 import './ByteAssistant.css';
 import './fix-bubble.css'; // Fix para eliminar botones detrás de ByteAssistant
-import byteNormal from '@/assets/img/byte-normal.png';
 import byteHappy from '@/assets/img/byte-happy.png';
+import byteNormal from '@/assets/img/byte-normal.png';
 import byteSad from '@/assets/img/byte-sad.png';
-import byteWarning from '@/assets/img/byte-warning.png';
 import byteThinking from '@/assets/img/byte-thinking.png';
+import byteWarning from '@/assets/img/byte-warning.png';
 
 // Importar el store para acceder al modo Ultra Rendimiento
 import useFlowStore from '@/stores/useFlowStore';
@@ -13,7 +14,7 @@ import useFlowStore from '@/stores/useFlowStore';
 const ByteAssistant = ({ simulationMode }) => {
   // Obtener el estado de modo Ultra Rendimiento del store
   const isUltraMode = useFlowStore(state => state.isUltraMode);
-  
+
   const [isVisible, setIsVisible] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
@@ -22,8 +23,8 @@ const ByteAssistant = ({ simulationMode }) => {
       text: '¡Hola! Soy Byte, tu experto en nodos y flujos. Pregúntame lo que necesites.',
       sender: 'byte',
       type: 'info',
-      id: 'initial-byte-message'
-    }
+      id: 'initial-byte-message',
+    },
   ]);
   const [userInput, setUserInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -114,7 +115,7 @@ const ByteAssistant = ({ simulationMode }) => {
     setByteState('thinking');
 
     try {
-          const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:5000/api';
+      const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:5000/api';
       const response = await fetch(`${API_BASE_URL}/byte-assistant`, {
         method: 'POST',
         headers: {
@@ -157,7 +158,7 @@ const ByteAssistant = ({ simulationMode }) => {
       addMessage(
         `¡Ups! ${error.message || 'Parece que hay un cortocircuito en mi sistema. Intenta de nuevo.'}`,
         'byte',
-        'error'
+        'error',
       );
       setByteState('sad');
     } finally {
@@ -214,14 +215,14 @@ const ByteAssistant = ({ simulationMode }) => {
                 style={{
                   boxShadow: `0 0 10px ${getTypeColor('info')}, 0 0 20px ${getTypeColor('info')}`,
                 }}
-              ></div>
+              />
             ) : (
-              <div 
+              <div
                 className="ts-byte-glow-simple"
                 style={{
                   border: `1px solid ${getTypeColor('info')}`,
                 }}
-              ></div>
+              />
             )}
           </div>
         </div>

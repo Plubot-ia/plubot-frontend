@@ -64,34 +64,34 @@ export const SAMPLE_EDGES = [
 export const generateSampleNodes = (count = 40) => {
   const nodes = [...SAMPLE_NODES];
   const edges = [...SAMPLE_EDGES];
-  
+
   // Generar nodos adicionales en una cuadrícula
   const columns = 5;
   const spacing = 300;
-  
+
   for (let i = 3; i < count; i++) {
     const row = Math.floor(i / columns);
     const col = i % columns;
-    
+
     const newNode = {
       id: `node-${i + 1}`,
       type: 'message',
-      position: { 
-        x: 100 + col * spacing, 
-        y: 400 + row * spacing 
+      position: {
+        x: 100 + col * spacing,
+        y: 400 + row * spacing,
       },
-      data: { 
-        label: `Nodo ${i + 1}`, 
-        message: `Este es el nodo ${i + 1}` 
+      data: {
+        label: `Nodo ${i + 1}`,
+        message: `Este es el nodo ${i + 1}`,
       },
       width: 150,
       height: 150,
       draggable: true,
       zIndex: 1000,
     };
-    
+
     nodes.push(newNode);
-    
+
     // Conectar con el nodo anterior para crear una red
     if (i > 3) {
       const newEdge = {
@@ -101,11 +101,11 @@ export const generateSampleNodes = (count = 40) => {
         type: 'default',
         style: { stroke: '#00e0ff', strokeWidth: 2 },
       };
-      
+
       edges.push(newEdge);
     }
   }
-  
+
   return { nodes, edges };
 };
 
@@ -120,9 +120,3 @@ export const mockAuthentication = () => {
     token: 'dev-token',
   };
 };
-
-// Determinar si estamos en modo desarrollo
-export const isDevelopment = import.meta.env.MODE === 'development';
-
-// Determinar si debemos usar datos de ejemplo
-export const useDevData = isDevelopment && (import.meta.env.VITE_USE_DEV_DATA === 'true' || !import.meta.env.VITE_USE_DEV_DATA);

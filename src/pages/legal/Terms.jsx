@@ -31,7 +31,7 @@ const Terms = () => {
 
         <h2 className="terms-subtitle">5. Limitación de Responsabilidad</h2>
         <p>
-          Plubot no será responsable por interrupciones del servicio, pérdida de datos, ni daños indirectos, incidentales o consecuentes derivados del uso de nuestra plataforma. Usas Plubot Web bajo tu propio riesgo, y nuestro servicio se proporciona "tal cual" sin garantías implícitas.
+          Plubot no será responsable por interrupciones del servicio, pérdida de datos, ni daños indirectos, incidentales o consecuentes derivados del uso de nuestra plataforma. Usas Plubot Web bajo tu propio riesgo, y nuestro servicio se proporciona &quot;tal cual&quot; sin garantías implícitas.
         </p>
 
         <h2 className="terms-subtitle">6. Terminación del Servicio</h2>

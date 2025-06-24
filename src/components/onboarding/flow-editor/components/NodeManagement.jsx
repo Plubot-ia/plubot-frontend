@@ -1,8 +1,9 @@
 import React, { useCallback } from 'react';
 import { useReactFlow } from 'reactflow';
-import { nodeConfig } from '@/utils/nodeConfig';
+
 import useFlowStore from '@/stores/useFlowStore';
 import useTrainingStore from '@/stores/useTrainingStore';
+import { nodeConfig } from '@/utils/nodeConfig';
 
 /**
  * Hook para la gestión de nodos en el editor de flujos
@@ -10,19 +11,19 @@ import useTrainingStore from '@/stores/useTrainingStore';
  */
 export const useNodeManagement = () => {
   // Obtener estado y acciones del store de Flow
-  const { 
-    nodes, 
+  const {
+    nodes,
     edges,
-    addNode, 
-    removeNode, 
-    updateNode, 
+    addNode,
+    removeNode,
+    updateNode,
     setSelectedNode,
-    removeEdge
+    removeEdge,
   } = useFlowStore();
-  
+
   // Obtener acciones del store de Training
   const { setByteMessage } = useTrainingStore();
-  
+
   const reactFlowInstance = useReactFlow();
 
   /**
@@ -39,7 +40,7 @@ export const useNodeManagement = () => {
     const initialData = {
       label: nodeType.label || 'Nuevo Nodo',
       ...nodeType.defaultData,
-      ...customData
+      ...customData,
     };
 
     // Ajustar la posición al grid
@@ -64,14 +65,14 @@ export const useNodeManagement = () => {
 
     // Eliminar conexiones relacionadas con el nodo
     const connectedEdges = edges.filter(
-      edge => edge.source === nodeId || edge.target === nodeId
+      edge => edge.source === nodeId || edge.target === nodeId,
     );
-    
+
     // Eliminar cada arista conectada
     connectedEdges.forEach(edge => {
       removeEdge(edge.id);
     });
-    
+
     // Eliminar el nodo
     removeNode(nodeId);
     setSelectedNode(null);
@@ -105,7 +106,7 @@ export const useNodeManagement = () => {
     const newNode = addNode(
       nodeToClone.type,
       newPosition,
-      { ...nodeToClone.data, label: `${nodeToClone.data.label} (copia)` }
+      { ...nodeToClone.data, label: `${nodeToClone.data.label} (copia)` },
     );
 
     setSelectedNode(newNode);

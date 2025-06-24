@@ -1,5 +1,6 @@
 import React, { memo, useEffect, useState } from 'react';
 import { getBezierPath, EdgeText } from 'reactflow';
+
 import { useFlowNodesEdges } from '@/stores/selectors';
 
 /**
@@ -20,11 +21,11 @@ const RobustEdge = ({
   markerEnd,
   data,
   selected,
-  label
+  label,
 }) => {
   // Estado para forzar re-renderizado
   const [forceUpdate, setForceUpdate] = useState(0);
-  
+
   // Calcular la ruta de la arista
   const [edgePath, labelX, labelY] = getBezierPath({
     sourceX,
@@ -34,46 +35,46 @@ const RobustEdge = ({
     targetY,
     targetPosition,
   });
-  
+
   // Estilos por defecto
   const defaultStyle = {
     stroke: '#00e0ff',
     strokeWidth: 2,
-    strokeOpacity: 0.8
+    strokeOpacity: 0.8,
   };
-  
+
   // Combinar estilos
   const edgeStyle = {
     ...defaultStyle,
     ...style,
-    strokeWidth: selected ? (style.strokeWidth || defaultStyle.strokeWidth) + 1 : style.strokeWidth || defaultStyle.strokeWidth
+    strokeWidth: selected ? (style.strokeWidth || defaultStyle.strokeWidth) + 1 : style.strokeWidth || defaultStyle.strokeWidth,
   };
-  
+
   // Efecto para forzar visibilidad
   useEffect(() => {
     // Forzar un re-renderizado después de montar
     const timer = setTimeout(() => {
       setForceUpdate(prev => prev + 1);
     }, 100);
-    
+
     // Escuchar eventos de actualización
     const handleForceUpdate = () => {
       setForceUpdate(prev => prev + 1);
     };
-    
+
     document.addEventListener('force-edge-update', handleForceUpdate);
     document.addEventListener('elite-edge-update-required', handleForceUpdate);
-    
+
     return () => {
       clearTimeout(timer);
       document.removeEventListener('force-edge-update', handleForceUpdate);
       document.removeEventListener('elite-edge-update-required', handleForceUpdate);
     };
   }, [id]);
-  
+
   // Obtener la función para guardar aristas del hook granular
   const { backupEdgesToLocalStorage } = useFlowNodesEdges();
-  
+
   // Guardar la arista en localStorage para persistencia
   useEffect(() => {
     try {
@@ -95,16 +96,16 @@ const RobustEdge = ({
             style: edgeStyle,
             data,
             sourceOriginal: source,
-            targetOriginal: target
+            targetOriginal: target,
           };
-          
+
           // Usar la función del store para guardar la arista
           // Esto centraliza la lógica de guardado y asegura consistencia
           backupEdgesToLocalStorage([edgeData], plubotId);
-          
+
           // Disparar evento para notificar que se guardó una arista
           const edgeSavedEvent = new CustomEvent('edge-saved', {
-            detail: { edge: edgeData, plubotId }
+            detail: { edge: edgeData, plubotId },
           });
           document.dispatchEvent(edgeSavedEvent);
         }
@@ -112,7 +113,7 @@ const RobustEdge = ({
     } catch (error) {}
 
   }, [id, source, target, sourceX, sourceY, targetX, targetY, edgeStyle, data, backupEdgesToLocalStorage]);
-  
+
   return (
     <>
       {/* Capa de fondo para mayor área de clic */}
@@ -123,7 +124,7 @@ const RobustEdge = ({
         fill="none"
         className="robust-edge-background"
       />
-      
+
       {/* Arista principal */}
       <path
         id={id}
@@ -137,11 +138,11 @@ const RobustEdge = ({
         markerEnd={markerEnd}
         style={{
           zIndex: 5,
-          pointerEvents: 'all'
+          pointerEvents: 'all',
         }}
         data-testid={`rf__edge-${id}`}
       />
-      
+
       {/* Etiqueta de la arista */}
       {label && (
         <EdgeText

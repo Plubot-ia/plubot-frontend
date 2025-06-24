@@ -1,4 +1,5 @@
 import React from 'react';
+
 import { EDGE_COLORS } from '@/utils/nodeConfig';
 
 /**
@@ -22,10 +23,10 @@ const EdgeMarker = () => {
           >
             {/* Efecto de brillo exterior */}
             <circle cx="6" cy="6" r="5.5" fill="none" stroke={color} strokeOpacity="0.3" strokeWidth="1" />
-            
+
             {/* Circulo principal */}
             <circle cx="6" cy="6" r="4" fill={color} />
-            
+
             {/* Brillo interior */}
             <circle cx="6" cy="6" r="2" fill="white" fillOpacity="0.4" />
           </marker>

@@ -12,9 +12,9 @@ const ActivitySection = ({ recentActivities, animateBadges }) => {
       <h3 className="profile-section-title">ACTIVIDAD RECIENTE</h3>
       <ul className="activity-list expanded">
         {recentActivities.map((activity, i) => (
-          <li 
-            key={i} 
-            className={`activity-item animated ${animateBadges ? 'animate-in' : ''}`} 
+          <li
+            key={i}
+            className={`activity-item animated ${animateBadges ? 'animate-in' : ''}`}
             style={{ animationDelay: `${i * 100}ms` }}
           >
             <div className="activity-icon">{activity.icon}</div>

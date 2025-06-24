@@ -10,8 +10,8 @@
 export const NODE_EXTENT = [
   -10000, // x mínimo (izquierda)
   -10000, // y mínimo (arriba)
-  10000,  // x máximo (derecha)
-  10000   // y máximo (abajo)
+  10000, // x máximo (derecha)
+  10000, // y máximo (abajo)
 ];
 
 // Definición del área donde el usuario puede navegar/panear el canvas
@@ -20,8 +20,8 @@ export const NODE_EXTENT = [
 export const TRANSLATE_EXTENT = [
   -20000, // x mínimo (izquierda)
   -20000, // y mínimo (arriba)
-  20000,  // x máximo (derecha)
-  20000   // y máximo (abajo)
+  20000, // x máximo (derecha)
+  20000, // y máximo (abajo)
 ];
 
 // Configuración para el zoom mínimo permitido

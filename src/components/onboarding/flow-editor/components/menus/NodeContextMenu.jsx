@@ -1,7 +1,9 @@
 import React, { useEffect, useRef } from 'react';
-import useFlowStore from '@/stores/useFlowStore';
-import { shallow } from 'zustand/shallow';
 import { FiEdit, FiTrash2, FiCopy } from 'react-icons/fi';
+import { shallow } from 'zustand/shallow';
+
+import useFlowStore from '@/stores/useFlowStore';
+
 
 const NodeContextMenu = ({ position, onClose }) => {
   const menuRef = useRef(null);
@@ -9,7 +11,7 @@ const NodeContextMenu = ({ position, onClose }) => {
     (state) => ({
       contextMenuItems: state.contextMenuItems,
     }),
-    shallow
+    shallow,
   );
 
   useEffect(() => {

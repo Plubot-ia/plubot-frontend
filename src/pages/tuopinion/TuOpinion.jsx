@@ -1,16 +1,19 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
-import useWindowSize from '../../hooks/useWindowSize';
 import { motion, AnimatePresence, useAnimation } from 'framer-motion';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
+
+import useWindowSize from '../../hooks/useWindowSize';
+
 import axiosInstance from '@/utils/axiosConfig';
+
 import './TuOpinion.css';
-import byteNormal from '@assets/img/byte-normal.png';
 import byteHappy from '@assets/img/byte-happy.png';
+import byteNormal from '@assets/img/byte-normal.png';
 import byteThinking from '@assets/img/byte-thinking.png';
 
 // Componente optimizado para las partículas
 const ParticlesBackground = React.memo(({ count = 15 }) => {
   // Pre-calcular posiciones aleatorias para mejor rendimiento
-  const particles = useMemo(() => 
+  const particles = useMemo(() =>
     Array.from({ length: count }).map((_, i) => ({
       id: i,
       size: Math.random() * 2 + 1,
@@ -19,7 +22,7 @@ const ParticlesBackground = React.memo(({ count = 15 }) => {
       destX: Math.random() * 100,
       destY: Math.random() * 100,
       duration: Math.random() * 10 + 15,
-      delay: Math.random() * 2
+      delay: Math.random() * 2,
     })),
   [count]);
 
@@ -29,21 +32,21 @@ const ParticlesBackground = React.memo(({ count = 15 }) => {
         <motion.div
           key={particle.id}
           className="custom-particle"
-          initial={{ 
-            left: `${particle.initialX}%`, 
-            top: `${particle.initialY}%`, 
-            opacity: 0.3 
+          initial={{
+            left: `${particle.initialX}%`,
+            top: `${particle.initialY}%`,
+            opacity: 0.3,
           }}
-          animate={{ 
+          animate={{
             left: [`${particle.initialX}%`, `${particle.destX}%`],
             top: [`${particle.initialY}%`, `${particle.destY}%`],
-            opacity: [0.2, 0.5, 0.2] 
+            opacity: [0.2, 0.5, 0.2],
           }}
-          transition={{ 
-            duration: particle.duration, 
-            repeat: Infinity, 
+          transition={{
+            duration: particle.duration,
+            repeat: Infinity,
             repeatType: 'reverse',
-            delay: particle.delay
+            delay: particle.delay,
           }}
           style={{
             width: particle.size,
@@ -54,29 +57,31 @@ const ParticlesBackground = React.memo(({ count = 15 }) => {
     </div>
   );
 });
+ParticlesBackground.displayName = 'ParticlesBackground';
 
 // Componente para el efecto de portal de energía
 const EnergyPortal = React.memo(() => {
   return (
-    <motion.div 
+    <motion.div
       className="energy-portal"
       initial={{ scale: 0.9, opacity: 0 }}
-      animate={{ 
+      animate={{
         scale: [0.95, 1.02, 0.98, 1],
-        opacity: [0, 0.7, 0.5]
+        opacity: [0, 0.7, 0.5],
       }}
-      transition={{ 
-        duration: 3, 
-        ease: "easeInOut",
+      transition={{
+        duration: 3,
+        ease: 'easeInOut',
       }}
     />
   );
 });
+EnergyPortal.displayName = 'EnergyPortal';
 
 // Componente optimizado para mensajes del formulario
 const FormMessage = React.memo(({ message, status }) => {
   if (!message) return null;
-  
+
   return (
     <motion.div
       className={`form-message ${status}`}
@@ -86,7 +91,7 @@ const FormMessage = React.memo(({ message, status }) => {
       transition={{ type: 'spring', stiffness: 150, damping: 15 }}
     >
       <div className="message-background">
-        <div className="message-circle"></div>
+        <div className="message-circle" />
       </div>
       <div className="message-content">
         <p>{message}</p>
@@ -101,35 +106,36 @@ const FormMessage = React.memo(({ message, status }) => {
     </motion.div>
   );
 });
+FormMessage.displayName = 'FormMessage';
 
 // Campo de entrada optimizado
-const InputField = React.memo(({ 
-  type = "text", 
-  name, 
-  placeholder, 
-  value, 
-  onChange, 
-  required = false 
+const InputField = React.memo(({
+  type = 'text',
+  name,
+  placeholder,
+  value,
+  onChange,
+  required = false,
 }) => {
   const [isFocused, setIsFocused] = useState(false);
 
   return (
-    <motion.div 
+    <motion.div
       className={`input-wrapper ${isFocused ? 'active' : ''}`}
       whileHover={{ scale: 1.01 }}
       transition={{ duration: 0.2 }}
     >
       <div className="input-icon">
-        <motion.div 
+        <motion.div
           className="icon-circle"
           animate={isFocused ? {
             scale: [1, 1.3, 1.2],
-            backgroundColor: ["#00ffea", "#ff00ff", "#00ffea"]
+            backgroundColor: ['#00ffea', '#ff00ff', '#00ffea'],
           } : {}}
           transition={{ duration: 1, repeat: isFocused ? Infinity : 0 }}
         />
       </div>
-      {type === "textarea" ? (
+      {type === 'textarea' ? (
         <textarea
           name={name}
           placeholder={placeholder}
@@ -153,7 +159,7 @@ const InputField = React.memo(({
           onBlur={() => setIsFocused(false)}
         />
       )}
-      <motion.div 
+      <motion.div
         className="input-line"
         initial={{ scaleX: 0 }}
         animate={{ scaleX: isFocused ? 1 : 0 }}
@@ -162,6 +168,7 @@ const InputField = React.memo(({
     </motion.div>
   );
 });
+InputField.displayName = 'InputField';
 
 // Botón de envío con efectos optimizados
 const SubmitButton = React.memo(({ loading, text }) => {
@@ -170,17 +177,17 @@ const SubmitButton = React.memo(({ loading, text }) => {
       type="submit"
       className="quantum-btn"
       disabled={loading}
-      whileHover={{ scale: 1.03, boxShadow: "0 0 15px rgba(0, 255, 234, 0.4)" }}
+      whileHover={{ scale: 1.03, boxShadow: '0 0 15px rgba(0, 255, 234, 0.4)' }}
       whileTap={{ scale: 0.97 }}
     >
-      <motion.span 
+      <motion.span
         className="btn-text"
         animate={loading ? { opacity: [1, 0.8, 1] } : {}}
         transition={{ duration: 1, repeat: loading ? Infinity : 0 }}
       >
         {loading ? 'Procesando...' : text}
       </motion.span>
-      
+
       {loading && (
         <motion.span
           className="btn-loader"
@@ -188,8 +195,8 @@ const SubmitButton = React.memo(({ loading, text }) => {
           transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
         />
       )}
-      
-      <motion.div 
+
+      <motion.div
         className="btn-glow"
         animate={{
           backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'],
@@ -199,66 +206,69 @@ const SubmitButton = React.memo(({ loading, text }) => {
     </motion.button>
   );
 });
+SubmitButton.displayName = 'SubmitButton';
 
 const TuOpinion = () => {
   const { width } = useWindowSize();
+  const heroRef = useRef(null);
   const [formData, setFormData] = useState({ nombre: '', opinion: '' });
-  const [formMessage, setFormMessage] = useState({ text: '', status: '' });
   const [loading, setLoading] = useState(false);
+  const [formMessage, setFormMessage] = useState({ text: null, status: null });
   const [byteState, setByteState] = useState('normal');
   const [isFormVisible, setIsFormVisible] = useState(false);
-  const [hasInteracted, setHasInteracted] = useState(false);
-  
+  const inViewport = useRef(false);
   const formRef = useRef(null);
   const mainControls = useAnimation();
-  const heroRef = useRef(null);
-  const inViewport = useRef(false);
   const idleCallbackIdRef = useRef(null);
 
   const getByteImage = () => {
     switch (byteState) {
-      case 'happy': return byteHappy;
-      case 'thinking': return byteThinking;
-      default: return byteNormal;
+      case 'happy':
+        return byteHappy;
+      case 'thinking':
+        return byteThinking;
+      default:
+        return byteNormal;
     }
   };
 
   useEffect(() => {
+    const heroElement = heroRef.current;
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
         if (entry.isIntersecting && !inViewport.current) {
           inViewport.current = true;
-          
+
           const sequence = async () => {
             await mainControls.start({ opacity: 1, transition: { duration: 0.5 } });
             setTimeout(() => setIsFormVisible(true), 800);
           };
-          
+
           sequence();
         }
       });
     }, { threshold: 0.2 });
-    
-    if (heroRef.current) {
-      observer.observe(heroRef.current);
+
+    if (heroElement) {
+      observer.observe(heroElement);
     }
-    
+
     return () => {
-      if (heroRef.current) observer.unobserve(heroRef.current);
+      if (heroElement) observer.unobserve(heroElement);
     };
   }, [mainControls]);
 
   useEffect(() => {
     const initInteractions = () => {
-      setHasInteracted(true);
+      // La variable de estado hasInteracted fue eliminada.
     };
-    
+
     if ('requestIdleCallback' in window) {
       idleCallbackIdRef.current = window.requestIdleCallback(initInteractions, { timeout: 2000 });
     } else {
       setTimeout(initInteractions, 2000);
     }
-    
+
     return () => {
       mainControls.stop();
       if ('cancelIdleCallback' in window && idleCallbackIdRef.current) {
@@ -276,7 +286,7 @@ const TuOpinion = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (loading) return;
-    
+
     setLoading(true);
     setByteState('thinking');
     setFormMessage({ text: '', status: '' });
@@ -290,29 +300,29 @@ const TuOpinion = () => {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
-        timeout: 30000 // Aumentado a 30s para dar más margen al backend
+        timeout: 30000, // Aumentado a 30s para dar más margen al backend
       });
-      
+
       setFormMessage({
         text: '¡Tu opinión ha sido enviada al Pluniverse! Gracias por ayudarnos a mejorar.',
         status: 'success',
       });
-      
+
       setFormData({ nombre: '', opinion: '' });
       setByteState('happy');
-      
+
       setTimeout(() => setFormMessage({ text: '', status: '' }), 5000);
     } catch (error) {
 
-      
+
       const errorMessage =
         error.response?.data?.message ||
         (error.code === 'ECONNABORTED' ? 'Tiempo de espera agotado. Intenta nuevamente.' : error.message) ||
         'Error al enviar tu opinión. Intenta nuevamente.';
-      
+
       setFormMessage({ text: errorMessage, status: 'error' });
       setByteState('normal');
-      
+
       setTimeout(() => setFormMessage({ text: '', status: '' }), 5000);
     } finally {
       setLoading(false);
@@ -344,7 +354,7 @@ const TuOpinion = () => {
   };
 
   return (
-    <motion.section 
+    <motion.section
       className="opinion-hero"
       ref={heroRef}
       initial={{ opacity: 0 }}
@@ -362,7 +372,7 @@ const TuOpinion = () => {
         </>
       )}
 
-      <motion.div 
+      <motion.div
         className="byte-image-column"
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
@@ -370,17 +380,17 @@ const TuOpinion = () => {
         style={{ position: 'relative', zIndex: 2 }}
       >
         <div className="byte-image-wrapper">
-          <div className="byte-hologram-effect"></div>
+          <div className="byte-hologram-effect" />
           <img
             src={getByteImage()}
             alt="Byte Assistant"
             className={`byte-image ${loading ? 'byte-thinking' : ''}`}
           />
-          <div className="byte-glow"></div>
+          <div className="byte-glow" />
         </div>
       </motion.div>
 
-      <motion.div 
+      <motion.div
         className="opinion-content"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -393,20 +403,20 @@ const TuOpinion = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: 'easeOut' }}
         >
-          <motion.span 
+          <motion.span
             className="neon-text"
-            animate={{ 
-              textShadow: ['0 0 15px #00ffea', '0 0 25px #00ffea', '0 0 15px #00ffea']
+            animate={{
+              textShadow: ['0 0 15px #00ffea', '0 0 25px #00ffea', '0 0 15px #00ffea'],
             }}
             transition={{ duration: 3, repeat: Infinity, repeatType: 'reverse' }}
           >
             Tu opinión
-          </motion.span> 
+          </motion.span>
           {' '}da forma al{' '}
-          <motion.span 
+          <motion.span
             className="neon-text-alt"
-            animate={{ 
-              textShadow: ['0 0 15px #ff00ff', '0 0 25px #ff00ff', '0 0 15px #ff00ff']
+            animate={{
+              textShadow: ['0 0 15px #ff00ff', '0 0 25px #ff00ff', '0 0 15px #ff00ff'],
             }}
             transition={{ duration: 3, repeat: Infinity, repeatType: 'reverse', delay: 1.5 }}
           >
@@ -421,10 +431,10 @@ const TuOpinion = () => {
           transition={{ duration: 1, ease: 'easeOut', delay: 0.5 }}
         >
           ¡Hola! Soy Byte, tu guía en el Pluniverse. Comparte tus{' '}
-          <motion.span 
+          <motion.span
             className="highlight-text"
-            animate={{ 
-              color: ['#00ffea', '#88ffff', '#00ffea']
+            animate={{
+              color: ['#00ffea', '#88ffff', '#00ffea'],
             }}
             transition={{ duration: 4, repeat: Infinity }}
           >
@@ -443,18 +453,18 @@ const TuOpinion = () => {
               exit={{ opacity: 0, y: -30 }}
               transition={{ type: 'spring', stiffness: 40, damping: 15 }}
             >
-              <motion.div 
+              <motion.div
                 className="holographic-overlay"
-                animate={{ 
+                animate={{
                   background: [
                     'linear-gradient(135deg, rgba(0, 255, 234, 0.05) 0%, rgba(255, 0, 255, 0.05) 50%, rgba(0, 255, 234, 0.05) 100%)',
                     'linear-gradient(225deg, rgba(0, 255, 234, 0.05) 0%, rgba(255, 0, 255, 0.05) 50%, rgba(0, 255, 234, 0.05) 100%)',
-                    'linear-gradient(135deg, rgba(0, 255, 234, 0.05) 0%, rgba(255, 0, 255, 0.05) 50%, rgba(0, 255, 234, 0.05) 100%)'
-                  ]
+                    'linear-gradient(135deg, rgba(0, 255, 234, 0.05) 0%, rgba(255, 0, 255, 0.05) 50%, rgba(0, 255, 234, 0.05) 100%)',
+                  ],
                 }}
                 transition={{ duration: 8, repeat: Infinity, ease: 'linear' }}
               />
-              
+
               <motion.form
                 onSubmit={handleSubmit}
                 className="opinion-form"
@@ -478,14 +488,14 @@ const TuOpinion = () => {
                     placeholder="Comparte tu opinión, sugerencia o idea..."
                     value={formData.opinion}
                     onChange={handleChange}
-                    required={true}
+                    required
                   />
                 </motion.div>
 
                 <motion.div variants={itemVariants}>
-                  <SubmitButton 
-                    loading={loading} 
-                    text="Enviar Opinión" 
+                  <SubmitButton
+                    loading={loading}
+                    text="Enviar Opinión"
                   />
                 </motion.div>
               </motion.form>
@@ -495,9 +505,9 @@ const TuOpinion = () => {
 
         <AnimatePresence>
           {formMessage.text && (
-            <FormMessage 
-              message={formMessage.text} 
-              status={formMessage.status} 
+            <FormMessage
+              message={formMessage.text}
+              status={formMessage.status}
             />
           )}
         </AnimatePresence>

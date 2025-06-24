@@ -1,8 +1,12 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom'; // Import Link for navigation
+
 import instance from '@/utils/axiosConfig'; // Import the configured axios instance
-// import useAuthStore from '@/stores/useAuthStore'; // Token handled by axiosConfig
+
 import AddIntegrationModal from './AddIntegrationModal'; // Import the new modal component
+
+
+// import useAuthStore from '@/stores/useAuthStore'; // Token handled by axiosConfig
 import '../styles/IntegrationsSection.css';
 
 const IntegrationsSection = ({ user, showNotification }) => {
@@ -25,7 +29,7 @@ const IntegrationsSection = ({ user, showNotification }) => {
           integration_name: int.integration_name, // Corrected: backend sends integration_name
           guild_id: int.guild_id, // Corrected: backend sends guild_id
           status: int.status, // Corrected: backend sends status
-          last_error_message: int.last_error_message // Add last_error_message from backend
+          last_error_message: int.last_error_message, // Add last_error_message from backend
         }));
         setDiscordIntegrations(mappedIntegrations);
       } else {
@@ -102,8 +106,6 @@ const IntegrationsSection = ({ user, showNotification }) => {
     return <div className="integrations-loading">Cargando integraciones...</div>;
   }
 
-  // Ensure showNotification is available, provide a default if not passed
-  const notify = showNotification || (() => {});
 
   const getStatusDisplayDetails = (status, lastErrorMessage) => {
     switch (status) {
@@ -111,31 +113,31 @@ const IntegrationsSection = ({ user, showNotification }) => {
         return {
           text: 'Pendiente de Verificación',
           className: 'status-pending-verification',
-          tooltipText: 'El token está guardado y se intentará verificar automáticamente.'
+          tooltipText: 'El token está guardado y se intentará verificar automáticamente.',
         };
       case 'active':
         return {
           text: 'Activo',
           className: 'status-active',
-          tooltipText: 'La integración está activa y funcionando correctamente.'
+          tooltipText: 'La integración está activa y funcionando correctamente.',
         };
       case 'invalid_token':
         return {
           text: 'Token Inválido',
           className: 'status-error',
-          tooltipText: `Error: ${lastErrorMessage || 'El token proporcionado no es válido o ha sido revocado por Discord.'}`
+          tooltipText: `Error: ${lastErrorMessage || 'El token proporcionado no es válido o ha sido revocado por Discord.'}`,
         };
       case 'verification_error':
         return {
           text: 'Error de Verificación',
           className: 'status-error',
-          tooltipText: `Error: ${lastErrorMessage || 'No se pudo verificar el token con Discord. Revisa el token o inténtalo más tarde.'}`
+          tooltipText: `Error: ${lastErrorMessage || 'No se pudo verificar el token con Discord. Revisa el token o inténtalo más tarde.'}`,
         };
       default:
         return {
           text: status ? status.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) : 'Desconocido',
           className: 'status-unknown',
-          tooltipText: lastErrorMessage || 'Estado desconocido de la integración.'
+          tooltipText: lastErrorMessage || 'Estado desconocido de la integración.',
         };
     }
   };
@@ -195,7 +197,7 @@ const IntegrationsSection = ({ user, showNotification }) => {
                 {(() => {
                   const displayDetails = getStatusDisplayDetails(integration.status, integration.last_error_message);
                   return (
-                    <span 
+                    <span
                       className={`status-badge ${displayDetails.className}`}
                       title={displayDetails.tooltipText}
                     >

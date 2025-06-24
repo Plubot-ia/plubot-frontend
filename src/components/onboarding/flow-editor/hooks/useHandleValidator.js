@@ -3,6 +3,7 @@
  */
 import { useEffect, useCallback, useRef } from 'react';
 import { useReactFlow } from 'reactflow';
+
 import { fixAllEdgeHandles } from '../utils/handleFixer';
 
 /**
@@ -21,37 +22,37 @@ const useHandleValidator = () => {
     if (validationRunning.current) {
       return;
     }
-    
+
     try {
       validationRunning.current = true;
-      
+
       // Limpiar timeout previo si existe
       if (validationTimeout.current) {
         clearTimeout(validationTimeout.current);
       }
-      
+
       // Usar un timeout para garantizar que no haya actualizaciones continuas
       validationTimeout.current = setTimeout(() => {
         const ALLOWED_CONNECTIONS = {
-          emotionDetection: ['message', 'ai', 'end', 'lead', 'condition', 'data', 'date', 'delay', 'email', 'math', 'notification', 'random', 'response', 'variable', 'webhook', 'zapier', 'script', 'tag', 'note']
+          emotionDetection: ['message', 'ai', 'end', 'lead', 'condition', 'data', 'date', 'delay', 'email', 'math', 'notification', 'random', 'response', 'variable', 'webhook', 'zapier', 'script', 'tag', 'note'],
         };
         const currentEdges = getEdges();
         if (!currentEdges || currentEdges.length === 0) {
           validationRunning.current = false;
           return;
         }
-        
+
         // Comparar aristas antes de aplicar cambios para evitar actualizaciones innecesarias
         const edgeIdsStr = currentEdges.map(e => e.id).sort().join(',');
         const fixedEdges = fixAllEdgeHandles(currentEdges);
         const fixedEdgeIdsStr = fixedEdges.map(e => e.id).sort().join(',');
-        
+
         // Solo actualizar si realmente hay cambios para evitar bucles
         if (edgeIdsStr !== fixedEdgeIdsStr && fixedEdges.length > 0) {
-  
+
           setEdges(fixedEdges);
         }
-        
+
         validationRunning.current = false;
       }, 300); // Delay para evitar actualizaciones en cascada
     } catch (error) {
@@ -64,15 +65,15 @@ const useHandleValidator = () => {
   useEffect(() => {
     // Ejecutar al montar el componente
     validateAndFixHandles();
-    
+
     // Escuchar eventos de ReactFlow para validar handles cuando sea necesario
     const handleEdgeUpdate = () => {
       setTimeout(validateAndFixHandles, 50);
     };
-    
+
     // Registrar listener para eventos de ReactFlow
     document.addEventListener('edge-update-required', handleEdgeUpdate);
-    
+
     // Limpiar listener al desmontar
     return () => {
       document.removeEventListener('edge-update-required', handleEdgeUpdate);
@@ -80,7 +81,7 @@ const useHandleValidator = () => {
   }, [validateAndFixHandles]);
 
   return {
-    validateAndFixHandles
+    validateAndFixHandles,
   };
 };
 

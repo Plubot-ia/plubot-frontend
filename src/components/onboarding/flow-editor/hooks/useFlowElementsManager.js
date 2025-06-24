@@ -1,7 +1,11 @@
 import { useCallback } from 'react';
+
+
 import useFlowStore from '@/stores/useFlowStore';
 import { NODE_LABELS } from '@/utils/nodeConfig';
+
 import { applyNodeVisibilityFix } from '../utils/optimized-flow-fixes';
+
 
 /**
  * Hook para gestionar la manipulación de nodos y aristas en el editor de flujos.
@@ -15,7 +19,7 @@ const useFlowElementsManager = (saveHistoryState, setHasChanges) => {
       setNodes: state.setNodes,
       setEdges: state.setEdges,
       onConnect: state.onConnect,
-    })
+    }),
   );
 
   const addNodeToFlow = useCallback((nodeType, position) => {
@@ -28,12 +32,12 @@ const useFlowElementsManager = (saveHistoryState, setHasChanges) => {
 
     saveHistoryState(nodes, edges);
     const nodeId = `${nodeType}-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
-    let nodeData = { 
+    const nodeData = {
       id: nodeId,
       label: NODE_LABELS && NODE_LABELS[nodeType] ? NODE_LABELS[nodeType] : `Nuevo ${nodeType}`,
     };
 
-    switch(nodeType) {
+    switch (nodeType) {
       case 'message':
         nodeData.message = 'Escribe tu mensaje aquí';
         break;
@@ -41,7 +45,7 @@ const useFlowElementsManager = (saveHistoryState, setHasChanges) => {
         nodeData.question = '¿Qué decisión quieres tomar?';
         nodeData.conditions = [
           { id: `cond-${nodeId}-default-yes`, text: 'Sí' },
-          { id: `cond-${nodeId}-default-no`, text: 'No' }
+          { id: `cond-${nodeId}-default-no`, text: 'No' },
         ];
         nodeData.handleIds = ['output-0', 'output-1'];
         break;
@@ -67,14 +71,14 @@ const useFlowElementsManager = (saveHistoryState, setHasChanges) => {
       type: nodeType,
       position: {
         x: Math.round(position.x),
-        y: Math.round(position.y)
+        y: Math.round(position.y),
       },
       data: nodeData,
       draggable: true,
       selectable: true,
       connectable: true,
       style: { opacity: 1, visibility: 'visible' },
-      hidden: false
+      hidden: false,
     };
 
     try {
@@ -114,8 +118,8 @@ const useFlowElementsManager = (saveHistoryState, setHasChanges) => {
       id: `${node.type}-${Date.now()}`,
       position: {
         x: node.position.x + 50,
-        y: node.position.y + 50
-      }
+        y: node.position.y + 50,
+      },
     };
     setNodes([...nodes, newNode]);
     setHasChanges(true);

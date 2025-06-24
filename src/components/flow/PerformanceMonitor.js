@@ -1,6 +1,6 @@
 /**
  * PerformanceMonitor.js
- * 
+ *
  * Este script se encarga de monitorear el rendimiento de la aplicación y mostrar
  * las estadísticas de rendimiento utilizando el componente PerformanceStats.
  * Se inyecta dinámicamente en la aplicación sin necesidad de modificar los componentes existentes.
@@ -8,6 +8,7 @@
 
 import React from 'react';
 import { createRoot } from 'react-dom/client';
+
 import PerformanceStats from './PerformanceStats';
 
 class PerformanceMonitor {
@@ -65,7 +66,7 @@ class PerformanceMonitor {
    */
   toggleVisibility() {
     if (!this.container) return;
-    
+
     const isVisible = this.container.style.display !== 'none';
     this.container.style.display = isVisible ? 'none' : 'block';
   }

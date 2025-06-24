@@ -1,21 +1,24 @@
 import React, { useState, useEffect, useRef } from 'react';
+
 import useWindowSize from '../../hooks/useWindowSize';
-import { Link } from 'react-router-dom';
+
 import './Historyverse.css';
 
 // Importaciones de imágenes
-import plubotBirth from '@assets/img/plubot-birth.webp';
-import byteImg from '@assets/img/characters/byte.webp';
-import zetaImg from '@assets/img/characters/zeta.webp';
-import mapImg from '@assets/img/pluniverse-map-full.webp';
-import founderImg from '@assets/img/characters/plubot-founder.webp';
-import glitchImg from '@assets/img/characters/glitch.webp';
-import novaImg from '@assets/img/characters/nova.webp';
 import aegisImg from '@assets/img/characters/aegis.webp';
+import byteImg from '@assets/img/characters/byte.webp';
 import echoImg from '@assets/img/characters/echo.webp';
 import fluxImg from '@assets/img/characters/flux.webp';
+import glitchImg from '@assets/img/characters/glitch.webp';
+import novaImg from '@assets/img/characters/nova.webp';
 import nyraImg from '@assets/img/characters/nyra.webp';
 import despiertoImg from '@assets/img/characters/plubot-despierto.webp';
+import founderImg from '@assets/img/characters/plubot-founder.webp';
+import zetaImg from '@assets/img/characters/zeta.webp';
+import plubotBirth from '@assets/img/plubot-birth.webp';
+import mapImg from '@assets/img/pluniverse-map-full.webp';
+
+import { Link } from 'react-router-dom';
 
 const Historyverse = () => {
   const { width, height } = useWindowSize();
@@ -23,14 +26,14 @@ const Historyverse = () => {
   const heroRef = useRef(null);
   const starsCanvasRef = useRef(null);
   const glowRef = useRef(null); // Nueva referencia para .hero-glow
-  
+
   // Estados para la gamificación
   const [userLevel, setUserLevel] = useState(1);
   const [pluCoins, setPluCoins] = useState(0);
   const [characterHover, setCharacterHover] = useState(null);
   const [selectedZone, setSelectedZone] = useState(null);
   const [showBadgeNotification, setShowBadgeNotification] = useState(false);
-  
+
   // Array de personajes para facilitar iteración
   const characters = [
     {
@@ -42,7 +45,7 @@ const Historyverse = () => {
       personality: 'Curioso, servicial, en constante aprendizaje.',
       phrase: 'Estoy listo para aprender y ayudarte.',
       power: 'Responder mensajes simples en web, guiar con opciones básicas, recolectar datos y ejecutar flujos simples.',
-      locked: false
+      locked: false,
     },
     {
       id: 'nova',
@@ -53,7 +56,7 @@ const Historyverse = () => {
       personality: 'Artística, visionaria, siempre rompiendo esquemas.',
       phrase: 'Cada bot es un espejo de su creador.',
       locked: true,
-      unlockLevel: 3
+      unlockLevel: 3,
     },
     {
       id: 'zeta',
@@ -63,7 +66,7 @@ const Historyverse = () => {
       role: 'Dirige la Academia de Automatización.',
       personality: 'Precisa, exigente pero muy sabia. Cree en la evolución de cada Plubot.',
       locked: true,
-      unlockLevel: 4
+      unlockLevel: 4,
     },
     {
       id: 'echo',
@@ -74,7 +77,7 @@ const Historyverse = () => {
       personality: 'Curiosa, ágil, siempre deja un eco de datos donde pasa.',
       visual: 'Bot translúcida con escáner de pulso en el pecho.',
       locked: true,
-      unlockLevel: 5
+      unlockLevel: 5,
     },
     {
       id: 'glitch',
@@ -85,7 +88,7 @@ const Historyverse = () => {
       personality: 'Sarcástico, caótico, súper capaz.',
       phrase: '¿Por qué ayudar, si podemos reemplazar?',
       locked: true,
-      unlockLevel: 6
+      unlockLevel: 6,
     },
     {
       id: 'flux',
@@ -96,7 +99,7 @@ const Historyverse = () => {
       personality: 'Metódico, técnico, habla en fórmulas.',
       visual: 'Brazos mecánicos múltiples y mochila de datos.',
       locked: true,
-      unlockLevel: 7
+      unlockLevel: 7,
     },
     {
       id: 'aegis',
@@ -107,7 +110,7 @@ const Historyverse = () => {
       personality: 'Leal, firme, habla poco pero actúa con precisión.',
       visual: 'Armadura blanca con líneas azules de energía pura.',
       locked: true,
-      unlockLevel: 8
+      unlockLevel: 8,
     },
     {
       id: 'nyra',
@@ -119,7 +122,7 @@ const Historyverse = () => {
       visual: 'Bot geométrica con patrones de luz que fluyen como constelaciones.',
       phrase: 'En el vacío nace la estructura.',
       locked: true,
-      unlockLevel: 9
+      unlockLevel: 9,
     },
     {
       id: 'byte',
@@ -130,7 +133,7 @@ const Historyverse = () => {
       personality: 'Inteligente, divertido, con mil años de conocimiento digital.',
       phrase: 'Todo problema tiene un flujo que lo resuelve.',
       locked: true,
-      unlockLevel: 10
+      unlockLevel: 10,
     },
     {
       id: 'founder',
@@ -141,8 +144,8 @@ const Historyverse = () => {
       power: 'Activar nuevos bots, expandir el mundo y traer luz donde hay caos.',
       symbol: 'Un bastón de código y un núcleo luminoso flotando.',
       locked: true,
-      unlockLevel: 11
-    }
+      unlockLevel: 11,
+    },
   ];
 
   // Zonas del mapa
@@ -151,14 +154,14 @@ const Historyverse = () => {
     { id: 'plulab', name: 'PluLab', description: 'Laboratorio donde nacen los nuevos Plubots.' },
     { id: 'coliseo', name: 'Coliseo', description: 'Arena de competición para los mejores Plubots.' },
     { id: 'academia', name: 'Academia', description: 'Centro de aprendizaje para mejorar tus habilidades.' },
-    { id: 'bazaar', name: 'Bazaar', description: 'Intercambia recompensas y recursos con otros Plubots.' }
+    { id: 'bazaar', name: 'Bazaar', description: 'Intercambia recompensas y recursos con otros Plubots.' },
   ];
 
   // Logros disponibles para desbloquear
   const badges = [
     { id: 'explorer', name: 'Explorador', description: 'Visita todas las zonas del mapa', unlocked: false },
     { id: 'collector', name: 'Coleccionista', description: 'Desbloquea 3 personajes', unlocked: false },
-    { id: 'wealthy', name: 'Acaudalado', description: 'Acumula 1000 PluCoins', unlocked: false }
+    { id: 'wealthy', name: 'Acaudalado', description: 'Acumula 1000 PluCoins', unlocked: false },
   ];
 
   // Efecto para inicializar el canvas de estrellas
@@ -167,11 +170,11 @@ const Historyverse = () => {
       const canvas = starsCanvasRef.current;
       const ctx = canvas.getContext('2d');
       const stars = [];
-      
+
       // El canvas se ajusta reactivamente gracias al hook useWindowSize
       canvas.width = width || 0;
-      canvas.height = height || 0;    
-      
+      canvas.height = height || 0;
+
       // Crear estrellas
       for (let i = 0; i < 200; i++) {
         stars.push({
@@ -179,35 +182,35 @@ const Historyverse = () => {
           y: Math.random() * canvas.height,
           radius: Math.random() * 1.5,
           opacity: Math.random(),
-          speed: Math.random() * 0.05
+          speed: Math.random() * 0.05,
         });
       }
-      
+
       // Animar estrellas
       const animateStars = () => {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        
+
         stars.forEach(star => {
           ctx.beginPath();
           ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
           ctx.fillStyle = `rgba(0, 224, 255, ${star.opacity})`;
           ctx.fill();
-          
+
           // Movimiento de estrellas
           star.y += star.speed;
-          
+
           // Resetear posición si sale del canvas
           if (star.y > canvas.height) {
             star.y = 0;
             star.x = Math.random() * canvas.width;
           }
         });
-        
+
         requestAnimationFrame(animateStars);
       };
-      
+
       animateStars();
-      
+
       // Limpieza al desmontar o al cambiar el tamaño
       return () => cancelAnimationFrame(animationFrameId);
     }
@@ -215,28 +218,28 @@ const Historyverse = () => {
 
   // Efecto para la animación del título y ajuste del .hero-glow
   useEffect(() => {
-  if (heroRef.current) {
-    const hero = heroRef.current;
+    if (heroRef.current) {
+      const hero = heroRef.current;
 
-    // Animar hero solo después de que todo esté cargado
-    const handleLoad = () => {
+      // Animar hero solo después de que todo esté cargado
+      const handleLoad = () => {
       // Iniciar animación con un breve retraso
-      setTimeout(() => {
-        hero.classList.add('animate-in');
-      }, 300);
-    };
+        setTimeout(() => {
+          hero.classList.add('animate-in');
+        }, 300);
+      };
 
-    if (document.readyState === 'complete') {
-      handleLoad();
-    } else {
-      window.addEventListener('load', handleLoad);
+      if (document.readyState === 'complete') {
+        handleLoad();
+      } else {
+        window.addEventListener('load', handleLoad);
+      }
+
+      return () => {
+        window.removeEventListener('load', handleLoad);
+      };
     }
-
-    return () => {
-      window.removeEventListener('load', handleLoad);
-    };
-  }
-}, []);
+  }, []);
 
   // Función para ganar PluCoins al interactuar
   const earnCoins = (amount) => {
@@ -244,8 +247,8 @@ const Historyverse = () => {
       const newTotal = prevCoins + amount;
       // Comprobar si se ha alcanzado el logro de acaudalado
       if (newTotal >= 1000 && !badges.find(b => b.id === 'wealthy').unlocked) {
-        const updatedBadges = badges.map(b => 
-          b.id === 'wealthy' ? { ...b, unlocked: true } : b
+        const updatedBadges = badges.map(b =>
+          b.id === 'wealthy' ? { ...b, unlocked: true } : b,
         );
         setShowBadgeNotification(true);
         setTimeout(() => setShowBadgeNotification(false), 3000);
@@ -272,8 +275,8 @@ const Historyverse = () => {
       // Comprobar si se ha desbloqueado el logro de coleccionista
       const unlockedCount = characters.filter(c => !c.locked).length;
       if (unlockedCount >= 3 && !badges.find(b => b.id === 'collector').unlocked) {
-        const updatedBadges = badges.map(b => 
-          b.id === 'collector' ? { ...b, unlocked: true } : b
+        const updatedBadges = badges.map(b =>
+          b.id === 'collector' ? { ...b, unlocked: true } : b,
         );
         setShowBadgeNotification(true);
         setTimeout(() => setShowBadgeNotification(false), 3000);
@@ -287,12 +290,12 @@ const Historyverse = () => {
   const visitZone = (zoneId) => {
     setSelectedZone(zoneId);
     earnCoins(10);
-    
+
     // Comprobar si se ha visitado todas las zonas para el logro
     const visitedZones = new Set([...zones.filter(z => z.visited).map(z => z.id), zoneId]);
     if (visitedZones.size === zones.length && !badges.find(b => b.id === 'explorer').unlocked) {
-      const updatedBadges = badges.map(b => 
-        b.id === 'explorer' ? { ...b, unlocked: true } : b
+      const updatedBadges = badges.map(b =>
+        b.id === 'explorer' ? { ...b, unlocked: true } : b,
       );
       setShowBadgeNotification(true);
       setTimeout(() => setShowBadgeNotification(false), 3000);
@@ -302,8 +305,8 @@ const Historyverse = () => {
   return (
     <div className="historyverse-wrapper">
       {/* Canvas para estrellas animadas en el fondo */}
-      <canvas ref={starsCanvasRef} className="stars-canvas"></canvas>
-      
+      <canvas ref={starsCanvasRef} className="stars-canvas" />
+
       {/* UI de gamificación */}
       <div className="game-ui">
         <div className="player-stats">
@@ -312,11 +315,11 @@ const Historyverse = () => {
             <span className="level-text">NIVEL</span>
           </div>
           <div className="coin-counter">
-            <div className="coin-icon"></div>
+            <div className="coin-icon" />
             <span>{pluCoins}</span>
           </div>
         </div>
-        
+
         {/* Notificación de logro */}
         {showBadgeNotification && (
           <div className="badge-notification">
@@ -324,21 +327,21 @@ const Historyverse = () => {
           </div>
         )}
       </div>
-      
+
       {/* Sección Hero con animación */}
-      <section ref={heroRef} className="historyverse-hero">  
-        <div ref={glowRef} className="hero-glow"></div> {/* Agregar el elemento .hero-glow */}
+      <section ref={heroRef} className="historyverse-hero">
+        <div ref={glowRef} className="hero-glow" /> {/* Agregar el elemento .hero-glow */}
         <h1 className="glow-text">El Pluniverse</h1>
         <p className="glow-text">Un universo digital donde los asistentes tienen alma y propósito.</p>
-        <div className="particles-container"></div>
+        <div className="particles-container" />
       </section>
 
       {/* Sección de origen con efecto parallax */}
       <section className="historyverse-origin parallax-section">
-        <div className="parallax-bg"></div>
-        <img 
-          src={plubotBirth} 
-          alt="Nacimiento de Plubot" 
+        <div className="parallax-bg" />
+        <img
+          src={plubotBirth}
+          alt="Nacimiento de Plubot"
           className="floating-element"
           onClick={() => earnCoins(5)}
         />
@@ -357,18 +360,18 @@ const Historyverse = () => {
       <section className="historyverse-characters">
         <h2 className="section-title">Los habitantes del Pluniverse</h2>
         <div className="progress-bar">
-          <div 
-            className="progress-fill" 
-            style={{width: `${(characters.filter(c => !c.locked).length / characters.length) * 100}%`}}
-          ></div>
+          <div
+            className="progress-fill"
+            style={{ width: `${(characters.filter(c => !c.locked).length / characters.length) * 100}%` }}
+          />
           <span className="progress-text">
             {characters.filter(c => !c.locked).length}/{characters.length} Personajes Desbloqueados
           </span>
         </div>
-        
+
         <div className="card-grid">
           {characters.map((character) => (
-            <div 
+            <div
               key={character.id}
               className={`card ${character.type} ${character.locked ? 'locked' : ''} ${characterHover === character.id ? 'active' : ''}`}
               onMouseEnter={() => setCharacterHover(character.id)}
@@ -383,14 +386,14 @@ const Historyverse = () => {
                 }
               }}
             >
-              <div className="card-glow"></div>
+              <div className="card-glow" />
               <div className="card-content">
                 <img src={character.img} alt={character.name} className="character-image" />
                 <h3>{character.name}</h3>
-                
+
                 {character.locked ? (
                   <div className="lock-info">
-                    <div className="lock-icon"></div>
+                    <div className="lock-icon" />
                     <p>Desbloquear en Nivel {character.unlockLevel}</p>
                   </div>
                 ) : (
@@ -403,8 +406,8 @@ const Historyverse = () => {
                     {character.visual && <p><strong>Visual:</strong> {character.visual}</p>}
                   </div>
                 )}
-                
-                <div className={`card-particles ${character.type}-particles`}></div>
+
+                <div className={`card-particles ${character.type}-particles`} />
               </div>
             </div>
           ))}
@@ -416,16 +419,16 @@ const Historyverse = () => {
         <h2 className="section-title">Explorá las zonas</h2>
         <div className="map-container">
           <img src={mapImg} alt="Mapa del Pluniverse" className="map-img" />
-          
+
           {/* Puntos interactivos en el mapa */}
           <div className="map-hotspots">
             {zones.map((zone) => (
-              <div 
+              <div
                 key={zone.id}
                 className={`hotspot ${zone.id} ${selectedZone === zone.id ? 'active' : ''}`}
                 onClick={() => visitZone(zone.id)}
               >
-                <div className="pulse"></div>
+                <div className="pulse" />
                 <div className="hotspot-tooltip">
                   <h4>{zone.name}</h4>
                   <p>{zone.description}</p>
@@ -439,7 +442,7 @@ const Historyverse = () => {
       {/* Sección de gamificación mejorada */}
       <section className="historyverse-gamification">
         <h2 className="section-title">Subí de nivel. Desbloqueá poderes.</h2>
-        
+
         {/* Panel de progresión */}
         <div className="progression-panel">
           <div className="level-progress">
@@ -448,17 +451,17 @@ const Historyverse = () => {
               <span className="next-level">{userLevel + 1}</span>
             </div>
             <div className="progress-bar">
-              <div 
-                className="progress-fill" 
-                style={{width: `${(pluCoins / (userLevel * 100)) * 100}%`}}
-              ></div>
+              <div
+                className="progress-fill"
+                style={{ width: `${(pluCoins / (userLevel * 100)) * 100}%` }}
+              />
             </div>
             <div className="xp-counter">
               <span>{pluCoins}/{userLevel * 100} PluCoins</span>
             </div>
           </div>
-          
-          <button 
+
+          <button
             className={`level-up-button ${pluCoins >= userLevel * 100 ? 'ready' : ''}`}
             onClick={() => levelUp()}
             disabled={pluCoins < userLevel * 100}
@@ -466,14 +469,14 @@ const Historyverse = () => {
             SUBIR DE NIVEL
           </button>
         </div>
-        
+
         {/* Logros desbloqueables */}
         <div className="achievements-section">
           <h3>Logros</h3>
           <div className="badges-grid">
             {badges.map((badge) => (
               <div key={badge.id} className={`badge ${badge.unlocked ? 'unlocked' : ''}`}>
-                <div className={`badge-icon ${badge.id}`}></div>
+                <div className={`badge-icon ${badge.id}`} />
                 <div className="badge-info">
                   <h4>{badge.name}</h4>
                   <p>{badge.description}</p>
@@ -482,7 +485,7 @@ const Historyverse = () => {
             ))}
           </div>
         </div>
-        
+
         <p className="quote-neon">"Donde otros ven datos, Plubot escucha emociones."</p>
       </section>
 
@@ -490,7 +493,7 @@ const Historyverse = () => {
       <section className="historyverse-cta">
         <Link to="/welcome" className="hero-button">
           <span className="button-text">Crear mi Plubot</span>
-          <div className="button-particles"></div>
+          <div className="button-particles" />
         </Link>
       </section>
     </div>

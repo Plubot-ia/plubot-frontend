@@ -1,6 +1,6 @@
-import { Link } from 'react-router-dom';
 import { motion, useInView } from 'framer-motion';
 import { useRef, useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import plubotImage from '/src/assets/img/plubot.svg';
 import './Home-hero.css';
 
@@ -211,12 +211,12 @@ const HomeHero = () => {
         </Link>
       </div>
       <div className="hero-image-container">
-        <img 
-          src={plubotImage} 
-          alt="Plubot" 
-          className="hero-plubot" 
-          loading="eager" 
-          fetchpriority="high" 
+        <img
+          src={plubotImage}
+          alt="Plubot"
+          className="hero-plubot"
+          loading="eager"
+          fetchPriority="high"
         />
       </div>
     </section>

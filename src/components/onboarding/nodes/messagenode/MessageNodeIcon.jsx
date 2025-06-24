@@ -5,27 +5,27 @@
  * @version 1.0.0
  */
 
-import React, { memo } from 'react';
-import PropTypes from 'prop-types';
-import { 
-  MessageSquare, 
-  User, 
-  Bot, 
-  AlertTriangle, 
-  AlertCircle, 
-  Info, 
-  HelpCircle
+import {
+  MessageSquare,
+  User,
+  Bot,
+  AlertTriangle,
+  AlertCircle,
+  Info,
+  HelpCircle,
 } from 'lucide-react';
+import PropTypes from 'prop-types';
+import React, { memo } from 'react';
 
 // Constantes
 export const MESSAGE_TYPES = {
-  USER: 'user',      // Mensaje del usuario
-  BOT: 'bot',       // Respuesta del bot
+  USER: 'user', // Mensaje del usuario
+  BOT: 'bot', // Respuesta del bot
   SYSTEM: 'system', // Mensaje de sistema
-  ERROR: 'error',   // Mensaje de error
+  ERROR: 'error', // Mensaje de error
   WARNING: 'warning', // Advertencia
-  INFO: 'info',     // Información
-  QUESTION: 'question' // Pregunta
+  INFO: 'info', // Información
+  QUESTION: 'question', // Pregunta
 };
 
 /**
@@ -33,13 +33,13 @@ export const MESSAGE_TYPES = {
  */
 export const MessageNodeIcon = memo(({ type, isUltraPerformanceMode = false }) => {
   // Tamaño y grosor optimizados para legibilidad
-  const iconProps = { 
-    size: 16, 
+  const iconProps = {
+    size: 16,
     strokeWidth: 2,
     // En modo ultra rendimiento, desactivamos animaciones
-    className: isUltraPerformanceMode ? '' : 'message-node__icon-svg'
+    className: isUltraPerformanceMode ? '' : 'message-node__icon-svg',
   };
-  
+
   /**
    * Devuelve el ícono correspondiente al tipo de mensaje
    */
@@ -64,7 +64,7 @@ export const MessageNodeIcon = memo(({ type, isUltraPerformanceMode = false }) =
   };
 
   return (
-    <div 
+    <div
       className={`message-node__icon message-node__icon--${type || 'system'}`}
       aria-hidden="true"
     >
@@ -77,7 +77,6 @@ MessageNodeIcon.displayName = 'MessageNodeIcon';
 
 MessageNodeIcon.propTypes = {
   type: PropTypes.oneOf(Object.values(MESSAGE_TYPES)),
-  isUltraPerformanceMode: PropTypes.bool
+  isUltraPerformanceMode: PropTypes.bool,
 };
-
 

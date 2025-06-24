@@ -1,7 +1,10 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useReactFlow } from 'reactflow';
-import { DELETE_KEYS } from '../utils/flowEditorConstants';
+
 import useFlowStore from '@/stores/useFlowStore';
+
+import { DELETE_KEYS } from '../utils/flowEditorConstants';
+
 
 /**
  * Hook personalizado para gestionar las interacciones del usuario con el editor de flujos
@@ -65,8 +68,8 @@ const useFlowInteractions = ({
           }
           const flowStore = useFlowStore.getState();
           if (flowStore && Array.isArray(flowStore.edges)) {
-            const edgesToRemove = flowStore.edges.filter(edge => 
-              edge && (edge.source === nodeId || edge.target === nodeId)
+            const edgesToRemove = flowStore.edges.filter(edge =>
+              edge && (edge.source === nodeId || edge.target === nodeId),
             );
             if (edgesToRemove.length > 0) {
               if (reactFlowInstance) {
@@ -83,8 +86,8 @@ const useFlowInteractions = ({
               }
               if (flowStore.setEdges) {
                 try {
-                  const remainingEdges = flowStore.edges.filter(edge => 
-                    edge && !(edge.source === nodeId || edge.target === nodeId)
+                  const remainingEdges = flowStore.edges.filter(edge =>
+                    edge && !(edge.source === nodeId || edge.target === nodeId),
                   );
                   flowStore.setEdges(remainingEdges);
                 } catch (e) { /* Silently fail */ }
@@ -183,7 +186,7 @@ const useFlowInteractions = ({
         const flowStore = useFlowStore.getState();
         if (flowStore && typeof flowStore.setSelectedNode === 'function') {
           flowStore.setSelectedNode(node);
-        } 
+        }
       }
     } catch (error) { /* Silently fail */ }
     closeContextMenu();

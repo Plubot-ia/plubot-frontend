@@ -13,7 +13,7 @@ export const getSuggestions = (context) => {
       const suggestions = provider(context);
       return [...acc, ...suggestions];
     } catch (error) {
-
+      console.error('Error en el proveedor de sugerencias:', error);
       return acc;
     }
   }, []);

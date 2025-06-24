@@ -1,5 +1,7 @@
 import { useNavigate } from 'react-router-dom';
+
 import pluniverseMap from '@assets/img/pluniverse-map.webp';
+
 import './PluniverseDashboard.css';
 
 const PluniverseDashboard = () => {

@@ -1,5 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+
 import App from './App.jsx';
 import './i18n';
 import './index.css';
@@ -19,7 +20,7 @@ if (window.isMobile) {
   // Reducir la complejidad de las animaciones en dispositivos móviles
   document.documentElement.style.setProperty('--animation-duration', '0.2s');
   document.documentElement.style.setProperty('--transition-duration', '0.2s');
-  
+
   // Optimizar el renderizado para dispositivos móviles
   const meta = document.createElement('meta');
   meta.name = 'viewport';
@@ -35,5 +36,5 @@ if (!window.isMobile || process.env.NODE_ENV === 'development') {
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <App />
-  </React.StrictMode>
+  </React.StrictMode>,
 );

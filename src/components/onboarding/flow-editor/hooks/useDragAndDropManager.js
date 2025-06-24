@@ -1,8 +1,12 @@
 import { useCallback } from 'react';
+import { v4 as uuidv4 } from 'uuid';
+
+
 import useFlowStore from '@/stores/useFlowStore';
+
 import { calculateCorrectDropPosition } from '../drop-position-fix';
 import { applyNodeVisibilityFix } from '../utils/optimized-flow-fixes';
-import { v4 as uuidv4 } from 'uuid';
+
 
 /**
  * Hook para gestionar la lógica de arrastrar y soltar (Drag and Drop) en el editor de flujos.
@@ -39,7 +43,7 @@ const useDragAndDropManager = (reactFlowWrapperRef, reactFlowInstance, setHasCha
     if (!reactFlowWrapperRef.current || !reactFlowInstance) {
       return;
     }
-    
+
     const position = calculateCorrectDropPosition(event, reactFlowWrapperRef.current, reactFlowInstance);
 
     const defaultConditions = [
@@ -48,13 +52,13 @@ const useDragAndDropManager = (reactFlowWrapperRef, reactFlowInstance, setHasCha
     ];
 
     const newNode = {
-      id: nodeInfo.id, 
-      type: nodeInfo.type, 
+      id: nodeInfo.id,
+      type: nodeInfo.type,
       position,
-      data: { 
+      data: {
         ...nodeInfo.data,
         id: nodeInfo.id,
-        ...(nodeInfo.type === 'decision' && { conditions: defaultConditions })
+        ...(nodeInfo.type === 'decision' && { conditions: defaultConditions }),
       },
       draggable: true,
       selectable: true,

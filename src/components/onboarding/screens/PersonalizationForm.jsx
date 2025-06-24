@@ -1,15 +1,16 @@
-import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { useNavigate, Link, useSearchParams, useLocation } from 'react-router-dom';
-import { usePlubotCreation } from '@/context/PlubotCreationContext.jsx';
 import Particles from '@tsparticles/react';
-import plubotImage from '@/assets/img/plubot.svg';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import { useNavigate, Link, useSearchParams, useLocation } from 'react-router-dom';
+
 import byteImage from '@/assets/img/byte.png';
+import plubotImage from '@/assets/img/plubot.svg';
 import proLogo from '@/assets/img/plubotpro.svg';
+import { usePlubotCreation } from '@/context/PlubotCreationContext.jsx';
 import { powers } from '@/data/powers.js';
 import './PersonalizationForm.css';
-import useAuthStore from '@/stores/useAuthStore';
 import useAPI from '@/hooks/useAPI';
+import useAuthStore from '@/stores/useAuthStore';
 
 const PersonalizationForm = () => {
   // Estados de UI y animación
@@ -33,7 +34,7 @@ const PersonalizationForm = () => {
   const navigate = useNavigate();
   const { request, createBot, loading, error } = useAPI();
   const { user, updateProfile, setUser } = useAuthStore();
-  
+
   // Obtener el ID del plubot y la fuente de navegación
   const plubotId = searchParams.get('plubotId');
   const source = searchParams.get('source') || '';
@@ -127,44 +128,44 @@ const PersonalizationForm = () => {
 
   const freePowers = [
     'notion', 'slack', 'trello', 'google-sheets', 'github', 'typeform', 'discord',
-    'asana', 'monday', 'zoom', 'instagram', 'google-analytics', 'hubspot'
+    'asana', 'monday', 'zoom', 'instagram', 'google-analytics', 'hubspot',
   ];
 
   const messages = {
     name: plubotId
-      ? "Edita el nombre de tu Plubot para reflejar su nueva identidad."
-      : "Dale un nombre único a tu Plubot Despierto. ¡Este será su identidad en el Pluniverse!",
+      ? 'Edita el nombre de tu Plubot para reflejar su nueva identidad.'
+      : 'Dale un nombre único a tu Plubot Despierto. ¡Este será su identidad en el Pluniverse!',
     personality: plubotId
-      ? "Ajusta la personalidad de tu Plubot para cambiar cómo interactúa."
-      : "Elige una personalidad para tu Plubot. Define cómo interactuará con el mundo.",
+      ? 'Ajusta la personalidad de tu Plubot para cambiar cómo interactúa.'
+      : 'Elige una personalidad para tu Plubot. Define cómo interactuará con el mundo.',
     powers: plubotId
-      ? "Modifica los poderes de tu Plubot para adaptarlo a nuevas tareas."
-      : "Selecciona poderes gratuitos para tu Plubot. Los poderes Pro desbloquean integraciones avanzadas.",
+      ? 'Modifica los poderes de tu Plubot para adaptarlo a nuevas tareas.'
+      : 'Selecciona poderes gratuitos para tu Plubot. Los poderes Pro desbloquean integraciones avanzadas.',
     preview: plubotId
-      ? "¡Tu Plubot está actualizado! Revisa los cambios antes de guardar."
-      : "¡Tu Plubot Despierto está listo! Actívalo para configurar sus respuestas.",
+      ? '¡Tu Plubot está actualizado! Revisa los cambios antes de guardar.'
+      : '¡Tu Plubot Despierto está listo! Actívalo para configurar sus respuestas.',
   };
 
   // Función para cargar datos del Plubot
   const fetchPlubotData = useCallback(async (id) => {
     if (!id) return false;
-    
+
     setIsLoading(true);
     setErrorMessage('');
-    
+
     try {
 
       const response = await request('GET', `/plubots/${id}`);
-      
+
       if (response?.status === 'success' && response?.plubot) {
         const { name, tone, color, powers, purpose, initial_message } = response.plubot;
-        
+
         // Normalizar datos para evitar valores nulos o indefinidos
         const normalizedTone = tone ? tone.toLowerCase() : 'neutral';
-        const normalizedPowers = Array.isArray(powers) 
-          ? powers 
+        const normalizedPowers = Array.isArray(powers)
+          ? powers
           : (typeof powers === 'string' ? powers.split(',').filter(p => p) : []);
-        
+
         // Actualizar el contexto con datos completos
         updatePlubotData({
           id,
@@ -173,13 +174,13 @@ const PersonalizationForm = () => {
           color: color || '#D1D5DB',
           powers: normalizedPowers,
           purpose: purpose || 'asistir a los clientes en chat web',
-          initial_message: initial_message || ''
+          initial_message: initial_message || '',
         });
-        
+
         // Actualizar estados locales
         setNameInput(name || '');
         setEnergyLevel(name ? Math.min(name.length * 10, 100) : 0);
-        
+
         return true;
       } else {
         const errorMsg = response?.message || 'Error desconocido al cargar datos';
@@ -190,7 +191,7 @@ const PersonalizationForm = () => {
       }
     } catch (error) {
 
-      
+
       // Manejar errores específicos
       if (error.message?.includes('404')) {
         setErrorMessage('Plubot no encontrado');
@@ -199,7 +200,7 @@ const PersonalizationForm = () => {
         setErrorMessage(error.message || 'Error de conexión');
         setMessageText(`Error al cargar el Plubot: ${error.message || 'Error de conexión'}`);
       }
-      
+
       return false;
     } finally {
       setIsLoading(false);
@@ -211,7 +212,7 @@ const PersonalizationForm = () => {
     // Evitar recargas innecesarias si el ID no ha cambiado
     if (previousPlubotIdRef.current === plubotId) return;
     previousPlubotIdRef.current = plubotId;
-    
+
     if (plubotId) {
       // Modo edición: cargar datos del Plubot existente
       updateActiveSection('name');
@@ -328,7 +329,7 @@ const PersonalizationForm = () => {
       initial_message: personalityMessages[plubotData.tone?.toLowerCase()]?.welcome || '¡Hola! Soy tu Plubot Despierto, aquí para ayudarte.',
       powers: plubotData.powers || [],
       plan: 'free',
-      limits: { responsesPerMonth: 100, channels: ['webchat'] }
+      limits: { responsesPerMonth: 100, channels: ['webchat'] },
     };
   }, [plubotData, nameInput, personalityMessages]);
 
@@ -337,11 +338,11 @@ const PersonalizationForm = () => {
     try {
 
       const response = await request('PUT', `/plubots/update/${id}`, payload);
-      
+
       if (response?.status !== 'success') {
         throw new Error(response?.message || 'Error al actualizar el Plubot');
       }
-      
+
       // Crear objeto actualizado con formato consistente
       const updatedPlubot = {
         id,
@@ -352,30 +353,30 @@ const PersonalizationForm = () => {
         initial_message: payload.initial_message,
         powers: Array.isArray(payload.powers) ? payload.powers.join(',') : payload.powers,
       };
-      
+
       // Actualizar el perfil del usuario con el Plubot modificado
-      const newPlubots = user?.plubots?.map(p => 
-        p.id === id ? updatedPlubot : p
+      const newPlubots = user?.plubots?.map(p =>
+        p.id === id ? updatedPlubot : p,
       ) || [];
-      
+
       updateProfile({ plubots: newPlubots });
-      
+
       // Forzar recarga de datos del perfil para asegurar consistencia
       const profileResponse = await request('GET', '/auth/profile');
       if (profileResponse?.status === 'success') {
         updateProfile({
           ...profileResponse.user,
-          plubots: profileResponse.user.plubots || user?.plubots || []
+          plubots: profileResponse.user.plubots || user?.plubots || [],
         });
       }
-      
+
       // Mostrar mensaje de éxito y redirigir
       setMessageText(personalityMessages[payload.tone]?.confirmation || '¡Plubot actualizado con éxito!');
-      
+
       // Determinar destino de redirección basado en parámetro source
       const redirectTarget = source === 'profile' ? '/profile' : '/profile';
       setTimeout(() => navigate(`${redirectTarget}?t=${Date.now()}`), 1000);
-      
+
       return true;
     } catch (error) {
 
@@ -394,28 +395,28 @@ const PersonalizationForm = () => {
         localStorage.setItem(localBackupKey, JSON.stringify({
           data: payload,
           timestamp: new Date().toISOString(),
-          status: 'pending'
+          status: 'pending',
         }));
       } catch (backupError) {
 
       }
-      
+
       // Crear el Plubot usando el método robusto de createBot
       const response = await createBot(payload);
-      
+
       if (response?.status !== 'success' || !response?.plubot?.id) {
         // Manejar caso de error recuperable
         if (response?._recoverable) {
           return handleRecoverableError(payload, response);
         }
-        
+
         throw new Error(response?.message || 'Error al crear el Plubot');
       }
-      
+
       // Procesar respuesta exitosa
       const newPlubotId = response.plubot.id;
       const isOfflineMode = response._offlineMode === true;
-      
+
       // Crear objeto completo del nuevo Plubot
       const newPlubot = {
         id: newPlubotId,
@@ -425,9 +426,9 @@ const PersonalizationForm = () => {
         purpose: payload.purpose,
         initial_message: payload.initial_message,
         powers: payload.powers, // Mantener como array si payload.powers es un array
-        _offlineCreated: isOfflineMode
+        _offlineCreated: isOfflineMode,
       };
-      
+
       // Guardar el nombre en localStorage para que esté disponible en TrainingScreen
       try {
         localStorage.setItem(`plubot-name-${newPlubotId}`, payload.name);
@@ -435,15 +436,15 @@ const PersonalizationForm = () => {
       } catch (storageError) {
 
       }
-      
+
       // Actualizar el contexto de creación con datos completos
       updatePlubotData({
         ...newPlubot,
         powers: payload.powers,
         flowData: { nodes: [], edges: [] },
-        flowVersions: []
+        flowVersions: [],
       });
-      
+
       // Actualizar el perfil del usuario CON DATOS FRESCOS DEL BACKEND
       try {
 
@@ -457,7 +458,6 @@ const PersonalizationForm = () => {
           if (profileResponse) {
 
 
-
           } else {
 
           }
@@ -465,7 +465,7 @@ const PersonalizationForm = () => {
           // Fallback a la lógica anterior si la recarga del perfil falla
           const authStore = useAuthStore.getState();
           // newPlubot debería estar definido en este scope desde la creación del Plubot
-          const updatedPlubots = [...(authStore.user?.plubots || []), newPlubot]; 
+          const updatedPlubots = [...(authStore.user?.plubots || []), newPlubot];
           updateProfile({ plubots: updatedPlubots });
         }
       } catch (profileError) {
@@ -475,35 +475,35 @@ const PersonalizationForm = () => {
         const updatedPlubots = [...(authStore.user?.plubots || []), newPlubot];
         updateProfile({ plubots: updatedPlubots });
       }
-      
+
       // Mostrar mensaje apropiado
       setMessageText(isOfflineMode
         ? '¡Plubot creado localmente! Se sincronizará cuando haya conexión.'
         : personalityMessages[payload.tone]?.confirmation || '¡Plubot creado con éxito!');
-      
+
       // Avanzar al siguiente paso y navegar a TrainingScreen
       nextStep();
       setTimeout(() => navigate(`/training?plubotId=${newPlubotId}`), 500);
-      
+
       return true;
     } catch (error) {
 
       setErrorMessage(error.message || 'Error al crear');
       setMessageText(`Error al crear el Plubot: ${error.message || 'Error desconocido'}`);
-      
+
       // Guardar datos para recuperación futura
       try {
         const failedPlubots = JSON.parse(localStorage.getItem('failed_plubots') || '[]');
         failedPlubots.push({
           data: payload,
           timestamp: new Date().toISOString(),
-          error: error.message || 'Error desconocido'
+          error: error.message || 'Error desconocido',
         });
         localStorage.setItem('failed_plubots', JSON.stringify(failedPlubots));
       } catch (recoveryError) {
 
       }
-      
+
       return false;
     }
   }, [createBot, updatePlubotData, nextStep, navigate, personalityMessages, setMessageText]);
@@ -511,7 +511,7 @@ const PersonalizationForm = () => {
   // Manejar errores recuperables durante la creación
   const handleRecoverableError = useCallback((payload, response) => {
 
-    
+
     // Crear ID temporal y objeto recuperado
     const tempId = `local_${Date.now()}`;
     const recoveredPlubot = {
@@ -522,20 +522,20 @@ const PersonalizationForm = () => {
       purpose: payload.purpose,
       initial_message: payload.initial_message,
       powers: Array.isArray(payload.powers) ? payload.powers.join(',') : payload.powers,
-      _recoveryPending: true
+      _recoveryPending: true,
     };
-    
+
     // Actualizar contexto con datos recuperados
     updatePlubotData({
       ...recoveredPlubot,
       powers: payload.powers,
       flowData: { nodes: [], edges: [] },
-      flowVersions: []
+      flowVersions: [],
     });
-    
+
     setMessageText('Se ha producido un error, pero tus datos están seguros. Continuando en modo de recuperación.');
     nextStep();
-    
+
     // Navegar a TrainingScreen con modo de recuperación
     setTimeout(() => navigate(`/training?plubotId=${tempId}&recovery=true`), 500);
     return true;
@@ -547,30 +547,27 @@ const PersonalizationForm = () => {
     if (!validateCurrentSection()) {
       return;
     }
-    
+
     // Manejar la navegación entre secciones
     if (activeSection === 'name') {
       // Actualizar datos y avanzar a personalidad
       updatePlubotData({ name: nameInput });
       updateActiveSection('personality');
-    } 
-    else if (activeSection === 'personality') {
+    } else if (activeSection === 'personality') {
       // Avanzar a poderes
       updateActiveSection('powers');
-    } 
-    else if (activeSection === 'powers') {
+    } else if (activeSection === 'powers') {
       // Avanzar a vista previa
       updateActiveSection('preview');
-    } 
-    else if (activeSection === 'preview') {
+    } else if (activeSection === 'preview') {
       // Guardar o actualizar el Plubot
       setIsLoading(true);
       setErrorMessage('');
-      
+
       try {
         // Preparar payload con datos actualizados
         const payload = preparePlubotPayload;
-        
+
         // Ejecutar operación según modo (edición o creación)
         if (isEditMode) {
           await updateExistingPlubot(plubotId, payload);
@@ -632,7 +629,7 @@ const PersonalizationForm = () => {
                 className="plubot-input"
                 maxLength={20}
               />
-              <div className="input-underline"></div>
+              <div className="input-underline" />
             </div>
             <div className="plan-info">
               <p>Estás {plubotId ? 'editando un' : 'creando un'} <strong>Plubot Despierto Gratuito</strong>:</p>
@@ -711,7 +708,7 @@ const PersonalizationForm = () => {
                   )}
                   {plubotData.powers?.includes(power.id) && freePowers.includes(power.id) && (
                     <div className="power-active-indicator">
-                      <div className="power-pulse"></div>
+                      <div className="power-pulse" />
                     </div>
                   )}
                 </motion.div>
@@ -783,26 +780,26 @@ const PersonalizationForm = () => {
           fullScreen: { enable: true },
           particles: {
             number: { value: 50, density: { enable: true, value_area: 800 } },
-            color: { value: "#00e0ff" },
-            shape: { type: "circle" },
+            color: { value: '#00e0ff' },
+            shape: { type: 'circle' },
             opacity: { value: 0.3, random: true },
             size: { value: 2, random: true },
             move: {
               enable: true,
               speed: 1,
-              direction: "none",
+              direction: 'none',
               random: true,
-              outModes: "out",
-              attract: { enable: false }
+              outModes: 'out',
+              attract: { enable: false },
             },
             links: {
               enable: true,
               distance: 120,
-              color: "#00e0ff",
+              color: '#00e0ff',
               opacity: 0.1,
               width: 1,
-            }
-          }
+            },
+          },
         }}
       />
       <AnimatePresence>
@@ -822,16 +819,16 @@ const PersonalizationForm = () => {
                   '--angle': `${Math.random() * 360}deg`,
                   '--distance': `${Math.random() * 40 + 40}%`,
                   '--size': `${Math.random() * 8 + 5}px`,
-                  backgroundColor: '#00e0ff'
+                  backgroundColor: '#00e0ff',
                 }}
-              ></div>
+              />
             ))}
           </motion.div>
         )}
       </AnimatePresence>
       <div className="cosmic-grid">
         {[...Array(10)].map((_, i) => (
-          <div key={i} className="grid-line"></div>
+          <div key={i} className="grid-line" />
         ))}
       </div>
       <div className="progress-tracker">
@@ -845,7 +842,7 @@ const PersonalizationForm = () => {
                   className={`progress-node ${isActive ? 'active' : ''}`}
                   style={{ borderColor: isActive ? '#00e0ff' : undefined }}
                 >
-                  {isActive && <div className="node-fill" style={{ backgroundColor: '#00e0ff' }}></div>}
+                  {isActive && <div className="node-fill" style={{ backgroundColor: '#00e0ff' }} />}
                 </div>
                 <span className="step-label">{step}</span>
               </div>
@@ -856,7 +853,7 @@ const PersonalizationForm = () => {
           <div
             className="progress-fill"
             style={{ width: `${progress}%`, backgroundColor: '#00e0ff' }}
-          ></div>
+          />
         </div>
       </div>
       <div className="lab-content">
@@ -865,7 +862,7 @@ const PersonalizationForm = () => {
             <div className="hologram-platform" style={{ boxShadow: `0 0 30px #00e0ff` }}>
               <div className="platform-rings">
                 {[...Array(3)].map((_, i) => (
-                  <div key={i} className="platform-ring" style={{ borderColor: '#00e0ff' }}></div>
+                  <div key={i} className="platform-ring" style={{ borderColor: '#00e0ff' }} />
                 ))}
               </div>
             </div>
@@ -873,7 +870,7 @@ const PersonalizationForm = () => {
               <div
                 className="energy-meter"
                 style={{ height: `${energyLevel}%`, backgroundColor: '#00e0ff' }}
-              ></div>
+              />
               <img
                 src={plubotImage}
                 alt="Plubot"
@@ -893,7 +890,7 @@ const PersonalizationForm = () => {
             </div>
             <div className="hologram-circles">
               {[...Array(3)].map((_, i) => (
-                <div key={i} className={`hologram-circle circle${i+1}`} style={{ borderColor: '#00e0ff' }}></div>
+                <div key={i} className={`hologram-circle circle${i + 1}`} style={{ borderColor: '#00e0ff' }} />
               ))}
             </div>
             <div className="energy-beams">
@@ -904,18 +901,18 @@ const PersonalizationForm = () => {
                   style={{
                     transform: `rotate(${i * 90}deg)`,
                     backgroundColor: '#00e0ff',
-                    opacity: energyLevel / 200 + 0.1
+                    opacity: energyLevel / 200 + 0.1,
                   }}
-                ></div>
+                />
               ))}
             </div>
           </div>
           <div className="message-console">
             <div className="console-header">
               <div className="console-dots">
-                <div className="console-dot"></div>
-                <div className="console-dot"></div>
-                <div className="console-dot"></div>
+                <div className="console-dot" />
+                <div className="console-dot" />
+                <div className="console-dot" />
               </div>
               <span>LABORATORIO PLUBOT v2.5</span>
             </div>
@@ -961,7 +958,7 @@ const PersonalizationForm = () => {
               disabled={isLoading}
             >
               {isLoading ? (
-                <span><i className="fas fa-spinner fa-spin"></i> {plubotId ? 'Actualizando...' : 'Activando...'}</span>
+                <span><i className="fas fa-spinner fa-spin" /> {plubotId ? 'Actualizando...' : 'Activando...'}</span>
               ) : (
                 plubotId ? 'Guardar Cambios' : activeSection === 'preview' ? 'Activar Plubot' : 'Continuar'
               )}

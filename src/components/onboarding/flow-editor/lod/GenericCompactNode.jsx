@@ -6,9 +6,10 @@
  * @version 1.0.0
  */
 
-import React, { memo } from 'react';
 import PropTypes from 'prop-types';
+import React, { memo } from 'react';
 import { Handle, Position } from 'reactflow';
+
 import GenericNodeIcon from './GenericNodeIcon';
 import './lodStyles.css';
 
@@ -41,13 +42,13 @@ const GenericCompactNodeComponent = ({ data, selected }) => {
     'lod-node',
     'lod-node--compact',
     selected ? 'lod-node--selected' : '',
-    `lod-node--${nodeType}`
+    `lod-node--${nodeType}`,
   ].join(' ');
 
   return (
     <div className={nodeClasses}>
       <Handle type="target" position={Position.Top} className="lod-node__handle" />
-      
+
       <div className="compact-header">
         <GenericNodeIcon nodeType={nodeType} size={16} />
         <h3 className="compact-title">{nodeType.charAt(0).toUpperCase() + nodeType.slice(1)}</h3>

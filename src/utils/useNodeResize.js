@@ -1,8 +1,9 @@
 // src/utils/useNodeResize.js
-import { useState, useCallback, useEffect } from 'react';
-import { useAnalytics } from '@/hooks/useAnalytics';
-import { useReactFlow } from 'reactflow';
 import { throttle } from 'lodash';
+import { useState, useCallback, useEffect, useMemo } from 'react';
+import { useReactFlow } from 'reactflow';
+
+import { useAnalytics } from '@/hooks/useAnalytics';
 
 export const useNodeResize = (nodeId, initialWidth, initialHeight, minWidth = 100, minHeight = 60) => {
   const [isResizing, setIsResizing] = useState(false);
@@ -15,11 +16,12 @@ export const useNodeResize = (nodeId, initialWidth, initialHeight, minWidth = 10
     setIsResizing(true);
   }, []);
 
-  const throttledSetNodes = useCallback(
-    throttle((updater) => {
-      setNodes(updater);
-    }, 16), // Throttle to ~60fps, ensuring smooth but controlled updates
-    [setNodes]
+  const throttledSetNodes = useMemo(
+    () =>
+      throttle((updater) => {
+        setNodes(updater);
+      }, 16), // Throttle to ~60fps, ensuring smooth but controlled updates
+    [setNodes],
   );
 
   const handleMouseMove = useCallback(
@@ -41,10 +43,10 @@ export const useNodeResize = (nodeId, initialWidth, initialHeight, minWidth = 10
             };
           }
           return node;
-        })
+        }),
       );
     },
-    [isResizing, nodeId, throttledSetNodes, initialWidth, initialHeight, minWidth, minHeight]
+    [isResizing, nodeId, throttledSetNodes, initialWidth, initialHeight, minWidth, minHeight],
   );
 
   const handleMouseUp = useCallback(() => {

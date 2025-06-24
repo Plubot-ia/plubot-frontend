@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
-import useWindowSize from '../../../hooks/useWindowSize';
 import { useTranslation } from 'react-i18next';
 import ReactMarkdown from 'react-markdown';
+
+import useWindowSize from '../../../hooks/useWindowSize';
 import './SimulationInterface.css';
 
 // Helper para obtener el token JWT (DEBES IMPLEMENTAR ESTO SEGÚN TU APP)
@@ -26,7 +27,7 @@ const executeDiscordAction = async (nodeData) => {
   const { discordToken, channelId, messageContent } = nodeData;
 
   if (!discordToken || !channelId || !messageContent) {
-    let missing = [];
+    const missing = [];
     if (!discordToken) missing.push(t('simulation.missingBotToken', 'Token del Bot'));
     if (!channelId) missing.push('ID del Canal');
     if (!messageContent) missing.push('Mensaje a Enviar');
@@ -34,7 +35,7 @@ const executeDiscordAction = async (nodeData) => {
   }
 
   try {
-        const baseUrl = import.meta.env.VITE_API_URL || 'http://127.0.0.1:5000/api';
+    const baseUrl = import.meta.env.VITE_API_URL || 'http://127.0.0.1:5000/api';
     const response = await fetch(`${baseUrl}/actions/discord/send_message`, {
       method: 'POST',
       headers: {
@@ -42,9 +43,9 @@ const executeDiscordAction = async (nodeData) => {
         'Authorization': `Bearer ${jwtToken}`,
       },
       body: JSON.stringify({
-        token: discordToken,      // Token del Bot de Discord
-        channel_id: channelId,    // ID del Canal de Discord
-        message: messageContent,   // Mensaje a enviar
+        token: discordToken, // Token del Bot de Discord
+        channel_id: channelId, // ID del Canal de Discord
+        message: messageContent, // Mensaje a enviar
       }),
     });
 
@@ -124,7 +125,7 @@ const executeEmotionDetectionNodeAction = async (nodeData, currentVariables, inp
     return { success: true, data: { detectedEmotion } };
 
   } catch (error) {
-    return { success: false, error: 'Error de red o servidor al detectar la emoción: ' + error.message };
+    return { success: false, error: `Error de red o servidor al detectar la emoción: ${error.message}` };
   }
 };
 
@@ -161,7 +162,7 @@ const executeAiNodeAction = async (nodeData, currentVariables, lastUserMessage, 
         prompt: interpolatedPrompt,
         temperature: nodeData.temperature,
         maxTokens: nodeData.maxTokens,
-        systemMessage: systemMessage,
+        systemMessage,
       }),
     });
 
@@ -182,7 +183,7 @@ const MessageItem = React.memo(({ message }) => {
   const itemClass = `ts-message ts-${type} ${isActionStatus ? 'ts-action-status' : ''}`;
   return (
     <div className={itemClass}>
-      {type === 'bot' && !isActionStatus && <div className="ts-bot-avatar"></div>}
+      {type === 'bot' && !isActionStatus && <div className="ts-bot-avatar" />}
       <div className="ts-message-content">
         <ReactMarkdown>{content}</ReactMarkdown>
         {timestamp && (
@@ -221,7 +222,6 @@ const SimulationInterface = ({
   const simulationStarted = useRef(false);
 
 
-
   const startNode = safeNodes.find(n => n.type === 'start' || n.type === 'startNode' || (typeof n.type === 'string' && n.type.toLowerCase().includes('start')));
   const initialStartNodeId = startNode?.id;
 
@@ -249,7 +249,7 @@ const SimulationInterface = ({
 
     // Para analítica
     if (analyticsTracker) {
-      try { analyticsTracker('simulation_node_processing', { nodeId: node.id, nodeType: node.type }); } catch(e) {}
+      try { analyticsTracker('simulation_node_processing', { nodeId: node.id, nodeType: node.type }); } catch (e) {}
     }
 
     switch (node.type) {
@@ -307,16 +307,16 @@ const SimulationInterface = ({
         });
         setFlowStatus('executing_action');
 
-        
+
         // Asegúrate que node.data contiene: discordToken, channelId, messageContent
         const actionData = {
-            discordToken: node.data.discordToken, 
-            channelId: node.data.channelId, 
-            messageContent: node.data.messageContent || "Mensaje desde Plubot",
+          discordToken: node.data.discordToken,
+          channelId: node.data.channelId,
+          messageContent: node.data.messageContent || 'Mensaje desde Plubot',
         };
 
         const result = await executeDiscordAction(actionData);
-        
+
         addMessageToHistory({
           id: `action-result-${node.id}`,
           type: result.success ? 'system' : 'error',
@@ -387,13 +387,13 @@ const SimulationInterface = ({
 
         if (emotionResult.success) {
           const { detectedEmotion } = emotionResult.data;
-          
+
           // No usar useFlowStore, simplemente continuar con el flujo
 
 
           // Encontrar la rama correspondiente a la emoción detectada
           const nextEdge = safeEdges.find(edge => edge.source === node.id && edge.sourceHandle === `emotion-${detectedEmotion}`);
-          
+
           if (nextEdge) {
             await processNode(nextEdge.target, currentResponses, currentMessageForNode);
           } else {
@@ -444,7 +444,7 @@ const SimulationInterface = ({
 
         const lastUserMessage = currentMessageForNode || userMessageForNode || Object.values(userResponses).pop() || '';
 
-        
+
         const nodeDataForAction = {
           ...node.data,
           responseVariable: node.data.responseVariable || 'ai_response',
@@ -454,11 +454,11 @@ const SimulationInterface = ({
         if (aiResult.success) {
           const aiResponse = aiResult.data;
           const responseVarName = nodeDataForAction.responseVariable; // Use the potentially fixed variable
-          const newResponsesWithAI = { 
-            ...currentResponses, 
-            [responseVarName]: aiResponse 
+          const newResponsesWithAI = {
+            ...currentResponses,
+            [responseVarName]: aiResponse,
           };
-          
+
           addMessageToHistory({
             id: `ai-response-${node.id}`,
             type: 'bot',
@@ -523,7 +523,7 @@ const SimulationInterface = ({
     setCurrentNodeId(initialStartNodeId);
     setFlowStatus('idle');
     if (analyticsTracker) {
-      try { analyticsTracker('simulation_started', { nodeCount: safeNodes.length }); } catch(e) {}
+      try { analyticsTracker('simulation_started', { nodeCount: safeNodes.length }); } catch (e) {}
     }
     if (initialStartNodeId) {
       processNode(initialStartNodeId, {}, null);
@@ -586,7 +586,7 @@ const SimulationInterface = ({
       }).filter(Boolean);
 
 
-    return options;
+      return options;
     }
     return [];
   }, [isWaitingForUserInput, currentProcessingNode, safeEdges, safeNodes]);
@@ -676,14 +676,14 @@ const SimulationInterface = ({
       <div className="ts-header">
         <h2>{t('simulation.title', 'Simulación')}</h2>
         <button onClick={handleClose} className="ts-close-btn" aria-label={t('simulation.close', 'Cerrar')}>
-          <i className="fas fa-times"></i>
+          <i className="fas fa-times" />
         </button>
       </div>
       <div className="ts-chat-container" ref={scrollRef}>
         {simulationHistory.length > 0 ? (
           simulationHistory.map((msg) => (
             <div key={msg.id} className={`ts-message ts-${msg.type}${msg.isActionStatus ? ' ts-action-status' : ''}`}>
-              {msg.type === 'bot' && !msg.isActionStatus && <div className="ts-bot-avatar"></div>}
+              {msg.type === 'bot' && !msg.isActionStatus && <div className="ts-bot-avatar" />}
               <div className="ts-message-content">
                 <ReactMarkdown>{msg.content}</ReactMarkdown>
                 {msg.timestamp && <div className="ts-timestamp">{new Date(msg.timestamp).toLocaleTimeString()}</div>}
@@ -741,7 +741,7 @@ const SimulationInterface = ({
               type="text"
               value={userInput}
               onChange={(e) => setUserInput(e.target.value)}
-              onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleUserInputSubmit(e); }}}
+              onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleUserInputSubmit(e); } }}
               placeholder={
                 currentDecisionOptions.length > 0
                   ? t('simulation.decisionPlaceholder', 'Elige una opción o escribe tu respuesta...')
@@ -755,12 +755,12 @@ const SimulationInterface = ({
               disabled={isExecuting || !userInput.trim()}
               aria-label={t('simulation.send', 'Enviar')}
             >
-              <i className="fas fa-paper-plane"></i>
+              <i className="fas fa-paper-plane" />
             </button>
           </form>
         </div>
       )}
-      
+
       {(flowStatus === 'ended' || flowStatus === 'error') && (
         <div className="ts-restart-container">
           <button onClick={startSimulation} className="ts-restart-btn">

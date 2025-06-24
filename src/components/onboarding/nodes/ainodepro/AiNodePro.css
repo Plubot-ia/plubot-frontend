@@ -121,9 +121,10 @@
   color: var(--ainodepro-text);
   font-size: 14px;
   resize: none;
-  overflow-y: hidden;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  overflow: hidden; /* Ocultar el scrollbar para la auto-expansión */
+  transition: border-color 0.2s, box-shadow 0.2s, height 0.1s ease-out;
   box-sizing: border-box;
+  min-height: 40px; /* Altura mínima */
 }
 
 .ainodepro-textarea:focus {

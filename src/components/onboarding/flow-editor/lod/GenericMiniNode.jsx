@@ -6,9 +6,10 @@
  * @version 1.0.0
  */
 
-import React, { memo } from 'react';
 import PropTypes from 'prop-types';
+import React, { memo } from 'react';
 import { Handle, Position } from 'reactflow';
+
 import GenericNodeIcon from './GenericNodeIcon';
 import './lodStyles.css'; // Usaremos un CSS dedicado para los estilos LOD
 
@@ -40,7 +41,7 @@ const GenericMiniNode = memo(({ data, selected }) => {
     'lod-node',
     'lod-node--mini',
     selected ? 'lod-node--selected' : '',
-    `lod-node--${nodeType}` // Clase específica para el tipo de nodo
+    `lod-node--${nodeType}`, // Clase específica para el tipo de nodo
   ].join(' ');
 
   return (

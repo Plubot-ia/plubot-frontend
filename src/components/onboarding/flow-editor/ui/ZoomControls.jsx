@@ -1,6 +1,7 @@
 import React from 'react';
-import { useReactFlow } from 'reactflow';
 import { FiZoomIn, FiZoomOut, FiMaximize, FiRotateCcw, FiRotateCw } from 'react-icons/fi';
+import { useReactFlow } from 'reactflow';
+
 import './ZoomControls.css';
 import { useUndoRedo } from '@/stores/selectors';
 
@@ -16,7 +17,7 @@ const ZoomControls = ({
   onUndo,
   onRedo,
   onToggleHistory,
-  historyActive
+  historyActive,
 }) => {
   // Obtener funciones de historial del store de Zustand
   const { undo, redo, canUndo, canRedo } = useUndoRedo();
@@ -54,7 +55,7 @@ const ZoomControls = ({
         <FiMaximize />
         <div className="button-tooltip">Ajustar vista</div>
       </button>
-      
+
       {/* Botones de deshacer/rehacer */}
       <button
         className={`zoom-control-button ${!isUndoEnabled ? 'disabled' : ''}`}
@@ -72,7 +73,7 @@ const ZoomControls = ({
         <FiRotateCw />
         <div className="button-tooltip">Rehacer</div>
       </button>
-      
+
       {/* El botón de historial de versiones ha sido eliminado */}
     </div>
   );

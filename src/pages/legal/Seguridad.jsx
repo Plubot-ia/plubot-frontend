@@ -1,8 +1,10 @@
-import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { motion, AnimatePresence, useAnimation } from 'framer-motion';
-import { Link } from 'react-router-dom';
 import { Shield, Lock, CheckCircle, Eye, BarChart3, FileCheck } from 'lucide-react';
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
+import { Link } from 'react-router-dom';
+
 import aegisAvatar from '@assets/img/characters/seguridad/aegis-seguridad.webp';
+
 import './Seguridad.css';
 
 // Constantes predefinidas para mejor rendimiento
@@ -45,6 +47,7 @@ const ShieldMatrix = React.memo(() => {
     </div>
   );
 });
+ShieldMatrix.displayName = 'ShieldMatrix';
 
 const SecurityRadar = React.memo(() => {
   return (
@@ -72,12 +75,13 @@ const SecurityRadar = React.memo(() => {
           animate={{ textShadow: ['0 0 5px var(--seguridad-primary)', '0 0 15px var(--seguridad-primary)', '0 0 5px var(--seguridad-primary)'] }}
           transition={{ repeat: Infinity, duration: 3, ease: 'easeInOut' }}
         >
-          "El Pluniverse está blindado. Crea con confianza."
+          &quot;El Pluniverse está blindado. Crea con confianza.&quot;
         </motion.p>
       </div>
     </div>
   );
 });
+SecurityRadar.displayName = 'SecurityRadar';
 
 // Variantes de animaciones predefinidas
 const buttonVariants = {
@@ -186,11 +190,11 @@ const Seguridad = () => {
   // Seguimiento del cursor - optimizado con throttling
   useEffect(() => {
     if (!containerRef.current) return;
-    
+
     let timeoutId;
     const handleMouseMove = (e) => {
       if (timeoutId) return;
-      
+
       timeoutId = setTimeout(() => {
         if (!containerRef.current) return;
         const rect = containerRef.current.getBoundingClientRect();
@@ -220,7 +224,7 @@ const Seguridad = () => {
 
   const handleMouseEnter = useCallback(() => setIsHovering(true), []);
   const handleMouseLeave = useCallback(() => setIsHovering(false), []);
-  
+
   const handleToggleDetails = useCallback(() => {
     setShowDetails((prev) => !prev);
     playActivationSound();
@@ -348,17 +352,17 @@ const Seguridad = () => {
       <div className="digital-grid">
         <div className="grid-lines grid-horizontal">
           {Array.from({ length: 8 }).map((_, i) => (
-            <div key={i} className="grid-line h-line"></div>
+            <div key={i} className="grid-line h-line" />
           ))}
         </div>
         <div className="grid-lines grid-vertical">
           {Array.from({ length: 8 }).map((_, i) => (
-            <div key={i} className="grid-line v-line"></div>
+            <div key={i} className="grid-line v-line" />
           ))}
         </div>
       </div>
 
-      <div className="scanner-line" ref={scannerRef}></div>
+      <div className="scanner-line" ref={scannerRef} />
 
       <div className="content-wrapper">
         <motion.h1
@@ -493,12 +497,12 @@ const Seguridad = () => {
             {showDetails && (
               <motion.div className="details-container" variants={detailsVariants} initial="hidden" animate="visible" exit="exit">
                 <div className="details-header">
-                  <div className="header-dot"></div>
+                  <div className="header-dot" />
                   <div className="header-title">AEGIS.SECURITY.PROTOCOLS</div>
                   <div className="header-dots">
-                    <div className="small-dot"></div>
-                    <div className="small-dot"></div>
-                    <div className="small-dot"></div>
+                    <div className="small-dot" />
+                    <div className="small-dot" />
+                    <div className="small-dot" />
                   </div>
                 </div>
                 <div className="details-content">
@@ -533,8 +537,8 @@ const Seguridad = () => {
       {isHovering && (
         <motion.div
           className="custom-cursor"
-          style={{ 
-            transform: `translate(${cursorPosition.x}px, ${cursorPosition.y}px)` 
+          style={{
+            transform: `translate(${cursorPosition.x}px, ${cursorPosition.y}px)`,
           }}
           initial={{ opacity: 0, scale: 0.5 }}
           animate={{ opacity: 0.8, scale: 1, boxShadow: 'var(--seguridad-glow-primary)' }}

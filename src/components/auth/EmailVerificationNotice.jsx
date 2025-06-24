@@ -1,7 +1,9 @@
-import React, { useEffect } from 'react';
-import useWindowSize from '../../hooks/useWindowSize';
-import { useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import React, { useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+
+import useWindowSize from '../../hooks/useWindowSize';
+
 import './EmailVerificationNotice.css';
 import useAuthStore from '@/stores/useAuthStore';
 
@@ -27,10 +29,8 @@ const EmailVerificationNotice = () => {
         if (card) {
           card.style.transform = `perspective(1000px) rotateY(${xAxis}deg) rotateX(${yAxis}deg)`;
         }
-      } else {
-        if (card) {
-          card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0)';
-        }
+      } else if (card) {
+        card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0)';
       }
     };
     const handleMouseLeave = () => {
@@ -66,17 +66,17 @@ const EmailVerificationNotice = () => {
       transition={{ duration: 0.8, ease: 'easeOut' }}
     >
       <div className="email-verification-cosmic-lights">
-        <div className="email-verification-light-beam email-verification-light-beam-1"></div>
-        <div className="email-verification-light-beam email-verification-light-beam-2"></div>
-        <div className="email-verification-light-beam email-verification-light-beam-3"></div>
+        <div className="email-verification-light-beam email-verification-light-beam-1" />
+        <div className="email-verification-light-beam email-verification-light-beam-2" />
+        <div className="email-verification-light-beam email-verification-light-beam-3" />
       </div>
       <div className="email-verification-particles">
-        <div className="email-verification-particle email-verification-particle-1"></div>
-        <div className="email-verification-particle email-verification-particle-2"></div>
-        <div className="email-verification-particle email-verification-particle-3"></div>
-        <div className="email-verification-particle email-verification-particle-4"></div>
-        <div className="email-verification-particle email-verification-particle-5"></div>
-        <div className="email-verification-particle email-verification-particle-6"></div>
+        <div className="email-verification-particle email-verification-particle-1" />
+        <div className="email-verification-particle email-verification-particle-2" />
+        <div className="email-verification-particle email-verification-particle-3" />
+        <div className="email-verification-particle email-verification-particle-4" />
+        <div className="email-verification-particle email-verification-particle-5" />
+        <div className="email-verification-particle email-verification-particle-6" />
       </div>
       <motion.div
         className="email-verification-card"
@@ -99,7 +99,7 @@ const EmailVerificationNotice = () => {
           aria-label="Ir a la página de inicio de sesión"
         >
           Ir a Iniciar Sesión
-          <span className="email-verification-btn-glow"></span>
+          <span className="email-verification-btn-glow" />
         </button>
       </motion.div>
     </motion.div>

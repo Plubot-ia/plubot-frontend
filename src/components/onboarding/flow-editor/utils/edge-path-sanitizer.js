@@ -12,20 +12,20 @@
 export const sanitizeCoordinates = (coords) => {
   // Si las coordenadas son undefined o null, devolver un objeto vacío
   if (!coords) return { x: 0, y: 0 };
-  
+
   // Crear un nuevo objeto para evitar modificar el original
   const sanitized = { ...coords };
-  
+
   // Sanitizar la coordenada x
   if (isNaN(sanitized.x) || !isFinite(sanitized.x)) {
     sanitized.x = 0;
   }
-  
+
   // Sanitizar la coordenada y
   if (isNaN(sanitized.y) || !isFinite(sanitized.y)) {
     sanitized.y = 0;
   }
-  
+
   return sanitized;
 };
 
@@ -37,16 +37,16 @@ export const patchReactFlowEdgePaths = () => {
   try {
     // Solo ejecutar en entorno de navegador
     if (typeof window === 'undefined') return;
-    
+
     // Verificar si ya aplicamos el parche
     if (window.__reactFlowEdgePathsPatched) return;
-    
+
     // Sobrescribir la función getBezierPath para sanitizar las coordenadas
     const originalGetBezierPath = window.getBezierPath;
     if (typeof originalGetBezierPath === 'function') {
       window.getBezierPath = function patchedGetBezierPath(
-        sourceX, sourceY, sourcePosition, 
-        targetX, targetY, targetPosition, centerX, centerY
+        sourceX, sourceY, sourcePosition,
+        targetX, targetY, targetPosition, centerX, centerY,
       ) {
         // Sanitizar todas las coordenadas numéricas antes de pasarlas a la función original
         const safeSourceX = isNaN(sourceX) ? 0 : sourceX;
@@ -55,15 +55,15 @@ export const patchReactFlowEdgePaths = () => {
         const safeTargetY = isNaN(targetY) ? 0 : targetY;
         const safeCenterX = isNaN(centerX) ? 0 : centerX;
         const safeCenterY = isNaN(centerY) ? 0 : centerY;
-        
+
         return originalGetBezierPath(
           safeSourceX, safeSourceY, sourcePosition,
           safeTargetX, safeTargetY, targetPosition,
-          safeCenterX, safeCenterY
+          safeCenterX, safeCenterY,
         );
       };
     }
-    
+
     // Marcar como parcheado para evitar aplicar múltiples veces
     window.__reactFlowEdgePathsPatched = true;
   } catch (error) {}
@@ -77,7 +77,7 @@ export const patchReactFlowEdgePaths = () => {
  */
 export const sanitizeSvgPath = (path) => {
   if (!path) return '';
-  
+
   // Reemplazar valores NaN por 0
   return path.replace(/NaN/g, '0');
 };
@@ -89,10 +89,10 @@ export const sanitizeSvgPath = (path) => {
 export const useEdgePathSanitizer = () => {
   // Aplicar el parche global solo una vez
   patchReactFlowEdgePaths();
-  
+
   return {
     sanitizeCoordinates,
-    sanitizeSvgPath
+    sanitizeSvgPath,
   };
 };
 

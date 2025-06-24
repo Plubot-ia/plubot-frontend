@@ -1,9 +1,10 @@
-import { useEffect, useState, useRef } from 'react';
 import { motion, useAnimation, AnimatePresence } from 'framer-motion';
+import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+
+import plubotIcon from '@/assets/img/plubot.svg';
 import { usePlubotCreation } from '@/context/PlubotCreationContext.jsx';
 import useAuthStore from '@/stores/useAuthStore';
-import plubotIcon from '@/assets/img/plubot.svg';
 import './WelcomeSequence.css';
 
 // Versión optimizada - Componente más ligero sin tsParticles
@@ -11,14 +12,14 @@ const OptimizedParticles = () => {
   return (
     <div className="optimized-particles">
       {[...Array(30)].map((_, i) => (
-        <div 
-          key={i} 
+        <div
+          key={i}
           className="optimized-particle"
           style={{
             top: `${Math.random() * 100}%`,
             left: `${Math.random() * 100}%`,
             animationDelay: `${Math.random() * 5}s`,
-            animationDuration: `${3 + Math.random() * 7}s`
+            animationDuration: `${3 + Math.random() * 7}s`,
           }}
         />
       ))}
@@ -35,15 +36,15 @@ const WelcomeSequence = () => {
   const [isAnimationComplete, setIsAnimationComplete] = useState(false);
   const [showSkipHint, setShowSkipHint] = useState(true);
   const [isHovered, setIsHovered] = useState(false);
-  
+
   // Textos para la secuencia
   const introTexts = [
-    "En un universo interconectado donde los datos son el nuevo oro...",
-    "Donde las ideas son infinitas pero el tiempo es el recurso más valioso...",
-    "Nace una inteligencia nunca antes vista...",
-    "PLUBOT - Tu asistente digital."
+    'En un universo interconectado donde los datos son el nuevo oro...',
+    'Donde las ideas son infinitas pero el tiempo es el recurso más valioso...',
+    'Nace una inteligencia nunca antes vista...',
+    'PLUBOT - Tu asistente digital.',
   ];
-  
+
   const speedMs = 40; // Velocidad de escritura
   const phasePause = 1200; // Pausa entre frases
 
@@ -70,9 +71,9 @@ const WelcomeSequence = () => {
         skipAnimation();
       }
     };
-    
+
     window.addEventListener('keydown', handleKeyDown);
-    
+
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
@@ -89,7 +90,7 @@ const WelcomeSequence = () => {
     const touchElement = document.querySelector('.welcome-screen');
     if (touchElement) {
       touchElement.addEventListener('touchstart', handleTouch);
-      
+
       return () => {
         touchElement.removeEventListener('touchstart', handleTouch);
       };
@@ -103,12 +104,12 @@ const WelcomeSequence = () => {
       y: [-5, -10, -5],
       transition: {
         duration: 4,
-        ease: "easeInOut",
+        ease: 'easeInOut',
         repeat: Infinity,
-        repeatType: "reverse"
-      }
+        repeatType: 'reverse',
+      },
     });
-    
+
     // Versión reducida y optimizada de la animación de fondo
     backgroundAnimation.start({
       background: [
@@ -117,67 +118,67 @@ const WelcomeSequence = () => {
       ],
       transition: {
         duration: 20,
-        ease: "easeInOut",
+        ease: 'easeInOut',
         repeat: Infinity,
-        repeatType: "reverse"
-      }
+        repeatType: 'reverse',
+      },
     });
-    
+
     // Animación del resplandor
     glowAnimation.start({
       opacity: [0.3, 0.7, 0.3],
       scale: [1, 1.2, 1],
       transition: {
         duration: 3,
-        ease: "easeInOut",
+        ease: 'easeInOut',
         repeat: Infinity,
-        repeatType: "reverse"
-      }
+        repeatType: 'reverse',
+      },
     });
   }, [plubotAnimation, backgroundAnimation, glowAnimation]);
 
   // Secuencia de texto optimizada
   useEffect(() => {
     let isMounted = true;
-    
+
     const typeTextSequence = async () => {
       // Iniciar la secuencia de tipeo con un retraso inicial menor
       await new Promise(resolve => setTimeout(resolve, 800));
-      
+
       // Para cada fase de texto
       for (let phase = 0; phase < introTexts.length; phase++) {
         if (!isMounted) return;
-        
+
         setCurrentPhase(phase);
         const text = introTexts[phase];
         let currentText = '';
-        
+
         // Escribir cada caracter con retraso
         for (let i = 0; i <= text.length; i++) {
           if (!isMounted) return;
-          
+
           currentText = text.slice(0, i);
           setDisplayText(currentText);
           await new Promise(resolve => setTimeout(resolve, speedMs));
         }
-        
+
         // Pausa entre fases
         await new Promise(resolve => setTimeout(resolve, phasePause));
       }
-      
+
       // Animación final y revelación del botón
       if (!isMounted) return;
-      
+
       setIsAnimationComplete(true);
       await new Promise(resolve => setTimeout(resolve, 600));
       setIsButtonEnabled(true);
-      
+
       // Ocultar el texto de ayuda para omitir
       setShowSkipHint(false);
     };
 
     typeTextSequence();
-    
+
     return () => {
       isMounted = false;
     };
@@ -190,7 +191,7 @@ const WelcomeSequence = () => {
       scale: 1.2,
       rotate: 5,
       filter: 'drop-shadow(0 0 15px #00e0ff)',
-      transition: { duration: 0.5 }
+      transition: { duration: 0.5 },
     });
   };
 
@@ -200,7 +201,7 @@ const WelcomeSequence = () => {
       scale: 1,
       rotate: 0,
       filter: 'drop-shadow(0 0 8px #00e0ff)',
-      transition: { duration: 0.5 }
+      transition: { duration: 0.5 },
     });
   };
 
@@ -211,7 +212,7 @@ const WelcomeSequence = () => {
       contentRef.current.style.transition = 'transform 0.5s ease, opacity 0.5s ease';
       contentRef.current.style.transform = 'scale(0)';
       contentRef.current.style.opacity = '0';
-      
+
       setTimeout(() => {
         nextStep();
         navigate('/factory');
@@ -220,7 +221,7 @@ const WelcomeSequence = () => {
   };
 
   return (
-    <motion.div 
+    <motion.div
       className="welcome-screen"
       animate={backgroundAnimation}
     >
@@ -228,8 +229,8 @@ const WelcomeSequence = () => {
 
       {/* Luces cósmicas reducidas */}
       <div className="cosmic-lights">
-        <div className="light-beam light-beam-1"></div>
-        <div className="light-beam light-beam-3"></div>
+        <div className="light-beam light-beam-1" />
+        <div className="light-beam light-beam-3" />
       </div>
 
       {/* Texto para omitir la animación */}
@@ -252,7 +253,7 @@ const WelcomeSequence = () => {
         ref={contentRef}
         initial={{ opacity: 0, y: 50, scale: 0.8 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
-        transition={{ duration: 1.2, ease: "easeOut" }}
+        transition={{ duration: 1.2, ease: 'easeOut' }}
       >
         <motion.div
           className="plubot-icon-container"
@@ -260,12 +261,12 @@ const WelcomeSequence = () => {
           onHoverEnd={handleHoverEnd}
           animate={plubotAnimation}
           initial={{ y: -50, opacity: 0 }}
-          transition={{ delay: 0.5, duration: 1, type: "spring" }}
+          transition={{ delay: 0.5, duration: 1, type: 'spring' }}
         >
-          <motion.div 
+          <motion.div
             className="plubot-glow"
             animate={glowAnimation}
-          ></motion.div>
+          />
           <motion.div className="plubot-icon">
             <img src={plubotIcon} alt="Plubot Icon" />
             <AnimatePresence>
@@ -284,10 +285,10 @@ const WelcomeSequence = () => {
           </motion.div>
 
           {/* Halo de energía alrededor de Plubot */}
-          <div className="energy-ring"></div>
+          <div className="energy-ring" />
         </motion.div>
 
-        <motion.div 
+        <motion.div
           className="intro-text-container"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -295,10 +296,10 @@ const WelcomeSequence = () => {
         >
           <h1 className="intro-text">
             <div className="typewriter-container">
-              <div className="typewriter-line"></div>
+              <div className="typewriter-line" />
               <div className="typewriter-text">
                 {displayText}
-                <span className="cursor"></span>
+                <span className="cursor" />
               </div>
             </div>
           </h1>
@@ -310,13 +311,13 @@ const WelcomeSequence = () => {
               className="epic-reveal"
               initial={{ scale: 0, opacity: 0 }}
               animate={{ scale: [0, 1.3, 1], opacity: [0, 0.8, 1] }}
-              transition={{ 
+              transition={{
                 duration: 1,
                 times: [0, 0.6, 1],
-                ease: "easeOut"
+                ease: 'easeOut',
               }}
             >
-              <div className="reveal-glow"></div>
+              <div className="reveal-glow" />
               <div className="reveal-text">PLUBOT</div>
             </motion.div>
           )}
@@ -331,13 +332,13 @@ const WelcomeSequence = () => {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               whileHover={{
                 scale: 1.05,
-                boxShadow: "0 0 20px rgba(0, 224, 255, 0.8)"
+                boxShadow: '0 0 20px rgba(0, 224, 255, 0.8)',
               }}
               whileTap={{ scale: 0.95 }}
               transition={{ duration: 0.4 }}
             >
               <span className="button-text">Descubre tu poder</span>
-              <span className="button-glow"></span>
+              <span className="button-glow" />
             </motion.button>
           )}
         </AnimatePresence>

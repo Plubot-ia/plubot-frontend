@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import ReactFlow, { Background, Controls, MiniMap, applyNodeChanges, applyEdgeChanges } from 'reactflow';
+
 import 'reactflow/dist/style.css';
-import ByteGuide from "../../components/pluniverse/ByteGuide.jsx";
+import ByteGuide from '../../components/pluniverse/ByteGuide.jsx';
 
 const initialNodes = [
   { id: '1', type: 'input', data: { label: 'Inicio de conversación' }, position: { x: 250, y: 5 } },

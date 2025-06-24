@@ -1,6 +1,5 @@
 import { useState, useCallback } from 'react';
-import { createPortal } from 'react-dom';
-import { createRoot } from 'react-dom/client';
+
 
 /**
  * Hook personalizado para mostrar notificaciones toast
@@ -31,7 +30,7 @@ const useToast = () => {
   const showToast = useCallback((message, type = 'info', duration = 3000) => {
     const id = Date.now().toString();
     const toast = { id, message, type, duration };
-    
+
     // Crear elemento para el toast
     const toastElement = document.createElement('div');
     toastElement.id = `toast-${id}`;
@@ -44,7 +43,7 @@ const useToast = () => {
     toastElement.style.display = 'flex';
     toastElement.style.justifyContent = 'space-between';
     toastElement.style.alignItems = 'center';
-    
+
     // Aplicar estilos según el tipo
     switch (type) {
       case 'success':
@@ -63,11 +62,11 @@ const useToast = () => {
         toastElement.style.backgroundColor = '#4facfe';
         toastElement.style.color = 'white';
     }
-    
+
     // Crear contenido del toast
     const messageElement = document.createElement('span');
     messageElement.textContent = message;
-    
+
     // Crear botón de cierre
     const closeButton = document.createElement('button');
     closeButton.textContent = '×';
@@ -81,7 +80,7 @@ const useToast = () => {
     closeButton.style.transition = 'opacity 0.2s';
     closeButton.onmouseover = () => { closeButton.style.opacity = '1'; };
     closeButton.onmouseout = () => { closeButton.style.opacity = '0.8'; };
-    
+
     // Función para cerrar el toast
     const closeToast = () => {
       toastElement.style.animation = 'toast-out 0.3s ease forwards';
@@ -93,18 +92,18 @@ const useToast = () => {
         setToasts(prev => prev.filter(t => t.id !== id));
       }, 300);
     };
-    
+
     // Agregar evento al botón de cierre
     closeButton.onclick = closeToast;
-    
+
     // Agregar elementos al toast
     toastElement.appendChild(messageElement);
     toastElement.appendChild(closeButton);
-    
+
     // Agregar toast al contenedor
     const container = getToastContainer();
     container.appendChild(toastElement);
-    
+
     // Agregar estilos de animación si no existen
     if (!document.getElementById('toast-styles')) {
       const styleElement = document.createElement('style');
@@ -121,13 +120,13 @@ const useToast = () => {
       `;
       document.head.appendChild(styleElement);
     }
-    
+
     // Configurar cierre automático
     setTimeout(closeToast, duration);
-    
+
     // Actualizar estado
     setToasts(prev => [...prev, toast]);
-    
+
     // Retornar ID para posible referencia
     return id;
   }, [getToastContainer]);
@@ -166,7 +165,7 @@ const useToast = () => {
     showToast,
     hideToast,
     hideAllToasts,
-    toasts
+    toasts,
   };
 };
 

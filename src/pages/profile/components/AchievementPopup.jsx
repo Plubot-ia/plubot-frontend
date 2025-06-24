@@ -8,7 +8,7 @@ import React from 'react';
  */
 const AchievementPopup = ({ show, achievement }) => {
   if (!show || !achievement) return null;
-  
+
   return (
     <div className="achievement-unlocked">
       <div className="achievement-icon">{achievement.icon}</div>

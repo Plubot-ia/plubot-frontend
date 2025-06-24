@@ -1,11 +1,12 @@
 import React, { lazy, Suspense } from 'react';
+
 import { useGlobalContext } from '../../context/GlobalProvider';
 import useFlowStore from '../../stores/useFlowStore';
 
 // Importar componentes de modal directamente
-import SyncModal from '../onboarding/modals/SyncModal';
 import EmbedModal from '../onboarding/modals/EmbedModal';
 import ImportExportModal from '../onboarding/modals/ImportExportModal';
+import SyncModal from '../onboarding/modals/SyncModal';
 
 // Cargar componentes pesados con lazy loading
 const TemplateSelector = lazy(() => import('../onboarding/modals/TemplateSelector'));
@@ -14,7 +15,7 @@ const SimulationModal = lazy(() => import('../onboarding/simulation/SimulationIn
 // Componente de carga para lazy loading
 const LoadingFallback = () => (
   <div className="modal-loading">
-    <div className="modal-loading-spinner"></div>
+    <div className="modal-loading-spinner" />
     <p>Cargando...</p>
   </div>
 );
@@ -24,17 +25,17 @@ const LoadingFallback = () => (
  */
 const ModalContainer = () => {
   // Obtener estado y funciones del contexto global
-  const { 
-    activeModals, 
-    closeModal, 
-    showNotification, 
-    setByteMessage 
+  const {
+    activeModals,
+    closeModal,
+    showNotification,
+    setByteMessage,
   } = useGlobalContext();
-  
+
   // Obtener los nodos y aristas del FlowStore para el SimulationModal
   const { nodes, edges } = useFlowStore(state => ({
     nodes: state.nodes || [],
-    edges: state.edges || []
+    edges: state.edges || [],
   }));
 
   // Si no hay modales activos, no renderizar nada
@@ -96,35 +97,35 @@ const ModalContainer = () => {
   return (
     <>
       <style>{modalStyle}</style>
-      
+
       {/* RENDERIZADO DE MODALES - Solo se renderiza uno a la vez */}
       {(() => {
         // Determinar cuál modal está activo actualmente
         const activeModalName = Object.keys(activeModals).find(modal => activeModals[modal]);
-        
+
         // Renderizar solo el modal activo
         switch (activeModalName) {
           case 'syncModal':
             return (
-              <SyncModal 
-                onClose={() => closeModal('syncModal')} 
+              <SyncModal
+                onClose={() => closeModal('syncModal')}
                 onSync={handleSync}
                 project={{ name: 'Mi Proyecto', id: '1' }}
               />
             );
-            
+
           case 'embedModal':
             return (
-              <EmbedModal 
+              <EmbedModal
                 onClose={() => closeModal('embedModal')}
                 plubotId="123"
                 plubotName="Mi Plubot"
               />
             );
-            
+
           case 'importExportModal':
             return (
-              <ImportExportModal 
+              <ImportExportModal
                 onClose={() => closeModal('importExportModal')}
                 nodes={[]}
                 edges={[]}
@@ -138,11 +139,11 @@ const ModalContainer = () => {
                 updatePlubotData={() => {}}
               />
             );
-            
+
           case 'templateSelector':
             return (
               <Suspense fallback={<LoadingFallback />}>
-                <TemplateSelector 
+                <TemplateSelector
                   onClose={() => closeModal('templateSelector')}
                   onSelectTemplate={() => {
                     closeModal('templateSelector');
@@ -151,11 +152,11 @@ const ModalContainer = () => {
                 />
               </Suspense>
             );
-            
+
           case 'simulationModal':
             return (
               <Suspense fallback={<LoadingFallback />}>
-                <SimulationModal 
+                <SimulationModal
                   onClose={() => closeModal('simulationModal')}
                   nodes={Array.isArray(nodes) ? nodes : []}
                   edges={Array.isArray(edges) ? edges : []}
@@ -165,7 +166,7 @@ const ModalContainer = () => {
                 />
               </Suspense>
             );
-            
+
           default:
             return null; // No renderizar nada si no hay modal activo
         }

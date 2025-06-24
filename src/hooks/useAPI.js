@@ -1,10 +1,10 @@
 import { useState, useCallback } from 'react';
+
 import instance from '../utils/axiosConfig';
 
 const useAPI = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-
 
 
   const request = useCallback(async (method, url, data = null, config = {}) => {
@@ -16,11 +16,10 @@ const useAPI = () => {
       const headers = {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
-        ...(config.headers || {})
+        ...(config.headers || {}),
       };
 
       // Para depuración
-
 
 
       const response = await instance({
@@ -36,9 +35,8 @@ const useAPI = () => {
       setLoading(false);
       const status = err.response?.status || 'unknown';
       const errorMessage = err.response?.data?.message || err.message || 'Error en la solicitud';
-      
-      // Log detallado del error
 
+      // Log detallado del error
 
 
       if (err.response) {
@@ -52,7 +50,7 @@ const useAPI = () => {
 
       // El manejo de errores 401 ahora es global y está en `axiosConfig.js`.
       // El interceptor se encargará del logout y la redirección.
-      
+
 
       setError(errorMessage);
       throw new Error(errorMessage);
@@ -68,33 +66,33 @@ const useAPI = () => {
         ...plubotData,
         _localId: `local_${Date.now()}`,
         _timestamp: timestamp,
-        _synced: false
+        _synced: false,
       };
-      
+
       // Guardar en localStorage como respaldo
       try {
         // Obtener plubots guardados localmente o inicializar array
         const localPlubots = JSON.parse(localStorage.getItem('local_plubots_backup') || '[]');
-        
+
         // Añadir el nuevo plubot
         localPlubots.push(plubotBackup);
-        
+
         // Guardar array actualizado
         localStorage.setItem('local_plubots_backup', JSON.stringify(localPlubots));
 
       } catch (backupError) {
 
       }
-      
+
       // Intentar enviar al servidor con sistema de reintentos
       let response;
       let retryCount = 0;
       const maxRetries = 3;
-      
+
       while (retryCount < maxRetries) {
         try {
           response = await request('POST', '/plubots/create', plubotData);
-          
+
           // Si la petición es exitosa, actualizar el estado de sincronización
           if (response && response.status === 'success') {
             try {
@@ -106,10 +104,10 @@ const useAPI = () => {
                 }
                 return p;
               });
-              
+
               localStorage.setItem('local_plubots_backup', JSON.stringify(updatedLocalPlubots));
 
-              
+
               // Actualizar también el respaldo de plubots del usuario
               try {
                 const userPlubots = JSON.parse(localStorage.getItem('user_plubots_backup') || '[]');
@@ -125,15 +123,15 @@ const useAPI = () => {
             } catch (syncError) {
 
             }
-            
+
             break; // Salir del bucle de reintentos
           }
-          
+
         } catch (error) {
           retryCount++;
           if (retryCount >= maxRetries) {
 
-            
+
             // Devolver un objeto de éxito simulado con los datos locales
             // para que la UI pueda continuar funcionando
             return {
@@ -141,28 +139,28 @@ const useAPI = () => {
               message: 'Plubot creado localmente. Se sincronizará cuando haya conexión.',
               plubot: {
                 ...plubotBackup,
-                id: plubotBackup._localId // Usar el ID local como ID temporal
+                id: plubotBackup._localId, // Usar el ID local como ID temporal
               },
-              _offlineMode: true
+              _offlineMode: true,
             };
           }
-          
+
 
           await new Promise(resolve => setTimeout(resolve, 1000 * retryCount)); // Espera progresiva
         }
       }
-      
+
       return response;
     } catch (error) {
 
-      
+
       // En caso de error crítico, devolver un objeto de error pero con los datos locales
       // para que la UI pueda mostrar un mensaje adecuado
       return {
         status: 'error',
         message: 'Error al crear plubot. Se ha guardado una copia local.',
         _localBackup: plubotData,
-        _recoverable: true
+        _recoverable: true,
       };
     }
   }, [request]);

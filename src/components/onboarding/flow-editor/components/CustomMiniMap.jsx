@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
+
 import useFlowStore from '@/stores/useFlowStore';
+
 import './CustomMiniMap.css';
-import { useEffect, useState, useRef, useCallback } from 'react';
 import { Maximize2, Minimize2, Move } from 'lucide-react'; // Añadido icono Move
 
 // Creamos un componente personalizado que simula un MiniMap
@@ -13,9 +14,9 @@ const CustomMiniMap = () => {
     nodes: state.nodes,
     edges: state.edges,
     setNodes: state.setNodes,
-    fitView: state.fitView
+    fitView: state.fitView,
   }));
-  
+
   // Estado local para asegurar que los nodos tengan IDs únicos en el minimap
   const [minimapNodes, setMinimapNodes] = useState([]);
   // Estado para controlar si el mapa está contraído o expandido (inicia contraído)
@@ -24,21 +25,21 @@ const CustomMiniMap = () => {
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const mapContainerRef = useRef(null);
-  
+
   // Procesar los nodos para asegurar IDs únicos
   useEffect(() => {
     if (nodes && nodes.length > 0) {
       // Siempre procesar todos los nodos para minimapNodes
       const processedNodes = nodes.map((node, index) => ({
         ...node,
-        minimapId: `minimap-${node.id}-${index}` // ID único original
+        minimapId: `minimap-${node.id}-${index}`, // ID único original
       }));
       setMinimapNodes(processedNodes);
     } else {
       setMinimapNodes([]);
     }
   }, [nodes]); // Depender solo de 'nodes' para que se actualice siempre que los nodos cambien
-  
+
   // Función para alternar entre estado contraído y expandido
   const toggleCollapse = () => {
     setIsCollapsed(!isCollapsed);
@@ -47,38 +48,38 @@ const CustomMiniMap = () => {
   // Función para iniciar el arrastre del mapa
   const handleMouseDown = useCallback((e) => {
     if (isCollapsed) return;
-    
+
     setIsDragging(true);
     setDragStart({
       x: e.clientX,
-      y: e.clientY
+      y: e.clientY,
     });
   }, [isCollapsed]);
 
   // Función para manejar el movimiento durante el arrastre
   const handleMouseMove = useCallback((e) => {
     if (!isDragging || isCollapsed) return;
-    
+
     const dx = (e.clientX - dragStart.x) * 10; // Factor de escala para el movimiento
     const dy = (e.clientY - dragStart.y) * 10;
-    
+
     // Actualizar la posición de todos los nodos
     if (nodes && nodes.length > 0) {
       const updatedNodes = nodes.map(node => ({
         ...node,
         position: {
           x: node.position.x - dx,
-          y: node.position.y - dy
-        }
+          y: node.position.y - dy,
+        },
       }));
-      
+
       setNodes(updatedNodes);
     }
-    
+
     // Actualizar el punto de inicio para el próximo movimiento
     setDragStart({
       x: e.clientX,
-      y: e.clientY
+      y: e.clientY,
     });
   }, [isDragging, isCollapsed, dragStart, nodes, setNodes]);
 
@@ -97,7 +98,7 @@ const CustomMiniMap = () => {
   useEffect(() => {
     document.addEventListener('mousemove', handleMouseMove);
     document.addEventListener('mouseup', handleMouseUp);
-    
+
     return () => {
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseup', handleMouseUp);
@@ -120,7 +121,7 @@ const CustomMiniMap = () => {
                 const targetX = (targetNode.position?.x || 0) / 10;
                 const targetY = (targetNode.position?.y || 0) / 10;
                 return (
-                  <line 
+                  <line
                     key={`hidden-minimap-edge-${edge.id}`}
                     x1={`${sourceX}%`} y1={`${sourceY}%`}
                     x2={`${targetX}%`} y2={`${targetY}%`}
@@ -130,14 +131,14 @@ const CustomMiniMap = () => {
               })}
             </svg>
             {minimapNodes.map(node => (
-              <div 
+              <div
                 key={`hidden-minimap-node-${node.minimapId}`}
                 style={{
                   position: 'absolute',
                   left: `${(node.position?.x || 0) / 10}%`,
                   top: `${(node.position?.y || 0) / 10}%`,
                   width: '1px', height: '1px',
-                  backgroundColor: getNodeColor(node)
+                  backgroundColor: getNodeColor(node),
                 }}
               />
             ))}
@@ -150,11 +151,11 @@ const CustomMiniMap = () => {
           <div className="custom-minimap-bubble-content">
             {/* Versión miniatura de los nodos */}
             {minimapNodes.slice(0, 5).map(node => (
-              <div 
+              <div
                 key={node.minimapId}
                 className={`custom-minimap-node-mini ${node.type || 'default'}`}
                 style={{
-                  backgroundColor: getNodeColor(node)
+                  backgroundColor: getNodeColor(node),
                 }}
               />
             ))}
@@ -170,7 +171,7 @@ const CustomMiniMap = () => {
           <div className="custom-minimap-toggle" onClick={toggleCollapse}>
             <Minimize2 size={16} />
           </div>
-          
+
           {/* Indicador de modo de arrastre */}
           <div className="custom-minimap-drag-indicator" style={{ opacity: isDragging ? 1 : 0 }}>
             <Move size={16} />
@@ -178,7 +179,7 @@ const CustomMiniMap = () => {
           </div>
 
           {/* Representación simplificada del mapa */}
-          <div 
+          <div
             className={`custom-minimap-nodes ${isDragging ? 'dragging' : ''}`}
             onMouseDown={handleMouseDown}
             ref={mapContainerRef}
@@ -189,17 +190,17 @@ const CustomMiniMap = () => {
                 // Buscar los nodos de origen y destino
                 const sourceNode = minimapNodes.find(n => n.id === edge.source);
                 const targetNode = minimapNodes.find(n => n.id === edge.target);
-                
+
                 if (!sourceNode || !targetNode) return null;
-                
+
                 // Calcular las posiciones en el minimapa
                 const sourceX = (sourceNode.position?.x || 0) / 10;
                 const sourceY = (sourceNode.position?.y || 0) / 10;
                 const targetX = (targetNode.position?.x || 0) / 10;
                 const targetY = (targetNode.position?.y || 0) / 10;
-                
+
                 return (
-                  <line 
+                  <line
                     key={`minimap-edge-${edge.id}`}
                     x1={`${sourceX}%`}
                     y1={`${sourceY}%`}
@@ -212,17 +213,17 @@ const CustomMiniMap = () => {
                 );
               })}
             </svg>
-            
+
             {/* Renderizar los nodos encima de las aristas */}
             {minimapNodes.map(node => (
-              <div 
+              <div
                 key={node.minimapId} // Usar el ID único para el minimap
                 className={`custom-minimap-node ${node.type || 'default'}`}
                 style={{
                   left: `${(node.position?.x || 0) / 10}%`,
                   top: `${(node.position?.y || 0) / 10}%`,
                   backgroundColor: getNodeColor(node),
-                  zIndex: 2 // Asegurar que los nodos estén por encima de las aristas
+                  zIndex: 2, // Asegurar que los nodos estén por encima de las aristas
                 }}
               />
             ))}

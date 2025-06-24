@@ -355,7 +355,7 @@
 /* Contenedor principal del editor */
 .flow-editor-wrapper {
   width: 100%;
-  height: 100%;
+  height: 100vh; /* Ocupar toda la altura de la ventana */
   overflow: visible; /* Restaurado para visibilidad completa */
 
  /* Cambiado desde 100vh para permitir scroll */

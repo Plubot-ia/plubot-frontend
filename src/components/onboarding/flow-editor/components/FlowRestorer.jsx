@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+
 import useFlowStore from '@/stores/useFlowStore';
 
 /**
@@ -8,13 +9,13 @@ import useFlowStore from '@/stores/useFlowStore';
 const FlowRestorer = () => {
   useEffect(() => {
 
-    
+
     // Paso 1: Crear estilos globales que sobrescriban cualquier interferencia
     const createGlobalStyles = () => {
       // Eliminar cualquier estilo anterior
       const oldStyle = document.getElementById('flow-restorer-styles');
       if (oldStyle) oldStyle.remove();
-      
+
       const style = document.createElement('style');
       style.id = 'flow-restorer-styles';
       style.innerHTML = `
@@ -81,18 +82,18 @@ const FlowRestorer = () => {
       document.head.appendChild(style);
 
     };
-    
+
     // Paso 2: Función para validar y corregir nodos
     const validateAndRepairNodes = () => {
       const nodes = useFlowStore.getState().nodes || [];
       if (!nodes.length) return;
-      
+
       const usedPositions = new Set();
       const getUniquePosition = (baseX = 300, baseY = 200) => {
         const offset = 80;
         let x = baseX;
         let y = baseY;
-        
+
         for (let i = 0; i < 20; i++) {
           const posKey = `${x},${y}`;
           if (!usedPositions.has(posKey)) {
@@ -102,25 +103,25 @@ const FlowRestorer = () => {
           x += offset;
           y += offset;
         }
-        
+
         return {
           x: Math.floor(300 + Math.random() * 500),
-          y: Math.floor(200 + Math.random() * 300)
+          y: Math.floor(200 + Math.random() * 300),
         };
       };
-      
+
       const repairedNodes = nodes.map(node => {
-        const hasValidPosition = 
-          node.position && 
+        const hasValidPosition =
+          node.position &&
           typeof node.position.x === 'number' && !isNaN(node.position.x) &&
           typeof node.position.y === 'number' && !isNaN(node.position.y);
-        
-        const position = hasValidPosition 
+
+        const position = hasValidPosition
           ? { x: Math.round(node.position.x), y: Math.round(node.position.y) }
           : getUniquePosition();
-        
+
         usedPositions.add(`${position.x},${position.y}`);
-        
+
         return {
           ...node,
           position,
@@ -130,22 +131,22 @@ const FlowRestorer = () => {
           style: {
             ...node.style,
             visibility: 'visible',
-            opacity: 1
-          }
+            opacity: 1,
+          },
         };
       });
-      
+
       useFlowStore.getState().setNodes(repairedNodes);
 
     };
-    
+
     // Paso 3: Función para restaurar la interactividad completa
     const restoreInteractivity = () => {
-      const reactFlowInstance = useFlowStore.getState().reactFlowInstance;
+      const { reactFlowInstance } = useFlowStore.getState();
       if (!reactFlowInstance) {
         return;
       }
-      
+
       try {
         setTimeout(() => {
           reactFlowInstance.zoomTo(0.99);
@@ -157,18 +158,18 @@ const FlowRestorer = () => {
         // Silently fail
       }
     };
-    
+
     // Paso 4: Secuencia de ejecución con tiempos adecuados
     const executeRestoration = () => {
       createGlobalStyles();
-      
+
       try {
-        const styleSheets = document.styleSheets;
+        const { styleSheets } = document;
         for (let i = 0; i < styleSheets.length; i++) {
           try {
             const sheet = styleSheets[i];
             if (sheet.href && (
-              sheet.href.includes('fix-transform') || 
+              sheet.href.includes('fix-transform') ||
               sheet.href.includes('reset-transform')
             )) {
               sheet.disabled = true;
@@ -180,21 +181,21 @@ const FlowRestorer = () => {
       } catch (e) {
         // Silently fail
       }
-      
+
       setTimeout(validateAndRepairNodes, 100);
-      
+
       setTimeout(restoreInteractivity, 500);
-      
+
       const interval = setInterval(() => {
         validateAndRepairNodes();
       }, 3000);
-      
+
       return () => clearInterval(interval);
     };
-    
+
     return executeRestoration();
   }, []);
-  
+
   return null; // Componente invisible
 };
 

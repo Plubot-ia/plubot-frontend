@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+
 import useFlowStore from '@/stores/useFlowStore';
 import { NODE_TYPES } from '@/utils/nodeConfig';
 
@@ -13,29 +14,11 @@ import { NODE_TYPES } from '@/utils/nodeConfig';
  * @param {Array} params.initialEdges - Aristas por defecto para flujos vacíos
  */
 export default function usePlubotLoader({ plubotIdFromUrl, plubotData, initialNodes, initialEdges }) {
-  const {
-    plubotId,
-    flowName,
-    isLoaded,
-    nodes,
-    resetFlow,
-    setNodes,
-    setEdges,
-    setFlowName,
-  } = useFlowStore(state => ({
-    plubotId: state.plubotId,
-    flowName: state.flowName,
-    isLoaded: state.isLoaded,
-    nodes: state.nodes,
-    resetFlow: state.resetFlow,
-    setNodes: state.setNodes,
-    setEdges: state.setEdges,
-    setFlowName: state.setFlowName,
-  }));
+  const setFlowName = useFlowStore(state => state.setFlowName);
 
   useEffect(() => {
     // Se obtiene el estado más reciente directamente desde el store para evitar bucles de dependencia.
-    const { 
+    const {
       plubotId: currentPlubotIdInStore,
       flowName: currentFlowNameInStore,
       nodes: currentNodesInStore,
@@ -43,7 +26,6 @@ export default function usePlubotLoader({ plubotIdFromUrl, plubotData, initialNo
       setFlowName: setFlowNameFromStore,
       setNodes,
       setEdges,
-      resetFlow
     } = useFlowStore.getState();
 
     // Caso 1: Debemos cargar o ID cambió
@@ -102,5 +84,5 @@ export default function usePlubotLoader({ plubotIdFromUrl, plubotData, initialNo
     else if (!plubotIdFromUrl) {
       useFlowStore.getState().resetFlow(null, 'Flujo sin título', { skipLoad: true, allowResetFromLoader: true });
     }
-  }, [plubotIdFromUrl, plubotData?.name]); // FIX: Dependencia estabilizada a plubotData.name para evitar bucles de re-renderizado
+  }, [plubotIdFromUrl, plubotData?.name, initialNodes, initialEdges, setFlowName]);
 }

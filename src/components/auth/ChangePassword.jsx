@@ -1,7 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import useWindowSize from '../../hooks/useWindowSize';
 import { useNavigate } from 'react-router-dom';
+
 import useAuthStore from '@/stores/useAuthStore';
+
+import useWindowSize from '../../hooks/useWindowSize';
+
+
 import './ChangePassword.css';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 
@@ -67,7 +71,7 @@ const ChangePassword = () => {
       const response = await changePassword(
         formData.current_password,
         formData.new_password,
-        formData.confirm_password
+        formData.confirm_password,
       );
 
       if (response.success) {
@@ -109,10 +113,8 @@ const ChangePassword = () => {
         if (card) {
           card.style.transform = `perspective(1000px) rotateY(${xAxis}deg) rotateX(${yAxis}deg)`;
         }
-      } else {
-        if (card) {
-          card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0)';
-        }
+      } else if (card) {
+        card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0)';
       }
     };
 
@@ -134,17 +136,17 @@ const ChangePassword = () => {
   return (
     <div className="change-password-container">
       <div className="change-password-cosmic-lights">
-        <div className="change-password-light-beam change-password-light-beam-1"></div>
-        <div className="change-password-light-beam change-password-light-beam-2"></div>
-        <div className="change-password-light-beam change-password-light-beam-3"></div>
+        <div className="change-password-light-beam change-password-light-beam-1" />
+        <div className="change-password-light-beam change-password-light-beam-2" />
+        <div className="change-password-light-beam change-password-light-beam-3" />
       </div>
       <div className="change-password-particles">
-        <div className="change-password-particle change-password-particle-1"></div>
-        <div className="change-password-particle change-password-particle-2"></div>
-        <div className="change-password-particle change-password-particle-3"></div>
-        <div className="change-password-particle change-password-particle-4"></div>
-        <div className="change-password-particle change-password-particle-5"></div>
-        <div className="change-password-particle change-password-particle-6"></div>
+        <div className="change-password-particle change-password-particle-1" />
+        <div className="change-password-particle change-password-particle-2" />
+        <div className="change-password-particle change-password-particle-3" />
+        <div className="change-password-particle change-password-particle-4" />
+        <div className="change-password-particle change-password-particle-5" />
+        <div className="change-password-particle change-password-particle-6" />
       </div>
       <div className="change-password-card">
         <div className="change-password-card-header">
