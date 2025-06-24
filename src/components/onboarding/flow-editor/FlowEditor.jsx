@@ -361,25 +361,33 @@ const FlowEditorInner = ({
   
   // Acceso a las funciones de Zustand
   const {
-    // Funciones para actualizar nodos y aristas
     setNodes,
     setEdges,
     onNodesChange,
     onEdgesChange,
     onConnect,
-    
-    // Funciones de estado e identificación
-    setPlubotId, // Corregido: usar la acción del store directamente
+    setPlubotId,
     setFlowName,
     toggleUltraMode,
-    
-    // Funciones de historial
     undo,
     redo,
-    
-    // Funciones de guardado
-    saveFlow
-  } = useFlowStore();
+    saveFlow,
+  } = useFlowStore(
+    (state) => ({
+      setNodes: state.setNodes,
+      setEdges: state.setEdges,
+      onNodesChange: state.onNodesChange,
+      onEdgesChange: state.onEdgesChange,
+      onConnect: state.onConnect,
+      setPlubotId: state.setPlubotId,
+      setFlowName: state.setFlowName,
+      toggleUltraMode: state.toggleUltraMode,
+      undo: state.undo,
+      redo: state.redo,
+      saveFlow: state.saveFlow,
+    }),
+    shallow
+  );
   
   // ==============================================
   // SECCIÓN 2: ESTADO LOCAL Y HOOKS BÁSICOS
