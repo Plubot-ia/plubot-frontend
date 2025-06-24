@@ -2,18 +2,13 @@ import axios from 'axios';
 import useAuthStore from '@/stores/useAuthStore';
 
 const isDevelopment = import.meta.env.MODE === 'development';
-const prodApiUrl = import.meta.env.VITE_API_URL || 'https://plubot-backend.onrender.com';
+const apiUrl = (import.meta.env.VITE_API_URL || 'https://plubot-backend.onrender.com').trim();
 
-// Lógica robusta para construir la baseURL de producción
-let finalProdApiUrl = prodApiUrl;
-if (finalProdApiUrl.endsWith('/')) {
-  finalProdApiUrl = finalProdApiUrl.slice(0, -1); // Eliminar barra final si existe
-}
-if (!finalProdApiUrl.endsWith('/api')) {
-  finalProdApiUrl = `${finalProdApiUrl}/api`; // Añadir /api si no existe
-}
+// Normalizar la URL base: eliminar cualquier barra final y el sufijo '/api' si existe.
+const baseApiUrl = apiUrl.replace(/\/+$/, '').replace(/\/api$/, '');
 
-const baseURL = isDevelopment ? '/api' : finalProdApiUrl;
+// En desarrollo, usamos el proxy de Vite. En producción, construimos la URL completa asegurando que '/api' esté presente solo una vez.
+const baseURL = isDevelopment ? '/api' : `${baseApiUrl}/api`;
 
 const instance = axios.create({
   baseURL,

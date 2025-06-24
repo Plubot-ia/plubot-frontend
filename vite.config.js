@@ -37,18 +37,7 @@ export default defineConfig({
         target: 'http://127.0.0.1:5000',
         changeOrigin: true,
         secure: false,
-        ws: false,
-        configure: (proxy, _options) => {
-          proxy.on('error', (err, _req, _res) => {
-            console.log('[PROXY ERROR]', err);
-          });
-          proxy.on('proxyReq', (proxyReq, req, _res) => {
-            console.log('[PROXY] Sending request to:', req.method, req.url);
-          });
-          proxy.on('proxyRes', (proxyRes, req, _res) => {
-            console.log('[PROXY] Received response:', req.method, req.url, '->', proxyRes.statusCode);
-          });
-        }
+        ws: false
       },
     },
   },
