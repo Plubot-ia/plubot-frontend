@@ -42,10 +42,6 @@ export function applyPerformancePatches() {
   
   // Configurar el modo de rendimiento ultra
   setupUltraPerformanceMode();
-  
-  if (PERFORMANCE_CONFIG.logPerformance) {
-    console.log('[PerformancePatch] Optimizaciones aplicadas');
-  }
 }
 
 /**

@@ -14,17 +14,17 @@ let notificationCallbacks = [];
  */
 export const registerNotificationCallback = (callback) => {
   if (typeof callback !== 'function') {
-    console.warn('[NotificationManager] Intento de registrar un callback que no es una función');
+
     return () => {}; // Devolver una función vacía
   }
   
   notificationCallbacks.push(callback);
-  console.log(`[NotificationManager] Callback registrado. Total: ${notificationCallbacks.length}`);
+
   
   // Devolver función para cancelar registro
   return () => {
     notificationCallbacks = notificationCallbacks.filter(cb => cb !== callback);
-    console.log(`[NotificationManager] Callback eliminado. Quedan: ${notificationCallbacks.length}`);
+
   };
 };
 
@@ -34,7 +34,7 @@ export const registerNotificationCallback = (callback) => {
  * @param {string} type - Tipo de notificación ('success', 'error', 'warning', 'info')
  */
 export const sendNotification = (message, type = 'info') => {
-  console.log(`[NotificationManager] Enviando notificación: ${message} (${type})`);
+
   
   // Disparar evento global para cualquier componente que escuche
   try {
@@ -42,7 +42,7 @@ export const sendNotification = (message, type = 'info') => {
       detail: { message, type, timestamp: Date.now() }
     }));
   } catch (e) {
-    console.error('[NotificationManager] Error al disparar evento global:', e);
+
   }
   
   // Notificar a todos los callbacks registrados
@@ -50,7 +50,7 @@ export const sendNotification = (message, type = 'info') => {
     try {
       callback(message, type);
     } catch (error) {
-      console.error('[NotificationManager] Error en callback de notificación:', error);
+
     }
   });
   
@@ -130,7 +130,7 @@ export const showVisualNotification = (message, type = 'info') => {
       }
     }, 5000);
   } catch (error) {
-    console.error('[NotificationManager] Error al mostrar notificación visual:', error);
+
   }
 };
 

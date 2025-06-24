@@ -109,9 +109,8 @@ const RobustEdge = ({
           document.dispatchEvent(edgeSavedEvent);
         }
       }
-    } catch (error) {
-      console.error('Error al guardar arista en localStorage:', error);
-    }
+    } catch (error) {}
+
   }, [id, source, target, sourceX, sourceY, targetX, targetY, edgeStyle, data, backupEdgesToLocalStorage]);
   
   return (

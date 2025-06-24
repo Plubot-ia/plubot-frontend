@@ -159,7 +159,7 @@ const useTrainingStore = create(
 
           
           // Usar la instancia configurada de Axios que ya maneja la autenticación
-          const response = await instance.get(`/api/plubots/${plubotId}`);
+          const response = await instance.get(`/plubots/${plubotId}`);
           
           if (response.data) {
 
@@ -208,7 +208,7 @@ const useTrainingStore = create(
           };
           
           // Usar la instancia configurada de Axios que ya maneja la autenticación
-          const response = await instance.post(`/api/plubots/${plubotId}/flow`, payload);
+          const response = await instance.post(`/plubots/${plubotId}/flow`, payload);
           
           if (response.data) {
             // Actualizar el estado con los datos guardados

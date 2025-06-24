@@ -38,7 +38,7 @@ const EdgeConsistencyMonitor = ({ edges, setEdges }) => {
           if (nodeId) nodeIds.add(nodeId);
         });
         
-        console.log('EdgeConsistencyMonitor: Nodos actuales en el DOM:', Array.from(nodeIds));
+
         
         // Filtrar aristas huérfanas (aquellas cuyos nodos de origen o destino no existen)
         const validLocalEdges = parsedLocalEdges.filter(edge => {
@@ -53,14 +53,13 @@ const EdgeConsistencyMonitor = ({ edges, setEdges }) => {
           
           // Verificar que los nodos existan en el DOM
           const existsInDOM = nodesExistInDOM(edge);
-          if (!existsInDOM) {
-            console.warn(`EdgeConsistencyMonitor: Arista ${edge.id} ignorada porque sus nodos no existen en el DOM`);
-          }
+          if (!existsInDOM) {}
+
           
           return existsInDOM;
         });
         
-        console.log(`EdgeConsistencyMonitor: Filtradas ${parsedLocalEdges.length - validLocalEdges.length} aristas huérfanas o inválidas`);
+
         
         // Corregir los handles de las aristas válidas
         const fixedEdges = fixAllEdgeHandles(validLocalEdges);
@@ -68,12 +67,10 @@ const EdgeConsistencyMonitor = ({ edges, setEdges }) => {
         // Guardar las aristas válidas y corregidas de nuevo en localStorage
         if (validLocalEdges.length !== parsedLocalEdges.length || JSON.stringify(fixedEdges) !== JSON.stringify(validLocalEdges)) {
           localStorage.setItem('plubot-flow-edges', JSON.stringify(fixedEdges));
-          console.log('EdgeConsistencyMonitor: Aristas corregidas y guardadas en localStorage');
         }
         
         // Si no hay aristas en el estado actual pero sí en localStorage, restaurarlas
         if (edges.length === 0 && fixedEdges.length > 0) {
-          console.log('EdgeConsistencyMonitor: Restaurando aristas válidas desde localStorage');
           setEdges(fixedEdges);
           return;
         }
@@ -86,7 +83,6 @@ const EdgeConsistencyMonitor = ({ edges, setEdges }) => {
           });
           
           if (missingEdges.length > 0) {
-            console.log(`EdgeConsistencyMonitor: Encontradas ${missingEdges.length} aristas faltantes válidas`);
             // Añadir las aristas faltantes al estado actual
             setEdges(prevEdges => {
               // Corregir los handles de las aristas existentes
@@ -98,11 +94,7 @@ const EdgeConsistencyMonitor = ({ edges, setEdges }) => {
         } else {
           // Filtrar aristas actuales cuyos nodos no existen en el DOM
           const validCurrentEdges = edges.filter(edge => {
-            const exists = nodesExistInDOM(edge);
-            if (!exists) {
-              console.warn(`EdgeConsistencyMonitor: Arista ${edge.id} actual ignorada porque sus nodos no existen en el DOM`);
-            }
-            return exists;
+            return nodesExistInDOM(edge);
           });
           
           // Verificar si las aristas actuales válidas tienen handles correctos
@@ -110,13 +102,11 @@ const EdgeConsistencyMonitor = ({ edges, setEdges }) => {
           
           // Si hay diferencias entre las aristas originales y las filtradas/corregidas
           if (JSON.stringify(fixedCurrentEdges) !== JSON.stringify(edges)) {
-            console.log(`EdgeConsistencyMonitor: Corrigiendo handles de ${fixedCurrentEdges.length} aristas actuales válidas`);
             setEdges(fixedCurrentEdges);
           }
         }
-      } catch (error) {
-        console.error('EdgeConsistencyMonitor: Error al procesar aristas desde localStorage', error);
-      }
+      } catch (error) {}
+
     };
     
     // Verificar la consistencia después de un breve retraso

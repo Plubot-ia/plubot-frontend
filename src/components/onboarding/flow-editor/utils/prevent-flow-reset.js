@@ -27,12 +27,8 @@ export const preventFlowReset = () => {
     
     try {
       const backupKey = `plubot-nodes-emergency-backup-${plubotId}`;
-      console.log(`[preventFlowReset] Attempting to save emergency backup. Key: ${backupKey}, Nodes count: ${nodes.length}`);
       localStorage.setItem(backupKey, JSON.stringify(nodes));
-      console.log(`[preventFlowReset] Emergency backup saved successfully for plubotId: ${plubotId}`);
-    } catch (e) {
-      console.error(`[preventFlowReset] Error saving emergency backup for plubotId: ${plubotId}`, e);
-    }
+    } catch (e) {}
   };
   
   // Función para recuperar nodos de respaldo
@@ -41,28 +37,24 @@ export const preventFlowReset = () => {
     const plubotId = flowStoreState.plubotId;
 
     if (!plubotId) {
-      console.warn('[preventFlowReset] No plubotId provided to restoreNodesFromBackup.');
       return null;
     }
     try {
       const backupKey = `plubot-nodes-emergency-backup-${plubotId}`;
-      console.log(`[preventFlowReset] Emergency backup found for plubotId: ${plubotId}. Restoring...`);
+
       const backup = localStorage.getItem(backupKey);
       if (backup) {
         try {
           const nodes = JSON.parse(backup);
           if (Array.isArray(nodes) && nodes.length > 0) {
-            console.log(`[preventFlowReset] Recuperados ${nodes.length} nodos del respaldo de emergencia para ${plubotId} desde ${backupKey}`);
+
             return nodes;
           }
         } catch (error) {
-          console.error(`[preventFlowReset] Error parsing emergency backup for plubotId: ${plubotId}`, error);
           return null;
         }
       }
-    } catch (e) {
-      console.error('[preventFlowReset] Error al recuperar respaldo de emergencia:', e);
-    }
+    } catch (e) {}
     return null;
   };
   
@@ -85,24 +77,24 @@ export const preventFlowReset = () => {
             // Caso 1: Se permite el reseteo explícitamente a través de una opción.
             // Esta es la nueva forma robusta para que el cargador de flujos reinicie el estado.
             if (options.allowResetFromLoader === true) {
-              console.log('[preventFlowReset] Permitido reseteo explícito desde el cargador (allowResetFromLoader=true).');
+
               return originalResetFlow(...args);
             }
 
             // Caso 2: El reseteo no es forzado, se aplican las protecciones.
             // Si hay nodos en el editor, se bloquea para prevenir pérdida de datos.
             if (nodes.length > 0) {
-              console.warn('[preventFlowReset] BLOQUEADO: Intento de reseteo automático mientras hay nodos en el editor. La opción `allowResetFromLoader` no fue provista o fue falsa.');
+
               return prevState; // Bloquear el reseteo
             }
             
             // Caso 3: No hay nodos, por lo que el reseteo es seguro.
-            console.log('[preventFlowReset] Permitido reseteo porque no hay nodos en el editor.');
+
             return originalResetFlow(...args);
           }
         }));
         
-        console.log('[preventFlowReset] Protección para resetFlow instalada');
+
       }
       
       // 2. Proteger la función setNodes
@@ -119,7 +111,7 @@ export const preventFlowReset = () => {
             
             if (currentNodes.length > 0 && (!newNodes || (Array.isArray(newNodes) && newNodes.length === 0))) {
               if (!callStack.includes('TrainingScreen') && !callStack.includes('deleteNode')) {
-                console.warn('[preventFlowReset] Intento de eliminar todos los nodos bloqueado');
+
                 backupNodesToLocalStorage(currentNodes); // Guardar los nodos *antes* de la eliminación
                 return;
               }
@@ -138,7 +130,7 @@ export const preventFlowReset = () => {
           }
         }));
         
-        console.log('[preventFlowReset] Protección para setNodes instalada');
+
       }
       
       // 3. Añadir función de recuperación de emergencia al store
@@ -151,7 +143,7 @@ export const preventFlowReset = () => {
           if (currentNodes.length === 0) {
             // Intentar recuperar de la memoria primero
             if (lastNodes.length > 0) {
-              console.log(`[preventFlowReset] Recuperando ${lastNodes.length} nodos de memoria`);
+
               originalSetNodes(lastNodes);
               return true;
             }
@@ -181,23 +173,19 @@ export const preventFlowReset = () => {
           if (currentPlubotId) {
             emergencyBackupKey = `plubot-nodes-emergency-backup-${currentPlubotId}`;
             emergencyBackupForThisFlowExists = localStorage.getItem(emergencyBackupKey) !== null;
-            // console.log(`[preventFlowReset] Checking for emergency backup. Plubot ID: ${currentPlubotId}, Key: ${emergencyBackupKey}, Found: ${emergencyBackupForThisFlowExists}`);
+
           } else {
-            // console.log('[preventFlowReset] No currentPlubotId in store, cannot check for specific emergency backup.');
+
           }
 
           if (currentNodes.length === 0 && lastNodes.length > 0 && !emergencyBackupForThisFlowExists) {
-            console.warn(`[preventFlowReset] Nodos desaparecidos. Key '${emergencyBackupKey}' no encontrada (o no hay Plubot ID). NO SE RESTAURARÁ AUTOMÁTICAMENTE desde lastNodes.`);
             // currentState.setNodes(lastNodes); // <--- COMENTADO PARA EVITAR RESTAURACIÓN AUTOMÁTICA
-          } else if (currentNodes.length === 0 && lastNodes.length > 0 && emergencyBackupForThisFlowExists) {
-            console.log(`[preventFlowReset] Nodos desaparecidos, pero Key '${emergencyBackupKey}' existe. TrainingScreen.jsx gestionará.`);
-          }
-        } catch (e) {
-          console.error('[preventFlowReset] Error en verificación automática:', e);
-        }
+          } else if (currentNodes.length === 0 && lastNodes.length > 0 && emergencyBackupForThisFlowExists) {}
+
+        } catch (e) {}
       }, 5000); // Verificar cada 5 segundos
       
-      console.log('[preventFlowReset] Sistema de protección completo instalado');
+
       
       // Devolver función de limpieza
       return () => {
@@ -213,15 +201,11 @@ export const preventFlowReset = () => {
             flowStore.setState({ setNodes: originalSetNodes });
           }
           
-          console.log('[preventFlowReset] Sistema de protección desactivado');
-        } catch (e) {
-          console.error('[preventFlowReset] Error al restaurar funciones originales:', e);
-        }
+
+        } catch (e) {}
       };
     }
-  } catch (error) {
-    console.error('[preventFlowReset] Error al configurar protección:', error);
-  }
+  } catch (error) {}
   
   // Devolver función de limpieza vacía si algo falló
   return () => {};

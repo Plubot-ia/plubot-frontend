@@ -50,7 +50,6 @@ export const validateEdges = (edges, nodeMap = {}) => {
     const targetExists = nodeMap[target];
     
     if (!sourceExists || !targetExists) {
-      console.warn(`Arista ignorada: nodos no encontrados - source: ${source}, target: ${target}`);
       return false;
     }
     

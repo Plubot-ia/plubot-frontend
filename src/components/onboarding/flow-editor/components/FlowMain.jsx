@@ -673,7 +673,7 @@ const FlowMain = ({
     // Siempre delegar a externalValidConnectionsHandles si se proporciona.
     // Esta función ahora vendrá de useHandleValidator en FlowEditor.jsx y contendrá toda la lógica.
     if (typeof externalValidConnectionsHandles === 'function') {
-      // Los console.log detallados ahora estarán dentro de la función de useHandleValidator.
+
       return externalValidConnectionsHandles(connection);
     }
 

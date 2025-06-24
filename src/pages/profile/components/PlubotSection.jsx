@@ -39,7 +39,7 @@ const PlubotSection = memo(({
 
       // Asumimos que setModalPlubot puede manejar el estado de carga si es necesario,
       // o podríamos añadir un estado de carga local aquí.
-      const response = await axiosInstance.get(`/api/plubots/${plubot.id}`);
+      const response = await axiosInstance.get(`/plubots/${plubot.id}`);
       if (response.data.status === 'success' && response.data.plubot) {
 
         setModalPlubot(response.data.plubot); // Prop para abrir el modal de detalles

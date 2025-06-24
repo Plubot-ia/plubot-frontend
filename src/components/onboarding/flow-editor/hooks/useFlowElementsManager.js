@@ -20,11 +20,9 @@ const useFlowElementsManager = (saveHistoryState, setHasChanges) => {
 
   const addNodeToFlow = useCallback((nodeType, position) => {
     if (!nodeType) {
-      console.error('[useFlowElementsManager] Tipo de nodo no proporcionado');
       return;
     }
     if (!position || typeof position.x !== 'number' || typeof position.y !== 'number') {
-      console.error('[useFlowElementsManager] Posición inválida:', position);
       position = { x: 100, y: 100 }; // Posición por defecto
     }
 
@@ -60,7 +58,7 @@ const useFlowElementsManager = (saveHistoryState, setHasChanges) => {
         nodeData.startMessage = 'Inicio de la conversación';
         break;
       default:
-        console.log(`[useFlowElementsManager] Tipo de nodo no específico: ${nodeType}, usando configuración genérica`);
+
         break;
     }
 
@@ -91,13 +89,9 @@ const useFlowElementsManager = (saveHistoryState, setHasChanges) => {
             node.style.visibility = 'visible';
             node.style.display = 'block';
           });
-        } catch (e) {
-          console.error('[useFlowElementsManager] Error al forzar visibilidad:', e);
-        }
+        } catch (e) {}
       }, 100);
-    } catch (error) {
-      console.error('[useFlowElementsManager] Error al añadir nodo al flujo:', error);
-    }
+    } catch (error) {}
     return newNode;
   }, [nodes, edges, setNodes, saveHistoryState, setHasChanges]);
 

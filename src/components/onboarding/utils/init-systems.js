@@ -10,7 +10,7 @@ import { registerNotificationCallback, showVisualNotification } from './notifica
  * Inicializa todos los sistemas utilitarios
  */
 export const initAllSystems = () => {
-  console.log('[InitSystems] Inicializando sistemas globales de Plubot...');
+
   
   // Inicializar sistema de modales
   initModalManager();
@@ -18,7 +18,7 @@ export const initAllSystems = () => {
   // Configurar captura de errores globales para setByteMessage
   setupErrorHandling();
   
-  console.log('[InitSystems] Todos los sistemas inicializados correctamente');
+
 };
 
 /**
@@ -28,8 +28,6 @@ const setupErrorHandling = () => {
   // Capturar errores de setByteMessage a nivel global
   window.addEventListener('error', (event) => {
     if (event.message && event.message.includes('setByteMessage is not a function')) {
-      console.warn('[ErrorHandler] Capturado error de setByteMessage, aplicando corrección');
-      
       // Mostrar notificación visual como fallback
       const errorMessage = event.error?.message || 'Error en la operación';
       showVisualNotification(errorMessage, 'error');

@@ -29,7 +29,7 @@ export const registerModalListener = (listener) => {
  * @param {Object} props - Propiedades adicionales para pasar al modal
  */
 export const openModal = (modalName, props = {}) => {
-  console.log(`[ModalManager] Abriendo modal: ${modalName}`, props);
+
   
   // Actualizar estado interno
   modalState.activeModals[modalName] = {
@@ -42,9 +42,7 @@ export const openModal = (modalName, props = {}) => {
   modalState.listeners.forEach(listener => {
     try {
       listener({...modalState.activeModals});
-    } catch (error) {
-      console.error('[ModalManager] Error en listener de modal:', error);
-    }
+    } catch (error) {}
   });
   
   // Emitir evento global para componentes que escuchan eventos
@@ -52,9 +50,7 @@ export const openModal = (modalName, props = {}) => {
     window.dispatchEvent(new CustomEvent('plubot-modal-open', {
       detail: { modalName, props, timestamp: Date.now() }
     }));
-  } catch (e) {
-    console.error('[ModalManager] Error al disparar evento global de apertura:', e);
-  }
+  } catch (e) {}
 };
 
 /**
@@ -62,7 +58,7 @@ export const openModal = (modalName, props = {}) => {
  * @param {string} modalName - Nombre del modal a cerrar
  */
 export const closeModal = (modalName) => {
-  console.log(`[ModalManager] Cerrando modal: ${modalName}`);
+
   
   // Actualizar estado interno
   if (modalState.activeModals[modalName]) {
@@ -73,9 +69,7 @@ export const closeModal = (modalName) => {
   modalState.listeners.forEach(listener => {
     try {
       listener({...modalState.activeModals});
-    } catch (error) {
-      console.error('[ModalManager] Error en listener de modal:', error);
-    }
+    } catch (error) {}
   });
   
   // Emitir evento global para componentes que escuchan eventos
@@ -83,9 +77,7 @@ export const closeModal = (modalName) => {
     window.dispatchEvent(new CustomEvent('plubot-modal-close', {
       detail: { modalName, timestamp: Date.now() }
     }));
-  } catch (e) {
-    console.error('[ModalManager] Error al disparar evento global de cierre:', e);
-  }
+  } catch (e) {}
 };
 
 /**
@@ -115,7 +107,7 @@ if (typeof window !== 'undefined') {
 
 // Inicializador: configura eventos para escuchar comunicaciones entre componentes
 export const initModalManager = () => {
-  console.log('[ModalManager] Inicializando sistema de modales');
+
   
   // Escuchar eventos de apertura de modales desde otros componentes
   window.addEventListener('plubot-open-modal', (event) => {

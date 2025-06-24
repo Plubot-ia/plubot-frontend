@@ -16,6 +16,20 @@ const resources = {
       "contraseña": "Contraseña",
       "error": "Ha ocurrido un error inesperado",
       // ... agrega aquí todas las claves relevantes para la UI principal
+      "simulation": {
+        "title": "Simulación",
+        "close": "Cerrar",
+        "startPrompt": "Comienza la conversación...",
+        "waitingForInput": "Esperando tu respuesta...",
+        "inputPlaceholder": "Escribe tu respuesta...",
+        "inputLabel": "Tu respuesta",
+        "send": "Enviar",
+        "error": "Error",
+        "errorGeneric": "Ocurrió un error.",
+        "restart": "Reiniciar Simulación",
+        "executingAi": "Ejecutando Nodo IA...",
+        "decisionPlaceholder": "Elige una opción o escribe tu respuesta..."
+      }
     }
   },
   en: {

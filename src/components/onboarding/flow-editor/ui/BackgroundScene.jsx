@@ -43,10 +43,6 @@ const BackgroundScene = () => {
       return;
     }
     
-    console.log('Iniciando animación en modo normal');
-    
-
-    
     // Usar la referencia global en lugar de una variable local
     animationRef.current = null;
     

@@ -12,7 +12,6 @@
  */
 export const prepareEdgesForSaving = (edges) => {
   if (!Array.isArray(edges)) {
-    console.warn('[edgeFixUtil] prepareEdgesForSaving recibió un valor no-array. Se devolverá un array vacío.');
     return [];
   }
   return edges.map(({ id, source, target, sourceHandle, targetHandle, type, data, markerEnd }) => ({
@@ -37,9 +36,7 @@ export const backupEdgesToLocalStorage = (edges, plubotId) => {
   try {
     const backupKey = `rf-edges-backup-${plubotId}`;
     localStorage.setItem(backupKey, JSON.stringify(edges));
-  } catch (error) {
-    console.error('[edgeFixUtil] Error al respaldar las aristas en localStorage:', error);
-  }
+  } catch (error) {}
 };
 
 /**
@@ -54,11 +51,8 @@ export const recoverEdgesFromLocalStorage = (plubotId) => {
     const backup = localStorage.getItem(backupKey);
     if (backup) {
       const recoveredEdges = JSON.parse(backup);
-      console.log(`[edgeFixUtil] Se recuperaron ${recoveredEdges.length} aristas desde el backup de localStorage.`);
       return recoveredEdges;
     }
-  } catch (error) {
-    console.error('[edgeFixUtil] Error al recuperar las aristas desde localStorage:', error);
-  }
+  } catch (error) {}
   return null;
 };

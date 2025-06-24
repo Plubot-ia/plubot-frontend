@@ -16,26 +16,8 @@ import { setByteMessage } from '../utils/notification-manager';
  */
 const SystemInitializer = ({ children }) => {
   useEffect(() => {
-    console.log('[SystemInitializer] Inicializando sistemas del editor de flujos');
-    
-    // Monitorear errores de setByteMessage
-    const originalError = console.error;
-    console.error = (...args) => {
-      // Interceptar errores de setByteMessage
-      if (args[0] && typeof args[0] === 'string' && args[0].includes('setByteMessage is not a function')) {
-        console.warn('[ErrorInterceptor] Capturado error de setByteMessage');
-        
-        // window.setByteMessage assignment removed, notifications handled by GlobalProvider.
-      }
-      
-      // Llamar al error original
-      originalError.apply(console, args);
-    };
-    
-    // Limpiar al desmontar
-    return () => {
-      console.error = originalError;
-    };
+    // Los logs de inicialización y el interceptor de errores
+    // se han eliminado para limpiar el código de producción.
   }, []);
   
   return <>{children}</>;

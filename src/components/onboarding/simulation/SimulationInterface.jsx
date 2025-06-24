@@ -10,7 +10,6 @@ const getAuthToken = () => {
   // Asegúrate de que este token sea el JWT válido para tu backend.
   const token = localStorage.getItem('access_token'); // O el nombre que uses para tu token JWT
   if (!token) {
-    console.error("SimulationInterface: No se encontró el token JWT. Las acciones de nodo fallarán.");
   }
   return token;
 };
@@ -57,7 +56,6 @@ const executeDiscordAction = async (nodeData) => {
       return { success: false, message: responseData.message || responseData.error || `Error del servidor: ${response.status}` };
     }
   } catch (error) {
-    console.error('Error al ejecutar acción de Discord:', error);
     return { success: false, message: `Error de red o conexión: ${error.message}` };
   }
 };
@@ -126,7 +124,6 @@ const executeEmotionDetectionNodeAction = async (nodeData, currentVariables, inp
     return { success: true, data: { detectedEmotion } };
 
   } catch (error) {
-    console.error('[EmotionDetection] Error ejecutando nodo de detección de emoción:', error);
     return { success: false, error: 'Error de red o servidor al detectar la emoción: ' + error.message };
   }
 };
@@ -150,7 +147,7 @@ const executeAiNodeAction = async (nodeData, currentVariables, lastUserMessage, 
   }
 
   // CORRECTED: Use the correct API endpoint discovered during the audit.
-  const apiEndpoint = `${import.meta.env.VITE_API_URL}/api/ai-node`;
+  const apiEndpoint = `${import.meta.env.VITE_API_URL}/ai-node`;
 
   try {
     const response = await fetch(apiEndpoint, {
@@ -417,9 +414,6 @@ const SimulationInterface = ({
             content: t('simulation.errorEmotionDetection', 'Error al detectar la emoción: ') + emotionResult.error,
             timestamp: new Date().toISOString(),
           });
-          if (analyticsTracker) {
-            try { analyticsTracker('simulation_node_error', { nodeId: node.id, nodeType: node.type, error: emotionResult.error }); } catch(e) {}
-          }
         }
         return;
         break;
@@ -504,7 +498,12 @@ const SimulationInterface = ({
         break;
 
       default: // Nodos desconocidos o que no requieren interacción
-        console.warn(t('simulation.unknownNodeType', `Nodo de tipo desconocido o no interactivo: ${node.type}. Buscando siguiente nodo.`));
+        addMessageToHistory({
+          id: `system-non-interactive-${node.id}`,
+          type: 'system',
+          content: t('simulation.nonInteractiveNode', `Nodo no interactivo: ${node.type}. Buscando siguiente nodo.`),
+          timestamp: new Date().toISOString(),
+        });
         const defaultNextEdge = safeEdges.find(edge => edge.source === node.id);
         if (defaultNextEdge) {
           await processNode(defaultNextEdge.target, currentResponses, currentMessageForNode);

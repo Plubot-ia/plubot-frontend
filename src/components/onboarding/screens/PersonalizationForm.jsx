@@ -154,7 +154,7 @@ const PersonalizationForm = () => {
     
     try {
 
-      const response = await request('GET', `/api/plubots/${id}`);
+      const response = await request('GET', `/plubots/${id}`);
       
       if (response?.status === 'success' && response?.plubot) {
         const { name, tone, color, powers, purpose, initial_message } = response.plubot;
@@ -336,7 +336,7 @@ const PersonalizationForm = () => {
   const updateExistingPlubot = useCallback(async (id, payload) => {
     try {
 
-      const response = await request('PUT', `/api/plubots/update/${id}`, payload);
+      const response = await request('PUT', `/plubots/update/${id}`, payload);
       
       if (response?.status !== 'success') {
         throw new Error(response?.message || 'Error al actualizar el Plubot');

@@ -32,7 +32,6 @@ export const useNodeManagement = () => {
     // Obtener configuración del tipo de nodo
     const nodeType = nodeConfig[type];
     if (!nodeType) {
-      console.error(`Tipo de nodo desconocido: ${type}`);
       return null;
     }
 

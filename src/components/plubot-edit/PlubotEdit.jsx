@@ -23,7 +23,7 @@ const PlubotEdit = () => {
       }
 
       try {
-        const response = await request('GET', `/api/plubots/${plubotId}`);
+        const response = await request('GET', `/plubots/${plubotId}`);
         if (response.status === 'success') {
           const { name, flows, edges } = response.plubot;
           const normalizedNodes = Array.isArray(flows) ? flows.map((flow, index) => ({

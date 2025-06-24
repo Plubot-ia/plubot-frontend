@@ -108,7 +108,6 @@ export function stopAllAnimations(isUltraMode) {
     document.body.offsetHeight;
     
   } catch (err) {
-    console.error('[UltraModeManager] Error al detener animaciones:', err);
   }
 }
 
@@ -143,7 +142,6 @@ export function restoreAnimations() {
     });
     
   } catch (err) {
-    console.error('[UltraModeManager] Error al restaurar animaciones:', err);
   }
 }
 
@@ -159,7 +157,6 @@ function getUserPreference() {
     const stored = localStorage.getItem(USER_PREFERENCE_KEY);
     return stored ? JSON.parse(stored) : null;
   } catch (err) {
-    console.error('[UltraModeManager] Error al leer preferencia:', err);
     return null;
   }
 }
@@ -178,7 +175,6 @@ function saveUserPreference(enabled) {
     localStorage.setItem(USER_PREFERENCE_KEY, JSON.stringify(preference));
 
   } catch (err) {
-    console.error('[UltraModeManager] Error al guardar preferencia:', err);
   }
 }
 

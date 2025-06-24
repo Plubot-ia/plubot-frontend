@@ -41,7 +41,6 @@ const ForceNodePositioning = () => {
         }
       `;
       document.head.appendChild(style);
-      console.log('[ForceNodePositioning] Estilos globales aplicados');
     };
 
     // Aplicar los estilos globales
@@ -57,11 +56,9 @@ const ForceNodePositioning = () => {
           if (sheet.href && (sheet.href.includes('fix-transform') || sheet.href.includes('reset-transform'))) {
             // Deshabilitar la hoja de estilo problemática
             sheet.disabled = true;
-            console.log('[ForceNodePositioning] Deshabilitada hoja de estilo:', sheet.href);
           }
         } catch (e) {
-          // Algunas hojas de estilo pueden ser inaccesibles por CORS
-          console.warn('[ForceNodePositioning] Error al acceder a una hoja de estilo');
+
         }
       }
     };
@@ -74,8 +71,6 @@ const ForceNodePositioning = () => {
       // Obtener TODOS los nodos, incluyendo los más recientes
       const nodes = useFlowStore.getState().nodes || [];
       if (!nodes.length) return;
-
-      console.log('[ForceNodePositioning] Aplicando posición directa a', nodes.length, 'nodos');
 
       // Crear un mapa de nodos para acceso rápido
       const nodeMap = {};
@@ -111,11 +106,8 @@ const ForceNodePositioning = () => {
         // Seleccionar todos los elementos de nodo
         const nodeElements = document.querySelectorAll('.react-flow__node');
         if (!nodeElements.length) {
-          console.warn('[ForceNodePositioning] No se encontraron elementos de nodo en el DOM');
           return;
         }
-
-        console.log('[ForceNodePositioning] Encontrados', nodeElements.length, 'elementos de nodo en el DOM');
 
         // Aplicar posicionamiento directo vía CSS inline
         nodeElements.forEach(el => {
@@ -135,8 +127,6 @@ const ForceNodePositioning = () => {
             
             // Marcar como posicionado por esta utilidad
             el.classList.add('node-force-positioned');
-            
-            console.log(`[ForceNodePositioning] Nodo ${nodeId} posicionado en: ${node.position.x}px, ${node.position.y}px`);
           }
         });
 
@@ -151,7 +141,6 @@ const ForceNodePositioning = () => {
         try {
           const reactFlowInstance = useFlowStore.getState().reactFlowInstance;
           if (reactFlowInstance) {
-            console.log('[ForceNodePositioning] Restaurando interactividad de ReactFlow...');
             
             // Restaurar el viewport para que funcione el zoom
             const viewport = document.querySelector('.react-flow__viewport');
@@ -192,13 +181,10 @@ const ForceNodePositioning = () => {
               setTimeout(() => {
                 reactFlowInstance.zoomTo(1);
               }, 10);
-            } catch (e) {
-              console.warn('[ForceNodePositioning] Error al intentar zoom:', e);
-            }
+            } catch (e) {}
+
           }
-        } catch (error) {
-          console.error('[ForceNodePositioning] Error al restaurar interactividad:', error);
-        }
+        } catch (error) {}
       }, 300);
     };
 

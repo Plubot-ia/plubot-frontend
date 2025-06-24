@@ -19,7 +19,6 @@ export const recoverEdgesFromLocalStorage = (plubotId) => {
   // Limitar la frecuencia de recuperación
   const now = Date.now();
   if (now - lastRecoveryAttempt < recoveryThrottleMs) {
-    console.log(`edgeRecoveryUtil: Recuperación de aristas limitada por frecuencia. Espere ${Math.ceil((recoveryThrottleMs - (now - lastRecoveryAttempt)) / 1000)} segundos.`);
     return [];
   }
   
@@ -36,10 +35,8 @@ export const recoverEdgesFromLocalStorage = (plubotId) => {
         const parsedEdges = JSON.parse(genericStoredEdges);
         if (Array.isArray(parsedEdges) && parsedEdges.length > 0) {
           recoveredEdges = parsedEdges;
-          console.log(`edgeRecoveryUtil: Recuperadas ${parsedEdges.length} aristas desde clave genérica`);
         }
       } catch (e) {
-        console.error('Error al parsear aristas desde clave genérica:', e);
       }
     }
     
@@ -53,10 +50,8 @@ export const recoverEdgesFromLocalStorage = (plubotId) => {
           const parsedEdges = JSON.parse(storedEdges);
           if (Array.isArray(parsedEdges) && parsedEdges.length > 0) {
             recoveredEdges = parsedEdges;
-            console.log(`edgeRecoveryUtil: Recuperadas ${parsedEdges.length} aristas desde clave específica`);
           }
         } catch (e) {
-          console.error(`Error al parsear aristas desde ${keyFormat}:`, e);
         }
       }
     }
@@ -71,13 +66,11 @@ export const recoverEdgesFromLocalStorage = (plubotId) => {
       // Corregir los handles de las aristas filtradas
       const fixedEdges = fixAllEdgeHandles(filteredEdges);
       
-      console.log(`edgeRecoveryUtil: ${filteredEdges.length} aristas válidas recuperadas, ${fixedEdges.length} con handles corregidos`);
       return fixedEdges;
     }
     
     return [];
   } catch (error) {
-    console.error('Error al recuperar aristas desde localStorage:', error);
     return [];
   }
 };
@@ -108,13 +101,11 @@ export const saveEdgesToLocalStorage = (plubotId, edges) => {
     const validEdges = edges.filter(edge => {
       const exists = nodesExistInDOM(edge);
       if (!exists && edge && edge.id) {
-        console.warn(`saveEdgesToLocalStorage: Arista ${edge.id} ignorada porque sus nodos no existen en el DOM`);
       }
       return exists;
     });
     
     if (validEdges.length !== edges.length) {
-      console.log(`saveEdgesToLocalStorage: Filtradas ${edges.length - validEdges.length} aristas inválidas antes de guardar`);
     }
     
     // Corregir los handles de las aristas válidas antes de guardarlas
@@ -127,18 +118,12 @@ export const saveEdgesToLocalStorage = (plubotId, edges) => {
     localStorage.setItem(`plubot-edges-${plubotId}`, edgesJSON);
     localStorage.setItem('plubot-flow-edges', edgesJSON);
     localStorage.setItem('plubot-flow-edges-timestamp', Date.now().toString());
-    
-    console.log(`edgeRecoveryUtil: Guardadas ${fixedEdges.length} aristas con handles corregidos en localStorage para plubot ${plubotId}`);
   } catch (error) {
-    console.error('Error al guardar aristas en localStorage:', error);
-    
     // En caso de error con la corrección, intentar guardar las aristas originales
     try {
       const edgesJSON = JSON.stringify(edges);
       localStorage.setItem(`plubot-edges-${plubotId}`, edgesJSON);
-      console.log(`edgeRecoveryUtil: Guardadas ${edges.length} aristas originales (sin corregir) en localStorage para plubot ${plubotId}`);
     } catch (backupError) {
-      console.error('Error al guardar aristas originales en localStorage:', backupError);
     }
   }
 };
@@ -154,12 +139,10 @@ export const forceEdgeVisualUpdate = (edges) => {
   // Limitar la frecuencia de actualizaciones
   const now = Date.now();
   if (now - lastVisualUpdate < visualUpdateThrottleMs) {
-    console.log(`edgeRecoveryUtil: Actualización visual limitada por frecuencia. Espere ${Math.ceil((visualUpdateThrottleMs - (now - lastVisualUpdate)) / 1000)} segundos.`);
     return; // Evitar actualizaciones demasiado frecuentes
   }
   
   lastVisualUpdate = now;
-  console.log('edgeRecoveryUtil: Forzando actualización visual de aristas...');
   
   // Si se proporcionaron aristas, filtrar las válidas y corregir sus handles antes de emitir el evento
   let fixedHandles = false;
@@ -169,13 +152,11 @@ export const forceEdgeVisualUpdate = (edges) => {
       const validEdges = edges.filter(edge => {
         const exists = nodesExistInDOM(edge);
         if (!exists) {
-          console.warn(`edgeRecoveryUtil: Arista ${edge.id} ignorada durante actualización visual porque sus nodos no existen en el DOM`);
         }
         return exists;
       });
       
       if (validEdges.length !== edges.length) {
-        console.log(`edgeRecoveryUtil: Filtradas ${edges.length - validEdges.length} aristas inválidas durante actualización visual`);
       }
       
       // Intentar corregir los handles de las aristas válidas
@@ -193,7 +174,6 @@ export const forceEdgeVisualUpdate = (edges) => {
         }));
       }
     } catch (error) {
-      console.error('Error al filtrar y corregir handles de aristas durante actualización visual:', error);
     }
   }
   
@@ -237,7 +217,6 @@ export const restoreAndApplyEdges = (plubotId, setEdges) => {
   // Limitar la frecuencia de restauración
   const now = Date.now();
   if (now - lastRestoreAttempt < restoreThrottleMs) {
-    console.log(`edgeRecoveryUtil: Restauración de aristas limitada por frecuencia. Espere ${Math.ceil((restoreThrottleMs - (now - lastRestoreAttempt)) / 1000)} segundos.`);
     return false;
   }
   
@@ -246,7 +225,6 @@ export const restoreAndApplyEdges = (plubotId, setEdges) => {
   const recoveredEdges = recoverEdgesFromLocalStorage(plubotId);
   
   if (recoveredEdges.length > 0) {
-    console.log(`Aplicando ${recoveredEdges.length} aristas recuperadas`);
     
     // Verificar si setEdges está disponible
     if (setEdges) {
@@ -255,7 +233,6 @@ export const restoreAndApplyEdges = (plubotId, setEdges) => {
         setEdges(recoveredEdges);
       }, 100);
     } else {
-      console.warn('restoreAndApplyEdges: setEdges no está disponible');
     }
     
     return true;

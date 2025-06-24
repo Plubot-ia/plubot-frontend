@@ -9,12 +9,10 @@ import { cleanupStorage } from '../utils/storage-manager';
 const StorageQuotaManager = () => {
   useEffect(() => {
     // Limpiar localStorage al montar el componente
-    console.log('[StorageQuotaManager] Realizando limpieza inicial de localStorage');
     cleanupStorage(40, 24 * 60 * 60 * 1000); // Mantener máximo 40 entradas, eliminar las más antiguas de 24 horas
 
     // Configurar limpieza periódica cada 2 minutos
     const intervalId = setInterval(() => {
-      console.log('[StorageQuotaManager] Realizando limpieza periódica de localStorage');
       cleanupStorage(40, 24 * 60 * 60 * 1000);
     }, 2 * 60 * 1000);
 

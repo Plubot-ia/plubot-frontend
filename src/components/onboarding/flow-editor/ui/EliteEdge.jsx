@@ -48,7 +48,7 @@ const EliteEdgeComponent = ({
   // INSTRUMENTATION: Log de render de aristas
   useEffect(() => {
     const renderType = isUltraMode || lodLevel !== 'FULL' ? "Estática" : "Animada";
-    console.log(`[Render] Arista ${id} - Memoized: SÍ - Render: ${renderType} - LOD: ${lodLevel} - Ultra: ${isUltraMode}`);
+
   }, [id, isUltraMode, lodLevel]);
   
   // Procesamiento ultra-eficiente de handles con máxima optimización
@@ -72,9 +72,7 @@ const EliteEdgeComponent = ({
       return props;
     } catch (error) {
       // Log silencioso solo para errores críticos
-      if (process.env.NODE_ENV === 'development') {
-        console.warn(`[EliteEdge] Error de handle: ${error.message}`);
-      }
+
       return props;
     }
   }, [props.id, props.source, props.target, props.sourceHandle, props.targetHandle]);
@@ -102,7 +100,7 @@ const EliteEdgeComponent = ({
     // Validación final: sin source o target, la arista no puede existir
     if (!result.source || !result.target) {
       if (process.env.NODE_ENV === 'development') {
-        console.warn(`[EliteEdge] Arista con ID ${result.id} tiene source o target inválido`);
+
       }
     }
     
@@ -193,7 +191,7 @@ const EliteEdgeComponent = ({
         }
         
         if (process.env.NODE_ENV === 'development') {
-          console.log(`[EliteEdge] Asignación automática de sourceHandle para ${safeProps.id}: ${newSourceHandle}`);
+
         }
       }
       
@@ -219,7 +217,7 @@ const EliteEdgeComponent = ({
         }
         
         if (process.env.NODE_ENV === 'development') {
-          console.log(`[EliteEdge] Asignación automática de targetHandle para ${safeProps.id}: ${newTargetHandle}`);
+
         }
       }
       
@@ -235,7 +233,7 @@ const EliteEdgeComponent = ({
       // Etapa 4: Notificar cambios en los handles para sincronización
       if (newSourceHandle !== safeProps.sourceHandle || newTargetHandle !== safeProps.targetHandle) {
         if (process.env.NODE_ENV === 'development') {
-          console.log(`[EliteEdge] Handles corregidos para ${safeProps.id}: ${newSourceHandle} -> ${newTargetHandle}`);
+
         }
         
         // Emitir evento para notificar cambios en los handles
@@ -250,25 +248,25 @@ const EliteEdgeComponent = ({
       }
     } catch (error) {
       if (process.env.NODE_ENV === 'development') {
-        console.error(`[EliteEdge] Error al procesar handles para arista ${safeProps.id}:`, error);
+
       }
     }
   }, [safeProps.id, safeProps.source, safeProps.target, safeProps.sourceHandle, safeProps.targetHandle, safeProps.sourceY, safeProps.targetY, effectiveSourceHandle, effectiveTargetHandle]);
   
   useEffect(() => {
     if (process.env.NODE_ENV === 'development') {
-      // console.log('[EliteEdge] Modo Ultra Rendimiento:', isUltraMode ? 'Activado' : 'Desactivado');
+
     }
   }, [isUltraMode]);
   
   useEffect(() => {
     if (process.env.NODE_ENV === 'development') {
       if (isFinite(sourceX) && isFinite(sourceY) && isFinite(targetX) && isFinite(targetY)) {
-        // console.log(`[EliteEdge] Coordenadas VÁLIDAS RECIBIDAS para arista ${id}: sx:${sourceX}, sy:${sourceY}, tx:${targetX}, ty:${targetY}`);
+
       } else {
-        // Este caso ya está cubierto por el console.warn en el useMemo de edgePath, 
+
         // pero lo mantenemos aquí por si queremos diferenciar el momento de la actualización vs el cálculo inicial.
-        // console.log(`[EliteEdge] Coordenadas AÚN INVÁLIDAS/faltantes en useEffect para arista ${id}: sx:${sourceX}, sy:${sourceY}, tx:${targetX}, ty:${targetY}`);
+
       }
     }
   }, [id, sourceX, sourceY, targetX, targetY]);
@@ -333,7 +331,7 @@ const EliteEdgeComponent = ({
         !isFinite(targetY)
       ) {
         if (process.env.NODE_ENV === 'development') {
-          console.warn(`[EliteEdge] Coordenadas inválidas o faltantes para la arista ${id}. sx:${sourceX}, sy:${sourceY}, tx:${targetX}, ty:${targetY}. La arista no se renderizará todavía.`);
+
         }
         return null; // No renderizar la arista si las coordenadas no son válidas
       }
@@ -354,7 +352,7 @@ const EliteEdgeComponent = ({
     } catch (error) {
       // Este catch ahora es para errores inesperados de getBezierPath u otra lógica interna.
       if (process.env.NODE_ENV === 'development') {
-        console.error(`[EliteEdge] Error inesperado al calcular la ruta para la arista ${id} (después de la validación de coordenadas):`, error);
+
       }
       
       // No renderizamos esta arista para prevenir errores en cascada
@@ -523,7 +521,7 @@ const EliteEdgeComponent = ({
       pathRef.current.setAttribute('d', edgePath);
       
       if (process.env.NODE_ENV === 'development') {
-        console.log(`[EliteEdge] Actualización forzada de arista: ${id}`);
+
       }
     }
   }, [id, edgePath]);
@@ -610,7 +608,7 @@ const EliteEdgeComponent = ({
   // no renderizamos nada. React Flow lo intentará de nuevo en el siguiente ciclo.
   if (!edgePath) {
     if (process.env.NODE_ENV === 'development') {
-      console.log(`[EliteEdge] ID: ${id}. edgePath es null. No se renderizará la arista (modo normal).`);
+
     }
     return null;
   }

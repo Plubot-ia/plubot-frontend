@@ -149,7 +149,7 @@ if (typeof document !== 'undefined') {
     // Agregar los estilos al DOM
     document.head.appendChild(styleElement);
     
-    console.log('[PerformancePatch] Estilos de rendimiento aplicados');
+
   }
   
   // Eliminar estilos
@@ -160,7 +160,7 @@ if (typeof document !== 'undefined') {
       styleElement = null;
     }
     
-    console.log('[PerformancePatch] Estilos de rendimiento eliminados');
+
   }
   
   // Función para garantizar la visibilidad de los nodos y bordes en modo ultra rendimiento
@@ -205,11 +205,11 @@ if (typeof document !== 'undefined') {
       createStyles();
       // Actualizar posiciones inmediatamente
       updateNodePositions();
-      console.log('[PerformancePatch] Modo Ultra Rendimiento activado');
+
     } else {
       document.body.classList.remove('performance-mode-active');
       removeStyles();
-      console.log('[PerformancePatch] Modo Ultra Rendimiento desactivado');
+
     }
   }
   
@@ -261,7 +261,7 @@ if (typeof document !== 'undefined') {
     // Suscribirse a cambios futuros
     subscribeToStore();
     
-    console.log('[PerformancePatch] Inicializado');
+
   }
   
   // Iniciar cuando el DOM esté listo

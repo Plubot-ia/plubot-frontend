@@ -34,8 +34,6 @@ const SafeEdgeWrapper = (props) => {
   try {
     return <EliteEdge {...safeProps} />;
   } catch (error) {
-    console.error('[SafeEdgeWrapper] Error al renderizar EliteEdge:', error);
-    
     // Renderizar una arista básica en caso de error
     return (
       <g>

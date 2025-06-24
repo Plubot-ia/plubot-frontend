@@ -66,10 +66,8 @@ export const patchReactFlowEdgePaths = () => {
     
     // Marcar como parcheado para evitar aplicar múltiples veces
     window.__reactFlowEdgePathsPatched = true;
-    console.log('[edge-path-sanitizer] Paths SVG de aristas parcheados con éxito');
-  } catch (error) {
-    console.error('[edge-path-sanitizer] Error al parchear paths SVG de aristas:', error);
-  }
+  } catch (error) {}
+
 };
 
 /**

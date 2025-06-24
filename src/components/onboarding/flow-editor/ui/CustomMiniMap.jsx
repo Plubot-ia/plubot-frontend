@@ -40,7 +40,7 @@ const CustomMiniMap = ({
   const [isExpanded, setIsExpanded] = useState(propIsExpanded || false);
   
   // Función segura para mostrar mensajes
-  const setByteMessage = propSetByteMessage || (msg => console.log('[CustomMiniMap]', msg));
+  const setByteMessage = propSetByteMessage || (() => {});
   
   // Función para alternar expansión
   const handleToggle = useCallback(() => {
@@ -163,16 +163,8 @@ const CustomMiniMap = ({
       // Sanitizar los bounds para asegurar que todos los valores son números finitos
       return sanitizeBounds({ ...bounds, centerX, centerY });
     } catch (error) {
-      console.error('[CustomMiniMap] Error al calcular límites del diagrama:', error);
-      // Devolver bounds predeterminados en caso de error
-      return {
-        minX: 0,
-        maxX: 100,
-        minY: 0,
-        maxY: 100,
-        centerX: 50,
-        centerY: 50
-      };
+      // En caso de error, devolver un límite por defecto para evitar que el componente falle
+      return { minX: 0, minY: 0, maxX: 100, maxY: 100 };
     }
   }, [validNodes]);
 
@@ -210,7 +202,7 @@ const CustomMiniMap = ({
           typeof diagramBounds.maxY !== 'number' ||
           isNaN(diagramBounds.minX) || isNaN(diagramBounds.maxX) ||
           isNaN(diagramBounds.minY) || isNaN(diagramBounds.maxY)) {
-        console.error('[CustomMiniMap] Bounds inválidos detectados durante arrastre');
+        setIsDragging(false);
         return;
       }
       
@@ -236,8 +228,6 @@ const CustomMiniMap = ({
       
       setLastPosition({ x, y });
     } catch (error) {
-      console.error('[CustomMiniMap] Error durante arrastre:', error);
-      // Liberar el arrastre en caso de error
       setIsDragging(false);
     }
     
@@ -251,7 +241,6 @@ const CustomMiniMap = ({
   // Función principal para dibujar el minimapa
   const drawMiniMap = useCallback(() => {
     if (!canvasRef.current || !diagramBounds) {
-      console.log('[CustomMiniMap] No se puede dibujar: canvas o bounds no disponibles');
       return;
     }
 
@@ -268,7 +257,6 @@ const CustomMiniMap = ({
     const canvas = canvasRef.current;
       const ctx = canvas.getContext('2d');
       if (!ctx) {
-        console.error('[CustomMiniMap] No se pudo obtener el contexto 2D del canvas');
         return;
       }
       
@@ -554,11 +542,11 @@ const CustomMiniMap = ({
         ctx.textAlign = 'center';
         ctx.fillText(`${realDistance}px`, width - 50 + scaleBarLength / 2, scaleY - 5);
       } catch (error) {
-        console.error('[CustomMiniMap] Error dibujando barra de escala:', error);
+        // No hacer nada en caso de error
       }
     }
     } catch (error) {
-      console.error('[CustomMiniMap] Error al dibujar el minimapa:', error);
+      setHasError(true);
     }
   }, [validNodes, validEdges, diagramBounds, isExpanded, width, height, padding, nodeRadius, setByteMessage, viewport, windowWidth, windowHeight]);
 
@@ -568,9 +556,8 @@ const CustomMiniMap = ({
         drawMiniMap();
         if (!canvasReady) setCanvasReady(true);
       }
-    } catch (error) {
-      console.error('[CustomMiniMap] Error en effect de dibujado:', error);
-    }
+    } catch (error) {}
+
   }, [drawMiniMap, canvasReady, viewport?.x, viewport?.y, viewport?.zoom]);
 
   useEffect(() => {

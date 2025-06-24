@@ -13,7 +13,6 @@
  */
 export const saveLocalBackup = (plubotId, nodes, edges, name = 'Flujo') => {
   if (!plubotId) {
-    console.warn('[PersistenceManager] No se puede guardar respaldo sin plubotId');
     return;
   }
 
@@ -24,9 +23,7 @@ export const saveLocalBackup = (plubotId, nodes, edges, name = 'Flujo') => {
       name,
       timestamp: new Date().toISOString()
     }));
-    console.log(`[PersistenceManager] Respaldo local creado para flujo ${name}`);
   } catch (error) {
-    console.error('[PersistenceManager] Error al guardar respaldo local:', error);
   }
 };
 
@@ -45,10 +42,8 @@ export const loadLocalBackup = (plubotId) => {
     const backup = JSON.parse(backupJson);
     if (!backup || !backup.nodes) return null;
     
-    console.log(`[PersistenceManager] Respaldo local recuperado: ${backup.nodes.length} nodos`);
     return backup;
   } catch (error) {
-    console.error('[PersistenceManager] Error al cargar respaldo local:', error);
     return null;
   }
 };

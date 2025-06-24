@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import { Send, Loader, MessageCircle, ArrowLeft, Zap } from 'lucide-react';
 import './PublicChat.css';
-import axios from 'axios';
+import instance from '../../utils/axiosConfig';
 
 const PublicChat = () => {
   const { publicId } = useParams();
@@ -16,104 +16,53 @@ const PublicChat = () => {
   const [conversationHistory, setConversationHistory] = useState([]);
   const [isTyping, setIsTyping] = useState(false);
 
-  // Obtener la URL base del backend desde las variables de entorno
-  const baseURL = import.meta.env.VITE_API_URL || 'https://plubot-backend.onrender.com';
-
+  // La URL base del backend ya está configurada en la instancia central de Axios.
   // Cargar información del bot al montar el componente
   useEffect(() => {
     const fetchBotInfo = async () => {
       try {
         setIsLoading(true);
+        setError(null);
 
-        // Validar que el ID del chatbot sea un valor válido
         if (!publicId || publicId === 'undefined' || publicId === 'null') {
           throw new Error('ID de chatbot inválido');
         }
-
-        // Asegurarse de que el ID sea un número válido
         if (isNaN(parseInt(publicId))) {
           throw new Error('El ID del chatbot debe ser un número');
         }
 
-        // Configurar axios para esta petición específica
-        const axiosConfig = {
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-          },
-          // Añadir timeout para evitar esperas indefinidas
-          timeout: 10000
-        };
+        // Usar la instancia de Axios centralizada. La URL se resuelve automáticamente.
+        const response = await instance.get(`/plubots/chat/${publicId}`);
+        const data = response.data;
 
-        // Intentar cargar el chatbot desde el backend
-        try {
-          // Usar URL relativa para evitar problemas con dominios
-          const chatEndpoint = `/api/plubots/chat/${publicId}`;
-          
-          const response = await axios.get(chatEndpoint, axiosConfig);
-          const data = response.data;
-
-
-
-          if (data.status === 'success') {
-            setBotInfo(data.data);
-            // Añadir mensaje inicial del bot
-            const welcomeMessage = {
-              id: 'welcome',
-              text: data.data.initialMessage,
-              sender: 'bot',
-              timestamp: new Date().toISOString()
-            };
-
-            setMessages([welcomeMessage]);
-
-          } else {
-            setError(data.message || 'No se pudo cargar el chatbot');
-          }
-        } catch (apiError) {
-          // Si hay un error con la API relativa, intentar con URL absoluta
-          
-          try {
-            const absoluteEndpoint = `${baseURL}/api/plubots/chat/${publicId}`;
-            
-            const response = await axios.get(absoluteEndpoint, axiosConfig);
-            const data = response.data;
-            
-            if (data.status === 'success') {
-              setBotInfo(data.data);
-              // Añadir mensaje inicial del bot
-              const welcomeMessage = {
-                id: 'welcome',
-                text: data.data.initialMessage,
-                sender: 'bot',
-                timestamp: new Date().toISOString()
-              };
-
-              setMessages([welcomeMessage]);
-            } else {
-              throw new Error(data.message || 'No se pudo cargar el chatbot');
-            }
-          } catch (absoluteError) {
-            // Si ambos métodos fallan, mostrar un mensaje de error claro
-            setError('No se pudo conectar con el servidor. Por favor, intenta más tarde o contacta al administrador.');
-            throw absoluteError;
-          }
+        if (data.status === 'success') {
+          setBotInfo(data.data);
+          const welcomeMessage = {
+            id: 'welcome',
+            text: data.data.initialMessage,
+            sender: 'bot',
+            timestamp: new Date().toISOString()
+          };
+          setMessages([welcomeMessage]);
+        } else {
+          throw new Error(data.message || 'No se pudo cargar la información del chatbot');
         }
+
       } catch (error) {
-        
-        // Mensaje de error más descriptivo
         let errorMessage = 'Error de conexión. Por favor, intenta más tarde.';
         if (error.response) {
-          // El servidor respondió con un código de estado fuera del rango 2xx
-          errorMessage = `Error ${error.response.status}: ${error.response.data?.message || 'Error en la respuesta del servidor'}`;
+          if (error.response.status === 404) {
+            errorMessage = 'El chatbot que buscas no existe o ha sido movido.';
+          } else if (error.response.status >= 500) {
+            errorMessage = 'Estamos experimentando problemas en el servidor. Intenta de nuevo en unos minutos.';
+          } else {
+            errorMessage = error.response.data?.message || 'Error al contactar al servidor.';
+          }
         } else if (error.request) {
-          // La petición fue hecha pero no se recibió respuesta
-          errorMessage = 'No se recibió respuesta del servidor. Verifica tu conexión.';
+          errorMessage = 'No se pudo conectar con el servidor. Revisa tu conexión a internet.';
         } else {
-          // Algo ocurrió al configurar la petición
-          errorMessage = error.message || 'Error al procesar la solicitud';
+          errorMessage = error.message || 'Ocurrió un error inesperado.';
         }
-        
         setError(errorMessage);
       } finally {
         setIsLoading(false);
@@ -121,7 +70,7 @@ const PublicChat = () => {
     };
 
     fetchBotInfo();
-  }, [publicId, baseURL]);
+  }, [publicId]);
 
   // Desplazarse al último mensaje cuando se añaden nuevos mensajes
   useEffect(() => {
@@ -133,7 +82,6 @@ const PublicChat = () => {
   const handleSendMessage = async () => {
     if (!inputMessage.trim()) return;
 
-    // Añadir mensaje del usuario
     const userMessage = {
       id: `user-${Date.now()}`,
       text: inputMessage,
@@ -142,92 +90,38 @@ const PublicChat = () => {
     };
 
     setMessages(prev => [...prev, userMessage]);
-
-    const currentInputMessage = inputMessage;
+    const newConversationHistory = [...conversationHistory, { role: 'user', content: inputMessage }];
+    setConversationHistory(newConversationHistory);
     setInputMessage('');
-
-    // Mostrar indicador de "escribiendo..."
     setIsTyping(true);
-    const typingIndicator = {
-      id: 'typing',
-      text: '',
-      sender: 'bot',
-      isTyping: true,
-      timestamp: new Date().toISOString()
-    };
-
-    setMessages(prev => [...prev, typingIndicator]);
 
     try {
-      // Preparar los datos para enviar al backend
-      const requestData = {
-        message: currentInputMessage
+      const payload = {
+        message: inputMessage,
+        conversation_history: newConversationHistory,
+        flow_id: currentFlowId
       };
 
-      // Solo incluir current_flow_id si existe
-      if (currentFlowId) {
-        requestData.current_flow_id = currentFlowId;
-      }
-
-      // Solo incluir conversation_history si tiene elementos
-      if (conversationHistory.length > 0) {
-        requestData.conversation_history = conversationHistory;
-      }
-
-      // Configurar axios para esta petición específica
-      const axiosConfig = {
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
-        },
-        timeout: 15000 // 15 segundos de timeout
-      };
-
-      // Intentar primero con URL relativa
-      let response;
-      try {
-        const relativeEndpoint = `/api/plubots/chat/${publicId}/message`;
-        
-        response = await axios.post(relativeEndpoint, requestData, axiosConfig);
-      } catch (relativeError) {
-        
-        // Si falla, intentar con URL absoluta
-        const absoluteEndpoint = `${baseURL}/api/plubots/chat/${publicId}/message`;
-        
-        response = await axios.post(absoluteEndpoint, requestData, axiosConfig);
-      }
-
+      // Usar la instancia de Axios centralizada. La URL se resuelve automáticamente.
+      const response = await instance.post(`/plubots/chat/${publicId}/message`, payload);
       const data = response.data;
 
-      // Eliminar indicador de escritura
-      setIsTyping(false);
-      setMessages(prev => prev.filter(msg => msg.id !== 'typing'));
-
       if (data.status === 'success') {
-        // Actualizar el estado con los datos del backend
-        if (data.current_flow_id) {
-          setCurrentFlowId(data.current_flow_id);
-        }
-
-        if (data.conversation_history) {
-          setConversationHistory(data.conversation_history);
-        }
-
-        // Añadir respuesta del bot
-        const botMessage = {
+        const botResponse = {
           id: `bot-${Date.now()}`,
-          text: data.response,
+          text: data.data.response,
           sender: 'bot',
           timestamp: new Date().toISOString(),
-          options: data.options || []
+          options: data.data.options || []
         };
-
-        setMessages(prev => [...prev.filter(msg => msg.id !== 'typing'), botMessage]);
+        setMessages(prev => [...prev, botResponse]);
+        setConversationHistory(prev => [...prev, { role: 'assistant', content: data.data.response }]);
+        setCurrentFlowId(data.data.next_flow_id);
       } else {
-        throw new Error(data.message || 'Error al procesar el mensaje');
+        throw new Error(data.message || 'Error en la respuesta del bot');
       }
     } catch (error) {
-
+      const errorMessageText = error.response?.data?.message || 'No se pudo obtener una respuesta. Inténtalo de nuevo.';
 
       // Eliminar indicador de escritura
       setIsTyping(false);

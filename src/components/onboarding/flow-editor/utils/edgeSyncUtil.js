@@ -63,8 +63,6 @@ export const identifyMissingEdges = (edges) => {
 export const forceUpdateSpecificEdges = (edgeIds) => {
   if (!edgeIds || !Array.isArray(edgeIds) || edgeIds.length === 0) return;
   
-  console.log(`Forzando actualizaciu00f3n de ${edgeIds.length} aristas especu00edficas`);
-  
   // Emitir evento para forzar la actualizaciu00f3n de aristas especu00edficas
   document.dispatchEvent(new CustomEvent('force-specific-edges-update', { 
     detail: { 
@@ -87,20 +85,20 @@ export const verifyAndFixEdgeConsistency = (edges, setEdges, plubotId) => {
   
   // Si hay discrepancias, intentar corregirlas
   if (!consistencyCheck.consistent && consistencyCheck.missingCount > 0) {
-    console.log(`Detectadas ${consistencyCheck.missingCount} aristas faltantes en el DOM`);
+
     
     // Identificar aristas faltantes
     const missingEdges = identifyMissingEdges(edges);
     
     if (missingEdges.length > 0) {
-      console.log(`Identificadas ${missingEdges.length} aristas faltantes:`, missingEdges.map(e => e.id));
+
       
       // Forzar actualizaciu00f3n de aristas especu00edficas
       forceUpdateSpecificEdges(missingEdges.map(e => e.id));
       
       // Si hay demasiadas aristas faltantes, intentar una actualizaciu00f3n completa del estado
       if (missingEdges.length > edges.length / 3) {
-        console.log('Demasiadas aristas faltantes, forzando actualizaciu00f3n completa del estado');
+
         
         // Crear una copia profunda de las aristas para forzar una actualización completa
         const edgesCopy = JSON.parse(JSON.stringify(edges));
@@ -109,7 +107,7 @@ export const verifyAndFixEdgeConsistency = (edges, setEdges, plubotId) => {
         if (setEdges) {
           setEdges(edgesCopy);
         } else {
-          console.warn('verifyAndFixEdgeConsistency: setEdges no está disponible, no se puede forzar actualización');
+
           // Emitir evento para que otros componentes puedan manejar la actualización
           document.dispatchEvent(new CustomEvent('edges-fix-required-no-setter', { 
             detail: { edges: edgesCopy, timestamp: Date.now() }

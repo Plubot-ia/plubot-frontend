@@ -23,7 +23,6 @@ const isValidHandle = (nodeId, handleId) => {
     const handleElement = nodeElement.querySelector(`[data-handleid="${handleId}"]`);
     return handleElement !== null;
   } catch (error) {
-    console.error('Error verificando handle:', error);
     return false;
   }
 };
@@ -48,9 +47,7 @@ const getValidHandle = (nodeId, preferredHandle) => {
     if (handles.length > 0) {
       return handles[0].getAttribute('data-handleid');
     }
-  } catch (error) {
-    console.error('Error obteniendo handle válido:', error);
-  }
+  } catch (error) {}
   
   return 'default';
 };
@@ -66,7 +63,7 @@ export const normalizeEdgeHandles = (edge) => {
   if (!edge || !edge.id || !edge.source || !edge.target) {
     // Solo loguear en desarrollo y sin volcado de datos completo
     if (process.env.NODE_ENV === 'development') {
-      console.warn(`[handleFixer] Arista ${edge?.id || 'desconocida'} inválida`);
+
     }
     return null;
   }
@@ -92,7 +89,7 @@ export const normalizeEdgeHandles = (edge) => {
   // Eliminar log excesivo para mejorar rendimiento
   // Solo loguear en desarrollo y con nivel de detalle bajo
   if (process.env.NODE_ENV === 'development' && Math.random() < 0.05) { // Solo 5% de las veces
-    console.debug(`[handleFixer] Normalizado: ${edge.id}`);
+
   }
   
   return newEdge;
@@ -105,7 +102,6 @@ export const normalizeEdgeHandles = (edge) => {
  */
 export const fixAllEdgeHandles = (edges) => {
   if (!edges || !Array.isArray(edges)) {
-    console.warn('Se recibió un valor inválido para edges:', edges);
     return [];
   }
   
@@ -113,9 +109,7 @@ export const fixAllEdgeHandles = (edges) => {
   const fixedEdges = edges.map(edge => normalizeEdgeHandles(edge)).filter(Boolean);
   
   // Si se perdieron aristas en el proceso, registrarlo
-  if (fixedEdges.length !== edges.length) {
-    console.log(`fixAllEdgeHandles: ${edges.length - fixedEdges.length} aristas descartadas por ser inválidas`);
-  }
+
   
   return fixedEdges;
 };
@@ -126,7 +120,6 @@ export const fixAllEdgeHandles = (edges) => {
  */
 export const forceEdgesUpdate = (rfInstance) => {
   if (!rfInstance) {
-    console.warn('forceEdgesUpdate: No se proporcionó instancia de ReactFlow');
     return;
   }
   
@@ -135,7 +128,7 @@ export const forceEdgesUpdate = (rfInstance) => {
     const currentEdges = rfInstance.getEdges() || [];
     
     if (currentEdges.length === 0) {
-      console.log('forceEdgesUpdate: No hay aristas para actualizar');
+
       return;
     }
     
@@ -143,13 +136,13 @@ export const forceEdgesUpdate = (rfInstance) => {
     const validEdges = currentEdges.filter(edge => {
       const exists = nodesExistInDOM(edge);
       if (!exists) {
-        console.warn(`forceEdgesUpdate: Arista ${edge.id} ignorada porque sus nodos no existen en el DOM`);
+        return null; // Ignorar esta arista
       }
       return exists;
     });
     
     if (validEdges.length !== currentEdges.length) {
-      console.log(`forceEdgesUpdate: ${currentEdges.length - validEdges.length} aristas ignoradas por nodos inexistentes`);
+
     }
     
     // Forzar explicitamente el uso de handles 'default' para todas las aristas
@@ -162,7 +155,7 @@ export const forceEdgesUpdate = (rfInstance) => {
     // Actualizar las aristas en ReactFlow
     rfInstance.setEdges(forcedEdges);
     
-    console.log(`forceEdgesUpdate: ${forcedEdges.length} aristas actualizadas con handles forzados a 'default'`);
+
     
     // Emitir un evento para notificar que se actualizaron las aristas
     document.dispatchEvent(new CustomEvent('edges-updated', { 
@@ -189,9 +182,7 @@ export const forceEdgesUpdate = (rfInstance) => {
     setTimeout(() => {
       rfInstance.setEdges(forcedEdges);
     }, 100);
-  } catch (error) {
-    console.error('Error al forzar actualización de aristas:', error);
-  }
+  } catch (error) {}
 };
 
 /**
@@ -201,21 +192,15 @@ export const forceEdgesUpdate = (rfInstance) => {
  */
 const hasValidHandles = (edge) => {
   if (!edge) {
-    console.warn('Se recibió una arista nula o indefinida');
     return false;
   }
   
   // Verificar que la arista tenga los campos mínimos requeridos
   if (!edge.id) {
-    console.warn('Arista sin ID:', edge);
     return false;
   }
   
   if (!edge.source || !edge.target) {
-    console.warn(`Arista ${edge.id} sin source o target:`, {
-      source: edge.source,
-      target: edge.target
-    });
     return false;
   }
   
@@ -241,12 +226,6 @@ const hasValidHandles = (edge) => {
   const targetExists = document.querySelector(`[data-id="${edge.target}"]`) !== null;
   
   if (!sourceExists || !targetExists) {
-    console.warn(`Nodos no encontrados para arista ${edge.id}:`, {
-      sourceExists,
-      targetExists,
-      source: edge.source,
-      target: edge.target
-    });
     return false;
   }
   

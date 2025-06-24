@@ -73,7 +73,7 @@ const EmbedModal = ({ plubotId, plubotName, onClose, onExport, flowData }) => {
     setIsLoading(true);
     try {
       // Intentar obtener datos del backend
-      const response = await request('POST', `/api/plubots/${plubotId}/embed`, { customization });
+      const response = await request('POST', `/plubots/${plubotId}/embed`, { customization });
 
       if (response && response.status === 'success' && response.data) {
         // Si el backend responde correctamente, usar esos datos

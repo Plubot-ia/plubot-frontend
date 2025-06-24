@@ -38,8 +38,7 @@ export const ensureNodesAreInteractive = (force = false) => {
       return;
     }
     
-    // Eliminar console.log para mejorar rendimiento
-    // console.log(`[ensure-node-interaction] Optimizando ${nodes.length} nodos`);
+
     
     // Aplicar correcciones a cada nodo
     nodes.forEach(node => {
@@ -167,8 +166,7 @@ export const setupNodeInteractionObserver = () => {
   // Guardar referencia para poder limpiarlo si es necesario
   window.__nodeInteractionInterval = interval;
   
-  // Eliminar console.log para mejorar rendimiento
-  // console.log('[ensure-node-interaction] Sistema de monitoreo de nodos activado');
+
 };
 
 /**
@@ -178,15 +176,13 @@ export const stopNodeInteractionObserver = () => {
   if (window.__nodeInteractionObserver) {
     window.__nodeInteractionObserver.disconnect();
     window.__nodeInteractionObserver = null;
-    // Eliminar console.log para mejorar rendimiento
-    // console.log('[ensure-node-interaction] Observador de nodos desactivado');
+
   }
   
   if (window.__nodeInteractionInterval) {
     clearInterval(window.__nodeInteractionInterval);
     window.__nodeInteractionInterval = null;
-    // Eliminar console.log para mejorar rendimiento
-    // console.log('[ensure-node-interaction] Intervalo de verificación desactivado');
+
   }
 };
 

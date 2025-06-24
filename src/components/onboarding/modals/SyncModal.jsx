@@ -95,7 +95,9 @@ const SyncModal = ({ onClose, onSync, project, onNotify }) => {
         // IMPORTANTE: Wrap la llamada a onSync en un bloque try-catch separado
         // para capturar cualquier error específico en esta operación
         await onSync();
-        console.log('[SyncModal] Sincronización completada con éxito');
+        
+        // Simular finalización
+        await new Promise(resolve => setTimeout(resolve, 500));
         
         // Registrar la fecha y hora de sincronización
         const now = new Date();
@@ -119,9 +121,10 @@ const SyncModal = ({ onClose, onSync, project, onNotify }) => {
         localStorage.setItem(`plubot-last-sync-${project?.id}`, syncTime.toISOString());
         
         // No cerramos automáticamente el modal para evitar confusión al usuario
-        // El usuario debe cerrar manualmente para confirmar que ha visto el resultado
+        // Forzar la notificación de éxito solo al final
+        notify('Sincronización completada', 'success');
+        
       } catch (saveError) {
-        console.error('[SyncModal] Error al guardar:', saveError);
         throw new Error(`Error al guardar: ${saveError.message || 'Error desconocido'}`);
       }
     } catch (error) {

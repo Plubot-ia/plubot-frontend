@@ -21,8 +21,6 @@ const EdgePersistenceManager = ({ edges }) => {
     const plubotId = getPlubotId();
     if (!plubotId || !edges || !Array.isArray(edges) || edges.length === 0) return;
     
-    console.log(`EdgePersistenceManager: Guardando ${edges.length} aristas en localStorage`);
-    
     // Usar un timeout para evitar guardar demasiado frecuentemente
     const timeoutId = setTimeout(() => {
       try {
@@ -36,9 +34,7 @@ const EdgePersistenceManager = ({ edges }) => {
             timestamp: Date.now() 
           } 
         }));
-      } catch (error) {
-        console.error('EdgePersistenceManager: Error al guardar aristas:', error);
-      }
+      } catch (error) {}
     }, 300);
     
     return () => clearTimeout(timeoutId);
@@ -51,7 +47,6 @@ const EdgePersistenceManager = ({ edges }) => {
     
     const handleFlowSaved = () => {
       if (edges && Array.isArray(edges) && edges.length > 0) {
-        console.log(`EdgePersistenceManager: Guardando ${edges.length} aristas despuu00e9s de guardar flujo`);
         saveEdgesToLocalStorage(plubotId, edges);
       }
     };

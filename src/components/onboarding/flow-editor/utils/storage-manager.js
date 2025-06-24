@@ -27,7 +27,7 @@ export function cleanupStorage(maxEntries = 50, maxAgeMs = 60 * 60 * 1000) {
       return;
     }
 
-    console.log(`[StorageManager] Limpiando localStorage (${keys.length} entradas encontradas)`);
+
 
     // Eliminar entradas antiguas basadas en timestamp
     const now = Date.now();
@@ -54,13 +54,10 @@ export function cleanupStorage(maxEntries = 50, maxAgeMs = 60 * 60 * 1000) {
     keysToRemove.forEach(({ key, timestamp }) => {
       // Eliminar si es más antiguo que maxAgeMs o si es necesario para llegar a maxEntries
       if (now - timestamp > maxAgeMs || keysWithTimestamps.length > maxEntries) {
-        console.log(`[StorageManager] Eliminando entrada antigua: ${key}`);
         localStorage.removeItem(key);
       }
     });
-  } catch (error) {
-    console.error('[StorageManager] Error al limpiar localStorage:', error);
-  }
+  } catch (error) {}
 }
 
 /**
@@ -92,19 +89,15 @@ export function safeSetItem(key, value, addTimestamp = true) {
   } catch (error) {
     // Si se excede la cuota, limpiar y reintentar
     if (error.name === 'QuotaExceededError' || error.code === 22 || error.code === 1014) {
-      console.warn('[StorageManager] Cuota excedida, limpiando almacenamiento...');
       cleanupStorage();
       
       try {
         // Reintentar después de limpiar
         localStorage.setItem(key, JSON.stringify(value));
         return true;
-      } catch (retryError) {
-        console.error('[StorageManager] Error al reintentar guardar después de limpiar:', retryError);
-      }
-    } else {
-      console.error('[StorageManager] Error al guardar en localStorage:', error);
-    }
+      } catch (retryError) {}
+    } else {}
+
     
     return false;
   }
@@ -133,7 +126,6 @@ export function safeGetItem(key, defaultValue = null) {
       return value;
     }
   } catch (error) {
-    console.error('[StorageManager] Error al recuperar de localStorage:', error);
     return defaultValue;
   }
 }

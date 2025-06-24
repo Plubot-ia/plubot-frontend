@@ -24,16 +24,12 @@ const FlowControls = ({
   hasAutoOptimized,
   optimizationLevel
 }) => {
-  console.log('!!!!!!!!!!!!!!!!! FLOW CONTROLS COMPONENT IS RENDERING !!!!!!!!!!!!!!!!!!');
   const fitView = useFlowStore(state => state.reactFlowInstance?.fitView);
 
   const handleForceFitView = () => {
     if (fitView) {
-      console.log('[FlowControls] Forzando fitView para diagnóstico...');
       fitView({ padding: 0.2, duration: 0 });
-    } else {
-      console.warn('[FlowControls] fitView no está disponible en el store.');
-    }
+    } else {}
   };
   return (
     <div className="flow-controls">
