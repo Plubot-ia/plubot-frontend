@@ -224,6 +224,17 @@ const useAuthStore = create(
           }
         },
 
+        // Obtener la URL de autenticación de Google
+        getGoogleAuthUrl: async () => {
+          try {
+            const response = await instance.get('api/google/login');
+            return response.data;
+          } catch (error) {
+            logger.error('Error al obtener la URL de autenticación de Google', error);
+            throw new Error('No se pudo iniciar la autenticación con Google.');
+          }
+        },
+
         // Verificar autenticación
         checkAuth: async () => {
           const token = localStorage.getItem('access_token');

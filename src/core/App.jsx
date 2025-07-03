@@ -14,7 +14,8 @@ import ForgotPassword from '../components/auth/ForgotPassword.jsx';
 import Login from '../components/auth/Login.jsx';
 import Logout from '../components/auth/Logout.jsx';
 import ProtectedRoute from '../components/auth/ProtectedRoute.jsx';
-import Register from '../components/auth/Register.jsx';
+import Register from '../pages/auth/Register.jsx';
+import GoogleAuthCallback from '../pages/auth/GoogleAuthCallback.jsx';
 import ResetPassword from '../components/auth/ResetPassword.jsx';
 import FlowBenchmarkTool from '../components/benchmarking/FlowBenchmarkTool';
 import ModalContainer from '../components/modals/ModalContainer';
@@ -357,6 +358,7 @@ const AppWrapper = () => {
                 <Routes>
                   <Route path='/login' element={<Login />} />
                   <Route path='/register' element={<Register />} />
+                <Route path='/auth/google/callback' element={<GoogleCallback />} />
                   <Route path='/forgot-password' element={<ForgotPassword />} />
                   <Route path='/reset-password' element={<ResetPassword />} />
                   <Route path='/change-password' element={<ChangePassword />} />
