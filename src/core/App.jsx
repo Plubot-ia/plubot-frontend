@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import { useEffect, Suspense, lazy, Component, useRef, useMemo } from 'react';
+import { useEffect, Suspense, lazy, Component, useRef } from 'react';
 import {
   BrowserRouter,
   Routes,
@@ -27,7 +27,6 @@ import WelcomeSequence from '../components/onboarding/screens/WelcomeSequence';
 import GamificationProvider from '../context/GamificationContext';
 import GlobalProvider from '../context/GlobalProvider';
 import { PlubotCreationProvider } from '../context/PlubotCreationContext';
-import GoogleAuthCallback from '../pages/auth/GoogleAuthCallback.jsx';
 import Home from '../pages/home/Home.jsx';
 import Layout from '../pages/layout/Layout.jsx';
 import NotFound from '../pages/notfound/NotFound.jsx';
@@ -35,25 +34,25 @@ import useAuthStore from '../stores/use-auth-store.js';
 
 const Tutoriales = lazy(() => import('../pages/tutoriales/Tutoriales.jsx'));
 const TutorialesAutomatizacion = lazy(
-  () => import('../pages/tutoriales/TutorialesAutomatizacion.jsx'),
+  () => import('../pages/tutoriales/TutorialesAutomatizacion.jsx')
 );
 const TutorialesAprendizaje = lazy(
-  () => import('../pages/tutoriales/TutorialesAprendizaje.jsx'),
+  () => import('../pages/tutoriales/TutorialesAprendizaje.jsx')
 );
 const TutorialesFlujos = lazy(
-  () => import('../pages/tutoriales/TutorialesFlujos.jsx'),
+  () => import('../pages/tutoriales/TutorialesFlujos.jsx')
 );
 const TutorialesExpansion = lazy(
-  () => import('../pages/tutoriales/TutorialesExpansion.jsx'),
+  () => import('../pages/tutoriales/TutorialesExpansion.jsx')
 );
 const TutorialDiscord = lazy(
-  () => import('../pages/tutoriales/tutorialesdiscord/TutorialDiscord.jsx'),
+  () => import('../pages/tutoriales/tutorialesdiscord/TutorialDiscord.jsx')
 );
 const TutorialDiscordChannelId = lazy(
   () =>
     import(
       '../pages/tutoriales/tutorialesdiscord/TutorialDiscordChannelId.jsx'
-    ),
+    )
 );
 const Profile = lazy(() => import('../pages/profile/Profile.jsx'));
 const Services = lazy(() => import('../pages/zquantum/Services.jsx'));
@@ -69,7 +68,7 @@ const Plans = lazy(() => import('../pages/plans/Plans.jsx'));
 const Poderes = lazy(() => import('../pages/poderes/Poderes.jsx'));
 const PoderesAbout = lazy(() => import('../pages/poderes/Poderes-about.jsx'));
 const PluniverseDashboard = lazy(
-  () => import('../pages/pluniversedashboard/PluniverseDashboard.jsx'),
+  () => import('../pages/pluniversedashboard/PluniverseDashboard.jsx')
 );
 const PlubotStudio = lazy(() => import('../pages/zquantum/PlubotStudio.jsx'));
 const Academy = lazy(() => import('../pages/pluniverse/Academy.jsx'));
@@ -79,22 +78,21 @@ const Tower = lazy(() => import('../pages/pluniverse/Tower.jsx'));
 const Sanctuary = lazy(() => import('../pages/pluniverse/Sanctuary.jsx'));
 const AboutPlubot = lazy(() => import('../pages/AboutPlubot/AboutPlubot'));
 const ByteEmbajador = lazy(
-  () => import('../pages/AboutPlubot/ByteEmbajador.jsx'),
+  () => import('../pages/AboutPlubot/ByteEmbajador.jsx')
 );
 const Historyverse = lazy(
-  () => import('../pages/historyverse/Historyverse.jsx'),
+  () => import('../pages/historyverse/Historyverse.jsx')
 );
 const FAQ = lazy(() => import('../pages/faq/FAQ.jsx'));
 const TuOpinion = lazy(() => import('../pages/tuopinion/TuOpinion.jsx'));
 const PlubotEdit = lazy(
-  () => import('../components/plubot-edit/PlubotEdit.jsx'),
+  () => import('../components/plubot-edit/PlubotEdit.jsx')
 );
 const CreatePlubot = lazy(
-  () => import('../pages/createplubot/CreatePlubot.jsx'),
+  () => import('../pages/createplubot/CreatePlubot.jsx')
 );
 const PublicChat = lazy(() => import('../pages/public-chat/PublicChat.jsx'));
 
-// Componente de carga para mostrar durante la carga de componentes lazy
 const LoadingFallback = () => (
   <div
     style={{
@@ -109,14 +107,14 @@ const LoadingFallback = () => (
     <div>
       <div style={{ textAlign: 'center', marginBottom: '20px' }}>
         <img
-          src='/logo.svg'
-          alt='Plubot Logo'
+          src="/logo.svg"
+          alt="Plubot Logo"
           style={{ width: '120px', height: 'auto' }}
         />
       </div>
       <div style={{ display: 'flex', justifyContent: 'center' }}>
         <div
-          className='spinner'
+          className="spinner"
           style={{
             width: '40px',
             height: '40px',
@@ -127,17 +125,22 @@ const LoadingFallback = () => (
           }}
         />
       </div>
-      <style>{`
-        @keyframes spin {
-          0% { transform: rotate(0deg); }
-          100% { transform: rotate(360deg); }
-        }
-      `}</style>
+      <style>
+        {`
+          @keyframes spin {
+            0% {
+              transform: rotate(0deg);
+            }
+            100% {
+              transform: rotate(360deg);
+            }
+          }
+        `}
+      </style>
     </div>
   </div>
 );
 
-// Error boundary para errores globales
 class ErrorBoundary extends Component {
   static propTypes = {
     children: PropTypes.node.isRequired,
@@ -158,7 +161,13 @@ class ErrorBoundary extends Component {
   render() {
     if (this.state.hasError) {
       return (
-        <div style={{ padding: '20px', textAlign: 'center', color: 'white' }}>
+        <div
+          style={{
+            padding: '20px',
+            textAlign: 'center',
+            color: 'white',
+          }}
+        >
           <h2>¡Ups! Algo salió mal.</h2>
           <p>Por favor, recarga la página o inténtalo de nuevo más tarde.</p>
           <button
@@ -184,7 +193,6 @@ class ErrorBoundary extends Component {
   }
 }
 
-// Componente para inicializar la autenticación
 const AuthInitializer = ({ children }) => {
   const { checkAuth, isAuthenticated, loading } = useAuthStore();
   const initialized = useRef(false);
@@ -209,7 +217,7 @@ const AuthInitializer = ({ children }) => {
           () => {
             checkAuth();
           },
-          5 * 60 * 1000,
+          5 * 60 * 1000
         );
       }
     }
@@ -226,103 +234,20 @@ AuthInitializer.propTypes = {
   children: PropTypes.node.isRequired,
 };
 
-// Helper function to find the main scrollable container
-const findScrollableContainer = () => {
-  const containers = [
-    document.querySelector('.app-container'),
-    document.querySelector('.main-content'),
-    document.querySelector('main'),
-    document.querySelector('div[style*="overflow-y"]'),
-    document.body,
-    document.documentElement,
-  ];
-
-  return (
-    containers.find((container) => {
-      if (!container) return false;
-      const style = getComputedStyle(container);
-      const isScrollable =
-        style.overflowY === 'auto' || style.overflowY === 'scroll';
-      const hasScrollableContent =
-        container.scrollHeight > container.clientHeight;
-      return isScrollable && hasScrollableContent;
-    }) || globalThis
-  ); // Default to window if no other container is found
-};
-
-// Componente para desplazar al inicio en cada cambio de ruta
 function ScrollToTop() {
   const { pathname } = useLocation();
 
   useEffect(() => {
-    const container = findScrollableContainer();
-    if (container) {
-      // Usar setTimeout para asegurar que el DOM esté listo
-      setTimeout(() => {
-        switch (pathname) {
-          case '/': {
-            container.scrollTo({ top: 0, behavior: 'smooth' });
-            break;
-          }
-          case '/welcome':
-          case '/factory':
-          case '/training': {
-            // No hacer scroll en onboarding
-            break;
-          }
-          default: {
-            // Para otras rutas, hacer scroll al inicio
-            container.scrollTo({ top: 0, behavior: 'smooth' });
-            break;
-          }
-        }
-
-        // Verificar si el scroll se realizó correctamente
-        const checkScroll = () => {
-          const { activeElement } = document;
-          // Prevenir auto-enfoque en elementos navegables después del scroll
-          if (
-            activeElement &&
-            (activeElement.tagName === 'A' ||
-              activeElement.tagName === 'BUTTON' ||
-              activeElement.getAttribute('role') === 'button')
-          ) {
-            activeElement.blur();
-          }
-
-          // Verificar nuevamente después de un breve retraso para asegurar
-          // que el scroll se completó
-          setTimeout(() => {
-            const currentScrollY =
-              container === globalThis ? window.scrollY : container.scrollTop;
-            if (currentScrollY > 0) {
-              container.scrollTo({ top: 0, behavior: 'auto' });
-            }
-          }, 100);
-        };
-
-        checkScroll();
-      }, 0);
-    }
-
-    // Deshabilitar la restauración automática del desplazamiento
-    if ('scrollRestoration' in globalThis.history) {
-      globalThis.history.scrollRestoration = 'manual';
-    }
-
-    // Limpiar el timeout al desmontar
-    return () => {
-      // No es necesario limpiar nada aquí, pero se mantiene por completitud
-    };
+    window.scrollTo(0, 0);
   }, [pathname]);
+
+  return null;
 }
 
-// Envoltorio que decide si usar Layout o no
 const AppWrapper = () => {
   const location = useLocation();
   const { pathname } = location;
 
-  // Páginas de autenticación que no usan el Layout
   const isAuthPage = [
     '/login',
     '/register',
@@ -331,9 +256,9 @@ const AppWrapper = () => {
     '/change-password',
     '/email-verification-notice',
     '/auth/verify-email',
+    '/auth/google/callback',
   ].includes(pathname);
 
-  // Rutas donde queremos ocultar el encabezado y pie de página
   const isHideHeaderFooter = [
     '/training',
     '/plubot/edit/training',
@@ -341,7 +266,6 @@ const AppWrapper = () => {
     '/benchmark',
   ].some((route) => pathname.startsWith(route));
 
-  // Verificación adicional para rutas con parámetros de consulta
   const hasTrainingQueryParameter =
     pathname === '/training' || pathname.includes('/training?');
   const shouldHideHeaderFooter =
@@ -356,139 +280,99 @@ const AppWrapper = () => {
             <Suspense fallback={<LoadingFallback />}>
               {isAuthPage ? (
                 <Routes>
-                  <Route path='/login' element={<Login />} />
-                  <Route path='/register' element={<Register />} />
-                <Route path='/auth/google/callback' element={<GoogleCallback />} />
-                  <Route path='/forgot-password' element={<ForgotPassword />} />
-                  <Route path='/reset-password' element={<ResetPassword />} />
-                  <Route path='/change-password' element={<ChangePassword />} />
+                  <Route path="/login" element={<Login />} />
+                  <Route path="/register" element={<Register />} />
+                  <Route path="/forgot-password" element={<ForgotPassword />} />
+                  <Route path="/reset-password" element={<ResetPassword />} />
+                  <Route path="/change-password" element={<ChangePassword />} />
                   <Route
-                    path='/email-verification-notice'
+                    path="/email-verification-notice"
                     element={<EmailVerificationNotice />}
                   />
                   <Route
-                    path='/auth/google/success'
+                    path="/auth/google/callback"
                     element={<GoogleAuthCallback />}
                   />
+                  <Route path="/auth/login" element={<Navigate to="/login" replace />} />
                   <Route
-                    path='/auth/google/callback'
-                    element={<GoogleAuthCallback />}
-                  />
-                  {/* Rutas alternativas para compatibilidad */}
-                  <Route
-                    path='/auth/login'
-                    element={<Navigate to='/login' replace />}
+                    path="/auth/register"
+                    element={<Navigate to="/register" replace />}
                   />
                   <Route
-                    path='/auth/register'
-                    element={<Navigate to='/register' replace />}
-                  />
-                  <Route
-                    path='/auth/forgot'
-                    element={<Navigate to='/forgot-password' replace />}
-                  />
-                  <Route
-                    path='/auth/reset'
-                    element={<Navigate to='/reset-password' replace />}
-                  />
-                  <Route
-                    path='/reset-password/:token'
+                    path="/reset-password/:token"
                     element={
                       <Navigate
-                        to={(navLocation) => {
-                          return `/reset-password?token=${navLocation.pathname.split('/').pop()}`;
-                        }}
+                        to={(loc) => `/reset-password?token=${loc.pathname.split('/').pop()}`}
                         replace
                       />
                     }
                   />
-                  <Route
-                    path='/auth/verify-email'
-                    element={
-                      <Navigate to='/email-verification-notice' replace />
-                    }
-                  />
-                  <Route
-                    path='/api/auth/verify_email/:token'
-                    element={
-                      <Navigate
-                        to={(navLocation) => {
-                          // Extraer el token del path y redirigir a login con mensaje de verificación
-                          const token = navLocation.pathname.split('/').pop();
-                          return `/login?message=verified`;
-                        }}
-                        replace
-                      />
-                    }
-                  />
-                  <Route path='*' element={<Navigate to='/login' replace />} />
+                  <Route path="*" element={<Navigate to="/login" replace />} />
                 </Routes>
               ) : (
                 <Layout hideHeaderFooter={shouldHideHeaderFooter}>
                   <ScrollToTop />
                   <Routes>
-                    {/* Rutas públicas */}
-                    <Route path='/' element={<Home />} />
-                    <Route path='/benchmark' element={<FlowBenchmarkTool />} />
-                    <Route path='/tutoriales' element={<Tutoriales />} />
+                    <Route path="/" element={<Home />} />
+                    <Route path="/benchmark" element={<FlowBenchmarkTool />} />
+                    <Route path="/tutoriales" element={<Tutoriales />} />
                     <Route
-                      path='/tutoriales/automatizacion'
+                      path="/tutoriales/automatizacion"
                       element={<TutorialesAutomatizacion />}
                     />
                     <Route
-                      path='/tutoriales/aprendizaje'
+                      path="/tutoriales/aprendizaje"
                       element={<TutorialesAprendizaje />}
                     />
+                    <Route path="/tutoriales/flujos" element={<TutorialesFlujos />} />
                     <Route
-                      path='/tutoriales/flujos'
-                      element={<TutorialesFlujos />}
-                    />
-                    <Route
-                      path='/tutoriales/expansion'
+                      path="/tutoriales/expansion"
                       element={<TutorialesExpansion />}
                     />
                     <Route
-                      path='/tutoriales/tutorialesdiscord'
+                      path="/tutoriales/tutorialesdiscord"
                       element={<TutorialDiscord />}
                     />
-                    <Route path='/services' element={<Services />} />
-                    <Route path='/case-studies' element={<CaseStudies />} />
-                    <Route path='/chatbot' element={<Chatbot />} />
-                    <Route path='/contact' element={<Contact />} />
-                    <Route path='/blog' element={<Blog />} />
-                    <Route path='/blog/:slug' element={<BlogPost />} />
-                    <Route path='/terms' element={<Terms />} />
-                    <Route path='/privacy' element={<Privacy />} />
-                    <Route path='/seguridad' element={<Seguridad />} />
-                    <Route path='/plans' element={<Plans />} />
-                    <Route path='/poderes' element={<Poderes />} />
-                    <Route path='/poderes-about' element={<PoderesAbout />} />
-                    <Route path='/about-plubot' element={<AboutPlubot />} />
-                    <Route path='/byte-embajador' element={<ByteEmbajador />} />
-                    <Route path='/historyverse' element={<Historyverse />} />
-                    <Route path='/faq' element={<FAQ />} />
-                    <Route path='/tu-opinion' element={<TuOpinion />} />
-                    <Route path='/public-chat' element={<PublicChat />} />
+                    <Route path="/services" element={<Services />} />
+                    <Route path="/case-studies" element={<CaseStudies />} />
+                    <Route path="/chatbot" element={<Chatbot />} />
+                    <Route path="/contact" element={<Contact />} />
+                    <Route path="/blog" element={<Blog />} />
+                    <Route path="/blog/:slug" element={<BlogPost />} />
+                    <Route path="/terms" element={<Terms />} />
+                    <Route path="/privacy" element={<Privacy />} />
+                    <Route path="/seguridad" element={<Seguridad />} />
+                    <Route path="/plans" element={<Plans />} />
+                    <Route path="/poderes" element={<Poderes />} />
+                    <Route path="/poderes-about" element={<PoderesAbout />} />
+                    <Route path="/about-plubot" element={<AboutPlubot />} />
+                    <Route path="/byte-embajador" element={<ByteEmbajador />} />
+                    <Route path="/historyverse" element={<Historyverse />} />
+                    <Route path="/faq" element={<FAQ />} />
+                    <Route path="/tu-opinion" element={<TuOpinion />} />
+                    <Route path="/public-chat" element={<PublicChat />} />
                     <Route
-                      path='/plubot/about'
-                      element={<Navigate to='/about-plubot' replace />}
+                      path="/plubot/about"
+                      element={<Navigate to="/about-plubot" replace />}
                     />
                     <Route
-                      path='/plubot/about-chat-byte'
-                      element={<Navigate to='/byte-embajador' replace />}
+                      path="/plubot/about-chat-byte"
+                      element={<Navigate to="/byte-embajador" replace />}
                     />
                     <Route
-                      path='/plubot/create'
-                      element={<Navigate to='/welcome' replace />}
-                    />
-
-                    {/* Rutas protegidas */}
-                    <Route
-                      path='/pluniverse'
-                      element={<PluniverseDashboard />}
+                      path="/plubot/create"
+                      element={<Navigate to="/welcome" replace />}
                     />
                     <Route
-                      path='/plubot-studio'
+                      path="/pluniverse"
+                      element={
+                        <ProtectedRoute>
+                          <PluniverseDashboard />
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/plubot-studio"
                       element={
                         <ProtectedRoute>
                           <PlubotStudio />
@@ -496,20 +380,20 @@ const AppWrapper = () => {
                       }
                     />
                     <Route
-                      path='/academy'
+                      path="/academy"
                       element={
                         <ProtectedRoute>
                           <Academy />
                         </ProtectedRoute>
                       }
                     />
-                    <Route path='/marketplace' element={<Marketplace />} />
+                    <Route path="/marketplace" element={<Marketplace />} />
                     <Route
-                      path='/pluniverse/marketplace'
-                      element={<Navigate to='/marketplace' replace />}
+                      path="/pluniverse/marketplace"
+                      element={<Navigate to="/marketplace" replace />}
                     />
                     <Route
-                      path='/coliseum'
+                      path="/coliseum"
                       element={
                         <ProtectedRoute>
                           <Coliseum />
@@ -517,11 +401,11 @@ const AppWrapper = () => {
                       }
                     />
                     <Route
-                      path='/pluniverse/coliseum'
-                      element={<Navigate to='/coliseum' replace />}
+                      path="/pluniverse/coliseum"
+                      element={<Navigate to="/coliseum" replace />}
                     />
                     <Route
-                      path='/tower'
+                      path="/tower"
                       element={
                         <ProtectedRoute>
                           <Tower />
@@ -529,7 +413,7 @@ const AppWrapper = () => {
                       }
                     />
                     <Route
-                      path='/sanctuary'
+                      path="/sanctuary"
                       element={
                         <ProtectedRoute>
                           <Sanctuary />
@@ -537,11 +421,11 @@ const AppWrapper = () => {
                       }
                     />
                     <Route
-                      path='/pluniverse/sanctuary'
-                      element={<Navigate to='/sanctuary' replace />}
+                      path="/pluniverse/sanctuary"
+                      element={<Navigate to="/sanctuary" replace />}
                     />
                     <Route
-                      path='/plubot/create'
+                      path="/plubot/create"
                       element={
                         <ProtectedRoute>
                           <CreatePlubot />
@@ -549,7 +433,7 @@ const AppWrapper = () => {
                       }
                     />
                     <Route
-                      path='/plubot/edit/:id'
+                      path="/plubot/edit/:id"
                       element={
                         <ProtectedRoute>
                           <PlubotEdit />
@@ -557,7 +441,7 @@ const AppWrapper = () => {
                       }
                     />
                     <Route
-                      path='/plubot/edit/personalization'
+                      path="/plubot/edit/personalization"
                       element={
                         <ProtectedRoute>
                           <PersonalizationForm />
@@ -565,7 +449,7 @@ const AppWrapper = () => {
                       }
                     />
                     <Route
-                      path='/plubot/edit/training/:plubotId'
+                      path="/plubot/edit/training/:plubotId"
                       element={
                         <ProtectedRoute>
                           <Layout hideHeaderFooter>
@@ -574,18 +458,18 @@ const AppWrapper = () => {
                         </ProtectedRoute>
                       }
                     />
-                    <Route path='/welcome' element={<WelcomeSequence />} />
-                    <Route path='/factory' element={<FactoryScreen />} />
+                    <Route path="/welcome" element={<WelcomeSequence />} />
+                    <Route path="/factory" element={<FactoryScreen />} />
                     <Route
-                      path='/plubot/create/welcome'
-                      element={<Navigate to='/welcome' replace />}
+                      path="/plubot/create/welcome"
+                      element={<Navigate to="/welcome" replace />}
                     />
                     <Route
-                      path='/plubot/create/factory'
-                      element={<Navigate to='/factory' replace />}
+                      path="/plubot/create/factory"
+                      element={<Navigate to="/factory" replace />}
                     />
                     <Route
-                      path='/personalization'
+                      path="/personalization"
                       element={
                         <ProtectedRoute>
                           <PersonalizationForm />
@@ -593,11 +477,11 @@ const AppWrapper = () => {
                       }
                     />
                     <Route
-                      path='/plubot/create/personalization'
-                      element={<Navigate to='/personalization' replace />}
+                      path="/plubot/create/personalization"
+                      element={<Navigate to="/personalization" replace />}
                     />
                     <Route
-                      path='/training'
+                      path="/training"
                       element={
                         <ProtectedRoute>
                           <Layout hideHeaderFooter>
@@ -607,11 +491,11 @@ const AppWrapper = () => {
                       }
                     />
                     <Route
-                      path='/plubot/edit/training'
-                      element={<Navigate to='/training' replace />}
+                      path="/plubot/edit/training"
+                      element={<Navigate to="/training" replace />}
                     />
                     <Route
-                      path='/profile'
+                      path="/profile"
                       element={
                         <ProtectedRoute>
                           <Profile />
@@ -619,7 +503,7 @@ const AppWrapper = () => {
                       }
                     />
                     <Route
-                      path='/change-password'
+                      path="/change-password"
                       element={
                         <ProtectedRoute>
                           <ChangePassword />
@@ -627,24 +511,22 @@ const AppWrapper = () => {
                       }
                     />
                     <Route
-                      path='/tutoriales/discord'
+                      path="/tutoriales/discord"
                       element={<TutorialDiscord />}
                     />
                     <Route
-                      path='/tutoriales/discord-id-canal'
+                      path="/tutoriales/discord-id-canal"
                       element={<TutorialDiscordChannelId />}
                     />
                     <Route
-                      path='/logout'
+                      path="/logout"
                       element={
                         <ProtectedRoute>
                           <Logout />
                         </ProtectedRoute>
                       }
                     />
-
-                    {/* Redirecciones */}
-                    <Route path='*' element={<NotFound />} />
+                    <Route path="*" element={<NotFound />} />
                   </Routes>
                 </Layout>
               )}
@@ -656,28 +538,14 @@ const AppWrapper = () => {
   );
 };
 
-// Importar el GlobalProvider
-// Importar el contenedor de modales
-
 function App() {
-  // Fallback definition for window.setByteMessage removed as part of refactoring.
-  // window.closeAllModals has been removed as part of a global refactor.
-  // All modal closing logic is now handled through the GlobalContext.
-
   useEffect(() => {
     const cleanupPreventFlowReset = preventFlowReset();
-    // Opcional: retornar la función de limpieza si es necesario al desmontar App
-    // return cleanupPreventFlowReset;
   }, []);
 
   return (
     <GlobalProvider>
-      <BrowserRouter
-        future={{
-          v7_startTransition: true,
-          v7_relativeSplatPath: true,
-        }}
-      >
+      <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <AppWrapper />
       </BrowserRouter>
     </GlobalProvider>
