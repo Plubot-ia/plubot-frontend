@@ -1,0 +1,402 @@
+/* ==========================================================================
+   EmailVerificationNotice Styles - Estilo Galáctico (Encapsulado)
+   ========================================================================== */
+   .email-verification-container {
+    display: flex;
+    min-height: 100vh;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem;
+    padding-top: 100px;
+    position: relative;
+    z-index: 1;
+    font-family: 'Rajdhani', sans-serif;
+    background: radial-gradient(circle at 50% 50%, rgba(0,10,30,1) 0%, rgba(0,0,10,1) 100%);
+    color: white;
+    perspective: 1000px;
+    box-sizing: border-box;
+    transition: background 0.8s ease-out;
+}
+
+.email-verification-container .email-verification-card {
+    width: 100%;
+    max-width: 500px;
+    backdrop-filter: blur(15px);
+    background: rgba(0, 0, 0, 0.7);
+    border-radius: 25px;
+    border: 1px solid rgba(0, 224, 255, 0.7);
+    box-shadow: 
+        0 0 40px rgba(0, 224, 255, 0.6),
+        0 0 100px rgba(0, 0, 0, 0.8),
+        inset 0 0 20px rgba(0, 224, 255, 0.3);
+    padding: 2.5rem;
+    position: relative;
+    transform-style: preserve-3d;
+    transform: perspective(1000px) rotateX(0deg);
+    transition: transform 0.5s ease, box-shadow 0.5s ease;
+    overflow: hidden;
+    animation: email-verification-fadeIn 1s ease-out forwards;
+    will-change: transform, opacity, scale;
+}
+
+.email-verification-container .email-verification-card:hover {
+    transform: perspective(1000px) rotateX(2deg) translateZ(10px);
+    box-shadow: 
+        0 0 50px rgba(0, 224, 255, 0.8),
+        0 0 120px rgba(0, 0, 0, 0.9),
+        inset 0 0 25px rgba(0, 224, 255, 0.5);
+}
+
+.email-verification-container .email-verification-card-header {
+    margin-bottom: 2rem;
+    text-align: center;
+    position: relative;
+}
+
+.email-verification-container .email-verification-logo {
+    margin-bottom: 1.5rem;
+    position: relative;
+    display: inline-block;
+}
+
+.email-verification-container .email-verification-logo img {
+    height: 80px;
+    width: auto;
+    filter: drop-shadow(0 0 8px #00e0ff);
+}
+
+.email-verification-container .email-verification-logo::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    height: 3px;
+    width: 80%;
+    background: linear-gradient(90deg, rgba(0, 224, 255, 0) 0%, rgba(0, 224, 255, 1) 50%, rgba(0, 224, 255, 0) 100%);
+    border-radius: 2px;
+    filter: blur(1px);
+    animation: email-verification-pulseLine 3s infinite;
+}
+
+.email-verification-container .email-verification-card-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: #00e0ff;
+    text-shadow: 
+        0 0 10px rgba(0, 224, 255, 0.6),
+        0 0 20px rgba(0, 224, 255, 0.3);
+    letter-spacing: 1px;
+    margin-bottom: 0.5rem;
+}
+
+.email-verification-container .email-verification-card-subtitle {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 1.1rem;
+    letter-spacing: 0.5px;
+    line-height: 1.5;
+}
+
+.email-verification-container .email-verification-btn {
+    background: linear-gradient(45deg, #00e0ff, #9900ff, #ff00ff);
+    background-size: 200% 200%;
+    animation: email-verification-gradientShift 5s ease infinite;
+    color: white;
+    font-size: 1.2rem;
+    padding: 1rem 2rem;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 600;
+    letter-spacing: 1px;
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+    margin-top: 1rem;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+    box-shadow: 
+        0 0 20px rgba(0, 224, 255, 0.7),
+        0 5px 15px rgba(0, 0, 0, 0.3),
+        inset 0 0 10px rgba(255, 255, 255, 0.2);
+}
+
+.email-verification-container .email-verification-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 
+        0 0 30px rgba(0, 224, 255, 0.9),
+        0 8px 25px rgba(0, 0, 0, 0.4),
+        inset 0 0 15px rgba(255, 255, 255, 0.3);
+}
+
+.email-verification-container .email-verification-btn:active {
+    transform: translateY(1px);
+}
+
+.email-verification-container .email-verification-btn::before {
+    content: '';
+    position: absolute;
+    top: -5px;
+    left: -5px;
+    right: -5px;
+    bottom: -5px;
+    background: linear-gradient(45deg, 
+        rgba(0, 224, 255, 0.8), 
+        rgba(153, 0, 255, 0.5), 
+        rgba(255, 0, 255, 0.8), 
+        rgba(0, 224, 255, 0.5));
+    background-size: 400% 400%;
+    border-radius: 54px;
+    z-index: -1;
+    opacity: 0;
+    filter: blur(10px);
+    animation: email-verification-glowingBorder 10s linear infinite;
+    transition: opacity 0.3s ease;
+}
+
+.email-verification-container .email-verification-btn:hover::before {
+    opacity: 1;
+}
+
+.email-verification-container .email-verification-cosmic-lights {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    z-index: 0;
+    pointer-events: none;
+}
+
+.email-verification-container .email-verification-light-beam {
+    position: absolute;
+    width: 150vmax;
+    height: 4px;
+    background: linear-gradient(90deg, 
+        rgba(0, 224, 255, 0) 0%, 
+        rgba(0, 224, 255, 0.5) 50%,
+        rgba(0, 224, 255, 0) 100%);
+    opacity: 0.3;
+    transform-origin: left center;
+    filter: blur(3px);
+    box-shadow: 0 0 15px rgba(0, 224, 255, 0.5);
+}
+
+.email-verification-container .email-verification-light-beam-1 {
+    top: 20%;
+    left: -50%;
+    transform: rotate(25deg);
+    animation: email-verification-beamMovement1 15s infinite alternate ease-in-out;
+}
+
+.email-verification-container .email-verification-light-beam-2 {
+    top: 65%;
+    left: -50%;
+    transform: rotate(-15deg);
+    animation: email-verification-beamMovement2 18s infinite alternate ease-in-out;
+    opacity: 0.2;
+}
+
+.email-verification-container .email-verification-light-beam-3 {
+    top: 40%;
+    left: -50%;
+    transform: rotate(5deg);
+    animation: email-verification-beamMovement3 20s infinite alternate ease-in-out;
+    opacity: 0.15;
+    background: linear-gradient(90deg, 
+        rgba(255, 0, 255, 0) 0%, 
+        rgba(255, 0, 255, 0.4) 50%,
+        rgba(255, 0, 255, 0) 100%);
+}
+
+.email-verification-container .email-verification-particles {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.email-verification-container .email-verification-particle {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: linear-gradient(45deg, #00e0ff, #ff00ff);
+    opacity: 0;
+    filter: blur(1px);
+    animation-duration: 3s;
+    animation-delay: 0.3s;
+}
+
+.email-verification-container .email-verification-particle-1 {
+    top: 10%;
+    left: 10%;
+    animation: email-verification-particleFloat1 3s infinite ease-out;
+}
+
+.email-verification-container .email-verification-particle-2 {
+    top: 20%;
+    left: 80%;
+    animation: email-verification-particleFloat2 4s infinite ease-out;
+}
+
+.email-verification-container .email-verification-particle-3 {
+    top: 70%;
+    left: 20%;
+    animation: email-verification-particleFloat3 5s infinite ease-out;
+}
+
+.email-verification-container .email-verification-particle-4 {
+    top: 60%;
+    left: 90%;
+    animation: email-verification-particleFloat4 3.2s infinite ease-out;
+}
+
+.email-verification-container .email-verification-particle-5 {
+    top: 90%;
+    left: 50%;
+    animation: email-verification-particleFloat5 3.8s infinite ease-out;
+}
+
+.email-verification-container .email-verification-particle-6 {
+    top: 30%;
+    left: 30%;
+    animation: email-verification-particleFloat6 4.2s infinite ease-out;
+}
+
+.email-verification-container .email-verification-card::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: repeating-linear-gradient(
+        0deg,
+        rgba(0, 224, 255, 0.03) 0px,
+        rgba(0, 224, 255, 0.03) 1px,
+        rgba(0, 0, 0, 0) 1px,
+        rgba(0, 0, 0, 0) 4px
+    );
+    pointer-events: none;
+    z-index: 5;
+    opacity: 0.4;
+    animation: email-verification-scanlines 8s linear infinite;
+}
+
+/* ==========================================================================
+   Media Queries
+   ========================================================================== */
+@media (max-width: 768px) {
+    .email-verification-container {
+        min-height: 100vh;
+        padding: 1rem;
+        padding-top: 80px;
+    }
+
+    .email-verification-container .email-verification-card {
+        padding: 2rem;
+        max-width: 90%;
+    }
+
+    .email-verification-container .email-verification-card-title {
+        font-size: 1.8rem;
+    }
+
+    .email-verification-container .email-verification-logo img {
+        height: 60px;
+    }
+
+    .email-verification-container .email-verification-btn {
+        font-size: 1.1rem;
+        padding: 0.9rem 1.8rem;
+    }
+}
+
+/* ==========================================================================
+   Animaciones
+   ========================================================================== */
+@keyframes email-verification-pulseLine {
+    0%, 100% { opacity: 0.6; width: 60%; }
+    50% { opacity: 1; width: 90%; }
+}
+
+@keyframes email-verification-glowingBorder {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+@keyframes email-verification-gradientShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+@keyframes email-verification-beamMovement1 {
+    0%, 100% { transform: rotate(25deg); opacity: 0.3; }
+    50% { transform: rotate(28deg); opacity: 0.5; }
+}
+
+@keyframes email-verification-beamMovement2 {
+    0%, 100% { transform: rotate(-15deg); opacity: 0.2; }
+    50% { transform: rotate(-12deg); opacity: 0.4; }
+}
+
+@keyframes email-verification-beamMovement3 {
+    0%, 100% { transform: rotate(5deg); opacity: 0.15; }
+    50% { transform: rotate(8deg); opacity: 0.25; }
+}
+
+@keyframes email-verification-particleFloat1 {
+    0% { transform: translate(0, 0) scale(0.5); opacity: 0; }
+    20% { opacity: 0.9; }
+    100% { transform: translate(-30px, -40px) scale(0); opacity: 0; }
+}
+
+@keyframes email-verification-particleFloat2 {
+    0% { transform: translate(0, 0) scale(0.7); opacity: 0; }
+    20% { opacity: 0.8; }
+    100% { transform: translate(35px, -35px) scale(0); opacity: 0; }
+}
+
+@keyframes email-verification-particleFloat3 {
+    0% { transform: translate(0, 0) scale(0.6); opacity: 0; }
+    20% { opacity: 0.9; }
+    100% { transform: translate(-25px, 35px) scale(0); opacity: 0; }
+}
+
+@keyframes email-verification-particleFloat4 {
+    0% { transform: translate(0, 0) scale(0.8); opacity: 0; }
+    20% { opacity: 0.7; }
+    100% { transform: translate(30px, 30px) scale(0); opacity: 0; }
+}
+
+@keyframes email-verification-particleFloat5 {
+    0% { transform: translate(0, 0) scale(0.5); opacity: 0; }
+    20% { opacity: 0.8; }
+    100% { transform: translate(0, 40px) scale(0); opacity: 0; }
+}
+
+@keyframes email-verification-particleFloat6 {
+    0% { transform: translate(0, 0) scale(0.6); opacity: 0; }
+    20% { opacity: 0.9; }
+    100% { transform: translate(-20px, -35px) scale(0); opacity: 0; }
+}
+
+@keyframes email-verification-scanlines {
+    0% { background-position: 0 0; }
+    100% { background-position: 0 100px; }
+}
+
+@keyframes email-verification-fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
