@@ -52,10 +52,10 @@ export const ModalProvider = ({ children }) => {
    * @returns {string} ID del modal registrado
    */
   const registerModal = useCallback(
-    (id = null, options = {}) => {
+    (id, options = {}) => {
       // Security guard against prototype pollution.
       if (id === '__proto__' || id === 'constructor' || id === 'prototype') {
-        return null;
+        return;
       }
       const modalId = id || `modal-${idCounter}`;
 
@@ -71,11 +71,11 @@ export const ModalProvider = ({ children }) => {
           newModals.set(modalId, {
             id: modalId,
             isOpen: false,
-            data: null,
+            data: undefined,
             blocking: options.blocking || false,
             zIndex: options.zIndex || 1000,
             size: options.size || 'medium',
-            onBeforeClose: options.onBeforeClose || null,
+            onBeforeClose: options.onBeforeClose || undefined,
             history: options.preserveHistory || false,
           });
         }
@@ -97,7 +97,7 @@ export const ModalProvider = ({ children }) => {
    * @param {Object} data - Datos a pasar al modal
    */
   const openModal = useCallback(
-    (id, data = null) => {
+    (id, data) => {
       if (!modals.has(id)) {
         return;
       }
@@ -127,7 +127,7 @@ export const ModalProvider = ({ children }) => {
    * @param {Object} result - Resultado o datos de salida del modal
    */
   const closeModal = useCallback(
-    async (id, result = null) => {
+    async (id, result) => {
       if (!modals.has(id)) {
         return;
       }
@@ -150,7 +150,11 @@ export const ModalProvider = ({ children }) => {
         const newModals = new Map(previous);
         const currentModal = newModals.get(id);
         if (currentModal) {
-          newModals.set(id, { ...currentModal, isOpen: false, data: null });
+          newModals.set(id, {
+            ...currentModal,
+            isOpen: false,
+            data: undefined,
+          });
         }
         return newModals;
       });
@@ -190,7 +194,7 @@ export const ModalProvider = ({ children }) => {
    */
   const getModalState = useCallback(
     (id) => {
-      return modals.get(id) || null;
+      return modals.get(id) || undefined;
     },
     [modals],
   );

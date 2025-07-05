@@ -111,7 +111,7 @@ const Tower = () => {
           estrategas del Pluniverse.
         </p>
         <div className='gallery-grid'>
-          {gallery.map((item, index) => (
+          {gallery.map((item) => (
             <div className='gallery-item' key={item.name}>
               <img src={item.image} alt={item.name} className='gallery-image' />
               <h3>{item.name}</h3>

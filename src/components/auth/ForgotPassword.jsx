@@ -1,4 +1,3 @@
-import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 
 import useCardTiltEffect from '../../hooks/useCardTiltEffect';
@@ -79,7 +78,5 @@ const ForgotPassword = () => {
     </div>
   );
 };
-
-ForgotPassword.propTypes = {};
 
 export default ForgotPassword;

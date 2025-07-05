@@ -244,7 +244,7 @@ SubmitButton.displayName = 'SubmitButton';
 
 const TuOpinion = () => {
   const { width } = useWindowSize();
-  const heroReference = useRef(null);
+  const heroReference = useRef(undefined);
   const [formData, setFormData] = useState({ nombre: '', opinion: '' });
   const [loading, setLoading] = useState(false);
   const [formMessage, setFormMessage] = useState({
@@ -254,9 +254,9 @@ const TuOpinion = () => {
   const [byteState, setByteState] = useState('normal');
   const [isFormVisible, setIsFormVisible] = useState(false);
   const inViewport = useRef(false);
-  const formReference = useRef(null);
+  const formReference = useRef(undefined);
   const mainControls = useAnimation();
-  const idleCallbackIdReference = useRef(null);
+  const idleCallbackIdReference = useRef(undefined);
 
   const getByteImage = () => {
     switch (byteState) {
@@ -272,37 +272,40 @@ const TuOpinion = () => {
     }
   };
 
+  const startVisibilitySequence = React.useCallback(async () => {
+    await mainControls.start({
+      opacity: 1,
+      transition: { duration: 0.5 },
+    });
+    setTimeout(() => setIsFormVisible(true), 800);
+  }, [mainControls]);
+
   useEffect(() => {
     const heroElement = heroReference.current;
-    const observer = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (entry.isIntersecting && !inViewport.current) {
-            inViewport.current = true;
 
-            const sequence = async () => {
-              await mainControls.start({
-                opacity: 1,
-                transition: { duration: 0.5 },
-              });
-              setTimeout(() => setIsFormVisible(true), 800);
-            };
-
-            sequence();
-          }
+    const handleIntersection = (entries) => {
+      for (const entry of entries) {
+        if (entry.isIntersecting && !inViewport.current) {
+          inViewport.current = true;
+          startVisibilitySequence();
         }
-      },
-      { threshold: 0.2 },
-    );
+      }
+    };
+
+    const observer = new IntersectionObserver(handleIntersection, {
+      threshold: 0.2,
+    });
 
     if (heroElement) {
       observer.observe(heroElement);
     }
 
     return () => {
-      if (heroElement) observer.unobserve(heroElement);
+      if (heroElement) {
+        observer.unobserve(heroElement);
+      }
     };
-  }, [mainControls]);
+  }, [startVisibilitySequence]);
 
   useEffect(() => {
     const initInteractions = () => {

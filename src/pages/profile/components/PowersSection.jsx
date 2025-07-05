@@ -1,30 +1,43 @@
 import PropTypes from 'prop-types';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 
-import { powers } from '@/data/powers';
+import { powers as allPowersData } from '@/data/powers';
 import axiosInstance from '@/utils/axios-config.js';
+
+import AddPowerForm from './AddPowerForm';
+import PowerItem from './PowerItem';
+
+const getPowerDetails = (powerId) => {
+  const power = allPowersData.find((p) => p.id === powerId);
+  return power
+    ? { title: power.title, icon: power.icon, description: power.description }
+    : { title: powerId, icon: '⚡', description: 'Desconocido' };
+};
 
 /**
  * Componente que gestiona la sección de poderes del usuario
  * @param {Object} props - Propiedades del componente
  * @param {Object} props.user - Datos del usuario
- * @param {Function} props.setUser - Función para actualizar los datos del usuario
+ * @param {Function} props.updateProfile - Función para actualizar los datos del usuario
  * @param {Function} props.showNotification - Función para mostrar notificaciones
  * @param {Function} props.navigate - Función de navegación
  */
 const PowersSection = ({ user, updateProfile, showNotification, navigate }) => {
-  const [newPower, setNewPower] = useState('');
-  const [showPowerTooltip, setShowPowerTooltip] = useState();
   const [powerAnimations, setPowerAnimations] = useState({});
 
-  // Inicializar animaciones de poderes
+  const activateAnimation = useCallback((key) => {
+    setPowerAnimations((previous) => ({
+      ...previous,
+      // eslint-disable-next-line security/detect-object-injection
+      [key]: { ...previous[key], active: true },
+    }));
+  }, []);
+
   useEffect(() => {
     if (user && Array.isArray(user.powers)) {
       const animations = {};
       for (const [index, power] of user.powers.entries()) {
         if (power) {
-          // The key `power` is safe; it originates from `user.powers`,
-          // a controlled list from the backend, not direct user input.
           // eslint-disable-next-line security/detect-object-injection
           animations[power] = { delay: index * 300, active: false };
         }
@@ -32,18 +45,7 @@ const PowersSection = ({ user, updateProfile, showNotification, navigate }) => {
       setPowerAnimations(animations);
 
       const timeouts = Object.keys(animations).map((key, index) =>
-        setTimeout(
-          () => {
-            setPowerAnimations((previous) => ({
-              ...previous,
-              // The key `key` is safe; it originates from `Object.keys` on a
-              // controlled object, not direct user input.
-              // eslint-disable-next-line security/detect-object-injection
-              [key]: { ...previous[key], active: true },
-            }));
-          },
-          index * 300 + 500,
-        ),
+        setTimeout(() => activateAnimation(key), index * 300 + 500),
       );
 
       return () => {
@@ -52,26 +54,10 @@ const PowersSection = ({ user, updateProfile, showNotification, navigate }) => {
         }
       };
     }
+  }, [user, activateAnimation]);
 
-    // Devuelve una función de limpieza no operativa para satisfacer la regla
-    // `consistent-return` de ESLint, asegurando que el hook useEffect
-    // siempre devuelva una función.
-    return () => {
-      // No-op: esta función está intencionadamente vacía.
-    };
-  }, [user]);
-
-  const handlePowerHover = (powerId) => {
-    setShowPowerTooltip(powerId);
-  };
-
-  const handlePowerLeave = () => {
-    setShowPowerTooltip(undefined);
-  };
-
-  const handleAddPower = async (event) => {
-    event.preventDefault();
-    if (!newPower) {
+  const handleAddPower = async (newPowerId) => {
+    if (!newPowerId) {
       showNotification('Por favor, selecciona un poder.', 'error');
       return;
     }
@@ -79,18 +65,15 @@ const PowersSection = ({ user, updateProfile, showNotification, navigate }) => {
     try {
       showNotification('Adquiriendo poder...', 'info');
       const response = await axiosInstance.post('auth/profile/powers', {
-        powerId: newPower,
+        powerId: newPowerId,
       });
 
       if (response.data.status === 'success') {
         updateProfile({ ...user, powers: response.data.powers });
-        setNewPower('');
-
         showNotification('¡Poder adquirido con éxito!', 'success');
-
         setPowerAnimations((previous) => ({
           ...previous,
-          [newPower]: { delay: 0, active: true },
+          [newPowerId]: { delay: 0, active: true },
         }));
       } else {
         showNotification(
@@ -125,8 +108,6 @@ const PowersSection = ({ user, updateProfile, showNotification, navigate }) => {
       if (response.data.status === 'success') {
         setPowerAnimations((previous) => ({
           ...previous,
-          // The key `powerId` is safe; it originates from `user.powers`,
-          // a controlled list from the backend, not direct user input.
           // eslint-disable-next-line security/detect-object-injection
           [powerId]: { ...previous[powerId], active: false, removing: true },
         }));
@@ -158,60 +139,21 @@ const PowersSection = ({ user, updateProfile, showNotification, navigate }) => {
     }
   };
 
-  const getPowerDetails = (powerId) => {
-    const power = powers.find((p) => p.id === powerId);
-    return power
-      ? { title: power.title, icon: power.icon, description: power.description }
-      : { title: powerId, icon: '⚡', description: 'Desconocido' };
-  };
-
   return (
     <div className='profile-section powers-section'>
       <h3 className='profile-section-title'>PODERES</h3>
       <div className='powers-grid full'>
         {Array.isArray(user?.powers) && user.powers.length > 0 ? (
-          user.powers.map((power) => {
-            const { title, icon, description } = getPowerDetails(power);
-            // The key `power` is safe; it originates from `user.powers`,
-            // a controlled list from the backend, not direct user input.
-            // eslint-disable-next-line security/detect-object-injection
-            const isActive = powerAnimations[power]?.active;
-            // eslint-disable-next-line security/detect-object-injection
-            const isRemoving = powerAnimations[power]?.removing;
-
-            return (
-              <div
-                key={power}
-                className={`power-item large ${isActive ? 'active' : ''} ${
-                  isRemoving ? 'removing' : ''
-                } power-item-large-styles`}
-                style={{
-                  // eslint-disable-next-line security/detect-object-injection
-                  animationDelay: `${powerAnimations[power]?.delay || 0}ms`,
-                }}
-                onMouseEnter={() => handlePowerHover(power)}
-                onMouseLeave={handlePowerLeave}
-              >
-                <div className='power-icon large'>{icon}</div>
-                <div className='power-name'>{title}</div>
-                {showPowerTooltip === power && (
-                  <div className='power-tooltip large'>
-                    <div className='tooltip-title'>{title}</div>
-                    <div className='tooltip-description'>{description}</div>
-                    <button
-                      className='cyber-button small'
-                      onClick={(event) => {
-                        event.stopPropagation();
-                        handleRemovePower(power);
-                      }}
-                    >
-                      Desactivar
-                    </button>
-                  </div>
-                )}
-              </div>
-            );
-          })
+          user.powers.map((powerId) => (
+            <PowerItem
+              key={powerId}
+              power={powerId}
+              powerDetails={getPowerDetails(powerId)}
+              // eslint-disable-next-line security/detect-object-injection
+              animation={powerAnimations[powerId]}
+              onRemove={handleRemovePower}
+            />
+          ))
         ) : (
           <div className='empty-state'>
             <div className='empty-icon'>⚡</div>
@@ -220,23 +162,10 @@ const PowersSection = ({ user, updateProfile, showNotification, navigate }) => {
         )}
       </div>
 
-      <form className='power-form-container' onSubmit={handleAddPower}>
-        <select
-          value={newPower}
-          onChange={(event) => setNewPower(event.target.value)}
-          className='power-select-styles'
-        >
-          <option value=''>Selecciona un poder</option>
-          {powers.map((power) => (
-            <option key={power.id} value={power.id}>
-              {power.title}
-            </option>
-          ))}
-        </select>
-        <button type='submit' className='cyber-button glow-effect'>
-          AGREGAR PODER
-        </button>
-      </form>
+      <AddPowerForm
+        onAddPower={handleAddPower}
+        existingPowers={user?.powers || []}
+      />
     </div>
   );
 };

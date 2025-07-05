@@ -4,7 +4,7 @@
  * @version 5.0.0 - Refactorización con selectores granulares para eliminar ciclos de renderizado.
  */
 
-import { GitBranch, Edit2, PlusCircle, Copy, Trash2 } from 'lucide-react';
+import { Edit2, PlusCircle, Copy, Trash2 } from 'lucide-react';
 import PropTypes from 'prop-types';
 import React, {
   useState,
@@ -16,8 +16,6 @@ import React, {
 } from 'react';
 import { Position, Handle, useUpdateNodeInternals } from 'reactflow';
 import { shallow } from 'zustand/shallow';
-
-import logger from '@/services/loggerService';
 
 import './DecisionNode.css';
 
@@ -46,6 +44,12 @@ const isValidQuestion = (question) =>
   question?.trim().length > 0 && question.trim().length <= 500;
 
 const DecisionNodeInternal = ({ id, selected, isConnectable }) => {
+  // --- Prop Types para validación interna ---
+  DecisionNodeInternal.propTypes = {
+    id: PropTypes.string.isRequired,
+    selected: PropTypes.bool,
+    isConnectable: PropTypes.bool,
+  };
   // --- 1. Hooks de React y Zustand (TODOS INCONDICIONALES) ---
   const updateNodeInternals = useUpdateNodeInternals();
 
@@ -54,7 +58,7 @@ const DecisionNodeInternal = ({ id, selected, isConnectable }) => {
     addDecisionNodeCondition,
     updateDecisionNodeConditionText,
     deleteDecisionNodeCondition,
-    generateOptionNodes,
+
     duplicateNode,
     deleteNode,
     showContextMenu,
@@ -78,7 +82,7 @@ const DecisionNodeInternal = ({ id, selected, isConnectable }) => {
   // La clave es `conditions.length`, que fuerza la actualización cuando se agrega/elimina una condición.
   const nodeData = useFlowStore((state) => {
     const node = state.nodes.find((n) => n.id === id);
-    if (!node) return null;
+    if (!node) return;
     return {
       question: node.data.question,
       conditions: node.data.conditions,
@@ -242,6 +246,17 @@ const DecisionNodeInternal = ({ id, selected, isConnectable }) => {
     ],
   );
 
+  const handleKeyDown = useCallback(
+    (event) => {
+      // Permite la interacción con teclado para accesibilidad
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        startEditing();
+      }
+    },
+    [startEditing],
+  );
+
   useEffect(() => {
     if (
       nodeData &&
@@ -250,13 +265,6 @@ const DecisionNodeInternal = ({ id, selected, isConnectable }) => {
       updateNodeData(id, { conditions: defaultConditions });
     }
   }, [id, nodeData, defaultConditions, updateNodeData]);
-
-  // Clave de dependencia para regenerar nodos de opción solo cuando los datos relevantes cambian.
-  // Se serializa `currentConditions` para crear una dependencia estable que solo cambia si los datos reales cambian.
-  const conditionsKey = useMemo(
-    () => JSON.stringify(currentConditions),
-    [currentConditions],
-  );
 
   useEffect(() => {
     // Si el estado de edición ha cambiado (de true a false o de false a true),
@@ -283,7 +291,7 @@ const DecisionNodeInternal = ({ id, selected, isConnectable }) => {
   // --- Guarda de renderizado ---
   // Se ejecuta DESPUÉS de todos los hooks para cumplir las reglas de React.
   if (!nodeData) {
-    return null;
+    return;
   }
 
   // --- Renderizado del Componente ---
@@ -325,17 +333,22 @@ const DecisionNodeInternal = ({ id, selected, isConnectable }) => {
                 onAddCondition={addCondition}
                 onConditionChange={handleConditionTextChange}
                 onDeleteCondition={handleDeleteCondition}
-                onMoveCondition={() => {}} // Placeholder
+                onMoveCondition={() => {
+                  // Placeholder
+                }}
                 isUltraPerformanceMode={isUltraMode}
                 isEditing={isEditing}
-                activeConditionId={null}
-                setActiveConditionId={() => {}}
+                activeConditionId={undefined}
+                setActiveConditionId={() => {
+                  // Placeholder
+                }}
               />
             </>
           ) : (
             <div
               className='decision-node__question-preview'
               onClick={startEditing}
+              onKeyDown={handleKeyDown}
               role='button'
               tabIndex={0}
             >
@@ -371,7 +384,9 @@ const DecisionNodeInternal = ({ id, selected, isConnectable }) => {
               onToggleVariables={() =>
                 updateNodeData(id, { enableVariables: !enableVariables })
               }
-              onToggleLogic={() => {}} // Placeholder
+              onToggleLogic={() => {
+                // Placeholder
+              }}
               enableMarkdown={enableMarkdown || false}
               enableVariables={enableVariables || false}
               enableLogic={false} // Placeholder

@@ -9,14 +9,19 @@ import {
 } from 'lucide-react';
 import React, {
   useState,
-  useEffect,
   useRef,
-  useMemo,
+  useEffect,
   useCallback,
+  useMemo,
 } from 'react';
 import { Link } from 'react-router-dom';
 
 import aegisAvatar from '@assets/img/characters/seguridad/aegis-seguridad.webp';
+
+// Función de ayuda para generar números aleatorios más seguros
+const secureRandom = () => {
+  return crypto.getRandomValues(new Uint32Array(1))[0] / (2 ** 32 - 1);
+};
 
 import './Seguridad.css';
 
@@ -79,11 +84,11 @@ const ShieldMatrix = React.memo(() => {
             className='matrix-dot'
             initial={{ opacity: 0 }}
             animate={{
-              opacity: Math.random() > 0.7 ? 0.8 : 0.2,
-              scale: Math.random() > 0.8 ? [1, 1.3, 1] : 1,
+              opacity: secureRandom() > 0.7 ? 0.8 : 0.2,
+              scale: secureRandom() > 0.8 ? [1, 1.3, 1] : 1,
             }}
             transition={{
-              duration: 2 + Math.random() * 2,
+              duration: 2 + secureRandom() * 2,
               repeat: Infinity,
               repeatType: 'reverse',
             }}
@@ -195,10 +200,10 @@ const Seguridad = () => {
   const [isHovering, setIsHovering] = useState(false);
   const [isShieldActivated, setIsShieldActivated] = useState(false);
 
-  const containerReference = useRef(null);
-  const audioReference = useRef(null);
-  const scannerReference = useRef(null);
-  const animationFrameReference = useRef(null);
+  const containerReference = useRef(undefined);
+  const audioReference = useRef(undefined);
+  const scannerReference = useRef(undefined);
+  const animationFrameReference = useRef(undefined);
 
   const controlsMetrics = useAnimation();
   const controlsTitle = useAnimation();
@@ -285,17 +290,17 @@ const Seguridad = () => {
     }
 
     let timeoutId;
-    const handleMouseMove = (e) => {
+    const handleMouseMove = (event) => {
       if (timeoutId) return;
 
       timeoutId = setTimeout(() => {
         if (!containerReference.current) return;
         const rect = containerReference.current.getBoundingClientRect();
         setCursorPosition({
-          x: e.clientX - rect.left,
-          y: e.clientY - rect.top,
+          x: event.clientX - rect.left,
+          y: event.clientY - rect.top,
         });
-        timeoutId = null;
+        timeoutId = undefined;
       }, 16);
     };
 
@@ -567,7 +572,9 @@ const Seguridad = () => {
                 width={80}
                 height={80}
                 loading='lazy'
-                onError={(e) => (e.target.src = '/api/placeholder/80/80')}
+                onError={(event) =>
+                  (event.target.src = '/api/placeholder/80/80')
+                }
                 initial={{ scale: 0.8 }}
                 animate={{
                   scale: isShieldActivated ? [0.98, 1.02, 0.98] : 0.98,

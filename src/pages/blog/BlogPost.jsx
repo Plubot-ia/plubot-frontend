@@ -10,7 +10,7 @@ import './Blog.css';
 
 const BlogPost = () => {
   const { slug } = useParams();
-  const [post, setPost] = useState(null);
+  const [post, setPost] = useState();
   const xp = useReadingXP(slug);
 
   useEffect(() => {
@@ -282,10 +282,11 @@ const BlogPost = () => {
           },
         };
 
-        // eslint-disable-next-line security/detect-object-injection -- Falso positivo: slug seguro.
-        const selectedPost = staticPosts[slug];
-        if (selectedPost) {
-          setPost(selectedPost);
+        const postData = Object.prototype.hasOwnProperty.call(staticPosts, slug)
+          ? staticPosts[slug]
+          : undefined;
+        if (postData) {
+          setPost(postData);
         }
       } catch (error) {
         logger.error('Error al cargar la publicación del blog:', error);

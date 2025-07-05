@@ -64,12 +64,9 @@ const EpicHeader = ({
   const displayFlowName = propertiesFlowName || flowNameFromStore;
 
   // Log para depuración
-  React.useEffect(
-    () => {
-      /* no-op */
-    },
-    [propertiesFlowName, flowNameFromStore, displayFlowName],
-  );
+  React.useEffect(() => {
+    /* no-op */
+  }, [propertiesFlowName, flowNameFromStore, displayFlowName]);
 
   // Obtener funciones del store de Training
   const {
@@ -640,7 +637,5 @@ EpicHeader.propTypes = {
   getVisibleNodeCount: PropTypes.func,
   plubotId: PropTypes.string,
 };
-
-
 
 export default React.memo(EpicHeader);

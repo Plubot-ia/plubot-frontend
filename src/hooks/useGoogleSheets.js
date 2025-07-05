@@ -7,14 +7,14 @@ import useAPI from './useAPI';
 
 const useGoogleSheets = () => {
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [sheetsData, setSheetsData] = useState(null);
+  const [error, setError] = useState();
+  const [sheetsData, setSheetsData] = useState();
   const { axiosInstance } = useAPI();
   const { user } = useAuthStore();
 
   const connectGoogleSheets = async (credentials) => {
     setLoading(true);
-    setError(null);
+    setError(undefined);
 
     try {
       const response = await axiosInstance.post(
@@ -38,7 +38,7 @@ const useGoogleSheets = () => {
 
   const fetchSheetData = async (spreadsheetId, range = 'A1:Z1000') => {
     setLoading(true);
-    setError(null);
+    setError(undefined);
 
     try {
       const response = await axiosInstance.post(

@@ -1,6 +1,5 @@
 import { motion } from 'framer-motion';
 import {
-  TrendingUp,
   Clock,
   Award,
   Users,
@@ -9,11 +8,12 @@ import {
   Download,
   ShoppingCart,
   Copy,
-  X,
 } from 'lucide-react';
+import PropTypes from 'prop-types';
 import { useState, useEffect, useRef } from 'react';
 
 import useWindowSize from '../../hooks/useWindowSize';
+
 import './Coliseum.css';
 
 const tabs = [
@@ -25,8 +25,7 @@ const tabs = [
 export default function ColiseoMejorado() {
   const { width, height } = useWindowSize();
   const [activeTab, setActiveTab] = useState('ranking');
-  const [showByteGuideMessage, setShowByteGuideMessage] = useState(true); // Estado para el mensaje
-  const canvasReference = useRef(null);
+  const canvasReference = useRef(undefined);
 
   // Datos de ejemplo
   const rankings = [
@@ -139,6 +138,9 @@ export default function ColiseoMejorado() {
   ];
 
   // Animación de partículas optimizada
+  /* eslint-disable sonarjs/pseudo-random */
+  // Se deshabilita la regla de 'pseudo-random' porque Math.random es suficiente
+  // para una animación puramente decorativa y no requiere seguridad criptográfica.
   useEffect(() => {
     const canvas = canvasReference.current;
     if (!canvas)
@@ -195,11 +197,7 @@ export default function ColiseoMejorado() {
 
     return () => cancelAnimationFrame(animationId);
   }, [width, height]);
-
-  // Manejador para cerrar el mensaje
-  const handleCloseByteGuide = () => {
-    setShowByteGuideMessage(false);
-  };
+  /* eslint-enable sonarjs/pseudo-random */
 
   // Componentes internos
   const BattleCard = ({ plubot }) => (
@@ -222,7 +220,7 @@ export default function ColiseoMejorado() {
           <h3 className='text-lg font-bold text-white'>{plubot.name}</h3>
           <p className='text-cyan-300'>{plubot.creator}</p>
           <div className='flex mt-1 gap-2'>
-            {plubot.badges.map((badge, index) => (
+            {plubot.badges.map((badge, _index) => (
               <span key={badge} className='battle-card-badge'>
                 {badge}
               </span>
@@ -259,6 +257,21 @@ export default function ColiseoMejorado() {
     </motion.div>
   );
 
+  BattleCard.propTypes = {
+    plubot: PropTypes.shape({
+      avatar: PropTypes.string.isRequired,
+      name: PropTypes.string.isRequired,
+      level: PropTypes.number.isRequired,
+      creator: PropTypes.string.isRequired,
+      badges: PropTypes.arrayOf(PropTypes.string).isRequired,
+      style: PropTypes.string.isRequired,
+      sales: PropTypes.number.isRequired,
+      reviews: PropTypes.number.isRequired,
+      votes: PropTypes.number.isRequired,
+      price: PropTypes.number.isRequired,
+    }).isRequired,
+  };
+
   const ChallengeCard = ({ challenge }) => (
     <motion.div
       className='challenge-card'
@@ -284,6 +297,16 @@ export default function ColiseoMejorado() {
       </div>
     </motion.div>
   );
+
+  ChallengeCard.propTypes = {
+    challenge: PropTypes.shape({
+      title: PropTypes.string.isRequired,
+      deadline: PropTypes.string.isRequired,
+      description: PropTypes.string.isRequired,
+      progress: PropTypes.number.isRequired,
+      reward: PropTypes.string.isRequired,
+    }).isRequired,
+  };
 
   const RankingTable = () => (
     <motion.div
@@ -354,11 +377,6 @@ export default function ColiseoMejorado() {
           transition={{ duration: 0.5, delay: 0.2 }}
         >
           <div className='stat-card'>
-            <TrendingUp size={28} className='text-cyan-400' />
-            <h3>Nivel Personal</h3>
-            <p className='metric-value'>6</p>
-          </div>
-          <div className='stat-card'>
             <Clock size={28} className='text-purple-400' />
             <h3>Horas Ahorradas</h3>
             <p className='metric-value'>12.5</p>
@@ -404,34 +422,6 @@ export default function ColiseoMejorado() {
             </div>
           )}
         </div>
-
-        {showByteGuideMessage && (
-          <motion.div
-            className='byteguide-message'
-            initial={{ opacity: 0, x: 100 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: 100 }}
-            transition={{ duration: 0.5 }}
-          >
-            <button
-              className='byteguide-close-btn'
-              onClick={handleCloseByteGuide}
-              aria-label='Cerrar mensaje'
-            >
-              <X size={16} />
-            </button>
-            <div className='flex gap-3'>
-              <div className='byteguide-avatar'>
-                <Zap size={18} className='text-white' />
-              </div>
-              <p>
-                ¡Bienvenido al Coliseo! Has ahorrado 4 horas esta semana,
-                ¡completa el reto &quot;Estratega del Tiempo&quot; para subir de
-                nivel!
-              </p>
-            </div>
-          </motion.div>
-        )}
       </div>
     </div>
   );

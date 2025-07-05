@@ -1,12 +1,12 @@
 import React, { lazy, Suspense } from 'react';
-import useFlowStore from '@/stores/use-flow-store';
-
-import useGlobalContext from '../../hooks/useGlobalContext';
 
 // Importar componentes de modal directamente
 import EmbedModal from '../onboarding/modals/EmbedModal';
 import ImportExportModal from '../onboarding/modals/ImportExportModal';
 import SyncModal from '../onboarding/modals/SyncModal';
+
+import useFlowStore from '@/stores/use-flow-store';
+import useGlobalContext from '../../hooks/useGlobalContext';
 
 // Cargar componentes pesados con lazy loading
 const TemplateSelector = lazy(
@@ -44,7 +44,7 @@ const ModalContainer = () => {
 
   // Si no hay modales activos, no renderizar nada.
   if (!activeModalEntry) {
-    return <></>;
+    return null;
   }
 
   // Función para manejar sincronización (pasada a SyncModal)
@@ -132,12 +132,20 @@ const ModalContainer = () => {
                 edges={[]}
                 setByteMessage={setByteMessage}
                 exportFormat='json'
-                setExportFormat={() => { /* no-op */ }}
+                setExportFormat={() => {
+                  /* no-op */
+                }}
                 importData=''
-                setImportData={() => { /* no-op */ }}
-                setExportMode={() => { /* no-op */ }}
+                setImportData={() => {
+                  /* no-op */
+                }}
+                setExportMode={() => {
+                  /* no-op */
+                }}
                 plubotData={{ name: 'Mi Plubot' }}
-                updatePlubotData={() => { /* no-op */ }}
+                updatePlubotData={() => {
+                  /* no-op */
+                }}
               />
             );
           }
@@ -166,7 +174,7 @@ const ModalContainer = () => {
                   onClose={() => closeModal('simulationModal')}
                   nodes={Array.isArray(nodes) ? nodes : []}
                   edges={Array.isArray(edges) ? edges : []}
-                  analyticsTracker={(event, data) => {
+                  analyticsTracker={(_event, _data) => {
                     // El seguimiento de análisis se puede implementar aquí en el futuro.
                   }}
                 />
@@ -175,7 +183,7 @@ const ModalContainer = () => {
           }
 
           default: {
-            return <></>;
+            return null;
           } // No renderizar nada si no hay modal activo
         }
       })()}

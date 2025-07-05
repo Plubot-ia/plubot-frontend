@@ -1,5 +1,4 @@
 import { motion } from 'framer-motion';
-import PropTypes from 'prop-types';
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
@@ -12,7 +11,7 @@ import './GoogleAuthCallback.css';
 const GoogleAuthCallback = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { processGoogleAuth } = useAuthStore();
+
   const [status, setStatus] = useState('loading');
   const [message, setMessage] = useState(
     'Procesando autenticación con Google...',
@@ -66,8 +65,7 @@ const GoogleAuthCallback = () => {
             try {
               if (state) {
                 // El estado podría estar codificado en base64
-                const decodedState = atob(state);
-                const stateData = JSON.parse(decodedState);
+                JSON.parse(atob(state));
               }
             } catch (decodingError) {
               logger.warn(
@@ -213,29 +211,45 @@ const GoogleAuthCallback = () => {
 
           // Procesar el token con manejo robusto de errores y persistencia
           try {
-            const response = await processGoogleAuth(token);
+            const isDevelopment =
+              import.meta.env.DEV ||
+              globalThis.location.hostname === 'localhost' ||
+              globalThis.location.hostname === '127.0.0.1';
+            const backendBaseUrl = isDevelopment
+              ? ''
+              : 'https://plubot-backend.onrender.com';
 
-            if (response?.success) {
+            const response = await fetch(
+              `${backendBaseUrl}/api/auth/google/callback?token=${encodeURIComponent(token)}`,
+            );
+
+            if (!response.ok) {
+              const errorText =
+                'Error en la respuesta del servidor: ' +
+                `${response.status} ${response.statusText}`;
+              throw new Error(errorText);
+            }
+
+            const data = await response.json();
+
+            if (data.status === 'success' && data.user) {
               // Verificar que el usuario tenga todos los datos necesarios
-              if (response.user) {
+              if (data.user) {
                 // Guardar datos adicionales en localStorage para mayor seguridad
-                localStorage.setItem('user_email', response.user.email);
-                localStorage.setItem('user_id', response.user.id);
+                localStorage.setItem('user_email', data.user.email);
+                localStorage.setItem('user_id', data.user.id);
 
                 // Verificar si el usuario tiene plubots y asegurarse de que
                 // estén correctamente formateados
-                if (
-                  !response.user.plubots ||
-                  !Array.isArray(response.user.plubots)
-                ) {
-                  response.user.plubots = [];
+                if (!data.user.plubots || !Array.isArray(data.user.plubots)) {
+                  data.user.plubots = [];
                 }
 
                 // Guardar una copia de respaldo de los plubots en localStorage
                 try {
                   localStorage.setItem(
                     'user_plubots_backup',
-                    JSON.stringify(response.user.plubots),
+                    JSON.stringify(data.user.plubots),
                   );
                 } catch (backupError) {
                   logger.warn(
@@ -257,7 +271,7 @@ const GoogleAuthCallback = () => {
                 navigate('/pluniverse');
               }, 1500);
             } else {
-              throw new Error(response?.error || 'Error al procesar el token.');
+              throw new Error(data?.error || 'Error al procesar el token.');
             }
           } catch (tokenError) {
             setStatus('error');
@@ -278,7 +292,7 @@ const GoogleAuthCallback = () => {
     };
 
     processAuth();
-  }, [location, processGoogleAuth, navigate]);
+  }, [location, navigate]);
 
   // Variantes de animación para los elementos
   const containerVariants = {
@@ -387,7 +401,5 @@ const GoogleAuthCallback = () => {
     </motion.div>
   );
 };
-
-GoogleAuthCallback.propTypes = {};
 
 export default GoogleAuthCallback;

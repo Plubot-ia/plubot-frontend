@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 
 /**
@@ -6,7 +7,7 @@ import React from 'react';
  * @param {Array} props.recentActivities - Lista de actividades recientes
  * @param {boolean} props.animateBadges - Indica si se deben animar los elementos
  */
-const ActivitySection = ({ recentActivities, animateBadges }) => {
+function ActivitySection({ recentActivities, animateBadges = false }) {
   return (
     <div className='profile-section activity-section'>
       <h3 className='profile-section-title'>ACTIVIDAD RECIENTE</h3>
@@ -27,6 +28,17 @@ const ActivitySection = ({ recentActivities, animateBadges }) => {
       </ul>
     </div>
   );
+}
+
+ActivitySection.propTypes = {
+  recentActivities: PropTypes.arrayOf(
+    PropTypes.shape({
+      text: PropTypes.string.isRequired,
+      time: PropTypes.string.isRequired,
+      icon: PropTypes.string.isRequired,
+    }),
+  ).isRequired,
+  animateBadges: PropTypes.bool,
 };
 
 export default ActivitySection;

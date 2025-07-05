@@ -7,10 +7,10 @@
 import { useState, useEffect, useRef } from 'react';
 
 const useWorker = (workerPath) => {
-  const workerReference = useRef(null);
+  const workerReference = useRef(undefined);
   const [isBusy, setIsBusy] = useState(false);
-  const [error, setError] = useState(null);
-  const promiseReference = useRef(null); // Para resolver la promesa correcta
+  const [error, setError] = useState();
+  const promiseReference = useRef(undefined); // Para resolver la promesa correcta
 
   useEffect(() => {
     // Crear una nueva instancia del worker al montar el componente
@@ -18,8 +18,8 @@ const useWorker = (workerPath) => {
       type: 'module',
     });
 
-    const handleMessage = (e) => {
-      const { status, result, error: workerError } = e.data;
+    const handleMessage = (event_) => {
+      const { status, result, error: workerError } = event_.data;
       if (promiseReference.current) {
         if (status === 'success') {
           promiseReference.current.resolve(result);
@@ -28,7 +28,7 @@ const useWorker = (workerPath) => {
         }
       }
       setIsBusy(false);
-      promiseReference.current = null;
+      promiseReference.current = undefined;
     };
 
     const handleError = (error_) => {
@@ -37,7 +37,7 @@ const useWorker = (workerPath) => {
         promiseReference.current.reject(error_);
       }
       setIsBusy(false);
-      promiseReference.current = null;
+      promiseReference.current = undefined;
     };
 
     workerReference.current.addEventListener('message', handleMessage);
@@ -57,7 +57,7 @@ const useWorker = (workerPath) => {
     }
 
     setIsBusy(true);
-    setError(null);
+    setError(undefined);
 
     return new Promise((resolve, reject) => {
       promiseReference.current = { resolve, reject };

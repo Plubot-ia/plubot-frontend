@@ -1,5 +1,5 @@
-import PropTypes from 'prop-types';
 import React, { useState, useEffect, useRef, memo, useCallback } from 'react';
+import PropTypes from 'prop-types';
 
 import { useIntersection } from '../../hooks/useIntersection';
 import { useWebPSupport } from '../../hooks/useWebPSupport';

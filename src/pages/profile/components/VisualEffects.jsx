@@ -6,9 +6,9 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
  */
 const VisualEffects = () => {
   // Referencias para los contenedores de efectos
-  const particlesReference = useRef(null);
-  const gridLinesReference = useRef(null);
-  const cosmicLightsReference = useRef(null);
+  const particlesReference = useRef(undefined);
+  const gridLinesReference = useRef(undefined);
+  const cosmicLightsReference = useRef(undefined);
 
   // Estados para controlar la visibilidad
   const [particlesVisible, setParticlesVisible] = useState(false);

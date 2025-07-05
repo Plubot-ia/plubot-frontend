@@ -1,4 +1,5 @@
 // Importaciones de imágenes
+
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 
@@ -19,18 +20,22 @@ import useWindowSize from '../../hooks/useWindowSize';
 
 import './Historyverse.css';
 
+// Función de ayuda para generar números aleatorios más seguros
+const secureRandom = () => {
+  return crypto.getRandomValues(new Uint32Array(1))[0] / (2 ** 32 - 1);
+};
+
 const Historyverse = () => {
   const { width, height } = useWindowSize();
   // Referencias para animaciones y efectos
-  const heroReference = useRef(null);
-  const starsCanvasReference = useRef(null);
-  const glowReference = useRef(null); // Nueva referencia para .hero-glow
+  const heroReference = useRef(undefined);
+  const starsCanvasReference = useRef(undefined);
 
   // Estados para la gamificación
   const [userLevel, setUserLevel] = useState(1);
   const [pluCoins, setPluCoins] = useState(0);
-  const [characterHover, setCharacterHover] = useState(null);
-  const [selectedZone, setSelectedZone] = useState(null);
+  const [characterHover, setCharacterHover] = useState();
+  const [selectedZone, setSelectedZone] = useState();
   const [showBadgeNotification, setShowBadgeNotification] = useState(false);
 
   // Array de personajes para facilitar iteración
@@ -267,13 +272,6 @@ const Historyverse = () => {
     }
   };
 
-  const handleKeyDown = (event, action) => {
-    if (event.key === 'Enter' || event.key === ' ') {
-      event.preventDefault();
-      action();
-    }
-  };
-
   const handleCardClick = (character) => {
     if (character.locked) {
       if (unlockCharacter(character.id)) {
@@ -300,11 +298,11 @@ const Historyverse = () => {
 
       for (let index = 0; index < 200; index++) {
         stars.push({
-          x: Math.random() * canvas.width,
-          y: Math.random() * canvas.height,
-          radius: Math.random() * 1.5,
-          opacity: Math.random(),
-          speed: Math.random() * 0.05,
+          x: secureRandom() * canvas.width,
+          y: secureRandom() * canvas.height,
+          radius: secureRandom() * 1.5,
+          opacity: secureRandom(),
+          speed: secureRandom() * 0.05,
         });
       }
 
@@ -322,7 +320,7 @@ const Historyverse = () => {
 
           if (star.y > canvas.height) {
             star.y = 0;
-            star.x = Math.random() * canvas.width;
+            star.x = secureRandom() * canvas.width;
           }
         }
 
@@ -389,7 +387,7 @@ const Historyverse = () => {
       </div>
 
       <section ref={heroReference} className='historyverse-hero'>
-        <div ref={glowReference} className='hero-glow' />
+        <div className='hero-glow' />
         <h1 className='glow-text'>El Pluniverse</h1>
         <p className='glow-text'>
           Un universo digital donde los asistentes tienen alma y propósito.
@@ -444,7 +442,7 @@ const Historyverse = () => {
               type='button'
               className={`interactive-button-reset card ${character.type} ${character.locked ? 'locked' : ''} ${characterHover === character.id ? 'active' : ''}`}
               onMouseEnter={() => setCharacterHover(character.id)}
-              onMouseLeave={() => setCharacterHover(null)}
+              onMouseLeave={() => setCharacterHover(undefined)}
               onClick={() => handleCardClick(character)}
               disabled={character.locked}
             >

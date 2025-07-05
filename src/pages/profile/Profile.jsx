@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 // Contexts, Stores, and Services
@@ -146,16 +146,19 @@ const Profile = () => {
         id: 1,
         text: 'Gané 50 PluCoins en el Coliseo',
         time: 'hace 5 minutos',
+        icon: '⚔️',
       },
       {
         id: 2,
         text: 'Mi Plubot "Atención al Cliente" alcanzó el nivel 5',
         time: 'hace 2 horas',
+        icon: '🤖',
       },
       {
         id: 3,
         text: 'Desbloqueé el poder "Respuesta Rápida"',
         time: 'ayer',
+        icon: '⚡️',
       },
     ];
     setRecentActivities(activities);
@@ -178,6 +181,7 @@ const Profile = () => {
   }, [showAchievementUnlocked, setShowAchievementUnlocked]);
 
   const collectDailyReward = () => {
+    // eslint-disable-next-line sonarjs/pseudo-random
     const reward = Math.floor(Math.random() * 100) + 50;
     addPluCoins(reward);
     setDailyRewardAvailable(false);
@@ -189,6 +193,7 @@ const Profile = () => {
         id: 4,
         text: `Reclamaste ${reward} PluCoins de recompensa diaria`,
         time: 'ahora',
+        icon: '🎁',
         timestamp: now,
       },
       ...recentActivities.slice(0, 4),
@@ -205,7 +210,7 @@ const Profile = () => {
   };
 
   const toggleSectionExpansion = (section) => {
-    setExpandedSection(expandedSection === section ? null : section);
+    setExpandedSection(expandedSection === section ? undefined : section);
   };
 
   if (isLoading || !isLoaded) {

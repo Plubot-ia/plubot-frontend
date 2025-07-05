@@ -2,9 +2,10 @@ import axios from 'axios';
 
 import { emitEvent } from './event-bus';
 
-
 const isDevelopment = import.meta.env.MODE === 'development';
-const apiUrl = (import.meta.env.VITE_API_URL || 'https://plubot-backend.onrender.com').trim();
+const apiUrl = (
+  import.meta.env.VITE_API_URL || 'https://plubot-backend.onrender.com'
+).trim();
 
 // Normalizar la URL base de forma segura: se elimina cualquier barra final y el sufijo '/api'.
 // Se evita una expresión regular vulnerable (ReDoS) usando un bucle.
@@ -23,7 +24,7 @@ const instance = axios.create({
   withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
-    'Accept': 'application/json',
+    Accept: 'application/json',
   },
   timeout: 20_000,
   validateStatus(status) {
@@ -35,20 +36,34 @@ let refreshTokenPromise;
 
 instance.interceptors.request.use(
   (config) => {
-    const publicEndpoints = ['auth/login', 'auth/register', 'contact', 'opinion'];
-    const isPublicEndpoint = publicEndpoints.some(endpoint => config.url?.includes(endpoint));
+    const publicEndpoints = [
+      'auth/login',
+      'auth/register',
+      'contact',
+      'opinion',
+    ];
+    const isPublicEndpoint = publicEndpoints.some((endpoint) =>
+      config.url?.includes(endpoint),
+    );
 
     if (!isPublicEndpoint) {
-      const token = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
+      const token =
+        localStorage.getItem('access_token') ||
+        sessionStorage.getItem('access_token');
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
+      } else {
+        // If no token is found for a private endpoint, we reject the request
+        // to prevent sending an unauthenticated request.
+        return Promise.reject(
+          new Error('Authentication token not found. Request canceled.'),
+        );
       }
     }
     return config;
   },
-  (error) => {
-    throw error;
-  },
+  // eslint-disable-next-line promise/no-promise-in-callback
+  (error) => Promise.reject(error),
 );
 
 instance.interceptors.response.use(
@@ -66,12 +81,16 @@ instance.interceptors.response.use(
         refreshTokenPromise = new Promise((resolve, reject) => {
           (async () => {
             try {
-              const refreshToken = localStorage.getItem('refresh_token') || sessionStorage.getItem('refresh_token');
+              const refreshToken =
+                localStorage.getItem('refresh_token') ||
+                sessionStorage.getItem('refresh_token');
               if (!refreshToken) {
                 throw new Error('Session expired: No refresh token');
               }
 
-              const { data } = await instance.post('auth/refresh', { refresh_token: refreshToken });
+              const { data } = await instance.post('auth/refresh', {
+                refresh_token: refreshToken,
+              });
 
               if (data && data.access_token) {
                 const newAccessToken = data.access_token;

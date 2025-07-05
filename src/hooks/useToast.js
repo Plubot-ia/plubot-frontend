@@ -144,7 +144,7 @@ const useToast = () => {
   // Ocultar un toast específico
   const hideToast = useCallback(
     (id) => {
-      const toastElement = document.getElementById(`toast-${id}`);
+      const toastElement = document.querySelector(`#toast-${id}`);
       if (toastElement) {
         toastElement.style.animation = 'toast-out 0.3s ease forwards';
         setTimeout(() => {

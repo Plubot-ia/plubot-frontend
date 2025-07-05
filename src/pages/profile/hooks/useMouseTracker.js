@@ -6,7 +6,7 @@ import { useState, useEffect, useRef } from 'react';
  */
 const useMouseTracker = () => {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-  const containerReference = useRef(null);
+  const containerReference = useRef(undefined);
 
   useEffect(() => {
     const handleMouseMove = (event) => {

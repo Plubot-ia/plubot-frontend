@@ -1,6 +1,7 @@
 import { gsap } from 'gsap';
 import { ScrollToPlugin } from 'gsap/ScrollToPlugin';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import PropTypes from 'prop-types';
 import React, { useEffect, lazy, Suspense, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 
@@ -29,7 +30,7 @@ const ImportExportModal = lazy(
 
 gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
 
-const Layout = ({ children, hideHeaderFooter }) => {
+const Layout = ({ children, hideHeaderFooter = false }) => {
   const location = useLocation();
   const { activeModals, closeModal, currentFlowData } = useGlobalContext();
   const [statusMessage, setStatusMessage] = useState('');
@@ -130,8 +131,36 @@ const Layout = ({ children, hideHeaderFooter }) => {
       <main>{children}</main>
       {!hideHeaderFooter && <Footer />}
       <StatusBubble message={statusMessage} />
+
+      <Suspense fallback={<div />}>
+        {activeModals.templateSelector && (
+          <TemplateSelector
+            isOpen={activeModals.templateSelector}
+            onClose={() => closeModal('templateSelector')}
+          />
+        )}
+        {activeModals.embed && (
+          <EmbedModal
+            isOpen={activeModals.embed}
+            onClose={() => closeModal('embed')}
+            flowId={currentFlowData?.id}
+          />
+        )}
+        {activeModals.importExport && (
+          <ImportExportModal
+            isOpen={activeModals.importExport}
+            onClose={() => closeModal('importExport')}
+            flowData={currentFlowData}
+          />
+        )}
+      </Suspense>
     </div>
   );
+};
+
+Layout.propTypes = {
+  children: PropTypes.node.isRequired,
+  hideHeaderFooter: PropTypes.bool,
 };
 
 export default Layout;

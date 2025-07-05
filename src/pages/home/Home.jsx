@@ -25,7 +25,6 @@ const Home = () => {
     const subtitleWrapper = document.querySelector('.hero-subtitle-wrapper');
     if (subtitleWrapper) {
       subtitleWrapper.classList.remove('animate');
-      const _ = subtitleWrapper.offsetWidth;
       subtitleWrapper.classList.add('animate');
     }
   }, []);

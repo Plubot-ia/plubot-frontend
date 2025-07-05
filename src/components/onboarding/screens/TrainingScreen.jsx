@@ -41,6 +41,7 @@ import ByteAssistant from '../common/ByteAssistant.jsx';
 import EpicHeader from '../common/EpicHeader';
 import NodePalette from '../common/NodePalette.jsx';
 import StatusBubble from '../common/StatusBubble';
+import EmergencyRecovery from '../flow-editor/components/EmergencyRecovery.jsx';
 import FlowEditor from '../flow-editor/FlowEditor.jsx';
 import CustomMiniMap from '../flow-editor/ui/CustomMiniMap.jsx';
 import { backupEdgesToLocalStorage } from '../flow-editor/utils/edgeFixUtil';
@@ -170,6 +171,8 @@ const TrainingScreen = () => {
   const lastSignificantChange = useRef({ nodes: [], edges: [] });
   const [hasPendingChanges, setHasPendingChanges] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [selectedConnection, setSelectedConnection] = useState(null);
+  const [connectionProperties, setConnectionProperties] = useState(null);
 
   // --- Hooks de Zustand: Uso exclusivo de selectores seguros ---
   const {
@@ -1401,10 +1404,15 @@ const TrainingScreen = () => {
             handleError={handleError}
             plubotId={plubotId}
             name={plubotData?.name || 'Nuevo Plubot'}
-            notifyByte={setByteMessage}
+            notifyByte={byteMessage}
+            setByteMessage={setByteMessage}
             saveFlowData={handleSaveFlow}
             onDrop={handleNodeDrop}
             onDragOver={handleDragOver}
+            setSelectedNode={setSelectedNode}
+            setShowConnectionEditor={setShowConnectionEditor}
+            setSelectedConnection={setSelectedConnection}
+            setConnectionProperties={setConnectionProperties}
           />
         </div>
       </div>

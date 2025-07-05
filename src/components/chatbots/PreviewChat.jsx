@@ -9,7 +9,7 @@ import usePlubotCreation from '../../hooks/usePlubotCreation';
 import './PreviewChat.css';
 
 // Componente de mensaje memoizado para evitar re-renderizados innecesarios
-const ChatMessage = memo(function ChatMessage({ message }) {
+const ChatMessage = memo(({ message }) => {
   return (
     <motion.div
       className={`chat-message ${message.role}`}
@@ -37,7 +37,7 @@ ChatMessage.propTypes = {
 ChatMessage.displayName = 'ChatMessage';
 
 // Componente de botón memoizado
-const ChatButton = memo(function ChatButton({ button, onClick, color }) {
+const ChatButton = memo(({ button, onClick, color }) => {
   return (
     <motion.button
       className='chat-button'
@@ -162,8 +162,8 @@ const PreviewChat = ({ plubotId }) => {
 
   // Manejar tecla Enter (memoizado)
   const handleKeyPress = useCallback(
-    (e) => {
-      if (e.key === 'Enter') {
+    (event) => {
+      if (event.key === 'Enter') {
         sendMessage(inputMessage);
       }
     },
@@ -180,16 +180,16 @@ const PreviewChat = ({ plubotId }) => {
       </div>
       <div className='chat-container' ref={chatContainerReference}>
         <AnimatePresence>
-          {messages.map((message, index) => (
-            <ChatMessage key={index} message={message} />
+          {messages.map((message) => (
+            <ChatMessage key={message.id} message={message} />
           ))}
         </AnimatePresence>
       </div>
       <div className='chat-buttons'>
         <AnimatePresence>
-          {buttons.map((button, index) => (
+          {buttons.map((button) => (
             <ChatButton
-              key={index}
+              key={button.label}
               button={button}
               onClick={handleButtonClick}
               color={buttonColor}
@@ -201,7 +201,7 @@ const PreviewChat = ({ plubotId }) => {
         <input
           type='text'
           value={inputMessage}
-          onChange={(e) => setInputMessage(e.target.value)}
+          onChange={(event) => setInputMessage(event.target.value)}
           onKeyPress={handleKeyPress}
           placeholder='Escribe un mensaje...'
         />

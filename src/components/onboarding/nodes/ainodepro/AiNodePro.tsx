@@ -156,7 +156,17 @@ const AiNodeProComponent: React.FC<NodeProps<AiNodeProData>> = ({
         className='node-handle ainodepro-handle'
       />
 
-      <div className='ainodepro-header' onClick={handleToggleCollapse}>
+      <div
+        className='ainodepro-header'
+        onClick={handleToggleCollapse}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            handleToggleCollapse();
+          }
+        }}
+        role='button'
+        tabIndex={0}
+      >
         <div className='ainodepro-header-title'>
           <Brain className='ainodepro-icon' size={16} />
           <h3>{data.label || 'AI Pro'}</h3>
@@ -202,7 +212,7 @@ const AiNodeProComponent: React.FC<NodeProps<AiNodeProData>> = ({
                     onKeyDown={(e) => {
                       if (e.key === 'Enter' && !e.shiftKey) {
                         e.preventDefault();
-                        handleExecute();
+                        void handleExecute();
                       }
                     }}
                     placeholder='Escribe la instrucción para la IA...'
@@ -236,9 +246,10 @@ const AiNodeProComponent: React.FC<NodeProps<AiNodeProData>> = ({
                   min={0.2}
                   max={1}
                   step={0.01}
-                  onCommit={(value) =>
-                    handleSettingChange('temperature', value)
-                  }
+                  onCommit={(value) => {
+                    // eslint-disable-next-line @typescript-eslint/no-meaningless-void-operator
+                    void handleSettingChange('temperature', value);
+                  }}
                   className='creativity'
                   ariaLabel={`Control de creatividad: ${getTemperatureLabel(temperature)}`}
                 />
@@ -265,7 +276,9 @@ const AiNodeProComponent: React.FC<NodeProps<AiNodeProData>> = ({
                   min={50}
                   max={500}
                   step={10}
-                  onCommit={(value) => handleSettingChange('maxTokens', value)}
+                  onCommit={(value) => {
+                    handleSettingChange('maxTokens', value);
+                  }}
                   className='size'
                   ariaLabel={`Control de tamaño de respuesta: ${getSizeLabel(maxTokens)}`}
                 />
@@ -274,7 +287,9 @@ const AiNodeProComponent: React.FC<NodeProps<AiNodeProData>> = ({
 
             <div className='ainodepro-footer'>
               <button
-                onClick={handleExecute}
+                onClick={() => {
+                  void handleExecute();
+                }}
                 className='ainodepro-execute-btn'
                 disabled={isLoading}
               >
@@ -327,17 +342,17 @@ const arePropertiesEqual = (
   previousProperties: NodeProps<AiNodeProData>,
   nextProperties: NodeProps<AiNodeProData>,
 ) => {
-  return (
-    previousProperties.selected === nextProperties.selected &&
-    previousProperties.data.isCollapsed === nextProperties.data.isCollapsed &&
-    // [FIX] Check the correct data field for changes
-    previousProperties.data.promptTemplate ===
-      nextProperties.data.promptTemplate &&
-    previousProperties.data.temperature === nextProperties.data.temperature &&
-    previousProperties.data.maxTokens === nextProperties.data.maxTokens &&
-    previousProperties.data.lastResponse === nextProperties.data.lastResponse &&
-    previousProperties.data.ultraMode === nextProperties.data.ultraMode
-  );
+  const prevData = previousProperties.data;
+  const nextData = nextProperties.data;
+
+  const dataIsEqual =
+    Object.keys(prevData).length === Object.keys(nextData).length &&
+    (Object.keys(prevData) as (keyof AiNodeProData)[]).every(
+      // eslint-disable-next-line security/detect-object-injection
+      (key) => prevData[key] === nextData[key],
+    );
+
+  return previousProperties.selected === nextProperties.selected && dataIsEqual;
 };
 
 export default memo(AiNodeProComponent, arePropertiesEqual);

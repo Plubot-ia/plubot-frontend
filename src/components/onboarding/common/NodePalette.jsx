@@ -149,35 +149,8 @@ for (const category of advancedCategories) {
 }
 
 const NodePalette = () => {
-  // Funciones seguras que verifican disponibilidad antes de ejecutar
-  const addNode = useCallback((nodeData) => {
-    try {
-      const state = useFlowStore.getState();
-      if (state && typeof state.addNode === 'function') {
-        return state.addNode(nodeData);
-      }
-
-      return null;
-    } catch {
-      return null;
-    }
-  }, []);
-
-  const onNodesChange = useCallback((changes) => {
-    try {
-      const state = useFlowStore.getState();
-      if (state && typeof state.onNodesChange === 'function') {
-        return state.onNodesChange(changes);
-      }
-    } catch {}
-  }, []);
-
   // Obtener funciones del store de Training
-  const setByteMessage = useTrainingStore((state) => {
-    return state && typeof state.setByteMessage === 'function'
-      ? state.setByteMessage
-      : () => {};
-  });
+  const setByteMessage = useTrainingStore((state) => state?.setByteMessage);
 
   // Referencia al store completo para acceso directo en handlers
   const flowStoreReference = useRef(null);
@@ -199,12 +172,6 @@ const NodePalette = () => {
     } catch {}
   }, []);
 
-  // Asegurarse de que el store esté inicializado correctamente
-  useEffect(() => {
-    // Verificar que las funciones críticas estén disponibles
-    if (!addNode || !onNodesChange) {
-    }
-  }, [addNode, onNodesChange]);
   const [isPaletteExpanded, setIsPaletteExpanded] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [favoriteNodes, setFavoriteNodes] = useState(() => {
@@ -347,7 +314,7 @@ const NodePalette = () => {
     [setByteMessage],
   );
 
-  const onDragEndNode = useCallback((event) => {
+  const onDragEndNode = useCallback((_event) => {
     // Eliminar la clase 'dragging-source-item' de todos los nodos de la paleta
     const paletteNodes = document.querySelectorAll('.ts-draggable-node');
     for (const node of paletteNodes) {
@@ -359,7 +326,7 @@ const NodePalette = () => {
     if (!term) return items;
     return items.filter((item) => {
       const label = isPower ? item.title : item.label;
-      const desc = isPower ? item.description : item.description;
+      const desc = item.description;
       return (
         label.toLowerCase().includes(term.toLowerCase()) ||
         (desc && desc.toLowerCase().includes(term.toLowerCase()))
@@ -383,7 +350,6 @@ const NodePalette = () => {
 
   const NodeListItem = useCallback(
     ({ item, isPower = false }) => {
-      const identifier = isPower ? item.id : item.type;
       const label = isPower ? item.title : item.label;
       const icon = isPower ? item.icon : getNodeIcon(item.icon || item.type); // getNodeIcon is a helper
       const isFavorite = favoriteNodes.includes(

@@ -11,7 +11,7 @@ let lastValidDropPosition = { x: 400, y: 200 }; // Posición central por defecto
  */
 export function getViewportCenterPosition(reactFlowInstance) {
   if (!reactFlowInstance) {
-    return null;
+    return;
   }
   try {
     const { x, y, zoom } = reactFlowInstance.getViewport();
@@ -23,7 +23,6 @@ export function getViewportCenterPosition(reactFlowInstance) {
     };
   } catch (error) {
     console.error('Error getting viewport center position:', error);
-    return null;
   }
 }
 

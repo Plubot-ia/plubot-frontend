@@ -4,7 +4,6 @@ import { v4 as uuidv4 } from 'uuid';
 import useFlowStore from '@/stores/use-flow-store';
 
 import { calculateCorrectDropPosition } from '../drop-position-fix';
-import { applyNodeVisibilityFix } from '../utils/optimized-flow-fixes';
 
 /**
  * Hook para gestionar la lógica de arrastrar y soltar (Drag and Drop) en el editor de flujos.

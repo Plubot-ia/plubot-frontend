@@ -1,4 +1,4 @@
-import React from 'react';
+import PropTypes from 'prop-types';
 
 /**
  * Componente que muestra notificaciones al usuario
@@ -6,6 +6,9 @@ import React from 'react';
  * @param {Object|null} props.notification - Objeto de notificación con mensaje y tipo
  */
 const NotificationSystem = ({ notification }) => {
+  // En React, devolver null es una práctica idiomática para no renderizar nada.
+  // Se deshabilita esta regla de unicorn específicamente para este caso.
+  // eslint-disable-next-line unicorn/no-null
   if (!notification) return null;
 
   return (
@@ -17,6 +20,13 @@ const NotificationSystem = ({ notification }) => {
         : 'Notification message is not a string.'}
     </div>
   );
+};
+
+NotificationSystem.propTypes = {
+  notification: PropTypes.shape({
+    type: PropTypes.string.isRequired,
+    message: PropTypes.string.isRequired,
+  }),
 };
 
 export default NotificationSystem;

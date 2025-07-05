@@ -18,7 +18,7 @@ const StatusBubble = ({ notification }) => {
   const hideBubble = useCallback(() => {
     if (hideTimer.current) {
       clearTimeout(hideTimer.current);
-      hideTimer.current = null;
+      hideTimer.current = undefined;
     }
     setIsVisible(false);
   }, []);
@@ -51,7 +51,7 @@ const StatusBubble = ({ notification }) => {
 
   // Si no es visible, no renderizamos nada.
   if (!isVisible) {
-    return null;
+    return;
   }
 
   return (

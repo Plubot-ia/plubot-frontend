@@ -1,5 +1,5 @@
-import React from 'react';
 import PropTypes from 'prop-types';
+import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 
 import useAuthStore from '@/stores/use-auth-store';

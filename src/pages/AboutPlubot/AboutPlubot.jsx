@@ -1,8 +1,9 @@
 import { motion, useScroll, useTransform, useInView } from 'framer-motion';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 
 import epicImage from '@assets/img/plubot-core-full.webp';
+
 import './AboutPlubot.css';
 
 // Content moved to a constant for better maintainability
@@ -15,8 +16,8 @@ const paragraphs = [
 
 const AboutPlubot = () => {
   const [isLoaded, setIsLoaded] = useState(false);
-  const heroReference = useRef(null);
-  const textReference = useRef(null);
+  const heroReference = useRef(undefined);
+  const textReference = useRef(undefined);
   const isInView = useInView(textReference, { once: false, threshold: 0.2 });
 
   // Parallax effect
@@ -27,29 +28,33 @@ const AboutPlubot = () => {
 
   const imageY = useTransform(scrollYProgress, [0, 1], [0, 100]);
 
+  const handleIntersection = useCallback((entries, observer) => {
+    if (entries[0].isIntersecting) {
+      setIsLoaded(true);
+      observer.disconnect();
+    }
+  }, []);
+
   useEffect(() => {
-    // Load optimization
     const img = new Image();
     img.src = epicImage;
     img.addEventListener('load', () => setIsLoaded(true));
 
-    // Add intersection observer for lazy loading
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting) {
-          setIsLoaded(true);
-          observer.disconnect();
-        }
-      },
-      { threshold: 0.1 },
-    );
+    const observer = new IntersectionObserver(handleIntersection, {
+      threshold: 0.1,
+    });
 
-    if (heroReference.current) {
-      observer.observe(heroReference.current);
+    const currentHeroRef = heroReference.current;
+    if (currentHeroRef) {
+      observer.observe(currentHeroRef);
     }
 
-    return () => observer.disconnect();
-  }, []);
+    return () => {
+      if (currentHeroRef) {
+        observer.unobserve(currentHeroRef);
+      }
+    };
+  }, [handleIntersection]);
 
   return (
     <div className='about-plubot-container'>
@@ -90,7 +95,7 @@ const AboutPlubot = () => {
 
           {paragraphs.map((paragraph, index) => (
             <motion.p
-              key={paragraph.slice(0, 20)}
+              key={paragraph}
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: isInView ? 1 : 0, y: isInView ? 0 : 15 }}
               transition={{ duration: 0.5, delay: 0.4 + index * 0.1 }}

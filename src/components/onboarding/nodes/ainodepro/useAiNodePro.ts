@@ -11,7 +11,29 @@ interface UseAiNodeProProperties {
   data: AiNodeProData;
 }
 
-export const useAiNodePro = ({ id, data }: UseAiNodeProProperties) => {
+export interface UseAiNodeProReturn {
+  prompt: string;
+  temperature: number;
+  maxTokens: number;
+  isCollapsed: boolean;
+  isLoading: boolean;
+  error: string | null;
+  lastResponse: string | undefined;
+  lastPrompt: string | undefined;
+  ultraMode: boolean;
+  handlePromptChange: (newPrompt: string) => void;
+  handleSettingChange: <K extends keyof AiNodeProData>(
+    field: K,
+    value: AiNodeProData[K],
+  ) => void;
+  handleToggleCollapse: () => void;
+  handleExecute: () => Promise<void>;
+}
+
+export const useAiNodePro = ({
+  id,
+  data,
+}: UseAiNodeProProperties): UseAiNodeProReturn => {
   const { updateNode } = useFlowStore();
 
   // Validar y usar datos por defecto del schema si es necesario

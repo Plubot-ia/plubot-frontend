@@ -67,21 +67,20 @@ const FlowBenchmarkTool = () => {
   const [isFlowVisible, setIsFlowVisible] = useState(true);
   const benchmarkResults = useRef([]);
 
-  const handleGenerate = useCallback((count) => {
-    // 1. Forzar desmontaje del componente para asegurar un benchmark de montaje limpio
-    setIsFlowVisible(false);
-
-    // 2. Usar un timeout para permitir que React procese el desmontaje
-    setTimeout(() => {
-      // 3. Limpiar resultados y generar nuevos datos
-      benchmarkResults.current = [];
-      const newFlow = generateGridNodes(count);
-      setFlowData(newFlow);
-
-      // 4. Volver a montar el componente
-      setIsFlowVisible(true);
-    }, 100); // 100ms es un margen seguro para el desmontaje
+  const runGeneration = useCallback((count) => {
+    benchmarkResults.current = [];
+    const newFlow = generateGridNodes(count);
+    setFlowData(newFlow);
+    setIsFlowVisible(true);
   }, []);
+
+  const handleGenerate = useCallback(
+    (count) => {
+      setIsFlowVisible(false);
+      setTimeout(() => runGeneration(count), 100);
+    },
+    [runGeneration],
+  );
 
   const handleDownloadResults = () => {
     const allResults = benchmarkResults.current;
@@ -90,9 +89,6 @@ const FlowBenchmarkTool = () => {
     );
 
     if (mountResults.length === 0) {
-      console.warn(
-        'No se han registrado benchmarks de montaje válidos. Por favor, genera algunos nodos para forzar el re-montaje del editor.',
-      );
       return;
     }
 

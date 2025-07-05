@@ -12,7 +12,6 @@ import {
 } from 'lucide-react';
 import React, {
   useState,
-  useCallback,
   useEffect,
   useRef,
   memo,
@@ -23,10 +22,10 @@ import type { NodeProps } from 'reactflow';
 import { Handle, Position, useUpdateNodeInternals } from 'reactflow';
 
 import type { AiNodeData } from './types';
+import { useAINode } from './useAINode';
 import './AiNode.css';
 
 const Tooltip = lazy(async () => import('../../ui/ToolTip'));
-import { useAINode } from './useAINode';
 
 const AiNodeComponent: React.FC<NodeProps<AiNodeData>> = ({
   id,
@@ -62,7 +61,7 @@ const AiNodeComponent: React.FC<NodeProps<AiNodeData>> = ({
     }
   }, [promptTemplate]);
 
-  const [isSettingsExpanded, setIsSettingsExpanded] = useState(true);
+  const [isSettingsExpanded, _setIsSettingsExpanded] = useState(true);
   const [isPreviewExpanded, setIsPreviewExpanded] = useState(false);
 
   const updateNodeInternals = useUpdateNodeInternals();
@@ -91,14 +90,22 @@ const AiNodeComponent: React.FC<NodeProps<AiNodeData>> = ({
     handleSettingChange(field, value);
   };
 
-  const currentLabel = data.label || 'Nodo IA';
-
   return (
     <div
       className={`ai-node ${isCollapsed ? 'collapsed' : ''} ${ultraMode ? 'ai-node--ultra-performance' : 'ai-node--normal-mode'} ${selected ? 'selected' : ''}`}
     >
-      <div className='ai-node-header' onClick={hookHandleToggleCollapse}>
-        <h3>{data.label || 'Nodo IA'}</h3>
+      <div
+        className='ai-node-header'
+        onClick={hookHandleToggleCollapse}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            hookHandleToggleCollapse();
+          }
+        }}
+        role='button'
+        tabIndex={0}
+      >
+        <h3>{data.label ?? 'Nodo IA'}</h3>
         <button className='collapse-toggle'>
           {isCollapsed ? 'Expandir' : 'Contraer'}
         </button>
@@ -225,7 +232,7 @@ const AiNodeComponent: React.FC<NodeProps<AiNodeData>> = ({
                     <textarea
                       id={`system-${id}`}
                       className='ainode-textarea'
-                      value={systemMessage || ''}
+                      value={systemMessage ?? ''}
                       onChange={(e) => onSettingChange('systemMessage', e)}
                       placeholder='Ej: Eres un asistente experto en marketing...'
                       rows={2}
@@ -263,9 +270,9 @@ const AiNodeComponent: React.FC<NodeProps<AiNodeData>> = ({
             </div>
 
             <div className='ainode-section'>
-              <h3
-                className='ainode-section-title'
-                style={{ cursor: 'pointer' }}
+              <button
+                type='button'
+                className='ainode-section-title-button'
                 onClick={() => setIsPreviewExpanded(!isPreviewExpanded)}
               >
                 <Eye size={16} /> Vista Previa del Prompt Interpolado{' '}
@@ -274,10 +281,10 @@ const AiNodeComponent: React.FC<NodeProps<AiNodeData>> = ({
                 ) : (
                   <ChevronDown size={16} />
                 )}
-              </h3>
+              </button>
               {isPreviewExpanded && (
                 <div className='ainode-response-preview'>
-                  {interpolatedPromptPreview ||
+                  {interpolatedPromptPreview ??
                     'La vista previa aparecerá aquí cuando se interpelen las variables.'}
                 </div>
               )}
@@ -285,7 +292,7 @@ const AiNodeComponent: React.FC<NodeProps<AiNodeData>> = ({
 
             <button
               className='ainode-button'
-              onClick={handleExecute}
+              onClick={() => void handleExecute()}
               disabled={isLoading}
             >
               <Play size={16} style={{ marginRight: '8px' }} />

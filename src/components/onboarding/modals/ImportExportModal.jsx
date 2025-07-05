@@ -170,8 +170,8 @@ const ImportExportModal = ({
     const file = event.target.files[0];
     if (!file) return;
     const reader = new FileReader();
-    reader.addEventListener('load', (e) => {
-      setImportData(e.target.result);
+    reader.addEventListener('load', (event) => {
+      setImportData(event.target.result);
     });
     reader.readAsText(file);
   };
@@ -235,7 +235,7 @@ const ImportExportModal = ({
               <textarea
                 placeholder='Pega aquí el contenido del flujo para importar...'
                 value={importData}
-                onChange={(e) => setImportData(e.target.value)}
+                onChange={(event) => setImportData(event.target.value)}
                 rows={10}
                 className='ts-import-textarea'
               />

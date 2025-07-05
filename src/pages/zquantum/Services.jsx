@@ -71,7 +71,7 @@ const Services = () => {
     },
   ];
 
-  const servicesDetailsReference = useRef(null);
+  const servicesDetailsReference = useRef(undefined);
 
   // Intersection Observer para añadir clase visible
   useEffect(() => {

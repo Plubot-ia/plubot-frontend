@@ -224,17 +224,6 @@ const useAuthStore = create(
           }
         },
 
-        // Obtener la URL de autenticación de Google
-        getGoogleAuthUrl: async () => {
-          try {
-            const response = await instance.get('api/google/login');
-            return response.data;
-          } catch (error) {
-            logger.error('Error al obtener la URL de autenticación de Google', error);
-            throw new Error('No se pudo iniciar la autenticación con Google.');
-          }
-        },
-
         // Verificar autenticación
         checkAuth: async () => {
           const token = localStorage.getItem('access_token');
@@ -416,12 +405,10 @@ const useAuthStore = create(
             };
           } catch (error) {
             logger.error('Error al cargar el perfil del usuario', error);
-
             const errorMessage =
               error.response?.data?.message ||
               error.message ||
               'Error de conexión';
-
             // Actualizar el estado con el error
             set({
               profile: {
@@ -432,7 +419,6 @@ const useAuthStore = create(
               _isLoadingProfile: false,
             });
 
-            // Si hay un error de autenticación, limpiar todo
             if (error.response?.status === 401) {
               localStorage.removeItem('access_token');
               set({
@@ -758,7 +744,7 @@ const useAuthStore = create(
               return { success: true, user: currentState.user };
             }
 
-            const response = await instance.put('auth/profile', formData, {
+            const response = await instance.post('auth/profile', formData, {
               headers: {
                 'Content-Type': 'multipart/form-data',
               },

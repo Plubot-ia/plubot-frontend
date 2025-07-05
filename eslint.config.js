@@ -15,25 +15,20 @@ import tsParser from '@typescript-eslint/parser';
 import tsPlugin from '@typescript-eslint/eslint-plugin';
 import prettierPlugin from 'eslint-plugin-prettier';
 import prettierConfig from 'eslint-config-prettier';
-import { viteConfig } from './vite.config.js';
 
-// Configuración para resolver alias de Vite
-const viteResolver = {
+
+
+// Configuración compartida para resolver alias de Vite y React
+const sharedSettings = {
   'import/resolver': {
-    alias: {
-      map: [
-        ['@', './src'],
-        ['@assets', './src/assets'],
-        ['@components', './src/components'],
-        ['@pages', './src/pages'],
-        ['@context', './src/context'],
-        ['@core', './src/core'],
-        ['@utilities', './src/utilities'],
-        ['@hooks', './src/hooks']
-      ],
-      extensions: ['.js', '.jsx', '.ts', '.tsx']
-    }
-  }
+    typescript: {},
+    node: {
+      extensions: ['.js', '.jsx', '.ts', '.tsx'],
+    },
+  },
+  react: {
+    version: 'detect',
+  },
 };
 
 // Create a sanitized version of browser globals
@@ -92,12 +87,7 @@ export default [
       unicorn,
       prettier: prettierPlugin,
     },
-    settings: {
-      ...viteResolver,
-      react: {
-        version: 'detect',
-      },
-    },
+    settings: sharedSettings,
     rules: {
       // === PRETTIER ===
       'prettier/prettier': 'error',
@@ -351,15 +341,17 @@ export default [
   // === CONFIGURACIÓN PARA ARCHIVOS TS/TSX ===
   {
     files: ['**/*.{ts,tsx}'],
-    languageOptions: {
+        languageOptions: {
       parser: tsParser,
-      ecmaVersion: 2024,
       globals: sanitizedGlobals,
       parserOptions: {
-        ecmaVersion: 'latest',
-        ecmaFeatures: { jsx: true },
-        sourceType: 'module',
         project: './tsconfig.json',
+        tsconfigRootDir: import.meta.dirname,
+        ecmaVersion: 'latest',
+        sourceType: 'module',
+        ecmaFeatures: {
+          jsx: true,
+        },
       },
     },
     plugins: {
@@ -375,29 +367,7 @@ export default [
       unicorn,
       prettier: prettierPlugin,
     },
-    settings: {
-      react: {
-        version: 'detect',
-      },
-      'import/resolver': {
-        alias: {
-          map: [
-            ['@', './src'],
-            ['@assets', './src/assets'],
-            ['@components', './src/components'],
-            ['@pages', './src/pages'],
-            ['@context', './src/context'],
-            ['@core', './src/core'],
-            ['@utilities', './src/utilities'],
-            ['@hooks', './src/hooks']
-          ],
-          extensions: ['.js', '.jsx', '.ts', '.tsx']
-        },
-        node: {
-          extensions: ['.js', '.jsx', '.ts', '.tsx'],
-        },
-      },
-    },
+    settings: sharedSettings,
     rules: {
       // === PRETTIER ===
       'prettier/prettier': 'error',

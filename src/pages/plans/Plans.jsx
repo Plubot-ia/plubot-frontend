@@ -10,15 +10,15 @@ import './Plans.css';
 export default function Plans() {
   const { width } = useWindowSize();
   const [isVisible, setIsVisible] = useState(false);
-  const [activePlan, setActivePlan] = useState(null);
-  const particlesContainerReference = useRef(null);
-  const plansSectionReference = useRef(null);
+  const [activePlan, setActivePlan] = useState();
+  const particlesContainerReference = useRef();
+  const plansSectionReference = useRef();
 
   useEffect(() => {
     const element = plansSectionReference.current;
     const observer = new IntersectionObserver(
-      ([entry]) => {
-        setIsVisible(entry.isIntersecting);
+      ([intersectionEntry]) => {
+        setIsVisible(intersectionEntry.isIntersecting);
       },
       { threshold: 0.2, rootMargin: '50px' },
     );
@@ -34,6 +34,9 @@ export default function Plans() {
     };
   }, []);
 
+  /* eslint-disable sonarjs/pseudo-random */
+  // Se deshabilita la regla de 'pseudo-random' porque Math.random es suficiente
+  // para una animación puramente decorativa y no requiere seguridad criptográfica.
   const createParticlesBurst = (x, y) => {
     if (!particlesContainerReference.current || !isVisible) return;
 
@@ -44,11 +47,11 @@ export default function Plans() {
       particle.classList.add('interactive-particle');
 
       const rect = particlesContainerReference.current.getBoundingClientRect();
-      const relX = Math.max(0, Math.min(x - rect.left, rect.width));
-      const relY = Math.max(0, Math.min(y - rect.top, rect.height));
+      const relativeX = Math.max(0, Math.min(x - rect.left, rect.width));
+      const relativeY = Math.max(0, Math.min(y - rect.top, rect.height));
 
-      particle.style.left = `${relX}px`;
-      particle.style.top = `${relY}px`;
+      particle.style.left = `${relativeX}px`;
+      particle.style.top = `${relativeY}px`;
 
       const hue = Math.floor(Math.random() * 40) + 180;
       particle.style.backgroundColor = `hsl(${hue}, 100%, 70%)`;
@@ -78,9 +81,9 @@ export default function Plans() {
     }
   };
 
-  const handleClick = (e) => {
+  const handleClick = (event) => {
     if (!isVisible) return;
-    createParticlesBurst(e.clientX, e.clientY);
+    createParticlesBurst(event.clientX, event.clientY);
   };
 
   const handlePlanHover = (index) => {
@@ -186,7 +189,7 @@ export default function Plans() {
 
   const particles = useMemo(
     () =>
-      Array.from({ length: isLowPerfDevice ? 3 : 6 }).map((_, index) => ({
+      Array.from({ length: isLowPerfDevice ? 3 : 6 }).map((unused, index) => ({
         id: index,
       })),
     [isLowPerfDevice],
@@ -255,7 +258,7 @@ export default function Plans() {
                 className={`plan-card ${activePlan === index ? 'plan-card-active' : ''}`}
                 variants={itemVariants}
                 onMouseEnter={() => handlePlanHover(index)}
-                onMouseLeave={() => handlePlanHover(null)}
+                onMouseLeave={() => handlePlanHover()}
                 whileHover={{
                   scale: isLowPerfDevice ? 1.01 : 1.03,
                   y: isLowPerfDevice ? -2 : -5,

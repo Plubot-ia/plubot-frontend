@@ -41,7 +41,7 @@ const PerformanceStats = () => {
 
   // Formatear el tiempo desde el último guardado
   const formatLastSaved = () => {
-    if (!lastSaved) return 'Nunca';
+    if (lastSaved === undefined) return 'Nunca';
 
     const lastSavedDate = new Date(lastSaved);
     const now = new Date();
@@ -120,7 +120,9 @@ const PerformanceStats = () => {
           padding: '8px 12px',
           backgroundColor: '#0f0f1b',
           cursor: 'pointer',
-          borderBottom: expanded ? '1px solid rgba(0, 195, 255, 0.2)' : 'none',
+          borderBottom: expanded
+            ? '1px solid rgba(0, 195, 255, 0.2)'
+            : undefined,
         }}
         onClick={() => setExpanded(!expanded)}
         onKeyDown={(event) => {

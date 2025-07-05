@@ -9,7 +9,6 @@ const CreatePlubot = () => {
   return (
     <Routes>
       <Route path='/' element={<WelcomeSequence />} />
-      <Route path='/welcome' element={<WelcomeSequence />} />
       <Route path='/factory' element={<FactoryScreen />} />
       <Route path='/personalization' element={<PersonalizationForm />} />
       <Route path='/training/:flowId' element={<TrainingScreen />} />

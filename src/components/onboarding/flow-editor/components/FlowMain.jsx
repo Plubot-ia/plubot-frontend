@@ -6,128 +6,86 @@
  * @version 2.0.0
  */
 
+// External Libraries
 import PropTypes from 'prop-types';
 import React, {
-  useRef,
-  useState,
   useCallback,
   useEffect,
   useMemo,
-  useLayoutEffect,
+  useRef,
+  useState,
 } from 'react';
-// ReactFlow y sus componentes
-import ReactFlow, {
-  Background,
-  Controls,
-  MiniMap,
-  ReactFlowProvider,
-  useReactFlow,
-  useViewport,
-} from 'reactflow';
+import ReactFlow, { Controls, useReactFlow, useViewport } from 'reactflow';
 import 'reactflow/dist/style.css';
-
-// SOLUCIÓN UNIFICADA: Un solo archivo para todos los fixes sin necesidad de múltiples scripts
-import '../utils/optimized-flow-fixes';
-// SOLUCIÓN MINIMALISTA: Solo hace transparente el pane sin afectar nada más
-import './transparent-pane.css';
-
-// Importar el gestor de modo ultra rendimiento
-// La gestión del modo ultra ahora es manejada exclusivamente por el store Zustand.
-
-// Zustand Store - acceso optimizado con selectores
 import useResizeObserver from 'use-resize-observer';
+import { v4 as uuidv4 } from 'uuid';
 
+// Internal Aliases (@)
 import EmbedModal from '@/components/onboarding/modals/EmbedModal';
 import ImportExportModal from '@/components/onboarding/modals/ImportExportModal';
-import ActionNode from '@/components/onboarding/nodes/actionnode/ActionNode';
-import DecisionNode from '@/components/onboarding/nodes/decisionnode/DecisionNode';
-import EndNode from '@/components/onboarding/nodes/endnode/EndNode';
-import HttpRequestNode from '@/components/onboarding/nodes/httprequestnode/HttpRequestNode';
-import MessageNode from '@/components/onboarding/nodes/messagenode/MessageNode';
-import OptionNode from '@/components/onboarding/nodes/optionnode/OptionNode';
-import PowerNode from '@/components/onboarding/nodes/powernode/PowerNode';
-import StartNode from '@/components/onboarding/nodes/startnode/StartNode';
 import {
   createNodeTypes,
   edgeTypes as sharedEdgeTypes,
 } from '@/flow/nodeRegistry.jsx';
-import useGlobalContext from '@/hooks/useGlobalContext';
 import useFlowStore from '@/stores/use-flow-store';
 
+// Parent Imports (../)
 import { calculateCorrectDropPosition } from '../drop-position-fix';
 import useAdaptivePerformance from '../hooks/useAdaptivePerformance';
-import useNodeVirtualization from '../hooks/useNodeVirtualization'; // ¡El nuevo hook de virtualización!
+import useContextMenu from '../hooks/useContextMenu';
+import useNodeVirtualization from '../hooks/useNodeVirtualization';
 import BackgroundScene from '../ui/BackgroundScene';
 import CustomMiniMap from '../ui/CustomMiniMap';
 import ZoomControls from '../ui/ZoomControls';
 import {
-  NODE_EXTENT,
-  TRANSLATE_EXTENT,
-  MIN_ZOOM,
-  MAX_ZOOM,
-} from '../utils/flow-extents';
-import { getLODLevel, LOD_LEVELS } from '../utils/lodUtils'; // Importar utilidades LOD
+  ensureNodesAreInteractive,
+  stopNodeInteractionObserver,
+} from '../utils/ensure-node-interaction';
+import { fixNodePositions } from '../utils/fix-node-positions';
+import { MIN_ZOOM, MAX_ZOOM } from '../utils/flow-extents';
+import { getLODLevel, LOD_LEVELS } from '../utils/lodUtils';
 
+// Sibling Imports (./) - Components & Logic
 import EdgeContextMenu from './menus/EdgeContextMenu';
 import NodeContextMenu from './menus/NodeContextMenu';
 import MiniMapWrapper from './MiniMapWrapper';
-
-// Hooks específicos para optimización y rendimiento
-
-// Componentes de UI
-
-// Importar modales
-
-// Importar utilidades
-
-// Importar definiciones de límites para el canvas y los nodos
-
-// Importar shared node registry
-
-// Componentes de nodos - importados directamente para asegurar que se cargan como corresponde
-
-// Estilos CSS necesarios para el funcionamiento del componente
-import '../ui/elite-drag-optimizations.css';
-// Consolidated overrides for staging
-import '../react-flow-overrides.css';
-// Importar soluciones para eliminar estilos de debugging
-import '../ui/remove-debug-styles.css';
-import '../ui/hide-debug-elements.css'; // Solución adicional para garantizar que no haya elementos de depuración visibles
-import '../ui/mega-drag-fix.css'; // Solución definitiva de arrastre para garantizar que no haya elementos de depuración visibles
-
-// Componentes esenciales
 import StorageQuotaManager from './StorageQuotaManager';
-// import HideControls from './HideControls'; // Eliminado para optimización
 
-// Estilos para controles del editor
-import '../ui/ZoomControls.css';
-import '../ui/VerticalButtons.css';
+// -----------------------------------------
+// Helper Functions
+// -----------------------------------------
+
+/**
+ * Creates a new node object by duplicating an existing one.
+ * @param {object} nodeToDuplicate - The node to duplicate.
+ * @returns {object} The new duplicated node.
+ */
+const createDuplicatedNode = (nodeToDuplicate) => ({
+  id: uuidv4(),
+  type: nodeToDuplicate.type,
+  position: {
+    x: nodeToDuplicate.position.x + 40,
+    y: nodeToDuplicate.position.y + 40,
+  },
+  data: structuredClone(nodeToDuplicate.data),
+});
+
+// CSS Imports
+import '../node-positioning.css';
+import '../react-flow-overrides.css';
 import '../ui/EliteEdge.css';
+import '../ui/elite-drag-optimizations.css';
 import '../ui/FlowControls.css';
+import '../ui/hide-debug-elements.css';
 import '../ui/HistoryControls.css';
+import '../ui/mega-drag-fix.css';
+import '../ui/remove-debug-styles.css';
 import '../ui/SyncButton.css';
 import '../ui/UltraMode.css';
+import '../ui/VerticalButtons.css';
+import '../ui/ZoomControls.css';
+import './transparent-pane.css';
 
-// Optimización: Todas las funciones de corrección vienen de optimized-flow-fixes
-// Las importaciones se realizan en la parte superior del archivo
-import { fixNodePositions } from '../utils/fix-node-positions';
-// Importar solución para el posicionamiento correcto de nodos
-// Importar el sistema de garantía de interacción de nodos
-import {
-  ensureNodesAreInteractive,
-  setupNodeInteractionObserver,
-  stopNodeInteractionObserver,
-} from '../utils/ensure-node-interaction';
-// Importar el sanitizador de paths de aristas
-
-// Importar estilos CSS para posicionamiento de nodos
-import '../node-positioning.css';
-
-// Importar el nuevo validador de posiciones de nodos
-import {
-  validateNodePositions,
-  sanitizeEdgePaths,
-} from '../utils/node-position-validator';
 // Importar y aplicar automáticamente el parche de validación de posiciones
 
 /**
@@ -151,14 +109,14 @@ const FlowMain = ({
   setReactFlowInstance, // Retained for clarity, will be used as externalSetReactFlowInstance internally
   nodes: externalNodes,
   edges: externalEdges,
-  onNodesChange: externalOnNodesChange,
+
   onEdgesChange: externalOnEdgesChange,
   onConnect: externalOnConnect,
   onNodeClick: externalOnNodeClick,
   onPaneClick: externalOnPaneClick,
   onEdgeClick: externalOnEdgeClick,
   onNodeDragStop: externalOnNodeDragStop,
-  onSelectionDragStop: externalOnSelectionDragStop,
+
   onDragOver: externalOnDragOver,
   onDrop: externalOnDrop,
   onEdgeUpdate: externalOnEdgeUpdate,
@@ -172,15 +130,10 @@ const FlowMain = ({
   nodeTypes: externalNodeTypes,
   edgeTypes: externalEdgeTypes,
   validConnectionsHandles: externalValidConnectionsHandles,
-  isUltraMode: externalIsUltraMode,
-  openModal: externalOpenModal,
   closeModal: externalCloseModal,
   showEmbedModal: externalShowEmbedModal,
-  showTemplateSelector: externalShowTemplateSelector,
   showImportExportModal: externalShowImportExportModal,
   // Props for canvas behavior - utilizamos valores predeterminados si no se proporcionan
-  nodeExtent = NODE_EXTENT,
-  translateExtent = TRANSLATE_EXTENT,
   minZoom = MIN_ZOOM,
 }) => {
   // Props are now directly available from the function signature's destructuring.
@@ -197,26 +150,16 @@ const FlowMain = ({
   const flowContainerReference = useRef();
   const reactFlowInstanceReference = useRef();
   const isInitialLoad = useRef(true);
-  const nodeCache = useRef(new Map());
-  const edgeCache = useRef(new Map());
 
   // Referencias para el estado del sistema
   // Nota: Las referencias de rendimiento ahora se manejan en useAdaptivePerformance
 
   // Estado local para menús contextuales y modales
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [menu, setMenu] = useState();
-  const [menuPosition, setMenuPosition] = useState({ x: 0, y: 0 });
   const { fitView } = useReactFlow();
-
-  const { showNotification } = useGlobalContext();
-  const [selectedNode, setSelectedNode] = useState();
-  const [selectedEdge, setSelectedEdge] = useState();
   const [isDragging, setIsDragging] = useState(false);
   const [lodLevel, setLodLevel] = useState(LOD_LEVELS.FULL); // Estado para el nivel de detalle
 
   // Estados para modales internos (solo los que no vienen de props)
-  const [showSyncModal, setShowSyncModal] = useState(false);
 
   // La virtualización ahora es gestionada por el hook useNodeVirtualization.
 
@@ -229,7 +172,6 @@ const FlowMain = ({
   const isUltraMode = useFlowStore((state) => state.isUltraMode);
   const plubotId = useFlowStore((state) => state.plubotId);
   const flowName = useFlowStore((state) => state.flowName);
-  const isNodeBeingDragged = useFlowStore((state) => state.isNodeBeingDragged);
 
   // Flag de estado para controlar la renderización de las aristas y evitar condiciones de carrera.
   const [areEdgesReady, setAreEdgesReady] = useState(false);
@@ -263,12 +205,14 @@ const FlowMain = ({
     canUndo,
     canRedo,
     setIsNodeBeingDragged,
-    hideContextMenu,
   } = useFlowStore();
 
   // Determinar si se están usando nodos externos o internos
   const nodes = externalNodes || zustandNodes;
-  const edges = areEdgesReady ? externalEdges || zustandEdges : [];
+  const edges = useMemo(
+    () => (areEdgesReady ? externalEdges || zustandEdges : []),
+    [areEdgesReady, externalEdges, zustandEdges],
+  );
 
   // Efecto para centrar la vista únicamente en la carga inicial del flujo.
   // Esto evita el reajuste automático al mover nodos, dando control total al usuario.
@@ -283,14 +227,21 @@ const FlowMain = ({
   // -----------------------------------------
   // HOOKS PERSONALIZADOS
   // -----------------------------------------
+  // Lógica del menú contextual extraída a un hook personalizado.
+  const {
+    menu,
+    onNodeContextMenu,
+    onEdgeContextMenu,
+    onPaneClick: handlePaneClickForMenu,
+    closeContextMenu,
+  } = useContextMenu();
   // Sistema unificado de optimización de rendimiento
   const {
     optimizationLevel,
     startMonitoring,
     updatePerformance,
-    measurePerformance,
+
     fpsRef,
-    getStats,
   } = useAdaptivePerformance();
 
   // Estadísticas de rendimiento accesibles en la UI
@@ -318,13 +269,6 @@ const FlowMain = ({
 
   // --- GESTIÓN CENTRALIZADA DE LOD CON HISTÉRESIS CORREGIDA ---
 
-  // Jerarquía numérica para una comparación lógica correcta de los niveles de LOD.
-  const lodHierarchy = {
-    [LOD_LEVELS.FULL]: 2,
-    [LOD_LEVELS.COMPACT]: 1,
-    [LOD_LEVELS.MINI]: 0,
-  };
-
   const hysteresisTimer = useRef();
 
   // Efecto para gestionar el Nivel de Detalle (LOD) con histéresis.
@@ -335,21 +279,19 @@ const FlowMain = ({
     if (newLodLevel !== lodLevel) {
       clearTimeout(hysteresisTimer.current);
 
-      const currentNumericLod = lodHierarchy[lodLevel];
-      const newNumericLod = lodHierarchy[newLodLevel];
-
       // Si el nuevo nivel es MÁS detallado (número mayor), actualiza inmediatamente.
       setLodLevel(newLodLevel);
     }
 
-    return () => clearTimeout(hysteresisTimer.current);
+    // Capturar el valor de la referencia para usarlo en la función de limpieza.
+    // Esto asegura que se limpie el temporizador correcto, evitando condiciones de carrera.
+    const timerId = hysteresisTimer.current;
+    return () => clearTimeout(timerId);
   }, [viewport.zoom, lodLevel]);
 
   // INSTRUMENTATION: Log canvas zoom and LOD changes
-  useEffect(() => {}, [viewport.zoom, lodLevel]);
 
   // INSTRUMENTATION: Log canvas panning
-  useEffect(() => {}, [viewport.x, viewport.y]);
 
   // Inyectar el nivel de LOD calculado centralmente en los nodos visibles.
   const nodesWithLOD = useMemo(() => {
@@ -374,12 +316,6 @@ const FlowMain = ({
   }, [visibleEdges, lodLevel]);
 
   // INSTRUMENTATION: Log virtualization stats
-  useEffect(() => {}, [
-    visibleNodes.length,
-    nodes.length,
-    visibleEdges.length,
-    edges.length,
-  ]);
   // --- FIN DEL NUEVO SISTEMA DE VIRTUALIZACIÓN ---
 
   // -----------------------------------------
@@ -414,16 +350,6 @@ const FlowMain = ({
    * Manejador para cambios en nodos
    * @param {Array} changes - Cambios a aplicar a los nodos
    */
-  const handleNodesChange = useCallback(
-    (changes) => {
-      if (externalOnNodesChange) {
-        externalOnNodesChange(changes);
-      } else {
-        onNodesChange(changes);
-      }
-    },
-    [externalOnNodesChange, onNodesChange],
-  );
 
   /**
    * Manejador para cambios en aristas
@@ -485,194 +411,149 @@ const FlowMain = ({
    * @param {Event} event - Evento del clic
    * @param {Object} node - Nodo seleccionado
    */
+  const handleNodesDelete = useCallback(
+    (nodesToDelete) => {
+      if (externalOnNodesDelete) {
+        externalOnNodesDelete(nodesToDelete);
+      }
+      closeContextMenu();
+    },
+    [externalOnNodesDelete, closeContextMenu],
+  );
+
+  const handleEdgesDelete = useCallback(
+    (edgesToDelete) => {
+      if (externalOnEdgesDelete) {
+        externalOnEdgesDelete(edgesToDelete);
+      }
+      closeContextMenu();
+    },
+    [externalOnEdgesDelete, closeContextMenu],
+  );
+
+  const handleDuplicateNode = useCallback(
+    (nodeToDuplicate) => {
+      const newNode = createDuplicatedNode(nodeToDuplicate);
+      useFlowStore.getState().addNode(newNode);
+      closeContextMenu();
+    },
+    [closeContextMenu],
+  );
+
+  const handleEditNode = useCallback(
+    (_nodeToEdit) => {
+      // TODO: Implementar la lógica para abrir el modal de edición de nodos.
+      // Por ejemplo: openEditModal(nodeToEdit);
+      closeContextMenu();
+    },
+    [closeContextMenu],
+  );
+
   const handleNodeClick = useCallback(
     (event, node) => {
       if (externalOnNodeClick) {
         externalOnNodeClick(event, node);
-      } else {
-        setSelectedNode(node);
-        setMenuOpen(false);
       }
+      closeContextMenu();
     },
-    [externalOnNodeClick],
+    [externalOnNodeClick, closeContextMenu],
   );
 
-  /**
-   * Manejador para clic en el panel
-   * @param {Event} event - Evento del clic
-   */
   const handlePaneClick = useCallback(
     (event) => {
-      // Ocultar el menú contextual al hacer clic en el panel
-      hideContextMenu();
-
+      handlePaneClickForMenu(event);
       if (externalOnPaneClick) {
         externalOnPaneClick(event);
-      } else {
-        setSelectedNode(undefined);
-        setSelectedEdge(null);
-        setMenuOpen(false);
       }
     },
-    [externalOnPaneClick, hideContextMenu],
+    [externalOnPaneClick, handlePaneClickForMenu],
   );
 
-  /**
-   * Manejador para clic en arista
-   * @param {Event} event - Evento del clic
-   * @param {Object} edge - Arista seleccionada
-   */
   const handleEdgeClick = useCallback(
     (event, edge) => {
       if (externalOnEdgeClick) {
         externalOnEdgeClick(event, edge);
-      } else {
-        event.stopPropagation();
-        setSelectedEdge(edge);
-        setMenuOpen(true);
-        setMenu('edge');
-        setMenuPosition({
-          x: event.clientX,
-          y: event.clientY,
-        });
       }
+      closeContextMenu();
     },
-    [externalOnEdgeClick],
+    [externalOnEdgeClick, closeContextMenu],
   );
 
-  const onNodeContextMenu = useCallback((event, node) => {
-    event.preventDefault();
-    setSelectedNode(node);
-    setMenu('node');
-    setMenuPosition({ x: event.clientX, y: event.clientY });
-    setMenuOpen(true);
-  }, []);
+  const onNodeDragStart = useCallback(
+    (event, node) => {
+      setIsDragging(true);
+      setIsNodeBeingDragged(true);
+      if (externalOnNodeDragStart) {
+        externalOnNodeDragStart(event, node);
+      }
+    },
+    [externalOnNodeDragStart, setIsNodeBeingDragged],
+  );
 
-  const onEdgeContextMenu = useCallback((event, edge) => {
-    event.preventDefault();
-    setSelectedEdge(edge);
-    setMenu('edge');
-    setMenuPosition({ x: event.clientX, y: event.clientY });
-    setMenuOpen(true);
-  }, []);
+  const onNodeDrag = useCallback(
+    (event, node) => {
+      if (externalOnNodeDrag) {
+        externalOnNodeDrag(event, node);
+      }
+    },
+    [externalOnNodeDrag],
+  );
 
-  const onNodeDragStart = useCallback((event, node) => {
-    setIsDragging(true);
-    setIsNodeBeingDragged(true);
-    document.body.classList.add('elite-node-dragging');
-    if (externalOnNodeDragStart) {
-      externalOnNodeDragStart(event, node);
-    }
-  }, [externalOnNodeDragStart, setIsNodeBeingDragged]);
+  const onEdgeUpdateStart = useCallback(
+    (event, edge) => {
+      if (externalOnEdgeUpdateStart) {
+        externalOnEdgeUpdateStart(event, edge);
+      }
+    },
+    [externalOnEdgeUpdateStart],
+  );
 
-  const onNodeDrag = useCallback((event, node) => {
-    if (externalOnNodeDrag) {
-      externalOnNodeDrag(event, node);
-    }
-  }, [externalOnNodeDrag]);
+  const onEdgeUpdateEnd = useCallback(
+    (event, edge) => {
+      if (externalOnEdgeUpdateEnd) {
+        externalOnEdgeUpdateEnd(event, edge);
+      }
+    },
+    [externalOnEdgeUpdateEnd],
+  );
 
-  const onEdgeUpdateStart = useCallback((event, edge) => {
-    if (externalOnEdgeUpdateStart) {
-      externalOnEdgeUpdateStart(event, edge);
-    }
-  }, [externalOnEdgeUpdateStart]);
+  const onNodesDelete = useCallback(
+    (nodesToDelete) => {
+      if (externalOnNodesDelete) externalOnNodesDelete(nodesToDelete);
+    },
+    [externalOnNodesDelete],
+  );
 
-  const onEdgeUpdateEnd = useCallback((event, edge) => {
-    if (externalOnEdgeUpdateEnd) {
-      externalOnEdgeUpdateEnd(event, edge);
-    }
-  }, [externalOnEdgeUpdateEnd]);
-
-  const onNodesDelete = useCallback((nodes) => {
-    if (externalOnNodesDelete) {
-      externalOnNodesDelete(nodes);
-    }
-  }, [externalOnNodesDelete]);
-
-  const onEdgesDelete = useCallback((edges) => {
-    if (externalOnEdgesDelete) {
-      externalOnEdgesDelete(edges);
-    }
-  }, [externalOnEdgesDelete]);
+  const onEdgesDelete = useCallback(
+    (edgesToDelete) => {
+      const localEdges = edgesToDelete;
+      if (externalOnEdgesDelete) {
+        externalOnEdgesDelete(localEdges);
+      }
+    },
+    [externalOnEdgesDelete],
+  );
 
   const onSelectionChange = useCallback(
     (parameters) => {
       // Lógica unificada para manejar el cambio de selección, evitando procesamiento durante el arrastre.
       const shouldProcess = !isDragging;
 
-      if (externalOnSelectionChange) {
-        if (shouldProcess) {
-          externalOnSelectionChange(parameters);
-        }
-      } else {
-        const selectedNodeId = selectedNode?.id;
-        const newSelectedNodeId = parameters?.nodes?.[0]?.id;
-
-        if (shouldProcess && selectedNodeId !== newSelectedNodeId) {
-          if (parameters?.nodes?.length > 0) {
-            setSelectedNode(parameters.nodes[0]);
-          } else {
-            setSelectedNode(undefined);
-          }
-        }
+      if (externalOnSelectionChange && shouldProcess) {
+        externalOnSelectionChange(parameters);
       }
+      // La gestión de la selección interna (setSelectedNode) se ha eliminado.
+      // React Flow maneja su propia selección visualmente.
+      // Si se necesita un estado de nodo seleccionado, debe ser gestionado por el componente padre
+      // y pasado a través de props, o reimplementado de una manera que no entre en conflicto.
     },
-    [externalOnSelectionChange, isDragging, selectedNode, setSelectedNode],
+    [externalOnSelectionChange, isDragging],
   );
-
-  /**
-   * Manejador para clic derecho en nodo (menú contextual)
-   * @param {Event} event - Evento del clic
-   * @param {Object} node - Nodo seleccionado
-   */
-
-  /**
-   * Manejador para fin de arrastre de nodo
-   * @param {Event} event - Evento de arrastre
-   * @param {Object} node - Nodo arrastrado
-   */
-  // Crear un sistema de debounce para las validaciones de posición
-  const validationDebounceReference = useRef(null);
 
   const handleNodeDragStop = useCallback(
     (event, node) => {
-      // Este evento se dispara cuando el usuario termina de arrastrar un nodo
       setIsDragging(false);
-
-      // IMPORTANTE: Restablecer la bandera de arrastre en progreso
-      // para permitir que el sistema de validación funcione normalmente - FORMA SEGURA
       setIsNodeBeingDragged(false);
-
-      // ULTRA IMPORTANTE: Quitar la clase del body para volver a la normalidad - FORMA SEGURA
-      try {
-        document.body.classList.remove('elite-node-dragging'); // Corregir nombre de la clase
-      } catch {
-        // Manejar error de forma silenciosa
-      }
-
-      // Validación pospuesta - solo al final del arrastre
-      // Esto mejora drásticamente el rendimiento al mover nodos
-      if (validationDebounceReference.current) {
-        clearTimeout(validationDebounceReference.current);
-      }
-
-      // Retrasar ligeramente la validación para garantizar fluidez
-      validationDebounceReference.current = setTimeout(() => {
-        // Validar y corregir posiciones después del arrastre
-        const currentNodes = useFlowStore.getState().nodes;
-        if (currentNodes && currentNodes.length > 0) {
-          const validatedNodes = validateNodePositions(currentNodes);
-          if (validatedNodes !== currentNodes) {
-            useFlowStore.getState().setNodes(validatedNodes);
-          }
-        }
-
-        // Sanear paths de aristas después del arrastre
-        sanitizeEdgePaths();
-
-        validationDebounceReference.current = null;
-      }, 200); // Aumentar ligeramente el retraso para garantizar mayor fluidez
-
       if (externalOnNodeDragStop) {
         externalOnNodeDragStop(event, node);
       }
@@ -680,24 +561,6 @@ const FlowMain = ({
     [externalOnNodeDragStop, setIsNodeBeingDragged],
   );
 
-  /**
-   * Manejador para fin de arrastre de selección
-   * @param {Event} event - Evento de arrastre
-   * @param {Array} nodes - Nodos seleccionados
-   */
-  const handleSelectionDragStop = useCallback(
-    (event, nodes) => {
-      if (externalOnSelectionDragStop) {
-        externalOnSelectionDragStop(event, nodes);
-      }
-    },
-    [externalOnSelectionDragStop],
-  );
-
-  /**
-   * Manejador para arrastrar sobre el panel
-   * @param {Event} event - Evento de arrastre
-   */
   const handleDragOver = useCallback(
     (event) => {
       if (externalOnDragOver) {
@@ -710,13 +573,6 @@ const FlowMain = ({
     [externalOnDragOver],
   );
 
-  /**
-   * Manejador para soltar en el panel
-   * @param {Event} event - Evento de soltar
-   */
-  /**
-   * Manejador de drop usando calculateCorrectDropPosition del módulo drop-position-fix
-   */
   const handleDrop = useCallback(
     (event) => {
       event.preventDefault();
@@ -724,7 +580,7 @@ const FlowMain = ({
       // Si hay un manejador externo, lo llamamos primero
       if (externalOnDrop) {
         externalOnDrop(event);
-        return; // Permitimos que el manejador externo maneje todo
+        return;
       }
 
       // Implementación directa utilizando drop-position-fix.js
@@ -756,11 +612,6 @@ const FlowMain = ({
     [externalOnDrop],
   );
 
-  /**
-   * Manejador para actualización de arista
-   * @param {Object} oldEdge - Arista anterior
-   * @param {Object} newConnection - Nueva conexión
-   */
   const handleEdgeUpdate = useCallback(
     (oldEdge, newConnection) => {
       if (externalOnEdgeUpdate) {
@@ -769,10 +620,6 @@ const FlowMain = ({
     },
     [externalOnEdgeUpdate],
   );
-
-  /**
-   * Manejador para inicio de actualización de arista
-   */
 
   /**
    * Manejador para fin de actualización de arista
@@ -896,7 +743,7 @@ const FlowMain = ({
     // import('../utils/optimized-flow-fixes').then(({ initOptimizedFixes }) => {
       // Configuración mínima: sin logs y con intervalo largo para mejor rendimiento
 /*      const cleanup = initOptimizedFixes({
-        enableLogs: process.env.NODE_ENV === 'development' && false, // Deshabilitar logs incluso en desarrollo
+        enableLogs: import.meta.env.MODE === 'development' && false, // Deshabilitar logs incluso en desarrollo
         fixInterval: 3000, // Reducir frecuencia a 3 segundos
         fixes: {
           nodeDrag: true,
@@ -935,8 +782,8 @@ const FlowMain = ({
 
     // Actualizar el rendimiento con el viewport actual
     if (reactFlowInstance) {
-      const viewport = reactFlowInstance.getViewport();
-      updatePerformance(viewport);
+      const currentViewport = reactFlowInstance.getViewport();
+      updatePerformance(currentViewport);
     }
 
     return cleanup;
@@ -996,7 +843,7 @@ const FlowMain = ({
     return () => {
       // Limpiar cualquier estado o referencia al simulador al desmontar
       if (reactFlowInstanceReference.current) {
-        reactFlowInstanceReference.current = null;
+        reactFlowInstanceReference.current = undefined;
       }
     };
   }, []);
@@ -1046,11 +893,9 @@ const FlowMain = ({
           }}
           onDrop={handleDrop}
           onDragOver={handleDragOver}
-
           onNodeClick={handleNodeClick}
           onEdgeClick={handleEdgeClick}
           onNodeDragStop={handleNodeDragStop}
-
           onEdgeUpdate={handleEdgeUpdate}
           onNodeContextMenu={onNodeContextMenu}
           onEdgeContextMenu={onEdgeContextMenu}
@@ -1159,7 +1004,7 @@ const FlowMain = ({
 
           {/* Monitor de rendimiento - Opcional */}
           {typeof process !== 'undefined' &&
-            process.env.NODE_ENV === 'development' && (
+            import.meta.env.MODE === 'development' && (
               <div className='perf-monitor'>
                 FPS: {fpsRef.current.toFixed(1)}
                 {fpsRef.current < 30 && !isUltraMode && (
@@ -1169,17 +1014,23 @@ const FlowMain = ({
             )}
 
           {/* Menús contextuales */}
-          {menuOpen && menu === 'node' && selectedNode && (
+          {menu && menu.type === 'node' && (
             <NodeContextMenu
-              position={menuPosition}
-              onClose={() => setMenuOpen(false)}
+              nodeId={menu.id}
+              position={{ x: menu.left, y: menu.top }}
+              onClose={closeContextMenu}
+              onDelete={handleNodesDelete}
+              onDuplicate={handleDuplicateNode}
+              onEdit={handleEditNode}
+              nodeData={menu.data}
             />
           )}
-
-          {menuOpen && menu === 'edge' && selectedEdge && (
+          {menu && menu.type === 'edge' && (
             <EdgeContextMenu
-              position={menuPosition}
-              onClose={() => setMenuOpen(false)}
+              edgeId={menu.id}
+              position={{ x: menu.left, y: menu.top }}
+              onClose={closeContextMenu}
+              onDelete={handleEdgesDelete}
             />
           )}
 
@@ -1325,7 +1176,7 @@ const FlowMain = ({
                       plubotName: plubotInfo?.name || 'Mi Chatbot',
                     },
                   };
-                  const jsonString = JSON.stringify(exportData, null, 2);
+                  const jsonString = JSON.stringify(exportData, undefined, 2);
                   const blob = new Blob([jsonString], {
                     type: 'application/json',
                   });
@@ -1340,24 +1191,37 @@ const FlowMain = ({
                 } catch {}
               }}
               onImport={(data) => {
-                if (data && data.nodes && data.edges) {
+                if (!data?.nodes || !data?.edges) return;
+
+                startTransition(() => {
                   try {
                     const newNodes = data.nodes.map((node) => ({
                       ...node,
-                      id: `node-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`,
+                      id: uuidv4(),
                     }));
-                    const nodeIdMap = {};
-                    for (const [index, node] of data.nodes.entries()) {
-                      nodeIdMap[node.id] = newNodes[index].id;
-                    }
-                    const newEdges = data.edges.map((edge) => ({
-                      ...edge,
-                      id: `edge-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`,
-                      source: nodeIdMap[edge.source] || edge.source,
-                      target: nodeIdMap[edge.target] || edge.target,
-                    }));
+                    const nodeIdMap = new Map(
+                      data.nodes.map((node, index) => [
+                        node.id,
+                        newNodes[index].id,
+                      ]),
+                    );
+
+                    const newEdges = data.edges
+                      .filter(
+                        (edge) =>
+                          nodeIdMap.has(edge.source) &&
+                          nodeIdMap.has(edge.target),
+                      )
+                      .map((edge) => ({
+                        ...edge,
+                        id: uuidv4(),
+                        source: nodeIdMap.get(edge.source),
+                        target: nodeIdMap.get(edge.target),
+                      }));
+
                     setNodes(newNodes);
                     setEdges(newEdges);
+
                     if (typeof externalCloseModal === 'function') {
                       externalCloseModal('importExportModal');
                     } else {
@@ -1367,27 +1231,16 @@ const FlowMain = ({
                         }),
                       );
                     }
-                  } catch {}
-                }
+                  } catch (error) {
+                    // eslint-disable-next-line no-console
+                    console.error('Error importing flow:', error);
+                  }
+                });
               }}
             />
           </div>
         )}
       </div>
-
-      {/* Contenedor de modales con posición fija para evitar empujar contenido */}
-      <div
-        className='flow-editor-modals'
-        style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          width: '100%',
-          height: '100%',
-          pointerEvents: 'none',
-          zIndex: 1000,
-        }}
-      />
     </div>
   );
 };
@@ -1399,14 +1252,17 @@ FlowMain.propTypes = {
   setReactFlowInstance: PropTypes.func,
   nodes: PropTypes.array,
   edges: PropTypes.array,
-  onNodesChange: PropTypes.func,
   onEdgesChange: PropTypes.func,
   onConnect: PropTypes.func,
   onNodeClick: PropTypes.func,
   onPaneClick: PropTypes.func,
   onEdgeClick: PropTypes.func,
   onNodeDragStop: PropTypes.func,
-  onSelectionDragStop: PropTypes.func,
+  onNodeDragStart: PropTypes.func,
+  onNodesDelete: PropTypes.func,
+  onEdgesDelete: PropTypes.func,
+  onSelectionChange: PropTypes.func,
+  onNodeDrag: PropTypes.func,
   onDragOver: PropTypes.func,
   onDrop: PropTypes.func,
   onEdgeUpdate: PropTypes.func,
@@ -1415,14 +1271,9 @@ FlowMain.propTypes = {
   nodeTypes: PropTypes.object,
   edgeTypes: PropTypes.object,
   validConnectionsHandles: PropTypes.func,
-  isUltraMode: PropTypes.bool,
-  openModal: PropTypes.func,
   closeModal: PropTypes.func,
   showEmbedModal: PropTypes.bool,
-  showTemplateSelector: PropTypes.bool,
   showImportExportModal: PropTypes.bool,
-  nodeExtent: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.number)),
-  translateExtent: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.number)),
   minZoom: PropTypes.number,
 };
 

@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
-import { useReactFlow } from 'reactflow';
 
 import { nodeEstimatedDimensions } from '@/flow/nodeDimensions';
 

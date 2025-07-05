@@ -1,4 +1,4 @@
-import React from 'react';
+import PropTypes from 'prop-types';
 
 /**
  * Componente para mostrar un popup de logro desbloqueado
@@ -6,7 +6,8 @@ import React from 'react';
  * @param {boolean} props.show - Indica si se debe mostrar el popup
  * @param {Object} props.achievement - Datos del logro (título, descripción, icono)
  */
-const AchievementPopup = ({ show, achievement }) => {
+function AchievementPopup({ show, achievement }) {
+  // eslint-disable-next-line unicorn/no-null
   if (!show || !achievement) return null;
 
   return (
@@ -19,6 +20,15 @@ const AchievementPopup = ({ show, achievement }) => {
       </div>
     </div>
   );
+}
+
+AchievementPopup.propTypes = {
+  show: PropTypes.bool.isRequired,
+  achievement: PropTypes.shape({
+    icon: PropTypes.node.isRequired,
+    title: PropTypes.string.isRequired,
+    description: PropTypes.string.isRequired,
+  }),
 };
 
 export default AchievementPopup;

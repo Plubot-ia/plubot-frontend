@@ -110,8 +110,6 @@ const BackupManager = ({ plubotId }) => {
     }
   };
 
-
-
   return (
     <>
       <div
@@ -126,7 +124,7 @@ const BackupManager = ({ plubotId }) => {
         <div className='backup-manager-overlay' onClick={handleClose}>
           <div
             className='backup-manager-dialog'
-            onClick={(e) => e.stopPropagation()}
+            onClick={(event) => event.stopPropagation()}
           >
             <div className='backup-manager-header'>
               <div className='backup-manager-title'>

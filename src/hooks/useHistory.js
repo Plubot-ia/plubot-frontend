@@ -45,6 +45,7 @@ const useHistory = ({ maxHistory = 100 } = {}) => {
    * @returns {Object|null} - Estado anterior o null si no hay más cambios para deshacer
    */
   const undo = useCallback(() => {
+    // eslint-disable-next-line unicorn/no-null
     if (historyIndex.current <= 0) return null;
 
     isUndoRedo.current = true;
@@ -57,6 +58,7 @@ const useHistory = ({ maxHistory = 100 } = {}) => {
    * @returns {Object|null} - Estado siguiente o null si no hay más cambios para rehacer
    */
   const redo = useCallback(() => {
+    // eslint-disable-next-line unicorn/no-null
     if (historyIndex.current >= history.current.length - 1) return null;
 
     isUndoRedo.current = true;

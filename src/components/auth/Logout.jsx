@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import useAuthStore from '@/stores/use-auth-store';
@@ -17,7 +17,8 @@ const Logout = () => {
     performLogout();
   }, [logout, navigate]);
 
-  return <></>;
+  // eslint-disable-next-line unicorn/no-null
+  return null;
 };
 
 export default Logout;

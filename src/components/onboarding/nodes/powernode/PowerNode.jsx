@@ -4,8 +4,6 @@ import { Handle, Position } from 'reactflow';
 import './PowerNode.css';
 
 const PowerNodeComponent = ({
-  // eslint-disable-next-line no-unused-vars
-  id,
   data,
   isConnectable,
   isUltraPerformanceMode = false,
@@ -50,7 +48,6 @@ const PowerNodeComponent = ({
 };
 
 PowerNodeComponent.propTypes = {
-  id: PropTypes.string.isRequired,
   data: PropTypes.shape({
     label: PropTypes.string,
     powerId: PropTypes.string,

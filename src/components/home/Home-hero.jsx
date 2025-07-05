@@ -66,7 +66,7 @@ const HomeHero = () => {
           alt='Plubot'
           className='hero-plubot'
           loading='eager'
-          fetchpriority='high'
+          fetchPriority='high'
         />
       </div>
     </section>

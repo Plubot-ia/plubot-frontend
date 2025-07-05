@@ -1,12 +1,12 @@
 import { NavLink } from 'react-router-dom';
 
+import './Footer.css';
+
 import logo from '@assets/img/logo.svg';
 import facebookIcon from '@assets/img/social/facebook.svg';
 import instagramIcon from '@assets/img/social/instagram.svg';
 import threadsIcon from '@assets/img/social/threads.svg';
 import xIcon from '@assets/img/social/x.svg';
-
-import './Footer.css';
 
 import FooterLinks from './FooterLinks';
 import FooterSubscriptionForm from './FooterSubscriptionForm';
@@ -83,7 +83,7 @@ const Footer = () => {
       </div>
       <FooterSubscriptionForm />
       <div className='footer-bottom'>
-        <p>© 2025 Plubot Web. Forjado en el corazón del Pluniverse.</p>
+        <p> 2025 Plubot Web. Forjado en el corazón del Pluniverse.</p>
       </div>
     </footer>
   );

@@ -1,15 +1,7 @@
+import PropTypes from 'prop-types';
 import React from 'react';
-import { BiReset } from 'react-icons/bi';
 import { BsLightningFill } from 'react-icons/bs';
-import {
-  FiSave,
-  FiZoomIn,
-  FiZoomOut,
-  FiMap,
-  FiMaximize2,
-  FiMinimize2,
-  FiRefreshCw,
-} from 'react-icons/fi';
+import { FiSave, FiMap, FiRefreshCw } from 'react-icons/fi';
 
 import useFlowStore from '@/stores/useFlowStore';
 
@@ -38,7 +30,6 @@ const FlowControls = ({
   const handleForceFitView = () => {
     if (fitView) {
       fitView({ padding: 0.2, duration: 0 });
-    } else {
     }
   };
   return (
@@ -91,6 +82,16 @@ const FlowControls = ({
       )}
     </div>
   );
+};
+
+FlowControls.propTypes = {
+  toggleMiniMap: PropTypes.func.isRequired,
+  toggleUltraMode: PropTypes.func.isRequired,
+  onSave: PropTypes.func.isRequired,
+  minimapOpen: PropTypes.bool.isRequired,
+  isUltraMode: PropTypes.bool.isRequired,
+  hasAutoOptimized: PropTypes.bool.isRequired,
+  optimizationLevel: PropTypes.string.isRequired,
 };
 
 export default FlowControls;

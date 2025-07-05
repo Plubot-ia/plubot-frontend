@@ -85,10 +85,18 @@ const fakeEmotionAPI = async (text: string): Promise<EmotionAnalysis> => {
   });
 };
 
+export interface UseEmotionDetectionNodeReturn {
+  isLoading: boolean;
+  handleOutputVariableChange: (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => void;
+  runEmotionDetection: (text: string) => Promise<Emotion>;
+}
+
 export const useEmotionDetectionNode = (
   id: string,
   data: EmotionDetectionNodeData,
-) => {
+): UseEmotionDetectionNodeReturn => {
   const { updateNodeData } = useFlowStore((state) => ({
     updateNodeData: state.updateNodeData,
   }));

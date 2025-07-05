@@ -12,13 +12,7 @@ export const getNodeSize = (nodeType) => {
 
 const explorePathRecursive = (
   nodeId,
-  nodes,
-  edges,
-  currentPath,
-  visitedNodes,
-  routes,
-  cycles,
-  analysis,
+  { nodes, edges, currentPath, visitedNodes, routes, cycles, analysis },
 ) => {
   if (visitedNodes.has(nodeId)) {
     const cycleStartIndex = currentPath.indexOf(nodeId);
@@ -43,16 +37,15 @@ const explorePathRecursive = (
     }
   } else {
     for (const edge of outgoingEdges) {
-      explorePathRecursive(
-        edge.target,
+      explorePathRecursive(edge.target, {
         nodes,
         edges,
-        [...currentPath],
-        new Set(visitedNodes),
+        currentPath: [...currentPath],
+        visitedNodes: new Set(visitedNodes),
         routes,
         cycles,
         analysis,
-      );
+      });
     }
   }
 };
@@ -459,16 +452,15 @@ export const analyzeFlowRoutes = (nodes, edges) => {
     const routes = [];
     const cycles = [];
 
-    explorePathRecursive(
-      startNode.id,
+    explorePathRecursive(startNode.id, {
       nodes,
       edges,
-      [],
-      new Set(),
+      currentPath: [],
+      visitedNodes: new Set(),
       routes,
       cycles,
       analysis,
-    );
+    });
 
     // Guardar rutas y ciclos
     analysis.pathsByStartNode[startNode.id] = routes;

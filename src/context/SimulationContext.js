@@ -5,7 +5,7 @@ const SimulationContext = createContext();
 
 const initialState = {
   history: [],
-  currentNodeId: null,
+  currentNodeId: undefined,
   isTyping: false,
   userInput: '',
   simulationActive: false,

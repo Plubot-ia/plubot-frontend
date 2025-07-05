@@ -51,7 +51,7 @@ function applyPerformanceStyles() {
   const styleId = 'plubot-performance-styles';
 
   // Si ya existen los estilos, no hacer nada
-  if (document.getElementById(styleId)) return;
+  if (document.querySelector(`#${styleId}`)) return;
 
   const style = document.createElement('style');
   style.id = styleId;
@@ -178,14 +178,12 @@ function setupFPSMeter() {
   fpsMeterContainer.append(fpsMeter);
   document.body.append(fpsMeterContainer);
 
-  let lastTime = performance.now();
   let frameCount = 0;
   let lastFpsUpdate = 0;
   let fps = 0;
 
   function updateFPS() {
     const now = performance.now();
-    const delta = now - lastTime;
 
     frameCount++;
 
@@ -210,7 +208,6 @@ function setupFPSMeter() {
       lastFpsUpdate = now;
     }
 
-    lastTime = now;
     requestAnimationFrame(updateFPS);
   }
 

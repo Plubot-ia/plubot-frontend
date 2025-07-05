@@ -1,5 +1,5 @@
-import { motion, AnimatePresence } from 'framer-motion';
 import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 import axiosInstance from '../../utils/axios-config';
 

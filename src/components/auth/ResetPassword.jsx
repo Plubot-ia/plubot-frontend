@@ -1,7 +1,6 @@
-import PropTypes from 'prop-types';
 import { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 import useAuthStore from '@/stores/use-auth-store';
 
@@ -23,17 +22,17 @@ const ResetPassword = () => {
   const navigate = useNavigate();
   const { resetPassword, error: authError } = useAuthStore();
 
+  const showMessage = (text, type) => {
+    setMessage({ text, type });
+    setTimeout(() => setMessage({ text: '', type: '' }), 5000);
+  };
+
   // Efecto para manejar errores del store
   useEffect(() => {
     if (authError) {
       showMessage(authError, 'error');
     }
   }, [authError]);
-
-  const showMessage = (text, type) => {
-    setMessage({ text, type });
-    setTimeout(() => setMessage({ text: '', type: '' }), 5000);
-  };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -110,10 +109,10 @@ const ResetPassword = () => {
 
   useEffect(() => {
     const card = document.querySelector('.reset-password-card');
-    const handleMouseMove = (e) => {
+    const handleMouseMove = (event) => {
       if ((width || 0) > 768) {
-        const xAxis = ((width || 0) / 2 - e.pageX) / 25;
-        const yAxis = ((height || 0) / 2 - e.pageY) / 25;
+        const xAxis = ((width || 0) / 2 - event.pageX) / 25;
+        const yAxis = ((height || 0) / 2 - event.pageY) / 25;
         if (card) {
           card.style.transform = `perspective(1000px) rotateY(${xAxis}deg) rotateX(${yAxis}deg)`;
         }
@@ -256,7 +255,5 @@ const ResetPassword = () => {
     </div>
   );
 };
-
-ResetPassword.propTypes = {};
 
 export default ResetPassword;

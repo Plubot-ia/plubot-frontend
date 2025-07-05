@@ -25,8 +25,8 @@ const useNode = ({
   const [errorMessage, setErrorMessage] = useState('');
   const [isHovered, setIsHovered] = useState(false);
 
-  const nodeReference = useRef(null);
-  const resizeObserver = useRef(null);
+  const nodeReference = useRef(undefined);
+  const resizeObserver = useRef(undefined);
 
   // Añadir defensas para hooks
   const analytics = useAnalytics() || {};
@@ -48,7 +48,7 @@ const useNode = ({
   const { canEdit = true, canDelete = true } = permissions;
   const reactFlow = useReactFlow() || {};
   const {
-    getNode = () => null,
+    getNode = () => {},
     setNodes: setFlowNodes = () => {
       /* Placeholder */
     },

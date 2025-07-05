@@ -8,8 +8,11 @@ import React, { useState, useCallback, useRef, useEffect, lazy } from 'react';
 import { ReactFlowProvider } from 'reactflow';
 import { shallow } from 'zustand/shallow';
 
+import ContextMenu from '@/components/onboarding/ui/context-menu';
+import { useUndoRedo } from '@/hooks/useUndoRedo';
 import useAuthStore from '@/stores/use-auth-store';
 import useFlowStore from '@/stores/use-flow-store';
+import { onEvent } from '@/utils/event-bus';
 
 // Hooks del core de la aplicación
 
@@ -25,8 +28,6 @@ import useFlowStore from '@/stores/use-flow-store';
 
 // Componentes de UI
 
-import { onEvent } from '@/utils/event-bus.js';
-
 import EpicHeader from '../common/EpicHeader';
 import StatusBubble from '../common/StatusBubble';
 
@@ -35,11 +36,11 @@ import StatusBubble from '../common/StatusBubble';
 const EmbedModal = lazy(() => import('../modals/EmbedModal'));
 const ImportExportModal = lazy(() => import('../modals/ImportExportModal'));
 const TemplateSelector = lazy(() => import('../modals/TemplateSelector'));
-
 // Nodos - StartNode se importa directamente por ser crítico para el renderizado inicial
 
 import EmergencyRecovery from './components/EmergencyRecovery';
 import FlowMain from './components/FlowMain';
+import useConnectionValidator from './hooks/useConnectionValidator';
 import useDragAndDropManager from './hooks/useDragAndDropManager';
 
 // Nodos - El resto se carga bajo demanda para optimizar el tiempo de carga
@@ -56,9 +57,9 @@ const HttpRequestNode = lazy(
 const PowerNode = lazy(() => import('../nodes/powernode/PowerNode.jsx'));
 const DiscordNode = lazy(() => import('../nodes/discordnode/DiscordNode.tsx'));
 const AiNode = lazy(() => import('../nodes/ainode/AiNode')); // Import for the new AI Node
-const AiNodePro = lazy(() => import('../nodes/ainodepro'));
+const AiNodePro = lazy(() => import('../nodes/ainodepro/AiNodePro.jsx'));
 const EmotionDetectionNode = lazy(
-  () => import('../nodes/emotiondetectionnode'),
+  () => import('../nodes/emotiondetectionnode/EmotionDetectionNode.jsx'),
 );
 
 // Estilos
@@ -67,33 +68,13 @@ import './ui/UltraMode.css';
 import './ui/ultra-mode-fixes.css'; // Solución para barras de desplazamiento en Modo Ultra
 import './react-flow-overrides.css'; // Consolidated overrides for staging
 import './ui/PerformancePatch.js';
-
-import useConnectionValidator from './hooks/useConnectionValidator';
 import useFlowElementsManager from './hooks/useFlowElementsManager';
 import useLocalBackupManager from './hooks/useLocalBackupManager';
 import useNodeStyles from './hooks/useNodeStyles';
 import { prepareEdgesForSaving } from './utils/edgeFixUtil';
-import {
-  NODE_EXTENT,
-  TRANSLATE_EXTENT,
-  MIN_ZOOM,
-  MAX_ZOOM,
-} from './utils/flow-extents';
-import { applyNodeVisibilityFix } from './utils/optimized-flow-fixes';
-import {
-  safeSetItem,
-  safeGetItem,
-  cleanupStorage,
-} from './utils/storage-manager';
+import { NODE_EXTENT, TRANSLATE_EXTENT, MIN_ZOOM } from './utils/flow-extents';
 
-import ContextMenu from '@/components/onboarding/ui/context-menu';
-import {
-  createNodeTypes,
-  edgeTypes as sharedEdgeTypes,
-} from '@/flow/nodeRegistry.jsx';
-import useAPI from '@/hooks/useAPI';
-
-import { useUndoRedo } from '@/hooks/useUndoRedo';
+import PropTypes from 'prop-types';
 
 /**
  * Error Boundary para manejar errores de renderizado en componentes de nodos
@@ -106,7 +87,9 @@ class NodeErrorBoundary extends React.Component {
     return { hasError: true, error };
   }
 
-  componentDidCatch(error, errorInfo) {}
+  componentDidCatch(_error, _errorInfo) {
+    /* no-op */
+  }
 
   render() {
     if (this.state.hasError) {
@@ -133,11 +116,6 @@ const FlowEditorInner = ({
   // Props relacionadas con el flujo y la identificación
   plubotId,
   name,
-  saveFlowData,
-
-  // Props relacionadas con la interacción y selección
-  selectedNode,
-  setSelectedNode,
 
   // Props para gestión de conexiones
   setShowConnectionEditor,
@@ -150,7 +128,6 @@ const FlowEditorInner = ({
 
   // Props para manejo de errores y UI
   handleError,
-  hideHeader = false,
   hideContextMenu,
 }) => {
   // Referencias y navegación
@@ -175,8 +152,6 @@ const FlowEditorInner = ({
     setPlubotId,
     setFlowName,
     toggleUltraMode,
-    undo,
-    redo,
     saveFlow,
   } = useFlowStore(
     (state) => ({
@@ -187,8 +162,6 @@ const FlowEditorInner = ({
       setPlubotId: state.setPlubotId,
       setFlowName: state.setFlowName,
       toggleUltraMode: state.toggleUltraMode,
-      undo: state.undo,
-      redo: state.redo,
       saveFlow: state.saveFlow,
     }),
     shallow,
@@ -218,13 +191,7 @@ const FlowEditorInner = ({
   const [reactFlowInstance, setReactFlowInstance] = useState();
 
   // Historial global a través del hook unificado
-  const {
-    addToHistory,
-    undo: historyUndo,
-    redo: historyRedo,
-    canUndo,
-    canRedo,
-  } = useUndoRedo();
+  const { addToHistory } = useUndoRedo();
 
   const saveLocalBackup = useFlowStore((state) => state.saveLocalBackup);
 
@@ -259,19 +226,16 @@ const FlowEditorInner = ({
   // ==============================================
 
   // Hook para gestionar la manipulación de nodos y aristas
-  const {
-    addNodeToFlow,
-    deleteNode,
-    duplicateNode,
-    deleteEdge,
-    updateEdgeData,
-    onConnectNodes,
-  } = useFlowElementsManager(saveHistoryState, setHasChanges);
+  const { onConnectNodes } = useFlowElementsManager(
+    saveHistoryState,
+    setHasChanges,
+  );
 
   // Hook para gestionar respaldos locales
   const { createBackup, recoverFromBackup } = useLocalBackupManager(plubotId);
 
   // Hook para arrastrar y soltar nodos desde la paleta
+
   const { onDragOver, onDrop } = useDragAndDropManager(
     reactFlowWrapperReference,
     reactFlowInstance,
@@ -279,7 +243,7 @@ const FlowEditorInner = ({
   );
 
   // Obtener estilos una sola vez por render (hook debe ir a nivel superior)
-  const nodeStyles = useNodeStyles(isUltraMode);
+  useNodeStyles(isUltraMode);
 
   // La gestión de nodeTypes se ha centralizado en FlowMain.jsx para garantizar una referencia estable.
 
@@ -292,11 +256,6 @@ const FlowEditorInner = ({
   // ==============================================
   // SECCIÓN 4: FUNCIONES Y CALLBACKS
   // ==============================================
-
-  // Función para alternar el modo de rendimiento
-  const togglePerformanceMode = useCallback(() => {
-    toggleUltraMode();
-  }, [toggleUltraMode]);
 
   // Función para abrir modales (redirige al sistema global)
   const openModal = useCallback((modalName) => {
@@ -332,55 +291,55 @@ const FlowEditorInner = ({
     }
   }, []);
 
-  // Función mejorada para guardar el flujo usando Zustand
+  const handleSaveSuccess = useCallback(() => {
+    setHasChanges(false);
+    setByteStatus('success');
+    setByteMessage('Cambios guardados correctamente');
+  }, [setByteMessage, setByteStatus]);
+
+  const handleSaveError = useCallback(
+    (error, preparedEdges) => {
+      const errorMessage =
+        (error instanceof Error ? error.message : error?.message) ||
+        'Error desconocido al guardar';
+      setByteStatus('error');
+      setByteMessage(errorMessage);
+      createBackup(nodes, preparedEdges || edges);
+      if (error instanceof Error && handleError) {
+        handleError(error);
+      }
+    },
+    [nodes, edges, createBackup, handleError, setByteMessage, setByteStatus],
+  );
+
   const handleSaveFlow = useCallback(async () => {
-    if (!plubotId) {
-      return;
-    }
+    if (!plubotId) return;
+
+    setByteStatus('warning');
+    setByteMessage('Guardando cambios...');
+    setShowByte(true);
+
+    const preparedEdges = prepareEdgesForSaving(edges);
 
     try {
-      setByteStatus('warning');
-      setByteMessage('Guardando cambios...');
-      setShowByte(true);
-
-      // Preparar aristas para guardar (asegura que estén visibles)
-      const preparedEdges = prepareEdgesForSaving(edges);
-
-      // Usar la función del store para guardar
       const result = await saveFlow();
-
       if (result && result.success) {
-        // Actualizar estado local después de guardar
-        setHasChanges(false);
-        setByteStatus('success');
-        setByteMessage('Cambios guardados correctamente');
+        handleSaveSuccess();
       } else {
-        // Manejar error
-        setByteStatus('error');
-        setByteMessage(result?.message || 'Error al guardar los cambios');
-        // Crear respaldo local en caso de error
-        createBackup(nodes, preparedEdges);
+        handleSaveError(result, preparedEdges);
       }
     } catch (error) {
-      setByteStatus('error');
-      setByteMessage(
-        `Error al guardar: ${error.message || 'Error desconocido'}`,
-      );
-      handleError && handleError(error);
-
-      // Crear respaldo local en caso de error
-      createBackup(nodes, edges);
+      handleSaveError(error, preparedEdges);
     }
   }, [
     plubotId,
-    nodes,
     edges,
     saveFlow,
-    setByteMessage,
-    createBackup,
-    handleError,
-    setByteStatus,
     setShowByte,
+    setByteStatus,
+    setByteMessage,
+    handleSaveSuccess,
+    handleSaveError,
   ]);
 
   // Funciones para mantener el historial (complementando Zustand)
@@ -493,7 +452,7 @@ const FlowEditorInner = ({
   }, []);
 
   const onEdgeUpdateEnd = useCallback(
-    (_, edge) => {
+    (event, edge) => {
       if (!edgeUpdateSuccessful) {
         setEdges(edges.filter((e) => e.id !== edge.id));
         setHasChanges(true);
@@ -530,19 +489,21 @@ const FlowEditorInner = ({
     }
   }, [plubotId, name, flowName, setPlubotId, setFlowName]); // Corregido: dependencia actualizada
 
+  const attemptBackupRecovery = useCallback(() => {
+    const backup = recoverFromBackup();
+    if (backup && backup.nodes && backup.edges) {
+      setNodes(backup.nodes);
+      setEdges(backup.edges);
+      setBackupLoaded(true);
+    }
+  }, [recoverFromBackup, setNodes, setEdges]);
+
   // Sincronizar nodos con cambios externos si es necesario
   useEffect(() => {
     if (!isBackupLoaded && plubotId) {
-      // Intentar recuperar un respaldo si existe
-      const backup = recoverFromBackup();
-
-      if (backup && backup.nodes && backup.edges) {
-        setNodes(backup.nodes);
-        setEdges(backup.edges);
-        setBackupLoaded(true);
-      }
+      attemptBackupRecovery();
     }
-  }, [plubotId, isBackupLoaded, setNodes, setEdges, recoverFromBackup]);
+  }, [plubotId, isBackupLoaded, attemptBackupRecovery]);
 
   // Configurar listeners para mensajes de byte
   useEffect(() => {
@@ -636,6 +597,18 @@ const FlowEditorInner = ({
   );
 };
 
+FlowEditorInner.propTypes = {
+  plubotId: PropTypes.string.isRequired,
+  name: PropTypes.string.isRequired,
+  setShowConnectionEditor: PropTypes.func.isRequired,
+  setSelectedConnection: PropTypes.func.isRequired,
+  setConnectionProperties: PropTypes.func.isRequired,
+  notifyByte: PropTypes.string,
+  setByteMessage: PropTypes.func.isRequired,
+  handleError: PropTypes.func.isRequired,
+  hideContextMenu: PropTypes.func.isRequired,
+};
+
 /**
  * Componente principal FlowEditor que envuelve ReactFlowProvider
  * Proporciona un contexto global para ReactFlow y manejo de errores
@@ -711,6 +684,21 @@ const FlowEditor = ({
         )}
     </ReactFlowProvider>
   );
+};
+
+FlowEditor.propTypes = {
+  selectedNode: PropTypes.object,
+  setSelectedNode: PropTypes.func.isRequired,
+  setByteMessage: PropTypes.func.isRequired,
+  setShowConnectionEditor: PropTypes.func.isRequired,
+  setSelectedConnection: PropTypes.func.isRequired,
+  setConnectionProperties: PropTypes.func.isRequired,
+  handleError: PropTypes.func.isRequired,
+  plubotId: PropTypes.string.isRequired,
+  name: PropTypes.string.isRequired,
+  notifyByte: PropTypes.string,
+  saveFlowData: PropTypes.func.isRequired,
+  hideHeader: PropTypes.bool,
 };
 
 FlowEditor.displayName = 'FlowEditor';

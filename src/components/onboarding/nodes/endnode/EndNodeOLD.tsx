@@ -29,13 +29,12 @@ import { shallow } from 'zustand/shallow';
 
 import { useAnalytics } from '@/hooks/useAnalytics';
 import { usePermissions } from '@/hooks/usePermissions';
+import { cn } from '@/lib/utils';
 
 import type { Variable as VariableEditorVariable } from '../../ui/VariableEditor';
 
 import EndNodeContent from './EndNodeContent';
 import EndNodeHeader from './EndNodeHeader';
-
-import { cn } from '@/lib/utils';
 
 // --- CONSTANTES Y SCHEMAS ---
 const NODE_CONFIG = {

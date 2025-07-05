@@ -1,3 +1,72 @@
+/**
+ * @typedef {import('reactflow').Node} Node
+ * @typedef {import('reactflow').Edge} Edge
+ * @typedef {import('reactflow').Viewport} Viewport
+ * @typedef {import('reactflow').ReactFlowInstance} ReactFlowInstance
+ * @typedef {import('reactflow').NodeChange} NodeChange
+ * @typedef {import('reactflow').EdgeChange} EdgeChange
+ * @typedef {import('reactflow').Connection} Connection
+ */
+
+/**
+ * @typedef {object} FlowState
+ * @property {ReactFlowInstance | undefined} reactFlowInstance
+ * @property {Node[]} nodes
+ * @property {Edge[]} edges
+ * @property {Viewport} viewport
+ * @property {string | undefined} selectedNode
+ * @property {string | undefined} selectedEdge
+ * @property {boolean} isUltraMode
+ * @property {boolean} isSaving
+ * @property {Date | undefined} lastSaved
+ * @property {string | undefined} plubotId
+ * @property {string} flowName
+ * @property {boolean} isLoaded
+ * @property {boolean} loadError
+ * @property {boolean} isUndoing
+ * @property {boolean} isRedoing
+ * @property {boolean} shouldMoveToCenter
+ * @property {boolean} autoArrange
+ * @property {boolean} isBackupLoaded
+ * @property {boolean} hasChanges
+ * @property {{templateSelector: boolean, embedModal: boolean, importExportModal: boolean}} modals
+ * @property {{nodes: Node[], edges: Edge[], name: string}} previousState
+ * @property {{past: object[], future: object[], maxHistory: number}} history
+ * @property {boolean} contextMenuVisible
+ * @property {{x: number, y: number}} contextMenuPosition
+ * @property {string | undefined} contextMenuNodeId
+ * @property {any[]} contextMenuItems
+ * @property {boolean} isNodeBeingDragged
+ * @property {{FULL: number, COMPACT: number}} lodThresholds
+ * @property {{FULL: number, COMPACT: number}} defaultLodThresholds
+ */
+
+/**
+ * @typedef {object} FlowActions
+ * @property {(plubotId: string, flowName: string, options?: object) => void} resetFlow
+ * @property {(enable?: boolean, userInitiated?: boolean) => void} toggleUltraMode
+ * @property {(updates: object, forceHistory?: boolean) => void} _createHistoryEntry
+ * @property {(isDragging: boolean) => void} setIsNodeBeingDragged
+ * @property {(instance: ReactFlowInstance) => void} setReactFlowInstance
+ * @property {(thresholds: {FULL: number, COMPACT: number}) => void} setLodThresholds
+ * @property {(x: number, y: number, nodeId: string, items: any[]) => void} showContextMenu
+ * @property {() => void} hideContextMenu
+ * @property {(changes: NodeChange[]) => void} onNodesChange
+ * @property {(nodes: Node[]) => void} setNodes
+ * @property {(changes: EdgeChange[]) => void} onEdgesChange
+ * @property {(nodeType: string, position: {x: number, y: number}, userData?: object) => Node} _createNodeFromPalette
+ * @property {(decisionNode: Node) => void} _initializeDecisionNodeWithOptions
+ * @property {(nodeData: string | object, position?: {x: number, y: number}, userData?: object) => Node} addNode
+ * @property {(id: string, dataToUpdate: object) => void} updateNode
+ * @property {(nodeIdToDuplicate: string) => void} duplicateNode
+ * @property {(nodeIdToDelete: string | string[]) => void} deleteNode
+ * @property {(nodeId: string, newQuestion: string) => void} updateDecisionNodeQuestion
+ */
+
+/**
+ * @typedef {FlowState & FlowActions} FlowStore
+ */
+
 import isEqual from 'fast-deep-equal';
 import { debounce } from 'lodash';
 import { applyNodeChanges, applyEdgeChanges, addEdge } from 'reactflow';
@@ -136,6 +205,7 @@ const initialState = {
 // Crear el store de flujo con persistencia
 const useFlowStore = createWithEqualityFn(
   persist(
+    /** @type {import('zustand').StateCreator<FlowStore>} */
     (set, get) => ({
       ...initialState,
 
@@ -619,7 +689,7 @@ const useFlowStore = createWithEqualityFn(
       },
 
       updateDecisionNodeConditionText: (nodeId, conditionId, newText) => {
-        const { nodes, getConditionType, generateOptionNodes } = get();
+        const { nodes, generateOptionNodes } = get();
 
         const updatedNodes = nodes.map((node) => {
           if (node.id !== nodeId || node.type !== 'decision') {

@@ -1,7 +1,6 @@
-import PropTypes from 'prop-types';
 import { useState, useEffect } from 'react';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
-import { useNavigate, Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 import useAuthStore from '@/stores/use-auth-store';
 
@@ -60,7 +59,7 @@ const Register = () => {
     if (newPassword.length > 0) {
       if (newPassword.length >= 8) strengthValue += 25;
       if (/[A-Z]/.test(newPassword)) strengthValue += 25;
-      if (/[0-9]/.test(newPassword)) strengthValue += 25;
+      if (/\d/.test(newPassword)) strengthValue += 25;
       if (/[^A-Za-z0-9]/.test(newPassword)) strengthValue += 25;
 
       if (strengthValue <= 25) {
@@ -76,8 +75,6 @@ const Register = () => {
         feedbackText = 'Fuerte';
         color = '#00ff96';
       }
-    } else {
-      strengthValue = 0;
     }
 
     setStrength({ width: strengthValue, color, text: feedbackText });
@@ -149,10 +146,6 @@ const Register = () => {
         error?.response?.data?.message || 'Ocurrió un error inesperado.';
       showMessage(errorMessage, 'error');
     }
-  };
-
-  const handleNavigateToLogin = () => {
-    navigate('/auth/login');
   };
 
   useEffect(() => {
@@ -355,7 +348,5 @@ const Register = () => {
     </div>
   );
 };
-
-Register.propTypes = {};
 
 export default Register;

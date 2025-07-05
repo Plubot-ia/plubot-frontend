@@ -1,13 +1,11 @@
 import { Particles } from '@tsparticles/react';
 import { loadSlim } from '@tsparticles/slim';
-import { motion } from 'framer-motion';
 import { gsap } from 'gsap';
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import LazyImage from '@/components/common/LazyImage';
 import { powers } from '@/data/powers';
-import logger from '@/services/loggerService';
 import ByteGuide from '@components/pluniverse/ByteGuide.jsx';
 
 import usePlubotCreation from '../../hooks/usePlubotCreation';
@@ -35,8 +33,8 @@ const categories = [
 
 const Marketplace = () => {
   const [filter, setFilter] = useState('todos');
-  const [selectedModule, setSelectedModule] = useState(null);
-  const [notification, setNotification] = useState(null);
+  const [selectedModule, setSelectedModule] = useState();
+  const [notification, setNotification] = useState();
 
   const { plubotData, updatePlubotData, updateActiveSection } =
     usePlubotCreation();
@@ -110,7 +108,7 @@ const Marketplace = () => {
         type: 'error',
         message: 'Este poder ya está agregado.',
       });
-      setTimeout(() => setNotification(null), 3000);
+      setTimeout(() => setNotification(undefined), 3000);
       return;
     }
 
@@ -119,7 +117,7 @@ const Marketplace = () => {
         type: 'error',
         message: 'Ya has alcanzado el límite de 3 poderes.',
       });
-      setTimeout(() => setNotification(null), 3000);
+      setTimeout(() => setNotification(undefined), 3000);
       return;
     }
 
@@ -130,11 +128,11 @@ const Marketplace = () => {
       message: `¡${powers.find((module_) => module_.id === powerId).name} agregado con éxito!`,
     });
     setTimeout(() => {
-      setNotification(null);
+      setNotification(undefined);
       updateActiveSection('powerConfig');
       navigate('/plubot/create');
     }, 2000);
-    setSelectedModule(null);
+    setSelectedModule(undefined);
   };
 
   useEffect(() => {
@@ -164,9 +162,9 @@ const Marketplace = () => {
   }, [filteredModules]);
 
   useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (e.key === 'Escape') {
-        setSelectedModule(null);
+    const handleKeyDown = (event) => {
+      if (event.key === 'Escape') {
+        setSelectedModule(undefined);
       }
     };
 
@@ -222,8 +220,8 @@ const Marketplace = () => {
                 role='button'
                 tabIndex='0'
                 onClick={() => setSelectedModule(extension)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
+                onKeyDown={(event) => {
+                  if (event.key === 'Enter' || event.key === ' ') {
                     setSelectedModule(extension);
                   }
                 }}
@@ -234,8 +232,8 @@ const Marketplace = () => {
                   alt={extension.name}
                   className='extension-image'
                   placeholderColor='#1a1e3a'
-                  onError={(e) => {
-                    e.target.src =
+                  onError={(error) => {
+                    error.target.src =
                       'https://via.placeholder.com/150?text=Image+Not+Found';
                   }}
                 />
@@ -245,8 +243,8 @@ const Marketplace = () => {
                   <span className='extension-price'>Desbloquear</span>
                   <button
                     className='extension-buy-btn'
-                    onClick={(e) => {
-                      e.stopPropagation();
+                    onClick={(event) => {
+                      event.stopPropagation();
                       handleAddPower(extension.id);
                     }}
                   >
@@ -268,14 +266,14 @@ const Marketplace = () => {
           className='extension-modal-overlay'
           role='button'
           tabIndex='0'
-          onClick={(e) => {
-            if (e.target === e.currentTarget) {
-              setSelectedModule(null);
+          onClick={(event) => {
+            if (event.target === event.currentTarget) {
+              setSelectedModule(undefined);
             }
           }}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-              setSelectedModule(null);
+          onKeyDown={(event) => {
+            if (event.key === 'Enter' || event.key === ' ') {
+              setSelectedModule(undefined);
             }
           }}
         >
@@ -287,7 +285,7 @@ const Marketplace = () => {
           >
             <button
               className='close-modal-btn'
-              onClick={() => setSelectedModule(null)}
+              onClick={() => setSelectedModule(undefined)}
             >
               ×
             </button>
@@ -297,8 +295,8 @@ const Marketplace = () => {
               className='modal-image'
               placeholderColor='#1a1e3a'
               threshold={0.5}
-              onError={(e) => {
-                e.target.src =
+              onError={(error) => {
+                error.target.src =
                   'https://via.placeholder.com/200?text=Image+Not+Found';
               }}
             />

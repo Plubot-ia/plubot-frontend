@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React, { useState } from 'react';
 
 import instance from '@/utils/axios-config.js';
@@ -17,22 +18,23 @@ const AddIntegrationModal = ({
   );
   const [botToken, setBotToken] = useState(''); // Token is not pre-filled for editing, but can be updated
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState('');
 
   const handleClose = () => {
     setBotName('');
     setBotToken('');
-    setError(null);
+    setError('');
     setIsLoading(false);
     onClose();
   };
 
-  if (!isOpen) return null;
+  // eslint-disable-next-line unicorn/no-null
+  if (!isOpen) return null; // Retornar null es idiomático en React para no renderizar el componente.
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSubmit = async (event) => {
+    event.preventDefault();
     setIsLoading(true);
-    setError(null);
+    setError('');
 
     if (!botName.trim() || (!isEditMode && !botToken.trim())) {
       setError('El nombre del bot y el token son obligatorios.');
@@ -91,7 +93,7 @@ const AddIntegrationModal = ({
               type='text'
               id='botName'
               value={botName}
-              onChange={(e) => setBotName(e.target.value)}
+              onChange={(event) => setBotName(event.target.value)}
               placeholder={
                 isEditMode
                   ? integrationToEdit.integration_name
@@ -107,7 +109,7 @@ const AddIntegrationModal = ({
               type='password' // Use password type for tokens
               id='botToken'
               value={botToken}
-              onChange={(e) => setBotToken(e.target.value)}
+              onChange={(event) => setBotToken(event.target.value)}
               placeholder={
                 isEditMode
                   ? 'Ingresa un nuevo token para actualizar (opcional)'
@@ -154,6 +156,18 @@ const AddIntegrationModal = ({
       </div>
     </div>
   );
+};
+
+AddIntegrationModal.propTypes = {
+  isOpen: PropTypes.bool.isRequired,
+  onClose: PropTypes.func.isRequired,
+  onIntegrationAdded: PropTypes.func.isRequired,
+  onIntegrationUpdated: PropTypes.func.isRequired,
+  integrationToEdit: PropTypes.shape({
+    id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    integration_name: PropTypes.string,
+  }),
+  showNotification: PropTypes.func.isRequired,
 };
 
 export default AddIntegrationModal;

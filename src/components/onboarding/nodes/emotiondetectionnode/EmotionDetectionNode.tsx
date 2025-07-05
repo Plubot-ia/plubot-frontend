@@ -5,12 +5,12 @@
  * Renderiza la interfaz del nodo y conecta la lógica del hook `useEmotionDetectionNode`.
  */
 
-import clsx from 'clsx';
+import { clsx } from 'clsx';
 import { Brain } from 'lucide-react';
 import React, { memo } from 'react';
 import { Handle, Position } from 'reactflow';
 
-import type { EmotionDetectionNodeProps as EmotionDetectionNodeProperties } from './types';
+import type { EmotionDetectionNodeProperties } from './types';
 import { useEmotionDetectionNode, EMOTIONS } from './useEmotionDetectionNode';
 import './EmotionDetectionNode.css';
 
@@ -99,7 +99,7 @@ const EmotionDetectionNode: React.FC<EmotionDetectionNodeProperties> = ({
               <input
                 id={`output-var-${id}`}
                 type='text'
-                value={data.outputVariable || ''}
+                value={data.outputVariable ?? ''}
                 onChange={handleOutputVariableChange}
                 placeholder='Ej: emocion_detectada'
               />
@@ -133,6 +133,7 @@ const EmotionDetectionNode: React.FC<EmotionDetectionNodeProperties> = ({
           style={{ left: `${(index + 1) * (100 / (EMOTIONS.length + 1))}%` }}
           isConnectable
         >
+          {/* eslint-disable-next-line security/detect-object-injection */}
           <span className='emotion-handle-icon'>{EMOTION_EMOJIS[emotion]}</span>
         </Handle>
       ))}

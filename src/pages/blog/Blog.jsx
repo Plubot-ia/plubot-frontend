@@ -7,6 +7,10 @@ import logger from '../../services/loggerService';
 
 import './Blog.css';
 
+const secureRandom = () => {
+  return crypto.getRandomValues(new Uint32Array(1))[0] / (2 ** 32 - 1);
+};
+
 const badgeLevels = [
   'Explorador',
   'Aprendiz',
@@ -16,7 +20,7 @@ const badgeLevels = [
 ];
 
 const getRandomBadge = () => {
-  const index = Math.floor(Math.random() * badgeLevels.length);
+  const index = Math.floor(secureRandom() * badgeLevels.length);
 
   // The following line is a false positive for object injection.
   // The index is securely generated from a local, static array.
@@ -96,11 +100,7 @@ const Blog = () => {
             <span className='badge'>{post.badge}</span>
             <h2>{post.title}</h2>
             <p>{post.excerpt}</p>
-            <Link
-              to={`/blog/${post.slug}`}
-              className='read-more'
-              onClick={() => new Audio('/sounds/click.mp3').play()}
-            >
+            <Link to={`/blog/${post.slug}`} className='read-more'>
               Leer Más
             </Link>
           </div>

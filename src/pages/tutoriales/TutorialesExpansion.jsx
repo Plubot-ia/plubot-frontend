@@ -19,8 +19,8 @@ const TutorialesExpansion = () => {
   const [cursorPosition, setCursorPosition] = useState({ x: 0, y: 0 });
   const [isHovering, setIsHovering] = useState(false);
   const [activatedElements, setActivatedElements] = useState([]);
-  const containerReference = useRef(null);
-  const audioReference = useRef(null);
+  const containerReference = useRef(undefined);
+  const audioReference = useRef(undefined);
   const navigate = useNavigate();
 
   const phrases = useMemo(
@@ -129,264 +129,251 @@ const TutorialesExpansion = () => {
     exit: { opacity: 0, y: 30, scale: 0.95, transition: { duration: 0.5 } },
   };
 
-  return (
-    <div
-      className='tutoriales-expansion-page expansion-wrapper'
-      ref={containerReference}
-    >
-      <div className='scanner-line' />
-      <div
-        className='digital-cursor'
-        style={{
-          left: cursorPosition.x,
-          top: cursorPosition.y,
-          opacity: isHovering ? 1 : 0,
+  const renderHeader = () => (
+    <div className='tutorials-expansion-header'>
+      <h1 className='tutorials-expansion-title'>
+        EXPANSIÓN <span className='highlight'>PLUBOT</span>
+      </h1>
+      <p className='tutorials-expansion-description'>
+        Lleva tu Plubot al siguiente nivel con nuevas capacidades.
+      </p>
+    </div>
+  );
+
+  const renderByteContainer = () => (
+    <div className='expansion-byte-container'>
+      <motion.div
+        className='byte-avatar-container'
+        animate={{
+          rotateX: tilt.x,
+          rotateY: tilt.y,
+          scale: isHovering ? 1.1 : 1,
         }}
-      />
-      <div className='expansion-container'>
-        <motion.h1
-          className='glitch-title cyberpunk-text'
-          data-text='EXPANSIÓN EN EL PLUNIVERSE'
-          initial={{ opacity: 0, y: -60 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 1.2 }}
-        >
-          <span className='cyber-bracket'>[</span>
-          EXPANSIÓN EN EL PLUNIVERSE
-          <span className='cyber-bracket'>]</span>
-        </motion.h1>
+        transition={{ type: 'spring', stiffness: 260, damping: 20 }}
+      >
+        <img src={byteAvatar} alt='Byte' className='byte-avatar' />
+        <div className='byte-glow' />
+      </motion.div>
 
-        <motion.div
-          className='byte-section glass holographic-card'
-          initial={{ opacity: 0, y: 80 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ delay: 0.4, duration: 1.2 }}
-          style={{
-            transform: isHovering
-              ? `perspective(1000px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg)`
-              : 'perspective(1000px) rotateX(0) rotateY(0)',
-            transition: 'transform 0.5s ease-out',
-          }}
-          onMouseEnter={handleMouseEnter}
-          onMouseLeave={handleMouseLeave}
-        >
-          <div className='card-corner top-left' />
-          <div className='card-corner top-right' />
-          <div className='card-corner bottom-left' />
-          <div className='card-corner bottom-right' />
-
-          <motion.div
-            className='byte-floating hologram-effect'
-            animate={{
-              y: [0, -15, 0],
-              filter: [
-                'drop-shadow(0 0 15px #00ffea)',
-                'drop-shadow(0 0 25px #ff00ff)',
-                'drop-shadow(0 0 15px #00ffea)',
-              ],
-            }}
-            transition={{ repeat: Infinity, duration: 5, ease: 'easeInOut' }}
+      <motion.div
+        className='byte-speech-bubble'
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.5, duration: 0.5 }}
+      >
+        <AnimatePresence mode='wait'>
+          <motion.span
+            key={phraseIndex}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.3 }}
           >
-            <div className='avatar-container'>
-              <img src={byteAvatar} alt='Byte' className='byte-avatar' />
-              <div className='avatar-rings'>
-                <div className='ring ring1' />
-                <div className='ring ring2' />
-                <div className='ring ring3' />
+            {phrases[phraseIndex]}
+          </motion.span>
+        </AnimatePresence>
+      </motion.div>
+    </div>
+  );
+
+  const renderCardsContainer = () => (
+    <motion.div
+      className='expansion-cards-container'
+      initial='hidden'
+      animate='visible'
+      variants={{
+        visible: {
+          transition: {
+            staggerChildren: 0.2,
+          },
+        },
+      }}
+    >
+      <motion.div
+        className={`expansion-card activatable ${activatedElements.includes('plubazaar-card') ? 'activated' : ''}`}
+        variants={expandableContentVariants}
+        data-id='plubazaar-card'
+      >
+        <div className='expansion-card-icon'>💰</div>
+        <h2 className='expansion-card-title'>PluBazaar</h2>
+        <p className='expansion-card-description'>
+          Compra y vende flujos, plantillas y módulos para tu Plubot.
+        </p>
+      </motion.div>
+
+      <motion.div
+        className={`expansion-card activatable ${activatedElements.includes('coliseum-card') ? 'activated' : ''}`}
+        variants={expandableContentVariants}
+        data-id='coliseum-card'
+      >
+        <div className='expansion-card-icon'>🏆</div>
+        <h2 className='expansion-card-title'>Coliseo</h2>
+        <p className='expansion-card-description'>
+          Compite con otros creadores y gana recompensas únicas.
+        </p>
+      </motion.div>
+
+      <motion.div
+        className={`expansion-card activatable ${activatedElements.includes('premium-card') ? 'activated' : ''}`}
+        variants={expandableContentVariants}
+        data-id='premium-card'
+      >
+        <div className='expansion-card-icon'>✨</div>
+        <h2 className='expansion-card-title'>Planes Premium</h2>
+        <p className='expansion-card-description'>
+          Desbloquea todo el potencial con capacidades avanzadas.
+        </p>
+      </motion.div>
+    </motion.div>
+  );
+
+  const renderButtonContainer = () => (
+    <motion.div className='expansion-button-container'>
+      <motion.button
+        className='cyberpunk-button show-more-button'
+        onClick={() => setShowMore(!showMore)}
+        variants={buttonVariants}
+        whileHover='hover'
+        whileTap='tap'
+      >
+        <span className='button-glow' />
+        {showMore ? 'MOSTRAR MENOS' : 'MOSTRAR MÁS'}
+        <div className='button-icon'>{showMore ? '▲' : '▼'}</div>
+      </motion.button>
+    </motion.div>
+  );
+
+  const renderExpandedContent = () => (
+    <AnimatePresence>
+      {showMore && (
+        <motion.div
+          className='expanded-content'
+          initial='hidden'
+          animate='visible'
+          exit='exit'
+          variants={expandableContentVariants}
+        >
+          <div className='terminal-container'>
+            <div className='terminal-header'>
+              <div className='terminal-title'>EXPANSION.PROTOCOL</div>
+              <div className='terminal-controls'>
+                <span />
+                <span />
+                <span />
               </div>
             </div>
 
-            <AnimatePresence mode='wait'>
-              <motion.div
-                key={phraseIndex}
-                className='byte-dialog'
-                initial={{ opacity: 0, y: 15 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -15 }}
-                transition={{ duration: 0.8 }}
-              >
-                <div className='dialog-corner tl' />
-                <div className='dialog-corner tr' />
-                <div className='dialog-corner bl' />
-                <div className='dialog-corner br' />
-                {/* eslint-disable-next-line security/detect-object-injection */}
-                {phrases[phraseIndex]}
-              </motion.div>
-            </AnimatePresence>
-          </motion.div>
+            <motion.p className='expansion-text terminal-text'>
+              <span className='code-line'>
+                {'>'} Explorando nuevos poderes...
+              </span>
+              Encuentra módulos y plantillas en el PluBazaar para potenciar
+              tu Plubot.
+            </motion.p>
 
-          <div className='data-metrics'>
-            <div className='metric'>
-              <span className='metric-label'>PLUNIVERSE</span>
-              <span className='metric-value'>ONLINE</span>
-            </div>
-            <div className='metric'>
-              <span className='metric-label'>PLUBAZAAR</span>
-              <span className='metric-value'>ACTIVE</span>
-            </div>
-            <div className='metric'>
-              <span className='metric-label'>BYTE-STATUS</span>
-              <span className='metric-value'>OPERATIONAL</span>
-            </div>
+            <motion.p className='expansion-text terminal-text'>
+              <span className='code-line'>
+                {'>'} Compartiendo en PluBazaar...
+              </span>
+              Vende tus flujos y plantillas, gana PluCoins y construye tu
+              reputación.
+            </motion.p>
+
+            <motion.p className='expansion-text terminal-text'>
+              <span className='code-line'>
+                {'>'} Escalando tu negocio...
+              </span>
+              Usa múltiples Plubots para gestionar equipos y atender
+              clientes globales.
+            </motion.p>
+
+            <motion.p className='expansion-text terminal-text'>
+              <span className='code-line'>
+                {'>'} Compitiendo en el Coliseo...
+              </span>
+              Mide la eficiencia de tu Plubot y gana recompensas para tu
+              expansión.
+            </motion.p>
+
+            <motion.p className='expansion-text terminal-text'>
+              <span className='code-line'>
+                {'>'} Navegando el PluBazaar...
+              </span>
+              Compra poderes con PluCoins o adquiere módulos premium para tu
+              Plubot.
+            </motion.p>
+
+            <motion.p className='expansion-text terminal-text'>
+              <span className='code-line'>
+                {'>'} Vendiendo creaciones...
+              </span>
+              Sube flujos al PluBazaar y genera ingresos pasivos con tus
+              creaciones.
+            </motion.p>
+
+            <motion.p className='expansion-text terminal-text'>
+              <span className='code-line'>
+                {'>'} Escalando con planes Pro...
+              </span>
+              Gestiona equipos y optimiza resultados con múltiples Plubots.
+            </motion.p>
+
+            <motion.p className='expansion-text terminal-text'>
+              <span className='code-line'>
+                {'>'} Desafíos en el Coliseo...
+              </span>
+              Compite, gana medallas y usa tus recompensas para nuevos
+              poderes.
+            </motion.p>
+
+            <motion.div
+              className='expansion-cta'
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.9 }}
+            >
+              <motion.button
+                className='cyberpunk-button cta-button'
+                variants={buttonVariants}
+                whileHover='hover'
+                whileTap='tap'
+                onClick={() => {
+                  navigate('/pluniverse/marketplace');
+                  playActivationSound();
+                }}
+              >
+                <span className='button-glow' />
+                VISITA EL PLUBAZAAR
+                <div className='button-icon'>▶</div>
+              </motion.button>
+            </motion.div>
           </div>
-
-          <motion.p
-            className='expansion-text activatable'
-            data-id='text1'
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5 }}
-          >
-            En el <strong className='highlight-text'>Pluniverse</strong>, la
-            expansión es ilimitada.
-          </motion.p>
-
-          <motion.p
-            className='expansion-text activatable'
-            data-id='text2'
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.7 }}
-          >
-            Potencia tu Plubot, comparte creaciones y escala tu negocio con
-            aliados digitales.
-          </motion.p>
-
-          <motion.button
-            className='expansion-toggle cyberpunk-button'
-            variants={buttonVariants}
-            whileHover='hover'
-            whileTap='tap'
-            onClick={() => {
-              setShowMore((previous) => !previous);
-              playActivationSound();
-            }}
-          >
-            <span className='button-glow' />
-            <span className='button-text'>
-              {showMore ? 'CERRAR DATOS' : 'ACTIVAR DATOS'}
-            </span>
-            <div className='button-icon'>{showMore ? '×' : '▶'}</div>
-          </motion.button>
-
-          <AnimatePresence>
-            {showMore && (
-              <motion.div
-                className='expansion-story'
-                variants={expandableContentVariants}
-                initial='hidden'
-                animate='visible'
-                exit='exit'
-              >
-                <div className='terminal-header'>
-                  <div className='terminal-icon' />
-                  <div className='terminal-title'>EXPANSION.PROTOCOL</div>
-                  <div className='terminal-controls'>
-                    <span />
-                    <span />
-                    <span />
-                  </div>
-                </div>
-
-                <motion.p className='expansion-text terminal-text'>
-                  <span className='code-line'>
-                    {'>'} Explorando nuevos poderes...
-                  </span>
-                  Encuentra módulos y plantillas en el PluBazaar para potenciar
-                  tu Plubot.
-                </motion.p>
-
-                <motion.p className='expansion-text terminal-text'>
-                  <span className='code-line'>
-                    {'>'} Compartiendo en PluBazaar...
-                  </span>
-                  Vende tus flujos y plantillas, gana PluCoins y construye tu
-                  reputación.
-                </motion.p>
-
-                <motion.p className='expansion-text terminal-text'>
-                  <span className='code-line'>
-                    {'>'} Escalando tu negocio...
-                  </span>
-                  Usa múltiples Plubots para gestionar equipos y atender
-                  clientes globales.
-                </motion.p>
-
-                <motion.p className='expansion-text terminal-text'>
-                  <span className='code-line'>
-                    {'>'} Compitiendo en el Coliseo...
-                  </span>
-                  Mide la eficiencia de tu Plubot y gana recompensas para tu
-                  expansión.
-                </motion.p>
-
-                <motion.p className='expansion-text terminal-text'>
-                  <span className='code-line'>
-                    {'>'} Navegando el PluBazaar...
-                  </span>
-                  Compra poderes con PluCoins o adquiere módulos premium para tu
-                  Plubot.
-                </motion.p>
-
-                <motion.p className='expansion-text terminal-text'>
-                  <span className='code-line'>
-                    {'>'} Vendiendo creaciones...
-                  </span>
-                  Sube flujos al PluBazaar y genera ingresos pasivos con tus
-                  creaciones.
-                </motion.p>
-
-                <motion.p className='expansion-text terminal-text'>
-                  <span className='code-line'>
-                    {'>'} Escalando con planes Pro...
-                  </span>
-                  Gestiona equipos y optimiza resultados con múltiples Plubots.
-                </motion.p>
-
-                <motion.p className='expansion-text terminal-text'>
-                  <span className='code-line'>
-                    {'>'} Desafíos en el Coliseo...
-                  </span>
-                  Compite, gana medallas y usa tus recompensas para nuevos
-                  poderes.
-                </motion.p>
-
-                <motion.div
-                  className='expansion-cta'
-                  initial={{ opacity: 0, y: 30 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.9 }}
-                >
-                  <motion.button
-                    className='cyberpunk-button cta-button'
-                    variants={buttonVariants}
-                    whileHover='hover'
-                    whileTap='tap'
-                    onClick={() => {
-                      navigate('/pluniverse/marketplace');
-                      playActivationSound();
-                    }}
-                  >
-                    <span className='button-glow' />
-                    VISITA EL PLUBAZAAR
-                    <div className='button-icon'>▶</div>
-                  </motion.button>
-                </motion.div>
-              </motion.div>
-            )}
-          </AnimatePresence>
         </motion.div>
+      )}
+    </AnimatePresence>
+  );
 
-        <div className='interface-elements'>
-          <div className='interface-dot' />
-          <div className='interface-dot' />
-          <div className='interface-dot' />
-        </div>
+  const renderMainContent = () => (
+    <div
+      className='tutorials-expansion-container'
+      ref={containerReference}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+    >
+      {renderHeader()}
+      {renderByteContainer()}
+      {renderCardsContainer()}
+      {renderButtonContainer()}
+      {renderExpandedContent()}
+      <div className='interface-elements'>
+        <div className='interface-dot' />
+        <div className='interface-dot' />
+        <div className='interface-dot' />
       </div>
     </div>
   );
+
+  return renderMainContent();
 };
 
 export default TutorialesExpansion;

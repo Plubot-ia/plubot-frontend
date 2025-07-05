@@ -1,13 +1,77 @@
+import PropTypes from 'prop-types';
 import React, { useState, useEffect, useMemo } from 'react';
 
 import plubotLogo from '@/assets/img/logo.svg';
+
+// Función para calcular el nivel de poder basado en diferentes formatos posibles de plubot.powers
+const calculatePowerLevel = (powers) => {
+  if (!powers) return 0;
+
+  // Si powers es un string (formato: 'poder1,poder2,poder3')
+  if (typeof powers === 'string') {
+    return powers.split(',').filter((p) => p.trim()).length;
+  }
+
+  // Si powers es un array
+  if (Array.isArray(powers)) {
+    return powers.length;
+  }
+
+  // Si powers es un objeto (por ejemplo, si viene como un objeto JSON)
+  if (typeof powers === 'object') {
+    return Object.keys(powers).length;
+  }
+
+  return 0;
+};
+
+const ActionButtons = ({ onEditIdentity, onEditFlows }) => {
+  const [hoverIdentity, setHoverIdentity] = useState(false);
+  const [hoverFlows, setHoverFlows] = useState(false);
+
+  return (
+    <div className='edit-modal-buttons-container'>
+      <button
+        className={`edit-modal-identity-button cyber-button ${
+          hoverIdentity ? 'hover' : ''
+        }`}
+        onClick={onEditIdentity}
+        onMouseEnter={() => setHoverIdentity(true)}
+        onMouseLeave={() => setHoverIdentity(false)}
+      >
+        <div className='button-glitch' />
+        <span className='edit-modal-icon identity-icon'>🎨</span>
+        <span className='button-text'>Editar Identidad</span>
+        <div className='button-scanner' />
+      </button>
+
+      <button
+        className={`edit-modal-flows-button cyber-button ${
+          hoverFlows ? 'hover' : ''
+        }`}
+        onClick={onEditFlows}
+        onMouseEnter={() => setHoverFlows(true)}
+        onMouseLeave={() => setHoverFlows(false)}
+      >
+        <div className='button-glitch' />
+        <span className='edit-modal-icon flows-icon'>🔄</span>
+        <span className='button-text'>Editar Flujos</span>
+        <div className='button-scanner' />
+      </button>
+    </div>
+  );
+};
+
+ActionButtons.propTypes = {
+  onEditIdentity: PropTypes.func.isRequired,
+  onEditFlows: PropTypes.func.isRequired,
+};
 
 /**
  * Componente modal para editar un plubot
  * @param {Object} props - Propiedades del componente
  * @param {Object} props.plubot - Datos del plubot a editar
  * @param {Function} props.setEditModalPlubot - Función para cerrar el modal
-
  * @param {Function} props.showNotification - Función para mostrar notificaciones
  * @param {Function} props.navigate - Función de navegación
  */
@@ -17,43 +81,22 @@ const EditPlubotModal = ({
   showNotification,
   navigate,
 }) => {
-  const [hoverIdentity, setHoverIdentity] = useState(false);
-  const [hoverFlows, setHoverFlows] = useState(false);
   const [particleEffect, setParticleEffect] = useState(false);
   const particleData = useMemo(
     () =>
       Array.from({ length: 12 }, (_, index) => ({
         key: `particle-effect-${index}`,
         style: {
+          // eslint-disable-next-line sonarjs/pseudo-random
           left: `${Math.random() * 100}%`,
+          // eslint-disable-next-line sonarjs/pseudo-random
           animationDelay: `${Math.random() * 2}s`,
+          // eslint-disable-next-line sonarjs/pseudo-random
           animationDuration: `${3 + Math.random() * 5}s`,
         },
       })),
     [],
   );
-
-  // Función para calcular el nivel de poder basado en diferentes formatos posibles de plubot.powers
-  const calculatePowerLevel = (powers) => {
-    if (!powers) return 0;
-
-    // Si powers es un string (formato: 'poder1,poder2,poder3')
-    if (typeof powers === 'string') {
-      return powers.split(',').filter((p) => p.trim()).length;
-    }
-
-    // Si powers es un array
-    if (Array.isArray(powers)) {
-      return powers.length;
-    }
-
-    // Si powers es un objeto (por ejemplo, si viene como un objeto JSON)
-    if (typeof powers === 'object') {
-      return Object.keys(powers).length;
-    }
-
-    return 0;
-  };
 
   // Efecto para mostrar partículas al abrir el modal
   useEffect(() => {
@@ -81,12 +124,33 @@ const EditPlubotModal = ({
     navigate(`/plubot/edit/personalization?plubotId=${plubot.id}`);
   };
 
+  const handleEditFlows = () => {
+    if (!plubot.id) {
+      showNotification(
+        'Error: ID del Plubot no válido. Por favor, crea un nuevo plubot.',
+        'error',
+      );
+      setEditModalPlubot(undefined);
+      return;
+    }
+
+    // Efecto de sonido (opcional)
+    const audio = new Audio('/assets/sounds/click.mp3');
+    audio.volume = 0.3;
+    audio.play().catch(() => {
+      /* Suppress audio play errors */
+    });
+
+    // Navegar a la pantalla de entrenamiento/edición con el ID del plubot
+    navigate(`/plubot/edit/training/${plubot.id}`);
+  };
+
   return (
     <div
       className='modal-overlay modal-overlay-immediate'
       onClick={() => setEditModalPlubot(undefined)}
-      onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
+      onKeyDown={(event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
           setEditModalPlubot(undefined);
         }
       }}
@@ -151,57 +215,20 @@ const EditPlubotModal = ({
           Selecciona una opción para modificar las características de tu Plubot.
         </p>
 
-        <div className='edit-modal-buttons-container'>
-          <button
-            className={`edit-modal-identity-button cyber-button ${hoverIdentity ? 'hover' : ''}`}
-            onClick={handleEditIdentity}
-            onMouseEnter={() => setHoverIdentity(true)}
-            onMouseLeave={() => setHoverIdentity(false)}
-          >
-            <div className='button-glitch' />
-            <span className='edit-modal-icon identity-icon'>🎨</span>
-            <span className='button-text'>Editar Identidad</span>
-            <div className='button-scanner' />
-          </button>
-
-          <button
-            className={`edit-modal-flows-button cyber-button ${hoverFlows ? 'hover' : ''}`}
-            onClick={() => {
-              if (!plubot.id) {
-                showNotification(
-                  'Error: ID del Plubot no válido. Por favor, crea un nuevo plubot.',
-                  'error',
-                );
-                setEditModalPlubot(undefined);
-                return;
-              }
-
-              // Efecto de sonido (opcional)
-              const audio = new Audio('/assets/sounds/click.mp3');
-              audio.volume = 0.3;
-              audio.play().catch(() => {
-                /* Suppress audio play errors */
-              });
-
-              // Navegar a la pantalla de entrenamiento/edición con el ID del plubot
-              navigate(`/plubot/edit/training/${plubot.id}`);
-            }}
-            onMouseEnter={() => setHoverFlows(true)}
-            onMouseLeave={() => setHoverFlows(false)}
-          >
-            <div className='button-glitch' />
-            <span className='edit-modal-icon flows-icon'>🔄</span>
-            <span className='button-text'>Editar Flujos</span>
-            <div className='button-scanner' />
-          </button>
-        </div>
+        <ActionButtons
+          onEditIdentity={handleEditIdentity}
+          onEditFlows={handleEditFlows}
+        />
 
         <div className='modal-power-level'>
           <div className='power-bar'>
             <div
               className='power-fill'
               style={{
-                width: `${Math.min(100, calculatePowerLevel(plubot.powers) * 20)}%`,
+                width: `${Math.min(
+                  100,
+                  calculatePowerLevel(plubot.powers) * 20,
+                )}%`,
               }}
             />
           </div>
@@ -215,6 +242,21 @@ const EditPlubotModal = ({
       </div>
     </div>
   );
+};
+
+EditPlubotModal.propTypes = {
+  plubot: PropTypes.shape({
+    id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+    name: PropTypes.string,
+    powers: PropTypes.oneOfType([
+      PropTypes.string,
+      PropTypes.array,
+      PropTypes.object,
+    ]),
+  }).isRequired,
+  setEditModalPlubot: PropTypes.func.isRequired,
+  showNotification: PropTypes.func.isRequired,
+  navigate: PropTypes.func.isRequired,
 };
 
 export default EditPlubotModal;

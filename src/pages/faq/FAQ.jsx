@@ -3,16 +3,21 @@ import React, { useState, useEffect, useRef, useMemo } from 'react';
 
 import logo from '@assets/img/logo.svg';
 
+// Función de ayuda para generar números aleatorios más seguros
+const secureRandom = () => {
+  return crypto.getRandomValues(new Uint32Array(1))[0] / (2 ** 32 - 1);
+};
+
 import './FAQ.css';
 
 const FAQ = () => {
-  const [expanded, setExpanded] = useState(null);
+  const [expanded, setExpanded] = useState();
   const [searchTerm, setSearchTerm] = useState('');
   const [filteredFaqs, setFilteredFaqs] = useState([]);
   const [activeCategory, setActiveCategory] = useState('Todos');
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
-  const particlesContainerReference = useRef(null);
+  const particlesContainerReference = useRef(undefined);
 
   const categories = [
     'Todos',
@@ -270,7 +275,7 @@ const FAQ = () => {
   const currentFaqs = filteredFaqs.slice(startIndex, endIndex);
 
   const toggleFAQ = (index) => {
-    setExpanded(expanded === index ? null : index);
+    setExpanded(expanded === index ? undefined : index);
     if (expanded !== index && particlesContainerReference.current) {
       const clickWave = document.createElement('div');
       clickWave.classList.add('click-wave');
@@ -290,15 +295,15 @@ const FAQ = () => {
       particle.classList.add('interactive-particle');
       particle.style.left = `${x}px`;
       particle.style.top = `${y}px`;
-      const hue = Math.floor(Math.random() * 60) + 240;
+      const hue = Math.floor(secureRandom() * 60) + 240;
       particle.style.backgroundColor = `hsl(${hue}, 100%, 70%)`;
-      const size = Math.random() * 6 + 3;
+      const size = secureRandom() * 6 + 3;
       particle.style.width = `${size}px`;
       particle.style.height = `${size}px`;
       particlesContainerReference.current.append(particle);
       setTimeout(() => {
-        const angle = Math.random() * Math.PI * 2;
-        const distance = Math.random() * 50 + 30;
+        const angle = secureRandom() * Math.PI * 2;
+        const distance = secureRandom() * 50 + 30;
         const xEnd = Math.cos(angle) * distance;
         const yEnd = Math.sin(angle) * distance;
         particle.style.transform = `translate(${xEnd}px, ${yEnd}px)`;
@@ -312,25 +317,25 @@ const FAQ = () => {
     }
   };
 
-  const handleClick = (e) => {
-    createParticlesBurst(e.clientX, e.clientY);
+  const handleClick = (event) => {
+    createParticlesBurst(event.clientX, event.clientY);
   };
 
   const goToPage = (page) => {
-    setExpanded(null);
+    setExpanded(undefined);
     setCurrentPage(page);
   };
 
   const goToPreviousPage = () => {
     if (currentPage > 1) {
-      setExpanded(null);
+      setExpanded(undefined);
       setCurrentPage(currentPage - 1);
     }
   };
 
   const goToNextPage = () => {
     if (currentPage < totalPages) {
-      setExpanded(null);
+      setExpanded(undefined);
       setCurrentPage(currentPage + 1);
     }
   };
@@ -393,7 +398,7 @@ const FAQ = () => {
               type='text'
               placeholder='Buscar preguntas...'
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={(event) => setSearchTerm(event.target.value)}
               className='faq-search-input'
             />
             <span className='faq-search-icon'>🔍</span>
@@ -443,8 +448,8 @@ const FAQ = () => {
                       tabIndex='0'
                       className='faq-question'
                       onClick={() => toggleFAQ(startIndex + index)}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' || e.key === ' ') {
+                      onKeyDown={(event) => {
+                        if (event.key === 'Enter' || event.key === ' ') {
                           toggleFAQ(startIndex + index);
                         }
                       }}
@@ -498,7 +503,10 @@ const FAQ = () => {
             >
               <motion.button
                 className='pagination-btn'
-                onClick={goToPreviousPage}
+                onClick={(event) => {
+                  goToPreviousPage();
+                  event.preventDefault();
+                }}
                 disabled={currentPage === 1}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
@@ -513,7 +521,10 @@ const FAQ = () => {
                   <motion.button
                     key={pageNumber}
                     className={`pagination-page ${currentPage === pageNumber ? 'active' : ''}`}
-                    onClick={() => goToPage(pageNumber)}
+                    onClick={(event) => {
+                      goToPage(pageNumber);
+                      event.preventDefault();
+                    }}
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.9 }}
                   >
@@ -523,7 +534,10 @@ const FAQ = () => {
               </div>
               <motion.button
                 className='pagination-btn'
-                onClick={goToNextPage}
+                onClick={(event) => {
+                  goToNextPage();
+                  event.preventDefault();
+                }}
                 disabled={currentPage === totalPages}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}

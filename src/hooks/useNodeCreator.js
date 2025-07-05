@@ -15,7 +15,7 @@ import { generateId } from '@/services/flowService';
  * @returns {Object} Mu00e9todos para crear y conectar nodos
  */
 const useNodeCreator = (addNode, addEdge, getNodePosition) => {
-  const lastCreatedNodeReference = useRef(null);
+  const lastCreatedNodeReference = useRef(undefined);
 
   const configureNodeByType = useCallback((nodeBase, type, data = {}) => {
     const node = { ...nodeBase };
@@ -97,13 +97,7 @@ const useNodeCreator = (addNode, addEdge, getNodePosition) => {
   );
 
   const connectNodes = useCallback(
-    (
-      sourceId,
-      targetId,
-      sourceHandle = null,
-      targetHandle = null,
-      data = {},
-    ) => {
+    (sourceId, targetId, sourceHandle, targetHandle, data = {}) => {
       const edgeId = generateId('edge');
 
       const edge = {

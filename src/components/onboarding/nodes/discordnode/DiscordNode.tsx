@@ -16,6 +16,18 @@ export interface DiscordNodeData {
   lodLevel?: string;
 }
 
+// Interfaces para el tipado de la API de Discord
+interface DiscordIntegration {
+  id: string;
+  status: string;
+  bot_token?: string;
+  token_error?: string;
+}
+
+interface IntegrationsApiResponse {
+  integrations: DiscordIntegration[];
+}
+
 const DiscordNode: React.FC<NodeProps<DiscordNodeData>> = ({
   id,
   data,
@@ -45,7 +57,7 @@ const DiscordNode: React.FC<NodeProps<DiscordNodeData>> = ({
       <br />
       Para obtenerlo, activa el Modo Desarrollador en Discord (Ajustes de
       Usuario &gt; Avanzado), luego haz clic derecho en el canal y selecciona
-      'Copiar ID'.
+      &apos;Copiar ID&apos;.
       <br />
       <button
         className='discord-node__tooltip-button'
@@ -60,10 +72,10 @@ const DiscordNode: React.FC<NodeProps<DiscordNodeData>> = ({
   const { setNodes } = useReactFlow(); // Hook to update node data
 
   // Initialize state from data, providing defaults
-  const [discordToken, setDiscordToken] = useState(data.discordToken || '');
-  const [channelId, setChannelId] = useState(data.channelId || '');
+  const [discordToken, setDiscordToken] = useState(data.discordToken ?? '');
+  const [channelId, setChannelId] = useState(data.channelId ?? '');
   const [messageContent, setMessageContent] = useState(
-    data.messageContent || '',
+    data.messageContent ?? '',
   );
   const [isLoadingProfileToken, setIsLoadingProfileToken] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -76,28 +88,34 @@ const DiscordNode: React.FC<NodeProps<DiscordNodeData>> = ({
       setIsLoadingProfileToken(true);
       try {
         // 1. Obtener la lista de integraciones
-        const listResponse = await instance.get('discord-integrations/');
+        const listResponse = await instance.get<IntegrationsApiResponse>(
+          'discord-integrations/',
+        );
         if (
           listResponse.data?.integrations &&
           listResponse.data.integrations.length > 0
         ) {
           // 2. Buscar la primera integración activa
           const activeIntegration = listResponse.data.integrations.find(
-            (int: any) => int.status === 'active',
+            (integration) => integration.status === 'active',
           );
 
           if (activeIntegration?.id) {
             // 3. Si se encuentra una activa, obtener sus detalles (que ahora incluyen el token)
             try {
-              const detailResponse = await instance.get(
+              const detailResponse = await instance.get<DiscordIntegration>(
                 `/discord-integrations/${activeIntegration.id}`,
               );
               if (detailResponse.data?.bot_token) {
                 setDiscordToken(detailResponse.data.bot_token);
               } else if (detailResponse.data?.token_error) {
+                // Opcional: manejar el error de token, por ejemplo, mostrar un mensaje
               } else {
+                // Opcional: manejar el caso en que no hay ni token ni error
               }
-            } catch {}
+            } catch {
+              // Error al obtener los detalles de la integración, no es necesario notificar
+            }
           }
         }
       } catch {
@@ -107,7 +125,7 @@ const DiscordNode: React.FC<NodeProps<DiscordNodeData>> = ({
       }
     };
 
-    fetchProfileToken();
+    void fetchProfileToken();
   }, [data.discordToken]); // Solo se ejecuta si data.discordToken cambia (o al montar si es undefined)
 
   const { label = 'Discord Node', icon = '🎮' } = data || {};
@@ -151,7 +169,7 @@ const DiscordNode: React.FC<NodeProps<DiscordNodeData>> = ({
       />
       <div className='discord-node__header'>
         <span className='discord-node__icon'>{icon}</span>
-        {data.label || label}{' '}
+        {data.label ?? label}{' '}
         {/* Use data.label if available, otherwise default */}
       </div>
       <div className='discord-node__content'>
@@ -160,7 +178,11 @@ const DiscordNode: React.FC<NodeProps<DiscordNodeData>> = ({
             <div className='discord-node__label-group'>
               <label htmlFor={`token-${id}`}>Token del Bot:</label>
               <Tooltip content={tokenTooltipContent} position='top'>
-                <span className='discord-node__info-icon' tabIndex={0}>
+                <span
+                  className='discord-node__info-icon'
+                  role='button'
+                  tabIndex={0}
+                >
                   ?
                 </span>
               </Tooltip>
@@ -179,7 +201,11 @@ const DiscordNode: React.FC<NodeProps<DiscordNodeData>> = ({
             <div className='discord-node__label-group'>
               <label htmlFor={`channel-${id}`}>ID del Canal:</label>
               <Tooltip content={channelTooltipContent} position='top'>
-                <span className='discord-node__info-icon' tabIndex={0}>
+                <span
+                  className='discord-node__info-icon'
+                  role='button'
+                  tabIndex={0}
+                >
                   ?
                 </span>
               </Tooltip>

@@ -8,7 +8,7 @@ import { useEffect, useRef } from 'react';
  * que recibirá el efecto de inclinación.
  */
 const useCardTiltEffect = () => {
-  const cardRef = useRef(null);
+  const cardRef = useRef(undefined);
 
   useEffect(() => {
     const element = cardRef.current;

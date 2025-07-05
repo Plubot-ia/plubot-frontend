@@ -1,14 +1,13 @@
 import { motion } from 'framer-motion';
 import { useState, useEffect } from 'react';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
-import { useLocation, useNavigate, Link } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 import useAuthStore from '@/stores/use-auth-store';
 
 import useWindowSize from '../../hooks/useWindowSize';
 
 import GoogleAuthButton from './GoogleAuthButton';
-
 import './Login.css';
 
 const Login = () => {

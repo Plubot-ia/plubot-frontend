@@ -36,7 +36,7 @@ const useFlowOptimization = ({
   enabled = true,
   throttle = 32,
   idleTimeout = 2000,
-  onIdleChange = null,
+  onIdleChange,
 } = {}) => {
   // Utilizar nuestro sistema unificado de rendimiento
   const {

@@ -13,6 +13,7 @@ import './TransparentOverlay.css';
  */
 const TransparentOverlay = ({ isVisible, message }) => {
   if (!isVisible) {
+    // eslint-disable-next-line unicorn/no-null
     return null;
   }
 

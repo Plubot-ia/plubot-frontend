@@ -1,4 +1,5 @@
 import { motion, useAnimation, AnimatePresence } from 'framer-motion';
+import PropTypes from 'prop-types';
 import React, {
   useState,
   useEffect,
@@ -8,12 +9,16 @@ import React, {
   memo,
 } from 'react';
 
-import LazyImage from '@/components/common/LazyImage';
 import axiosInstance from '@/utils/axios-config.js';
 
 import useWindowSize from '../../hooks/useWindowSize';
 
 import './Contact.css';
+
+// Función de ayuda para generar números aleatorios más seguros
+const secureRandom = () => {
+  return crypto.getRandomValues(new Uint32Array(1))[0] / (2 ** 32 - 1);
+};
 
 // Variantes para animaciones (definidas fuera del componente para evitar recreaciones)
 const containerVariants = {
@@ -44,19 +49,19 @@ const itemVariants = {
 const Particle = memo(({ index }) => {
   // Valores pre-calculados para evitar cálculos en cada renderizado
   const { width, height } = useWindowSize();
-  const initialX = useMemo(() => Math.random() * (width || 0), [width]);
-  const initialY = useMemo(() => Math.random() * (height || 0), [height]);
-  const targetX = useMemo(() => Math.random() * (width || 0), [width]);
-  const targetY = useMemo(() => Math.random() * (height || 0), [height]);
-  const duration = useMemo(() => Math.random() * 15 + 20, []);
-  const initialOpacity = useMemo(() => Math.random() * 0.4 + 0.2, []);
+  const initialX = useMemo(() => secureRandom() * (width || 0), [width]);
+  const initialY = useMemo(() => secureRandom() * (height || 0), [height]);
+  const targetX = useMemo(() => secureRandom() * (width || 0), [width]);
+  const targetY = useMemo(() => secureRandom() * (height || 0), [height]);
+  const duration = useMemo(() => secureRandom() * 15 + 20, []);
+  const initialOpacity = useMemo(() => secureRandom() * 0.4 + 0.2, []);
   const bgColor = useMemo(
     () =>
-      `rgb(${Math.random() * 80}, ${Math.random() * 200}, ${Math.random() * 255 + 180})`,
+      `rgb(${secureRandom() * 80}, ${secureRandom() * 200}, ${secureRandom() * 255 + 180})`,
     [],
   );
-  const shadowSize = useMemo(() => Math.random() * 8 + 4, []);
-  const size = useMemo(() => Math.random() * 8 + 2, []);
+  const shadowSize = useMemo(() => secureRandom() * 8 + 4, []);
+  const size = useMemo(() => secureRandom() * 8 + 2, []);
   const uniqueId = useMemo(() => `particle-${index}`, [index]);
 
   return (
@@ -88,13 +93,17 @@ const Particle = memo(({ index }) => {
   );
 });
 
+Particle.propTypes = {
+  index: PropTypes.string.isRequired,
+};
+
 Particle.displayName = 'Particle';
 
 const NeuralNode = memo(({ index }) => {
-  const duration = useMemo(() => Math.random() * 3 + 2, []);
-  const delay = useMemo(() => Math.random() * 1.5, []);
-  const left = useMemo(() => `${Math.random() * 100}%`, []);
-  const top = useMemo(() => `${Math.random() * 100}%`, []);
+  const duration = useMemo(() => secureRandom() * 3 + 2, []);
+  const delay = useMemo(() => secureRandom() * 1.5, []);
+  const left = useMemo(() => `${secureRandom() * 100}%`, []);
+  const top = useMemo(() => `${secureRandom() * 100}%`, []);
   const uniqueId = useMemo(() => `neural-node-${index}`, [index]);
 
   return (
@@ -114,6 +123,10 @@ const NeuralNode = memo(({ index }) => {
     />
   );
 });
+
+NeuralNode.propTypes = {
+  index: PropTypes.string.isRequired,
+};
 
 NeuralNode.displayName = 'NeuralNode';
 
@@ -155,6 +168,17 @@ const InputField = memo(
   },
 );
 
+InputField.propTypes = {
+  type: PropTypes.string,
+  name: PropTypes.string.isRequired,
+  placeholder: PropTypes.string.isRequired,
+  value: PropTypes.string.isRequired,
+  onChange: PropTypes.func.isRequired,
+  onFocus: PropTypes.func.isRequired,
+  onBlur: PropTypes.func.isRequired,
+  isActive: PropTypes.bool.isRequired,
+};
+
 InputField.displayName = 'InputField';
 
 const Contact = () => {
@@ -166,10 +190,10 @@ const Contact = () => {
   const [formMessage, setFormMessage] = useState({ text: '', status: '' });
   const [connectionStrength, setConnectionStrength] = useState(0);
   const [isFormVisible, setIsFormVisible] = useState(false);
-  const [activeField, setActiveField] = useState(null);
+  const [activeField, setActiveField] = useState();
   const [loading, setLoading] = useState(false);
 
-  const formReference = useRef(null);
+  const formReference = useRef(undefined);
   const controls = useAnimation();
   const titleControls = useAnimation();
 
@@ -217,7 +241,8 @@ const Contact = () => {
     }
 
     if (formData.email) {
-      const isValidEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email);
+      const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+      const isValidEmail = emailRegex.test(formData.email);
       strength += isValidEmail ? 35 : 20;
     }
 
@@ -238,10 +263,10 @@ const Contact = () => {
   }, [calculateStrength]);
 
   // Handlers memoizados para evitar recreaciones en cada renderizado
-  const handleChange = useCallback((e) => {
+  const handleChange = useCallback((event) => {
     setFormData((previous) => ({
       ...previous,
-      [e.target.name]: e.target.value,
+      [event.target.name]: event.target.value,
     }));
   }, []);
 
@@ -267,7 +292,7 @@ const Contact = () => {
   );
 
   const handleBlur = useCallback(() => {
-    setActiveField(null);
+    setActiveField(undefined);
     controls.start({
       boxShadow: '0 0 20px rgba(0, 255, 234, 0.3)',
       transition: { duration: 0.5 },
@@ -275,8 +300,8 @@ const Contact = () => {
   }, [controls]);
 
   const handleSubmit = useCallback(
-    async (e) => {
-      e.preventDefault();
+    async (event) => {
+      event.preventDefault();
       setLoading(true);
       setFormMessage({ text: '', status: '' });
 

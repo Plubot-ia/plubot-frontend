@@ -21,7 +21,7 @@ const Tutoriales = () => {
   const [cursorPosition, setCursorPosition] = useState({ x: 0, y: 0 });
   const [isHovering, setIsHovering] = useState(false);
   const [activatedElements, setActivatedElements] = useState([]);
-  const containerReference = useRef(null);
+  const containerReference = useRef(undefined);
 
   // Optimización: useMemo para evitar recreaciones innecesarias
   const phrases = useMemo(

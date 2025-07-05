@@ -19,8 +19,8 @@ const TutorialesAprendizaje = () => {
   const [cursorPosition, setCursorPosition] = useState({ x: 0, y: 0 });
   const [isHovering, setIsHovering] = useState(false);
   const [activatedElements, setActivatedElements] = useState([]);
-  const containerReference = useRef(null);
-  const audioReference = useRef(null);
+  const containerReference = useRef(undefined);
+  const audioReference = useRef(undefined);
 
   const phrases = useMemo(
     () => [

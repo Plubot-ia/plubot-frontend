@@ -5,7 +5,7 @@
     "build": "vite build",
     "dev": "vite",
     "preview": "vite preview",
-    "lint": "eslint . --max-warnings 0 --no-cache"
+    "lint": "eslint 'src/**/*.{js,jsx,ts,tsx}' --max-warnings 0 --no-cache"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
@@ -73,6 +73,7 @@
     "eslint": "^9.29.0",
     "eslint-config-prettier": "^10.1.5",
     "eslint-import-resolver-alias": "^1.1.2",
+    "eslint-import-resolver-typescript": "^4.4.4",
     "eslint-import-resolver-vite": "^2.1.0",
     "eslint-plugin-import": "^2.32.0",
     "eslint-plugin-jsx-a11y": "^6.10.2",

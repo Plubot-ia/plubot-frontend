@@ -84,7 +84,7 @@ export default function usePlubotLoader({
         useFlowStore.getState().setFlowName(plubotData.name);
       }
     } else if (!plubotIdFromUrl) {
-      useFlowStore.getState().resetFlow(null, 'Flujo sin título', {
+      useFlowStore.getState().resetFlow(undefined, 'Flujo sin título', {
         skipLoad: true,
         allowResetFromLoader: true,
       });

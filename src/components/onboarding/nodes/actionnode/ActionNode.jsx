@@ -18,14 +18,10 @@ const areActionNodePropertiesEqual = (previousProperties, nextProperties) => {
     return false;
   }
 
-  if (
-    JSON.stringify(previousProperties.data) !==
+  return (
+    JSON.stringify(previousProperties.data) ===
     JSON.stringify(nextProperties.data)
-  ) {
-    return false;
-  }
-
-  return true;
+  );
 };
 
 const ACTION_TYPES = [
@@ -44,7 +40,7 @@ const ParameterFields = memo(
     const inputReferences = useRef({});
 
     const renderInputField = useCallback(
-      (key, placeholder, type = 'text', options = null) => {
+      (key, placeholder, type = 'text', options) => {
         const adjustHeight = (reference) => {
           if (reference.current) {
             reference.current.style.height = 'auto';
@@ -249,7 +245,7 @@ const ParameterFields = memo(
         );
       }
       default: {
-        return <></>;
+        break;
       }
     }
   },
@@ -501,13 +497,13 @@ const ActionNode = ({ data, isConnectable = true, selected = false, id }) => {
               <textarea
                 ref={textareaReference}
                 value={editDescription}
-                onChange={(e) => setEditDescription(e.target.value)}
+                onChange={(event) => setEditDescription(event.target.value)}
                 placeholder='Añade una descripción clara&hellip;'
                 className='action-node-textarea'
               />
               <select
                 value={editActionType}
-                onChange={(e) => setEditActionType(e.target.value)}
+                onChange={(event) => setEditActionType(event.target.value)}
                 className='action-node-select'
               >
                 <option value=''>Selecciona un tipo de acción&hellip;</option>
@@ -534,9 +530,9 @@ const ActionNode = ({ data, isConnectable = true, selected = false, id }) => {
                   type='button'
                   onClick={handleSaveChanges}
                   className='action-node-button-save'
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      handleSaveChanges(e);
+                  onKeyDown={(event) => {
+                    if (event.key === 'Enter' || event.key === ' ') {
+                      handleSaveChanges(event);
                     }
                   }}
                 >
@@ -586,11 +582,6 @@ ActionNode.propTypes = {
   id: PropTypes.string.isRequired,
   isConnectable: PropTypes.bool,
   selected: PropTypes.bool,
-};
-
-ActionNode.defaultProps = {
-  isConnectable: true,
-  selected: false,
 };
 
 ActionNode.displayName = 'ActionNode';
