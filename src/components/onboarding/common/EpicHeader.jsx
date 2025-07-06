@@ -1,34 +1,24 @@
-import PropTypes from 'prop-types';
-import React, { useState, useEffect, useRef } from 'react';
-import './EpicHeader.css';
 import {
   Save,
   Share2,
   Monitor,
   LayoutTemplate,
   MoreHorizontal,
-  History,
-  Settings,
-  Database,
-  BarChart2,
 } from 'lucide-react';
+import PropTypes from 'prop-types';
+import React, { useState, useEffect, useRef } from 'react';
 
-import BackupManager from '@/components/flow/BackupManager';
-// Importar el contexto global
-
-// Importar fuente Orbitron para el estilo cyberpunk
 import '@fontsource/orbitron/400.css';
-import '@fontsource/orbitron/700.css';
 
-// Importar los stores y selectores de Zustand
-import { useSyncService } from '@/services/syncService'; // Importar el servicio de sincronización
+import useGlobalContext from '@/hooks/useGlobalContext';
+import useSyncService from '@/services/syncService';
 import { useFlowMeta, useFlowNodesEdges } from '@/stores/selectors';
 import useAuthStore from '@/stores/use-auth-store';
 import useTrainingStore from '@/stores/use-training-store';
 
-import useGlobalContext from '../../../hooks/useGlobalContext';
-
-import StatusBubble from './StatusBubble'; // Importar la burbuja de estado
+import OptionsMenu from './OptionsMenu';
+import StatusBubble from './StatusBubble';
+import './EpicHeader.css';
 
 const EpicHeader = ({
   onCloseModals = () => {
@@ -107,7 +97,7 @@ const EpicHeader = ({
 
   // Estado para el menú desplegable de opciones
   const [optionsMenuOpen, setOptionsMenuOpen] = useState(false);
-  const optionsMenuReference = useRef(null);
+  const optionsMenuRef = useRef(null);
 
   // Estados para el botón de guardado
   const [isSaving, setSavingIndicator] = useState(false);
@@ -131,7 +121,7 @@ const EpicHeader = ({
   useEffect(() => {
     if (saveStatus) {
       saveTimeoutReference.current = setTimeout(() => {
-        setSaveStatus(null);
+        setSaveStatus(undefined);
       }, 3000);
     }
 
@@ -146,8 +136,8 @@ const EpicHeader = ({
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (
-        optionsMenuReference.current &&
-        !optionsMenuReference.current.contains(event.target)
+        optionsMenuRef.current &&
+        !optionsMenuRef.current.contains(event.target)
       ) {
         setOptionsMenuOpen(false);
       }
@@ -158,6 +148,49 @@ const EpicHeader = ({
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
+
+  const handleLogoClick = () => {
+    // Emitir evento para cerrar todos los modales y volver al editor
+    if (closeAllModals) closeAllModals();
+    // Si hay una función onCloseModals proporcionada, llamarla
+    if (onCloseModals) onCloseModals();
+  };
+
+  const handleOpenVersionHistory = () => {
+    // Cerrar el menú de opciones
+    setOptionsMenuOpen(false);
+    // Emitir evento para abrir el historial de versiones
+    globalThis.dispatchEvent(new CustomEvent('open-version-history'));
+  };
+
+  const handleOpenImportExport = () => {
+    setOptionsMenuOpen(false);
+    if (showOptionsModal) {
+      showOptionsModal();
+    }
+  };
+
+  const handleOpenSettingsModal = () => {
+    setOptionsMenuOpen(false);
+
+    // Cerrar todos los modales antes de abrir uno nuevo
+    if (closeAllModals) closeAllModals();
+
+    // Emitir evento para abrir el modal de configuración
+    globalThis.dispatchEvent(new CustomEvent('open-settings-modal'));
+
+    if (typeof finalSettingsModal === 'function') {
+      try {
+        finalSettingsModal();
+      } catch {}
+    }
+  };
+
+  const handleOpenPathAnalysis = () => {
+    setOptionsMenuOpen(false);
+    // Emitir evento para abrir el modal de análisis de ruta
+    globalThis.dispatchEvent(new CustomEvent('open-route-analysis'));
+  };
 
   // Formatear la fecha de última guardado
   const formatLastSaved = () => {
@@ -311,27 +344,35 @@ const EpicHeader = ({
         {/* Contenido del encabezado */}
         <div className='epic-header-left'>
           {/* Al hacer clic en el logo o en el nombre, se vuelve al editor y se cierran los modales */}
-          <img
-            src={logoSource}
-            alt='Plubot Logo'
-            className='epic-header-logo'
-            loading='eager' // Carga prioritaria
-            draggable='false' // Evita arrastrar accidentalmente
-            onClick={() => {
-              // Emitir evento para cerrar todos los modales y volver al editor
-              if (closeAllModals) closeAllModals();
-              // Si hay una función onCloseModals proporcionada, llamarla
-              if (onCloseModals) onCloseModals();
+          <div
+            role='button'
+            tabIndex={0}
+            onClick={handleLogoClick}
+            onKeyDown={(event) => {
+              if (event.key === 'Enter' || event.key === ' ') {
+                handleLogoClick();
+              }
             }}
             style={{ cursor: 'pointer' }}
             title='Volver al editor'
-          />
+            aria-label='Volver al editor'
+          >
+            <img
+              src={logoSource}
+              alt='Plubot Logo'
+              className='epic-header-logo'
+              loading='eager' // Carga prioritaria
+              draggable='false' // Evita arrastrar accidentalmente
+            />
+          </div>
           <div
-            onClick={() => {
-              // Emitir evento para cerrar todos los modales y volver al editor
-              if (closeAllModals) closeAllModals();
-              // Si hay una función onCloseModals proporcionada, llamarla
-              if (onCloseModals) onCloseModals();
+            role='button'
+            tabIndex={0}
+            onClick={handleLogoClick}
+            onKeyDown={(event) => {
+              if (event.key === 'Enter' || event.key === ' ') {
+                handleLogoClick();
+              }
             }}
             style={{ cursor: 'pointer' }}
             title='Volver al editor'
@@ -496,7 +537,7 @@ const EpicHeader = ({
             <span>Compartir</span>
           </button>
 
-          <div className='epic-header-dropdown' ref={optionsMenuReference}>
+          <div className='epic-header-dropdown' ref={optionsMenuRef}>
             <button
               className='epic-header-button'
               onClick={() => setOptionsMenuOpen((previous) => !previous)}
@@ -508,114 +549,17 @@ const EpicHeader = ({
 
             {/* Menú desplegable dentro del mismo contenedor para mantener la referencia */}
             {optionsMenuOpen && (
-              <div className='epic-header-dropdown-menu'>
-                {plubotId && (
-                  <div className='epic-header-dropdown-item'>
-                    <History size={16} className='epic-header-dropdown-icon' />
-                    <span>Copias de seguridad</span>
-                    <div className='epic-header-dropdown-action'>
-                      <BackupManager plubotId={plubotId} />
-                    </div>
-                  </div>
-                )}
-
-                {/* Historial de versiones */}
-                <div
-                  className='epic-header-dropdown-item clickable'
-                  onClick={() => {
-                    // Cerrar el menú de opciones
-                    setOptionsMenuOpen(false);
-                    // Emitir evento para abrir el historial de versiones
-                    globalThis.dispatchEvent(
-                      new CustomEvent('open-version-history'),
-                    );
-                  }}
-                >
-                  <History size={16} className='epic-header-dropdown-icon' />
-                  <span>Historial de versiones</span>
-                </div>
-
-                {/* Importar / Exportar */}
-                <div
-                  className='epic-header-dropdown-item clickable'
-                  onClick={() => {
-                    setOptionsMenuOpen(false);
-                    if (showOptionsModal) {
-                      showOptionsModal();
-                    }
-                  }}
-                >
-                  <Database size={16} className='epic-header-dropdown-icon' />
-                  <span>Importar / Exportar</span>
-                </div>
-
-                {/* Estadísticas de rendimiento */}
-                <div className='epic-header-dropdown-item'>
-                  <BarChart2 size={16} className='epic-header-dropdown-icon' />
-                  <span>Estadísticas de rendimiento</span>
-                  <div className='epic-header-dropdown-content'>
-                    <div className='performance-stats-mini'>
-                      <div className='performance-stats-row'>
-                        <span className='performance-stats-label'>
-                          Memoria estimada:
-                        </span>
-                        <span className='performance-stats-value'>
-                          {nodes.length * 2 + edges.length * 1.5} KB
-                        </span>
-                      </div>
-                      <div className='performance-stats-row'>
-                        <span className='performance-stats-label'>
-                          Tiempo de guardado:
-                        </span>
-                        <span className='performance-stats-value'>
-                          {lastSaved
-                            ? `${((Date.now() - new Date(lastSaved)) / 1000).toFixed(1)} s`
-                            : 'N/A'}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div
-                  className='epic-header-dropdown-item clickable'
-                  onClick={() => {
-                    setOptionsMenuOpen(false);
-
-                    // Cerrar todos los modales antes de abrir uno nuevo
-                    if (closeAllModals) closeAllModals();
-
-                    // Emitir evento para abrir el modal de configuración
-                    globalThis.dispatchEvent(
-                      new CustomEvent('open-settings-modal'),
-                    );
-
-                    if (typeof finalSettingsModal === 'function') {
-                      try {
-                        finalSettingsModal();
-                      } catch {}
-                    }
-                  }}
-                >
-                  <Settings size={16} className='epic-header-dropdown-icon' />
-                  <span>Configuración del flujo</span>
-                </div>
-
-                <div
-                  className='epic-header-dropdown-item clickable'
-                  onClick={() => {
-                    setOptionsMenuOpen(false);
-
-                    // Emitir evento para abrir el modal de análisis de ruta
-                    globalThis.dispatchEvent(
-                      new CustomEvent('open-route-analysis'),
-                    );
-                  }}
-                >
-                  <Database size={16} className='epic-header-dropdown-icon' />
-                  <span>Análisis de rutas</span>
-                </div>
-              </div>
+              <OptionsMenu
+                ref={optionsMenuRef}
+                plubotId={plubotId}
+                onOpenVersionHistory={handleOpenVersionHistory}
+                onOpenImportExport={handleOpenImportExport}
+                onOpenSettingsModal={handleOpenSettingsModal}
+                onOpenPathAnalysis={handleOpenPathAnalysis}
+                nodes={nodes}
+                edges={edges}
+                lastSaved={lastSaved}
+              />
             )}
           </div>
         </div>

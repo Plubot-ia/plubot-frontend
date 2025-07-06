@@ -137,10 +137,7 @@ const TutorialesAutomatizacion = () => {
   };
 
   return (
-    <div
-      className='tutoriales-automatizacion-page automatizacion-wrapper'
-      ref={containerReference}
-    >
+    <div className='tutoriales-page about-wrapper' ref={containerReference}>
       <div className='scanner-line' />
       <div
         className='digital-cursor'
@@ -150,7 +147,7 @@ const TutorialesAutomatizacion = () => {
           opacity: isHovering ? 1 : 0,
         }}
       />
-      <div className='automatizacion-container'>
+      <div className='about-container'>
         <motion.h1
           className='glitch-title cyberpunk-text'
           data-text='AUTOMATIZACIÓN'
@@ -174,7 +171,7 @@ const TutorialesAutomatizacion = () => {
         </motion.div>
 
         <motion.div
-          className='automatizacion-card glass holographic-card'
+          className='about-card glass holographic-card'
           initial={{ opacity: 0, y: 80 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -203,14 +200,12 @@ const TutorialesAutomatizacion = () => {
             <div className='avatar-container'>
               <img
                 src={byteAvatar}
-                alt='Byte el guía'
+                alt='Byte, el guía de automatización'
                 className='byte-avatar'
               />
-              <div className='avatar-rings'>
-                <div className='ring ring1' />
-                <div className='ring ring2' />
-                <div className='ring ring3' />
-              </div>
+              <div className='ring ring1' />
+              <div className='ring ring2' />
+              <div className='ring ring3' />
             </div>
 
             <AnimatePresence mode='wait'>
@@ -248,7 +243,7 @@ const TutorialesAutomatizacion = () => {
           </div>
 
           <motion.p
-            className='automatizacion-text activatable'
+            className='expansion-text activatable'
             data-id='text1'
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -260,7 +255,7 @@ const TutorialesAutomatizacion = () => {
           </motion.p>
 
           <motion.p
-            className='automatizacion-text activatable'
+            className='expansion-text activatable'
             data-id='text2'
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -271,7 +266,7 @@ const TutorialesAutomatizacion = () => {
           </motion.p>
 
           <motion.button
-            className='automatizacion-toggle cyberpunk-button'
+            className='cyberpunk-button'
             variants={buttonVariants}
             whileHover='hover'
             whileTap='tap'
@@ -290,7 +285,7 @@ const TutorialesAutomatizacion = () => {
           <AnimatePresence>
             {showMore && (
               <motion.div
-                className='automatizacion-story'
+                className='expansion-story'
                 variants={expandableContentVariants}
                 initial='hidden'
                 animate='visible'
@@ -306,14 +301,14 @@ const TutorialesAutomatizacion = () => {
                   </div>
                 </div>
 
-                <motion.p className='automatizacion-text terminal-text'>
+                <motion.p className='expansion-text terminal-text'>
                   <span className='code-line'>
                     {'>'} Iniciando protocolo de automatización...
                   </span>
                   Byte te guía para crear flujos que eliminan el trabajo manual.
                 </motion.p>
 
-                <motion.p className='automatizacion-text terminal-text'>
+                <motion.p className='expansion-text terminal-text'>
                   <span className='code-line'>
                     {'>'} Analizando procesos...
                   </span>
@@ -322,7 +317,7 @@ const TutorialesAutomatizacion = () => {
                 </motion.p>
 
                 <motion.div
-                  className='automatizacion-cta'
+                  className='expansion-cta'
                   initial={{ opacity: 0, y: 30 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.9 }}

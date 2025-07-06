@@ -4,6 +4,10 @@ import { useSearchParams, useNavigate } from 'react-router-dom'; // Cambiar useP
 import useAPI from '../../hooks/useAPI';
 import FlowEditor from '../onboarding/flow-editor/FlowEditor';
 
+// No-operation function for props that are not used in this context.
+// eslint-disable-next-line no-empty-function
+const noOp = () => {};
+
 const PlubotEdit = () => {
   const [searchParameters] = useSearchParams(); // Usar useSearchParams
   const plubotId = searchParameters.get('plubotId'); // Obtener plubotId de los parámetros de consulta
@@ -126,10 +130,6 @@ const PlubotEdit = () => {
       </div>
     );
   }
-
-  // No-operation function for props that are not used in this context.
-  // eslint-disable-next-line no-empty-function
-  const noOp = () => {};
 
   return (
     <FlowEditor

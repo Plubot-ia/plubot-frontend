@@ -84,11 +84,6 @@ const { TRANSITION_DURATION } = NODE_CONFIG;
  * Tipos de mensajes disponibles
  * @type {Object}
  */
-
-/**
- * Tipos de mensajes disponibles
- * @type {Object}
- */
 const MESSAGE_TYPES = {
   USER: 'user', // Mensaje del usuario
   BOT: 'bot', // Respuesta del bot
@@ -148,7 +143,7 @@ const typeToTitle = (type) => {
 const MessagePreview = memo(
   ({ message = '', variables = [], isUltraPerformanceMode = false }) => {
     const [isExpanded, setIsExpanded] = useState(false);
-    const messageReference = useRef(null);
+    const messageReference = useRef();
     const [isTruncated, setIsTruncated] = useState(false);
 
     // Formatear mensaje con variables
@@ -333,8 +328,11 @@ const VariableEditor = ({
    * @param {string} value - Nuevo valor
    */
   const handleVariableChange = useCallback(
-    (index, field, value) => {
-      onUpdateVariable(index, { ...variables[index], [field]: value });
+    (id, field, value) => {
+      const variableToUpdate = variables.find((v) => v.id === id);
+      if (variableToUpdate) {
+        onUpdateVariable(id, { ...variableToUpdate, [field]: value });
+      }
     },
     [variables, onUpdateVariable],
   );
@@ -344,7 +342,7 @@ const VariableEditor = ({
    * @param {Event} e - Evento de teclado
    */
   const handleKeyDown = useCallback(
-    (e) => {
+    (event) => {
       if (event.key === 'Enter') {
         handleSubmitAdd();
       } else if (event.key === 'Escape') {
@@ -461,9 +459,9 @@ Son como etiquetas para guardar información que cambia, como el nombre de un cl
         aria-label='Lista de variables'
       >
         {variables &&
-          variables.map((variable, index) => (
+          variables.map((variable) => (
             <div
-              key={`var-${index}`}
+              key={variable.id}
               className='message-node__variable'
               role='listitem'
             >
@@ -471,20 +469,20 @@ Son como etiquetas para guardar información que cambia, como el nombre de un cl
                 type='text'
                 value={variable.name}
                 onChange={(event) =>
-                  handleVariableChange(index, 'name', event.target.value)
+                  handleVariableChange(variable.id, 'name', event.target.value)
                 }
                 className='message-node__variable-name'
-                aria-label={`Nombre de variable ${index + 1}`}
+                aria-label={`Nombre de variable ${variable.name}`}
                 disabled={isUltraPerformanceMode}
               />
               <input
                 type='text'
                 value={variable.value}
                 onChange={(event) =>
-                  handleVariableChange(index, 'value', event.target.value)
+                  handleVariableChange(variable.id, 'value', event.target.value)
                 }
                 className='message-node__variable-value'
-                aria-label={`Valor de variable ${index + 1}`}
+                aria-label={`Valor de variable ${variable.name}`}
                 disabled={isUltraPerformanceMode}
               />
               {!isUltraPerformanceMode && (
@@ -492,7 +490,7 @@ Son como etiquetas para guardar información que cambia, como el nombre de un cl
                   <button
                     type='button'
                     className='message-node__variable-button message-node__variable-button--delete'
-                    onClick={() => onDeleteVariable(index)}
+                    onClick={() => onDeleteVariable(variable.id)}
                     aria-label={`Eliminar variable ${variable.name || 'sin nombre'}`}
                   >
                     <Trash2 size={14} aria-hidden='true' />
@@ -597,69 +595,67 @@ MessageNodeHeader.propTypes = {
   disableAnimations: PropTypes.bool, // PropType para disableAnimations
 };
 
-const MessageNodeEditor = memo(
-  ({ id, message, variables, DEFAULT_MESSAGE, editorActions }) => {
-    const {
-      handleMessageChange,
-      handleSave,
-      handleCancel,
-      handleAddVariable,
-      handleUpdateVariable,
-      handleDeleteVariable,
-    } = editorActions;
+const MessageNodeEditor = memo(({ id, message, variables, editorActions }) => {
+  const {
+    handleMessageChange,
+    handleSave,
+    handleCancel,
+    handleAddVariable,
+    handleUpdateVariable,
+    handleDeleteVariable,
+  } = editorActions;
 
-    return (
-      <>
-        <textarea
-          className='message-node__textarea nodrag'
-          value={message}
-          onChange={handleMessageChange}
-          placeholder={placeholder}
-          aria-label='Editor de mensaje'
-          rows={4}
-          onKeyDown={(event) => {
-            if (event.key === 'Escape') {
-              event.stopPropagation();
-              handleCancel();
-            }
-            if (event.key === 'Enter' && !event.shiftKey) {
-              event.preventDefault();
-              handleSave();
-            }
-          }}
-        />
-        <VariableEditor
-          nodeId={id}
-          variables={variables}
-          onAddVariable={handleAddVariable}
-          onUpdateVariable={handleUpdateVariable}
-          onDeleteVariable={handleDeleteVariable}
-          isUltraPerformanceMode={false} // Siempre es false cuando se está editando
-        />
-        <div className='message-node__editor-actions'>
-          <Tooltip content='Guardar cambios (Ctrl+Enter o Cmd+Enter)'>
-            <button
-              onClick={handleSave}
-              className='message-node__editor-button message-node__editor-button--save'
-              aria-label='Guardar mensaje'
-            >
-              <Send size={14} /> Guardar
-            </button>
-          </Tooltip>
-          <Tooltip content='Descartar cambios (Esc)'>
-            <button
-              onClick={handleCancel}
-              className='message-node__editor-button message-node__editor-button--cancel'
-              aria-label='Cancelar edición'
-            >
-              <X size={14} /> Cancelar
-            </button>
-          </Tooltip>
-        </div>
-      </>
-    );
-  },
-);
+  return (
+    <>
+      <textarea
+        className='message-node__textarea nodrag'
+        value={message}
+        onChange={handleMessageChange}
+        placeholder={placeholder}
+        aria-label='Editor de mensaje'
+        rows={4}
+        onKeyDown={(event) => {
+          if (event.key === 'Escape') {
+            event.stopPropagation();
+            handleCancel();
+          }
+          if (event.key === 'Enter' && !event.shiftKey) {
+            event.preventDefault();
+            handleSave();
+          }
+        }}
+      />
+      <VariableEditor
+        nodeId={id}
+        variables={variables}
+        onAddVariable={handleAddVariable}
+        onUpdateVariable={handleUpdateVariable}
+        onDeleteVariable={handleDeleteVariable}
+        isUltraPerformanceMode={false} // Siempre es false cuando se está editando
+      />
+      <div className='message-node__editor-actions'>
+        <Tooltip content='Guardar cambios (Ctrl+Enter o Cmd+Enter)'>
+          <button
+            onClick={handleSave}
+            className='message-node__editor-button message-node__editor-button--save'
+            aria-label='Guardar mensaje'
+          >
+            <Send size={14} /> Guardar
+          </button>
+        </Tooltip>
+        <Tooltip content='Descartar cambios (Esc)'>
+          <button
+            onClick={handleCancel}
+            className='message-node__editor-button message-node__editor-button--cancel'
+            aria-label='Cancelar edición'
+          >
+            <X size={14} /> Cancelar
+          </button>
+        </Tooltip>
+      </div>
+    </>
+  );
+});
 
 MessageNodeEditor.displayName = 'MessageNodeEditor';
 
@@ -667,7 +663,6 @@ MessageNodeEditor.propTypes = {
   id: PropTypes.string.isRequired,
   message: PropTypes.string,
   variables: PropTypes.array,
-  DEFAULT_MESSAGE: PropTypes.string,
   editorActions: PropTypes.shape({
     handleMessageChange: PropTypes.func.isRequired,
     handleSave: PropTypes.func.isRequired,
@@ -877,14 +872,14 @@ const MessageNodeComponent = ({
   // Estados locales (preservando exactamente el comportamiento original)
 
   // screenToFlowPosition se obtiene de useReactFlow, pero no lo usaremos aquí directamente para el menú contextual global.
-  // eslint-disable-next-line unicorn/no-null
-  const [editState, setEditState] = useState(null);
+
+  const [editState, setEditState] = useState();
   const editStateReference = useRef(editState);
   editStateReference.current = editState;
 
   // El modo de edición se deriva de la existencia de `editState`.
   // Este es el patrón de estado derivado: una única fuente de verdad.
-  const isEditing = editState !== null;
+  const isEditing = editState !== undefined;
 
   const [nodeState, setNodeState] = useState({ isSaving: false });
   const { showContextMenu } = useContextMenu();
@@ -914,7 +909,7 @@ const MessageNodeComponent = ({
   // Compatibilidad con el setNodes proporcionado por props
 
   // Referencias
-  const nodeReference = useRef(null);
+  const nodeReference = useRef();
 
   // Hooks personalizados eliminados ya que implementamos la lógica directamente
 
@@ -937,7 +932,7 @@ const MessageNodeComponent = ({
   const saveChanges = useCallback(() => {
     const currentEditState = editStateReference.current;
     if (!currentEditState || !currentEditState.message) {
-      setEditState(null);
+      setEditState(undefined);
       return;
     }
 
@@ -948,7 +943,7 @@ const MessageNodeComponent = ({
       variables: currentEditState.variables,
     });
 
-    setEditState(null);
+    setEditState(undefined);
     updateNodeInternals(id);
 
     setTimeout(() => {
@@ -967,8 +962,7 @@ const MessageNodeComponent = ({
    * Cancelar edición y restaurar valores originales
    */
   const cancelEdit = useCallback(() => {
-    // eslint-disable-next-line unicorn/no-null
-    setEditState(null);
+    setEditState(undefined);
   }, [setEditState]);
 
   /**
@@ -991,7 +985,10 @@ const MessageNodeComponent = ({
     (newVariable) => {
       setEditState((previous) => ({
         ...previous,
-        variables: [...(previous.variables || []), newVariable],
+        variables: [
+          ...(previous.variables || []),
+          { ...newVariable, id: Date.now() },
+        ],
       }));
     },
     [setEditState],
@@ -1001,11 +998,11 @@ const MessageNodeComponent = ({
    * Actualizar una variable existente
    */
   const handleUpdateVariable = useCallback(
-    (index, updatedVariable) => {
+    (variableId, updatedVariable) => {
       setEditState((previous) => ({
         ...previous,
-        variables: previous.variables.map((v, index_) =>
-          index_ === index ? updatedVariable : v,
+        variables: previous.variables.map((v) =>
+          v.id === variableId ? updatedVariable : v,
         ),
       }));
     },
@@ -1016,10 +1013,10 @@ const MessageNodeComponent = ({
    * Eliminar una variable
    */
   const handleDeleteVariable = useCallback(
-    (index) => {
+    (variableId) => {
       setEditState((previous) => ({
         ...previous,
-        variables: previous.variables.filter((_, index_) => index_ !== index),
+        variables: previous.variables.filter((v) => v.id !== variableId),
       }));
     },
     [setEditState],
@@ -1034,7 +1031,10 @@ const MessageNodeComponent = ({
     } else {
       setEditState({
         message: safeData.message || placeholder,
-        variables: safeData.variables || [],
+        variables: (safeData.variables || []).map((v, index) => ({
+          ...v,
+          id: v.id || Date.now() + index,
+        })),
       });
     }
   }, [
@@ -1151,7 +1151,7 @@ const MessageNodeComponent = ({
     //   styles.outline = '2px solid var(--message-node-primary, #2563eb)';
     // }
     return styles;
-  }, [isUltraMode, selected, safeData, lodLevel]); // Dependencias correctas: isUltraMode y selected del alcance del componente
+  }, []);
 
   // Dependencias del efecto (zoomLevel removido ya que isUltraMode lo cubre)
 
@@ -1170,7 +1170,6 @@ const MessageNodeComponent = ({
       data-testid='message-node'
       aria-labelledby={`message-node-title-${id}`}
       role='group'
-      tabIndex={0}
     >
       {(() => {
         const handleProperties = {

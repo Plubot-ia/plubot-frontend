@@ -1,8 +1,20 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import React, { useState, useEffect } from 'react';
 
-import { useSyncService, getSyncState } from '@/services/syncService';
+import useSyncService, { getSyncState } from '@/services/syncService';
 import './SyncButton.css';
+
+// Funciones helper movidas fuera del componente para optimización
+const getStatusColor = () => {
+  return '#00FF66'; // Verde neón brillante
+};
+
+const getSyncStatusText = (details) => {
+  if (details.isSyncing) return 'Sincronizando...';
+  if (details.syncStatus === 'success') return 'Sincronizado';
+  if (details.syncStatus === 'error') return 'Error';
+  return 'Listo';
+};
 
 /**
  * Botón de sincronización para el editor de flujos
@@ -11,11 +23,11 @@ import './SyncButton.css';
  */
 const SyncButton = () => {
   const [isExpanded, setIsExpanded] = useState(false);
-  const [syncDetails, setSyncDetails] = useState(null);
-  const [statusBubble, setStatusBubble] = useState(null); // Estado para la burbuja de notificación
+  const [syncDetails, setSyncDetails] = useState();
+  const [statusBubble, setStatusBubble] = useState(); // Estado para la burbuja de notificación
 
   // Usar el servicio de sincronización
-  const { syncState, syncAllPlubots } = useSyncService();
+  const { syncAllPlubots } = useSyncService();
 
   // Actualizar estado y detalles de sincronización
   useEffect(() => {
@@ -34,8 +46,8 @@ const SyncButton = () => {
   };
 
   // Forzar sincronización manual con notificación
-  const handleSync = async (e) => {
-    e.stopPropagation();
+  const handleSync = async (event) => {
+    event.stopPropagation();
     setStatusBubble({
       type: 'syncing',
       message: '⌛ Sincronizando cambios...',
@@ -53,7 +65,7 @@ const SyncButton = () => {
         message: `❌ Error: ${error.message || 'Error inesperado'}`,
       });
     } finally {
-      setTimeout(() => setStatusBubble(null), 3000);
+      setTimeout(() => setStatusBubble(undefined), 3000);
     }
   };
 
@@ -63,19 +75,6 @@ const SyncButton = () => {
 
     // Siempre mostrar el checkmark para un diseño más limpio
     return '✓'; // Checkmark simple y moderno
-  };
-
-  // Siempre usar el color verde neón para un diseño más limpio
-  const getStatusColor = () => {
-    return '#00FF66'; // Verde neón brillante
-  };
-
-  // Helper para obtener el texto del estado de sincronización
-  const getSyncStatusText = (details) => {
-    if (details.isSyncing) return 'Sincronizando...';
-    if (details.syncStatus === 'success') return 'Sincronizado';
-    if (details.syncStatus === 'error') return 'Error';
-    return 'Listo';
   };
 
   // Si no hay detalles de sincronización, mostrar indicador de carga

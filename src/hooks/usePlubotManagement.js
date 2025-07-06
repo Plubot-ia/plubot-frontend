@@ -41,33 +41,36 @@ export const usePlubotManagement = (showNotification) => {
         }
       } catch (error) {
         logger.error('Error al eliminar Plubot:', error);
-        const apiError = error.response?.data || {};
-        if (apiError.response?.status === 404) {
-          setUnremovablePlubots((previous) => {
-            if (previous.includes(plubotId)) {
-              return previous;
-            }
-            return [...previous, plubotId];
-          });
-          showNotification(
-            'Plubot no encontrado en el servidor. Puedes forzar su eliminación de esta lista si persiste.',
-            'warning',
-          );
-        } else if (
-          apiError.response?.status === 401 ||
-          apiError.message?.includes('sesión')
-        ) {
-          navigate('/login');
-          showNotification(
-            'Tu sesión ha expirado. Por favor, inicia sesión de nuevo.',
-            'error',
-          );
-        } else {
-          const errorMessage = apiError.message || 'Error de red o desconocido';
-          showNotification(
-            `Error al eliminar Plubot: ${errorMessage.slice(0, 50)}...`,
-            'error',
-          );
+        const status = error.response?.status;
+        const message =
+          error.response?.data?.message || 'Error de red o desconocido';
+
+        switch (status) {
+          case 401: {
+            showNotification(
+              'Tu sesión ha expirado. Por favor, inicia sesión de nuevo.',
+              'error',
+            );
+            navigate('/login');
+            break;
+          }
+          case 404: {
+            setUnremovablePlubots((previous) =>
+              previous.includes(plubotId) ? previous : [...previous, plubotId],
+            );
+            showNotification(
+              'Plubot no encontrado. Puedes forzar su eliminación de la lista.',
+              'warning',
+            );
+            break;
+          }
+          default: {
+            showNotification(
+              `Error al eliminar Plubot: ${message.slice(0, 50)}...`,
+              'error',
+            );
+            break;
+          }
         }
       } finally {
         setDeletingPlubotIds((previous) =>
@@ -80,10 +83,11 @@ export const usePlubotManagement = (showNotification) => {
 
   const handleForceRemovePlubot = useCallback(
     (plubotId) => {
-      if (user && Array.isArray(user.plubots)) {
-        const updatedPlubots = user.plubots.filter((p) => p.id !== plubotId);
-        const updatedUser = { ...user, plubots: updatedPlubots };
-        setUser(updatedUser);
+      if (user?.plubots) {
+        const updatedPlubots = user.plubots.filter(
+          (plubot) => plubot.id !== plubotId,
+        );
+        setUser({ ...user, plubots: updatedPlubots });
         showNotification('Plubot eliminado de la vista local', 'success');
         setUnremovablePlubots((previous) =>
           previous.filter((id) => id !== plubotId),
@@ -97,16 +101,16 @@ export const usePlubotManagement = (showNotification) => {
     setDeleteConfirmState({ isOpen: true, plubot });
   }, []);
 
-  const cancelDeletePlubot = () => {
+  const cancelDeletePlubot = useCallback(() => {
     setDeleteConfirmState({ isOpen: false, plubot: undefined });
-  };
+  }, []);
 
-  const confirmDeletePlubot = () => {
+  const confirmDeletePlubot = useCallback(() => {
     if (deleteConfirmState.plubot) {
       handleDeletePlubot(deleteConfirmState.plubot.id);
     }
     cancelDeletePlubot();
-  };
+  }, [deleteConfirmState.plubot, handleDeletePlubot, cancelDeletePlubot]);
 
   return {
     deletingPlubotIds,

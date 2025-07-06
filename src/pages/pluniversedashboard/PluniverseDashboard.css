@@ -15,9 +15,9 @@
   
   .pluniverse-dashboard .dashboard-title {
     position: absolute;
-    top: 10%; /* Posicionado dentro del main, ajustado para estar visible */
+    top: 65%;
     left: 50%;
-    transform: translateX(-50%);
+    transform: translate(-50%, -50%);
     color: white;
     font-size: 2rem;
     z-index: 2;
@@ -96,7 +96,7 @@
     }
   
     .pluniverse-dashboard .dashboard-title {
-      top: 5%; /* Ajustado para pantallas pequeñas */
+      top: 50%; /* Centrado para pantallas pequeñas */
       font-size: 1.5rem;
     }
   
@@ -147,7 +147,7 @@
   
     .pluniverse-dashboard .dashboard-title {
       font-size: 1.2rem;
-      top: 3%;
+      top: 50%;
     }
   
     .pluniverse-dashboard .map-region {

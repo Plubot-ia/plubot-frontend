@@ -186,11 +186,9 @@ const Tutoriales = () => {
                 alt='Byte el guía'
                 className='byte-avatar'
               />
-              <div className='avatar-rings'>
-                <div className='ring ring1' />
-                <div className='ring ring2' />
-                <div className='ring ring3' />
-              </div>
+              <div className='ring ring1' />
+              <div className='ring ring2' />
+              <div className='ring ring3' />
             </div>
 
             <AnimatePresence mode='wait'>
@@ -272,7 +270,7 @@ const Tutoriales = () => {
           <AnimatePresence>
             {showMore && (
               <motion.div
-                className='about-story'
+                className='expansion-story'
                 variants={expandableContentVariants}
                 initial='hidden'
                 animate='visible'
@@ -288,7 +286,7 @@ const Tutoriales = () => {
                   </div>
                 </div>
 
-                <motion.p className='about-text terminal-text'>
+                <motion.p className='expansion-text terminal-text'>
                   <span className='code-line'>
                     {'>'} Iniciando secuencia de datos...
                   </span>
@@ -296,7 +294,7 @@ const Tutoriales = () => {
                   guiar a los nuevos creadores.
                 </motion.p>
 
-                <motion.p className='about-text terminal-text'>
+                <motion.p className='expansion-text terminal-text'>
                   <span className='code-line'>
                     {'>'} Analizando registros de usuario...
                   </span>
@@ -323,7 +321,7 @@ const Tutoriales = () => {
                   </Link>
                 </motion.div>
 
-                <motion.p className='about-text-glow'>
+                <motion.p className='expansion-text-glow'>
                   <span className='code-line'>
                     {'>'} Mensaje del Pluniverse:
                   </span>

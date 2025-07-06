@@ -1,6 +1,6 @@
 // src/hooks/useKeyboardShortcuts.ts
 // Cross-platform keyboard-shortcut hook (replaces previous stub)
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useCallback } from 'react';
 
 /**
  * Map of keyboard shortcut strings to handler functions.
@@ -51,14 +51,12 @@ function eventMatches(event: KeyboardEvent, spec: ParsedShortcut): boolean {
 /**
  * React hook to attach global keyboard shortcuts.
  *
- * @param shortcuts Map of key patterns to handlers.
+ * @param shortcuts Map of key patterns to handlers. The hook will update if this object's reference changes.
  * @param active    Enable/disable the shortcuts.
- * @param deps      Extra deps to re-attach the listener when they change.
  */
 export const useKeyboardShortcuts = (
   shortcuts: ShortcutMap,
-  active: boolean = true,
-  deps: unknown[] = [],
+  active = true,
 ): void => {
   // Pre-parse the shortcuts only when `shortcuts` changes
   const parsedShortcuts = useMemo(() => {
@@ -68,10 +66,8 @@ export const useKeyboardShortcuts = (
     }));
   }, [shortcuts]);
 
-  useEffect(() => {
-    if (!active) return;
-
-    const handleKeyDown = (event: KeyboardEvent) => {
+  const handleKeyDown = useCallback(
+    (event: KeyboardEvent) => {
       // Ignore if focus is on input/textarea/contentEditable
       const target = event.target as HTMLElement;
       if (
@@ -93,14 +89,18 @@ export const useKeyboardShortcuts = (
           break; // stop on first match
         }
       }
-    };
+    },
+    [parsedShortcuts],
+  );
+
+  useEffect(() => {
+    if (!active) return;
 
     document.addEventListener('keydown', handleKeyDown, { capture: true });
     return () => {
       document.removeEventListener('keydown', handleKeyDown, { capture: true });
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [active, parsedShortcuts, ...deps]);
+  }, [active, handleKeyDown]);
 };
 
 export default useKeyboardShortcuts;

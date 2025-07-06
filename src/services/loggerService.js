@@ -16,7 +16,7 @@ const isProduction = import.meta.env.MODE === 'production';
 const logger = {
   /**
    * Registra un mensaje de información general.
-   * @param {...any} args - Argumentos a registrar.
+   * @param {...any} arguments_ - Argumentos a registrar.
    */
   log: (...arguments_) => {
     if (!isProduction) {
@@ -27,7 +27,7 @@ const logger = {
 
   /**
    * Registra un mensaje de advertencia.
-   * @param {...any} args - Argumentos a registrar.
+   * @param {...any} arguments_ - Argumentos a registrar.
    */
   warn: (...arguments_) => {
     if (!isProduction) {
@@ -38,7 +38,7 @@ const logger = {
 
   /**
    * Registra un mensaje de error.
-   * @param {...any} args - Argumentos a registrar.
+   * @param {...any} arguments_ - Argumentos a registrar.
    */
   error: (...arguments_) => {
     if (!isProduction) {
@@ -51,7 +51,7 @@ const logger = {
 
   /**
    * Registra un mensaje de información detallada (verbose).
-   * @param {...any} args - Argumentos a registrar.
+   * @param {...any} arguments_ - Argumentos a registrar.
    */
   info: (...arguments_) => {
     if (!isProduction) {

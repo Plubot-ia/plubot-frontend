@@ -28,31 +28,10 @@ const useNode = ({
   const nodeReference = useRef(undefined);
   const resizeObserver = useRef(undefined);
 
-  // Añadir defensas para hooks
-  const analytics = useAnalytics() || {};
-  const {
-    trackNodeEdit = () => {
-      /* Placeholder */
-    },
-    trackNodeConnected = () => {
-      /* Placeholder */
-    },
-  } = analytics;
-  const history = useNodeHistory() || {};
-  const {
-    addToHistory = () => {
-      /* Placeholder */
-    },
-  } = history;
-  const permissions = usePermissions() || {};
-  const { canEdit = true, canDelete = true } = permissions;
-  const reactFlow = useReactFlow() || {};
-  const {
-    getNode = () => {},
-    setNodes: setFlowNodes = () => {
-      /* Placeholder */
-    },
-  } = reactFlow;
+  const { trackNodeEdit } = useAnalytics() || {};
+  const { addToHistory } = useNodeHistory() || {};
+  const { canEdit = true, canDelete = true } = usePermissions() || {};
+  const { getNode } = useReactFlow() || {};
 
   const initialWidth = data.width || minWidth;
   const initialHeight = data.height || minHeight;
@@ -98,47 +77,38 @@ const useNode = ({
   }, [id, minWidth, minHeight, onNodesChange]);
 
   useEffect(() => {
-    const handleMouseMove = (e) => {
+    const handleMouseMove = (event) => {
       if (!isResizing || !nodeReference.current) return;
+
+      const node = getNode(id);
+      if (!node) return;
+
+      const newWidth = Math.max(minWidth, node.width + event.movementX);
+      const newHeight = Math.max(minHeight, node.height + event.movementY);
+
       onNodesChange([
-        {
-          type: 'change',
-          item: {
-            id,
-            width: Math.max(
-              minWidth,
-              (getNode(id)?.width || initialWidth) + e.movementX,
-            ),
-            height: Math.max(
-              minHeight,
-              (getNode(id)?.height || initialHeight) + e.movementY,
-            ),
-          },
-        },
+        { type: 'change', item: { id, width: newWidth, height: newHeight } },
       ]);
     };
 
     const handleMouseUp = () => {
-      if (isResizing) {
-        setIsResizing(false);
-        const node = getNode(id);
-        if (node) {
-          trackNodeEdit(id, 'resize', {
-            width: node.width,
-            height: node.height,
-          });
-        }
+      setIsResizing(false);
+      const node = getNode(id);
+      if (node) {
+        trackNodeEdit?.(id, 'resize', {
+          width: node.width,
+          height: node.height,
+        });
       }
     };
 
     if (isResizing) {
       globalThis.addEventListener('mousemove', handleMouseMove);
-      globalThis.addEventListener('mouseup', handleMouseUp);
+      globalThis.addEventListener('mouseup', handleMouseUp, { once: true });
     }
 
     return () => {
       globalThis.removeEventListener('mousemove', handleMouseMove);
-      globalThis.removeEventListener('mouseup', handleMouseUp);
     };
   }, [
     id,
@@ -153,8 +123,8 @@ const useNode = ({
   ]);
 
   const toggleCollapse = useCallback(
-    (e) => {
-      e.stopPropagation();
+    (event) => {
+      event.stopPropagation();
       const newCollapsed = !isCollapsed;
       setIsCollapsed(newCollapsed);
       onNodesChange([
@@ -170,15 +140,15 @@ const useNode = ({
     [isCollapsed, id, onNodesChange, getNode],
   );
 
-  const handleContextMenu = useCallback((e) => {
-    e.preventDefault();
-    setContextMenuPosition({ x: e.clientX, y: e.clientY });
+  const handleContextMenu = useCallback((event) => {
+    event.preventDefault();
+    setContextMenuPosition({ x: event.clientX, y: event.clientY });
     setShowContextMenu(true);
   }, []);
 
   const handleClick = useCallback(
-    (e) => {
-      e.stopPropagation();
+    (event) => {
+      event.stopPropagation();
       if (data.onSelect) {
         data.onSelect();
       }
@@ -187,8 +157,8 @@ const useNode = ({
   );
 
   const handleMouseDown = useCallback(
-    (e) => {
-      e.stopPropagation();
+    (event) => {
+      event.stopPropagation();
       if (!canEdit) {
         showError('No tienes permisos para redimensionar este nodo');
         return;
@@ -206,65 +176,42 @@ const useNode = ({
     setIsEditing(true);
   }, [canEdit, showError]);
 
-  const saveChanges = useCallback(
-    (updateData, previousData, nodeType) => {
+  const updateNodeData = useCallback(
+    (newData, trackingInfo = {}) => {
+      const { nodeType, previousValue, closeOnSave = true } = trackingInfo;
+
       onNodesChange([
         {
           type: 'change',
-          item: {
-            id,
-            data: { ...getNode(id)?.data, ...updateData },
-          },
+          item: { id, data: { ...getNode(id)?.data, ...newData } },
         },
       ]);
-      trackNodeEdit(id, nodeType, updateData);
-      addToHistory(id, {
-        action: 'edit',
-        timestamp: new Date().toISOString(),
-        user: data.currentUser || 'unknown',
-        previousValue: previousData,
-        newValue: updateData,
-      });
-      setIsEditing(false);
-    },
-    [id, onNodesChange, getNode, trackNodeEdit, addToHistory, data.currentUser],
-  );
 
-  const trackChanges = useCallback(
-    (nodeType, updateData, previousValue, newValue) => {
-      trackNodeEdit(id, nodeType, updateData);
-      addToHistory(id, {
+      trackNodeEdit?.(id, nodeType || 'generic', newData);
+      addToHistory?.(id, {
         action: 'edit',
         timestamp: new Date().toISOString(),
         user: data.currentUser || 'unknown',
         previousValue,
-        newValue,
+        newValue: newData,
       });
+
+      if (closeOnSave) {
+        setIsEditing(false);
+      }
     },
-    [id, trackNodeEdit, addToHistory, data.currentUser],
+    [id, onNodesChange, getNode, trackNodeEdit, addToHistory, data.currentUser],
   );
 
   const getStatusClass = useCallback(() => {
-    switch (data.status) {
-      case 'success': {
-        return 'node-status-success';
-      }
-      case 'warning': {
-        return 'node-status-warning';
-      }
-      case 'error': {
-        return 'node-status-error';
-      }
-      case 'processing': {
-        return 'node-status-processing';
-      }
-      case 'inactive': {
-        return 'node-status-inactive';
-      }
-      default: {
-        return '';
-      }
-    }
+    const statusMap = {
+      success: 'node-status-success',
+      warning: 'node-status-warning',
+      error: 'node-status-error',
+      processing: 'node-status-processing',
+      inactive: 'node-status-inactive',
+    };
+    return statusMap[data.status] || '';
   }, [data.status]);
 
   return {
@@ -282,12 +229,11 @@ const useNode = ({
     handleClick,
     handleMouseDown,
     handleDoubleClick,
-    saveChanges,
+    updateNodeData,
     setShowContextMenu,
     setIsHovered,
     showError,
     getStatusClass,
-    trackChanges,
     canEdit,
     canDelete,
     isConnectable,
@@ -301,7 +247,7 @@ const useNode = ({
 useNode.propTypes = {
   id: PropTypes.string.isRequired,
   data: PropTypes.object,
-  setNodes: PropTypes.func.isRequired,
+  onNodesChange: PropTypes.func.isRequired,
   isConnectable: PropTypes.bool,
   minWidth: PropTypes.number,
   minHeight: PropTypes.number,

@@ -45,9 +45,9 @@ const useWorker = (workerPath) => {
 
     // Limpieza: terminar el worker al desmontar el componente
     return () => {
-      workerReference.current.terminate();
       workerReference.current.removeEventListener('message', handleMessage);
       workerReference.current.removeEventListener('error', handleError);
+      workerReference.current.terminate();
     };
   }, [workerPath]);
 

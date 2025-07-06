@@ -59,43 +59,20 @@ export default function usePlubotLoader({
       for (const decisionNode of decisionNodesInDefault) {
         useFlowStore.getState().generateOptionNodes(decisionNode.id);
       }
-
-      const genericEmptyNamePattern = `Nuevo Flujo para ${plubotIdFromUrl}`;
-      const errorNamePattern = `Error al cargar ${plubotIdFromUrl}`;
-      const currentStoreFlowName = currentFlowNameInStore;
-
-      if (
-        currentStoreFlowName === 'Flujo sin título' ||
-        currentStoreFlowName === genericEmptyNamePattern ||
-        currentStoreFlowName === errorNamePattern ||
-        (plubotData?.name && currentStoreFlowName !== plubotData.name)
-      ) {
-        const newNameForEmpty = plubotData?.name || `Plubot ${plubotIdFromUrl}`;
-        if (currentStoreFlowName !== newNameForEmpty)
-          setFlowName(newNameForEmpty);
-      }
     } else if (
       plubotIdFromUrl === currentPlubotIdInStore &&
       currentIsLoadedInStore &&
       currentNodesInStore &&
       currentNodesInStore.length > 0
     ) {
-      if (plubotData?.name && plubotData.name !== currentFlowNameInStore) {
-        useFlowStore.getState().setFlowName(plubotData.name);
-      }
+      // La sincronización del nombre se gestiona en un efecto dedicado.
     } else if (!plubotIdFromUrl) {
       useFlowStore.getState().resetFlow(undefined, 'Flujo sin título', {
         skipLoad: true,
         allowResetFromLoader: true,
       });
     }
-  }, [
-    plubotIdFromUrl,
-    plubotData?.name,
-    initialNodes,
-    initialEdges,
-    setFlowName,
-  ]);
+  }, [plubotIdFromUrl, plubotData?.name, initialNodes, initialEdges]);
 
   // Efecto dedicado exclusivamente a sincronizar el nombre del Plubot
   // Se ejecuta solo cuando el nombre en plubotData cambia, desacoplando esta lógica.

@@ -4,7 +4,7 @@ import './TemplateSelector.css';
 
 // Importar fuentes para el estilo cyberpunk
 import '@fontsource/orbitron/400.css';
-import '@fontsource/orbitron/700.css';
+// import "@fontsource/orbitron/700.css"; // TODO: Restaurar cuando el entorno de NPM se repare. El paquete no se instala correctamente.
 
 const TemplateSelector = ({ onSelectTemplate, onClose, className }) => {
   const [selectedCategory, setSelectedCategory] = useState('all');

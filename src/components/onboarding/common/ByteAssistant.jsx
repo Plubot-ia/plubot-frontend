@@ -10,6 +10,23 @@ import byteThinking from '@/assets/img/byte-thinking.png';
 import byteWarning from '@/assets/img/byte-warning.png';
 import { useByteAssistant } from '@/hooks/useByteAssistant';
 
+const getTypeColor = (messageType) => {
+  switch (messageType) {
+    case 'error': {
+      return '#ff2e5b';
+    }
+    case 'success': {
+      return '#00ff9d';
+    }
+    case 'warning': {
+      return '#ffb700';
+    }
+    default: {
+      return '#00e0ff';
+    }
+  }
+};
+
 const ByteAssistant = ({ simulationMode = false }) => {
   const {
     isUltraMode,
@@ -35,6 +52,13 @@ const ByteAssistant = ({ simulationMode = false }) => {
     }
   };
 
+  const handleKeyDown = (event) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      handleImageClick();
+    }
+  };
+
   const getByteImage = () => {
     switch (byteState) {
       case 'happy': {
@@ -55,26 +79,15 @@ const ByteAssistant = ({ simulationMode = false }) => {
     }
   };
 
-  const getTypeColor = (messageType) => {
-    switch (messageType) {
-      case 'error': {
-        return '#ff2e5b';
-      }
-      case 'success': {
-        return '#00ff9d';
-      }
-      case 'warning': {
-        return '#ffb700';
-      }
-      default: {
-        return '#00e0ff';
-      }
-    }
-  };
-
   if (!isVisible) {
     return (
-      <div className='ts-byte-minimized' onClick={handleImageClick}>
+      <div
+        className='ts-byte-minimized'
+        onClick={handleImageClick}
+        onKeyDown={handleKeyDown}
+        role='button'
+        tabIndex={0}
+      >
         <img
           src={getByteImage()}
           alt='Byte asistente'
@@ -95,7 +108,10 @@ const ByteAssistant = ({ simulationMode = false }) => {
           <div
             className='ts-byte-image-container'
             onClick={handleImageClick}
+            onKeyDown={handleKeyDown}
             style={{ cursor: 'pointer' }}
+            role='button'
+            tabIndex={0}
           >
             <img
               src={getByteImage()}

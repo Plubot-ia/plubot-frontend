@@ -1,13 +1,13 @@
 export const useAnalytics = () => {
-  const trackNodeEdit = (nodeId, type, data) => {
+  const trackNodeEdit = (_nodeId, _type, _data) => {
     // Aquí iría la integración con tu herramienta de analítica (por ejemplo, Mixpanel)
   };
 
-  const trackNodeConnected = (nodeId, targetId, option) => {
+  const trackNodeConnected = (_nodeId, _targetId, _option) => {
     // Aquí iría la integración con tu herramienta de analítica
   };
 
-  const trackEvent = (eventName, eventData) => {
+  const trackEvent = (_eventName, _eventData) => {
     // Aquí iría la integración con tu herramienta de analítica
   };
 

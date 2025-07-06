@@ -2,6 +2,46 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 
 import useFlowStore from '@/stores/use-flow-store';
 
+const POSITIVE_KEYWORDS = [
+  'bien',
+  'genial',
+  'gracias',
+  'perfecto',
+  'excelente',
+  'feliz',
+  'listo',
+  'bueno',
+  'sí',
+  'claro',
+];
+const NEGATIVE_KEYWORDS = [
+  'mal',
+  'error',
+  'problema',
+  'no',
+  'falla',
+  'duda',
+  'difícil',
+  'complicado',
+];
+
+const analyzeSentiment = (text) => {
+  const lowerText = text.toLowerCase();
+  let positiveScore = 0;
+  let negativeScore = 0;
+
+  for (const keyword of POSITIVE_KEYWORDS) {
+    if (lowerText.includes(keyword)) positiveScore++;
+  }
+  for (const keyword of NEGATIVE_KEYWORDS) {
+    if (lowerText.includes(keyword)) negativeScore++;
+  }
+
+  if (positiveScore > negativeScore) return 'positive';
+  if (negativeScore > positiveScore) return 'negative';
+  return 'neutral';
+};
+
 /**
  * @description Custom hook for managing the state and logic of the ByteAssistant component.
  * @returns {object} The state and methods for the ByteAssistant component.
@@ -47,46 +87,6 @@ export const useByteAssistant = () => {
       },
     ]);
   }, []);
-
-  const analyzeSentiment = (text) => {
-    const lowerText = text.toLowerCase();
-    const positiveKeywords = [
-      'bien',
-      'genial',
-      'gracias',
-      'perfecto',
-      'excelente',
-      'feliz',
-      'listo',
-      'bueno',
-      'sí',
-      'claro',
-    ];
-    const negativeKeywords = [
-      'mal',
-      'error',
-      'problema',
-      'no',
-      'falla',
-      'duda',
-      'difícil',
-      'complicado',
-    ];
-
-    let positiveScore = 0;
-    let negativeScore = 0;
-
-    for (const keyword of positiveKeywords) {
-      if (lowerText.includes(keyword)) positiveScore++;
-    }
-    for (const keyword of negativeKeywords) {
-      if (lowerText.includes(keyword)) negativeScore++;
-    }
-
-    if (positiveScore > negativeScore) return 'positive';
-    if (negativeScore > positiveScore) return 'negative';
-    return 'neutral';
-  };
 
   const sendToAI = useCallback(
     async (userMessage) => {
@@ -151,14 +151,17 @@ export const useByteAssistant = () => {
     [addMessage, messages],
   );
 
-  const handleSendMessage = (event) => {
-    event.preventDefault();
-    if (!userInput.trim()) return;
+  const handleSendMessage = useCallback(
+    (event) => {
+      event.preventDefault();
+      if (!userInput.trim()) return;
 
-    addMessage(userInput, 'user', 'info');
-    sendToAI(userInput);
-    setUserInput('');
-  };
+      addMessage(userInput, 'user', 'info');
+      sendToAI(userInput);
+      setUserInput('');
+    },
+    [addMessage, sendToAI, userInput],
+  );
 
   return {
     isUltraMode,

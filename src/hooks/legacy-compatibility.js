@@ -17,10 +17,11 @@ import useAdaptivePerformance from '../components/onboarding/flow-editor/hooks/u
 export const useNodeHistory = () => {
   // Esta versiu00f3n compatible simplemente registra a consola, tal como haci00bda la original
   // Mantener la firma de la API por compatibilidad. La función es un no-op intencional.
-  // eslint-disable-next-line no-empty-function
-  const addToHistory = useCallback((nodeId, historyEntry) => {}, []);
+  const addToHistory = useCallback((_nodeId, _historyEntry) => {
+    // No-op for legacy compatibility
+  }, []);
 
-  const getHistory = useCallback((nodeId) => {
+  const getHistory = useCallback((_nodeId) => {
     return [];
   }, []);
 
@@ -65,7 +66,7 @@ const useFlowOptimization = ({
 
     // Métodos con nombres compatibles
     markActivity: useCallback(
-      (viewport) => {
+      (_viewport) => {
         // Actualizar tiempo de actividad
         idleStateReference.current.lastActivityTime = Date.now();
         idleStateReference.current.isIdle = false;
@@ -78,8 +79,9 @@ const useFlowOptimization = ({
     runOnNextFrame: useCallback((callback) => {
       requestAnimationFrame(callback);
       // Se retorna una función de cancelación no-op para mantener la compatibilidad de la API.
-      // eslint-disable-next-line no-empty-function
-      return () => {};
+      return () => {
+        // No-op
+      };
     }, []),
     toggleUltraMode: useCallback(
       (force) => (force === undefined ? true : force),

@@ -17,7 +17,6 @@ const TutorialesExpansion = () => {
   const { height } = useWindowSize();
   const [showMore, setShowMore] = useState(false);
   const [cursorPosition, setCursorPosition] = useState({ x: 0, y: 0 });
-  const [isHovering, setIsHovering] = useState(false);
   const [activatedElements, setActivatedElements] = useState([]);
   const containerReference = useRef(undefined);
   const audioReference = useRef(undefined);
@@ -103,21 +102,6 @@ const TutorialesExpansion = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [handleScroll]);
 
-  const handleMouseEnter = () => setIsHovering(true);
-  const handleMouseLeave = () => setIsHovering(false);
-
-  const calculateTilt = () => {
-    if (!containerReference.current || !isHovering) return { x: 0, y: 0 };
-    const rect = containerReference.current.getBoundingClientRect();
-    const centerX = rect.width / 2;
-    const centerY = rect.height / 2;
-    const tiltX = ((cursorPosition.y - centerY) / centerY) * 5;
-    const tiltY = ((cursorPosition.x - centerX) / centerX) * -5;
-    return { x: tiltX, y: tiltY };
-  };
-
-  const tilt = calculateTilt();
-
   const buttonVariants = {
     hover: { scale: 1.08, boxShadow: '0 0 20px rgba(255, 0, 255, 0.8)' },
     tap: { scale: 0.95 },
@@ -129,51 +113,43 @@ const TutorialesExpansion = () => {
     exit: { opacity: 0, y: 30, scale: 0.95, transition: { duration: 0.5 } },
   };
 
-  const renderHeader = () => (
-    <div className='tutorials-expansion-header'>
-      <h1 className='tutorials-expansion-title'>
-        EXPANSIÓN <span className='highlight'>PLUBOT</span>
-      </h1>
-      <p className='tutorials-expansion-description'>
-        Lleva tu Plubot al siguiente nivel con nuevas capacidades.
-      </p>
-    </div>
-  );
-
   const renderByteContainer = () => (
-    <div className='expansion-byte-container'>
-      <motion.div
-        className='byte-avatar-container'
-        animate={{
-          rotateX: tilt.x,
-          rotateY: tilt.y,
-          scale: isHovering ? 1.1 : 1,
-        }}
-        transition={{ type: 'spring', stiffness: 260, damping: 20 }}
-      >
-        <img src={byteAvatar} alt='Byte' className='byte-avatar' />
-        <div className='byte-glow' />
-      </motion.div>
+    <motion.div
+      className='byte-floating hologram-effect'
+      animate={{
+        y: [0, -15, 0],
+        filter: [
+          'drop-shadow(0 0 15px #00ffea)',
+          'drop-shadow(0 0 25px #ff00ff)',
+          'drop-shadow(0 0 15px #00ffea)',
+        ],
+      }}
+      transition={{ repeat: Infinity, duration: 5, ease: 'easeInOut' }}
+    >
+      <div className='avatar-container'>
+        <img src={byteAvatar} alt='Byte el guía' className='byte-avatar' />
+        <div className='ring ring1' />
+        <div className='ring ring2' />
+        <div className='ring ring3' />
+      </div>
 
-      <motion.div
-        className='byte-speech-bubble'
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.5, duration: 0.5 }}
-      >
-        <AnimatePresence mode='wait'>
-          <motion.span
-            key={phraseIndex}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.3 }}
-          >
-            {phrases[phraseIndex]}
-          </motion.span>
-        </AnimatePresence>
-      </motion.div>
-    </div>
+      <AnimatePresence mode='wait'>
+        <motion.div
+          key={phraseIndex}
+          className='byte-dialog'
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -15 }}
+          transition={{ duration: 0.8 }}
+        >
+          <div className='dialog-corner tl' />
+          <div className='dialog-corner tr' />
+          <div className='dialog-corner bl' />
+          <div className='dialog-corner br' />
+          {phrases[phraseIndex]}
+        </motion.div>
+      </AnimatePresence>
+    </motion.div>
   );
 
   const renderCardsContainer = () => (
@@ -267,8 +243,8 @@ const TutorialesExpansion = () => {
               <span className='code-line'>
                 {'>'} Explorando nuevos poderes...
               </span>
-              Encuentra módulos y plantillas en el PluBazaar para potenciar
-              tu Plubot.
+              Encuentra módulos y plantillas en el PluBazaar para potenciar tu
+              Plubot.
             </motion.p>
 
             <motion.p className='expansion-text terminal-text'>
@@ -280,11 +256,9 @@ const TutorialesExpansion = () => {
             </motion.p>
 
             <motion.p className='expansion-text terminal-text'>
-              <span className='code-line'>
-                {'>'} Escalando tu negocio...
-              </span>
-              Usa múltiples Plubots para gestionar equipos y atender
-              clientes globales.
+              <span className='code-line'>{'>'} Escalando tu negocio...</span>
+              Expande las capacidades de tu Plubot para gestionar más clientes y
+              procesos.
             </motion.p>
 
             <motion.p className='expansion-text terminal-text'>
@@ -296,17 +270,13 @@ const TutorialesExpansion = () => {
             </motion.p>
 
             <motion.p className='expansion-text terminal-text'>
-              <span className='code-line'>
-                {'>'} Navegando el PluBazaar...
-              </span>
+              <span className='code-line'>{'>'} Navegando el PluBazaar...</span>
               Compra poderes con PluCoins o adquiere módulos premium para tu
               Plubot.
             </motion.p>
 
             <motion.p className='expansion-text terminal-text'>
-              <span className='code-line'>
-                {'>'} Vendiendo creaciones...
-              </span>
+              <span className='code-line'>{'>'} Vendiendo creaciones...</span>
               Sube flujos al PluBazaar y genera ingresos pasivos con tus
               creaciones.
             </motion.p>
@@ -319,11 +289,8 @@ const TutorialesExpansion = () => {
             </motion.p>
 
             <motion.p className='expansion-text terminal-text'>
-              <span className='code-line'>
-                {'>'} Desafíos en el Coliseo...
-              </span>
-              Compite, gana medallas y usa tus recompensas para nuevos
-              poderes.
+              <span className='code-line'>{'>'} Desafíos en el Coliseo...</span>
+              Compite, gana medallas y usa tus recompensas para nuevos poderes.
             </motion.p>
 
             <motion.div
@@ -353,27 +320,65 @@ const TutorialesExpansion = () => {
     </AnimatePresence>
   );
 
-  const renderMainContent = () => (
-    <div
-      className='tutorials-expansion-container'
-      ref={containerReference}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
-    >
-      {renderHeader()}
-      {renderByteContainer()}
-      {renderCardsContainer()}
-      {renderButtonContainer()}
-      {renderExpandedContent()}
-      <div className='interface-elements'>
-        <div className='interface-dot' />
-        <div className='interface-dot' />
-        <div className='interface-dot' />
+  return (
+    <div className='tutoriales-page about-wrapper' ref={containerReference}>
+      <div className='scanner-line' />
+      <div className='about-container'>
+        <motion.h1
+          className='glitch-title cyberpunk-text'
+          data-text='EXPANSIÓN PLUBOT'
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 1.2 }}
+        >
+          <span className='cyber-bracket'>[</span>
+          EXPANSIÓN PLUBOT
+          <span className='cyber-bracket'>]</span>
+        </motion.h1>
+
+        <motion.div
+          className='digital-badge'
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.8, duration: 0.8 }}
+        >
+          SISTEMA DE MÓDULOS v1.2
+        </motion.div>
+
+        <motion.div className='about-card glass holographic-card'>
+          <div className='card-corner top-left' />
+          <div className='card-corner top-right' />
+          <div className='card-corner bottom-left' />
+          <div className='card-corner bottom-right' />
+
+          {renderByteContainer()}
+
+          <p className='tutorials-expansion-description'>
+            Lleva tu Plubot al siguiente nivel con nuevas capacidades.
+          </p>
+
+          {renderCardsContainer()}
+          {renderButtonContainer()}
+          {renderExpandedContent()}
+        </motion.div>
+
+        <div className='interface-elements'>
+          <div className='interface-dot' />
+          <div className='interface-dot' />
+          <div className='interface-dot' />
+        </div>
       </div>
+
+      <div
+        className='digital-cursor'
+        style={{
+          left: cursorPosition.x,
+          top: cursorPosition.y,
+          opacity: 1, // Mantener visible mientras el cursor está en la ventana
+        }}
+      />
     </div>
   );
-
-  return renderMainContent();
 };
 
 export default TutorialesExpansion;

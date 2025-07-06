@@ -26,9 +26,6 @@ function useWindowSize() {
     // Añadir el event listener
     window.addEventListener('resize', handleResize);
 
-    // Llamar al handler inmediatamente para que el estado se inicialice con el tamaño correcto
-    handleResize();
-
     // Limpiar el event listener al desmontar el componente
     return () => window.removeEventListener('resize', handleResize);
   }, []); // El array vacío asegura que el efecto solo se ejecute al montar y desmontar

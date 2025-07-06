@@ -20,12 +20,6 @@ const usePasswordForm = () => {
   const [successMessage, setSuccessMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Efecto para limpiar los mensajes cuando el usuario empieza a escribir
-  useEffect(() => {
-    if (error) setError('');
-    if (successMessage) setSuccessMessage('');
-  }, [passwords, error, successMessage]);
-
   // Efecto para mostrar errores provenientes del store de autenticación
   useEffect(() => {
     if (authError) {
@@ -34,6 +28,10 @@ const usePasswordForm = () => {
   }, [authError]);
 
   const handlePasswordChange = (event) => {
+    // Limpiar mensajes al empezar a editar para mejorar la UX
+    if (error) setError('');
+    if (successMessage) setSuccessMessage('');
+
     const { name, value } = event.target;
     setPasswords((previous) => ({
       ...previous,

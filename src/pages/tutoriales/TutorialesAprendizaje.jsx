@@ -137,10 +137,7 @@ const TutorialesAprendizaje = () => {
   };
 
   return (
-    <div
-      className='tutoriales-aprendizaje-page aprendizaje-wrapper'
-      ref={containerReference}
-    >
+    <div className='tutoriales-page about-wrapper' ref={containerReference}>
       <div className='scanner-line' />
       <div
         className='digital-cursor'
@@ -150,7 +147,7 @@ const TutorialesAprendizaje = () => {
           opacity: isHovering ? 1 : 0,
         }}
       />
-      <div className='aprendizaje-container'>
+      <div className='about-container'>
         <motion.h1
           className='glitch-title cyberpunk-text'
           data-text='APRENDIZAJE EN EL PLUNIVERSE'
@@ -165,7 +162,7 @@ const TutorialesAprendizaje = () => {
         </motion.h1>
 
         <motion.div
-          className='byte-section glass holographic-card'
+          className='about-card glass holographic-card'
           initial={{ opacity: 0, y: 80 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -192,12 +189,14 @@ const TutorialesAprendizaje = () => {
             transition={{ repeat: Infinity, duration: 5, ease: 'easeInOut' }}
           >
             <div className='avatar-container'>
-              <img src={byteAvatar} alt='Byte' className='byte-avatar' />
-              <div className='avatar-rings'>
-                <div className='ring ring1' />
-                <div className='ring ring2' />
-                <div className='ring ring3' />
-              </div>
+              <img
+                src={byteAvatar}
+                alt='Byte, el guía del aprendizaje'
+                className='byte-avatar'
+              />
+              <div className='ring ring1' />
+              <div className='ring ring2' />
+              <div className='ring ring3' />
             </div>
 
             <AnimatePresence mode='wait'>
@@ -261,7 +260,7 @@ const TutorialesAprendizaje = () => {
           </motion.p>
 
           <motion.button
-            className='aprendizaje-toggle cyberpunk-button'
+            className='cyberpunk-button'
             variants={buttonVariants}
             whileHover='hover'
             whileTap='tap'
@@ -280,7 +279,7 @@ const TutorialesAprendizaje = () => {
           <AnimatePresence>
             {showMore && (
               <motion.div
-                className='aprendizaje-story'
+                className='expansion-story'
                 variants={expandableContentVariants}
                 initial='hidden'
                 animate='visible'
@@ -296,7 +295,7 @@ const TutorialesAprendizaje = () => {
                   </div>
                 </div>
 
-                <motion.p className='aprendizaje-text terminal-text'>
+                <motion.p className='expansion-text terminal-text'>
                   <span className='code-line'>
                     {'>'} Iniciando protocolo de aprendizaje...
                   </span>
@@ -304,7 +303,7 @@ const TutorialesAprendizaje = () => {
                   habilidades.
                 </motion.p>
 
-                <motion.p className='aprendizaje-text terminal-text'>
+                <motion.p className='expansion-text terminal-text'>
                   <span className='code-line'>
                     {'>'} Cargando tutoriales interactivos...
                   </span>
@@ -312,7 +311,7 @@ const TutorialesAprendizaje = () => {
                   flujos e integraciones.
                 </motion.p>
 
-                <motion.p className='aprendizaje-text terminal-text'>
+                <motion.p className='expansion-text terminal-text'>
                   <span className='code-line'>
                     {'>'} Conectando con la comunidad...
                   </span>
@@ -320,7 +319,7 @@ const TutorialesAprendizaje = () => {
                   descubrir hacks.
                 </motion.p>
 
-                <motion.p className='aprendizaje-text terminal-text'>
+                <motion.p className='expansion-text terminal-text'>
                   <span className='code-line'>
                     {'>'} Desbloqueando certificaciones...
                   </span>
@@ -329,7 +328,7 @@ const TutorialesAprendizaje = () => {
                 </motion.p>
 
                 <motion.div
-                  className='aprendizaje-cta'
+                  className='expansion-cta'
                   initial={{ opacity: 0, y: 30 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.9 }}

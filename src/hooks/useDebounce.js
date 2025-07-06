@@ -1,10 +1,14 @@
 import debounce from 'lodash/debounce';
-import { useEffect, useRef } from 'react';
+import { useEffect, useMemo } from 'react';
 
 const useDebounce = (callback, delay) => {
-  const debouncedCallback = useRef(debounce(callback, delay)).current;
+  const debouncedCallback = useMemo(
+    () => debounce(callback, delay),
+    [callback, delay],
+  );
 
   useEffect(() => {
+    // Cleanup the debounce on unmount
     return () => {
       debouncedCallback.cancel();
     };

@@ -1,13 +1,14 @@
 import { Menu, X } from 'lucide-react';
-import { NavLink } from 'react-router-dom';
 import { useState, useEffect } from 'react';
+import { NavLink } from 'react-router-dom';
 
 import logo from '@assets/img/logo.header.svg';
 
 import './Header.css';
+import useAuthStore from '../../stores/use-auth-store';
+
 import NavLinks from './NavLinks';
 import UserProfile from './UserProfile';
-import useAuthStore from '../../stores/use-auth-store';
 
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);

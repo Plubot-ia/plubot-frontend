@@ -1,6 +1,6 @@
 
 > lint
-> eslint 'src/**/*.{js,jsx,ts,tsx}' --max-warnings 0 --no-cache
+> eslint "src/**/*.{js,jsx,ts,tsx}" --max-warnings 0 --no-cache
 
 
 /Users/wolf/Desktop/Plubot/plubot-frontend/src/components/auth/Login.jsx
@@ -38,25 +38,34 @@
   186:20  error  Use `undefined` instead of `null`  unicorn/no-null
 
 /Users/wolf/Desktop/Plubot/plubot-frontend/src/components/onboarding/common/EpicHeader.jsx
-    4:1   warning  `lucide-react` import should occur before import of `prop-types`                                                                                                                                   import/order
-   16:1   warning  There should be no empty line within import group                                                                                                                                                  import/order
-   33:20  warning  Arrow function has too many lines (462). Maximum allowed is 150                                                                                                                                    max-lines-per-function
-   33:20  warning  Arrow function has a complexity of 19. Maximum allowed is 15                                                                                                                                       complexity
-  134:23  error    Use `undefined` instead of `null`                                                                                                                                                                  unicorn/no-null
-  189:34  warning  'nodes' is already declared in the upper scope on line 60 column 11                                                                                                                                no-shadow
-  314:11  error    Visible, non-interactive elements with click handlers must have at least one keyboard listener                                                                                                     jsx-a11y/click-events-have-key-events
-  314:11  error    Non-interactive elements should not be assigned mouse or keyboard event listeners                                                                                                                  jsx-a11y/no-noninteractive-element-interactions
-  329:11  error    Visible, non-interactive elements with click handlers must have at least one keyboard listener                                                                                                     jsx-a11y/click-events-have-key-events
-  329:11  error    Avoid non-native interactive elements. If using native HTML is not possible, add an appropriate role and support for tabbing, mouse, keyboard, and touch inputs to an interactive content element  jsx-a11y/no-static-element-interactions
-  372:99  error    Refactor this code to not use nested template literals                                                                                                                                             sonarjs/no-nested-template-literals
-  523:17  error    Visible, non-interactive elements with click handlers must have at least one keyboard listener                                                                                                     jsx-a11y/click-events-have-key-events
-  523:17  error    Avoid non-native interactive elements. If using native HTML is not possible, add an appropriate role and support for tabbing, mouse, keyboard, and touch inputs to an interactive content element  jsx-a11y/no-static-element-interactions
-  539:17  error    Visible, non-interactive elements with click handlers must have at least one keyboard listener                                                                                                     jsx-a11y/click-events-have-key-events
-  539:17  error    Avoid non-native interactive elements. If using native HTML is not possible, add an appropriate role and support for tabbing, mouse, keyboard, and touch inputs to an interactive content element  jsx-a11y/no-static-element-interactions
-  580:17  error    Visible, non-interactive elements with click handlers must have at least one keyboard listener                                                                                                     jsx-a11y/click-events-have-key-events
-  580:17  error    Avoid non-native interactive elements. If using native HTML is not possible, add an appropriate role and support for tabbing, mouse, keyboard, and touch inputs to an interactive content element  jsx-a11y/no-static-element-interactions
-  604:17  error    Visible, non-interactive elements with click handlers must have at least one keyboard listener                                                                                                     jsx-a11y/click-events-have-key-events
-  604:17  error    Avoid non-native interactive elements. If using native HTML is not possible, add an appropriate role and support for tabbing, mouse, keyboard, and touch inputs to an interactive content element  jsx-a11y/no-static-element-interactions
+    4:1   warning  There should be no empty line within import group                                                                      import/order
+    4:1   warning  `lucide-react` import should occur before import of `prop-types`                                                       import/order
+   10:8   error    '/Users/wolf/Desktop/Plubot/plubot-frontend/node_modules/lucide-react/dist/lucide-react.d.ts' imported multiple times  import/no-duplicates
+   15:1   warning  `lucide-react` import should occur before import of `prop-types`                                                       import/order
+   15:9   error    Replace `⏎··ChevronDown,⏎··ChevronUp,⏎` with `·ChevronDown,·ChevronUp·`                                                prettier/prettier
+   16:3   error    Remove this unused import of 'ChevronDown'                                                                             sonarjs/unused-import
+   17:3   error    Remove this unused import of 'ChevronUp'                                                                               sonarjs/unused-import
+   18:8   error    '/Users/wolf/Desktop/Plubot/plubot-frontend/node_modules/lucide-react/dist/lucide-react.d.ts' imported multiple times  import/no-duplicates
+   19:10  warning  'useDetectClickOutside' is defined but never used. Allowed unused vars must match /^[A-Z_]|^_/u                        no-unused-vars
+   19:10  error    Remove this unused import of 'useDetectClickOutside'                                                                   sonarjs/unused-import
+   20:1   warning  There should be at least one empty line between import groups                                                          import/order
+   20:10  warning  'useLocation' is defined but never used. Allowed unused vars must match /^[A-Z_]|^_/u                                  no-unused-vars
+   20:10  error    Remove this unused import of 'useLocation'                                                                             sonarjs/unused-import
+   20:23  warning  'useNavigate' is defined but never used. Allowed unused vars must match /^[A-Z_]|^_/u                                  no-unused-vars
+   20:23  error    Remove this unused import of 'useNavigate'                                                                             sonarjs/unused-import
+   20:36  warning  'useParams' is defined but never used. Allowed unused vars must match /^[A-Z_]|^_/u                                    no-unused-vars
+   20:36  error    Remove this unused import of 'useParams'                                                                               sonarjs/unused-import
+   24:1   warning  There should be at least one empty line between import groups                                                          import/order
+   25:1   warning  There should be at least one empty line between import groups                                                          import/order
+   26:1   warning  There should be at least one empty line between import groups                                                          import/order
+   26:1   warning  `@/services/syncService` import should occur before import of `@/stores/selectors`                                     import/order
+   26:8   warning  Using exported name 'useSyncService' as identifier for default import                                                  import/no-named-as-default
+   27:1   warning  `./OptionsMenu` import should occur before import of `./StatusBubble`                                                  import/order
+   29:20  warning  Arrow function has too many lines (419). Maximum allowed is 150                                                        max-lines-per-function
+   29:20  warning  Arrow function has a complexity of 17. Maximum allowed is 15                                                           complexity
+  130:23  error    Use `undefined` instead of `null`                                                                                      unicorn/no-null
+  228:34  warning  'nodes' is already declared in the upper scope on line 56 column 11                                                    no-shadow
+  419:99  error    Refactor this code to not use nested template literals                                                                 sonarjs/no-nested-template-literals
 
 /Users/wolf/Desktop/Plubot/plubot-frontend/src/components/onboarding/common/NodePalette.jsx
    36:21  warning  Arrow function has a complexity of 28. Maximum allowed is 15                                                                                                                                                                                      complexity
@@ -84,30 +93,112 @@
   436:7   error    Avoid non-native interactive elements. If using native HTML is not possible, add an appropriate role and support for tabbing, mouse, keyboard, and touch inputs to an interactive content element                                                 jsx-a11y/no-static-element-interactions
   453:26  warning  Please rename the variable `e`. Suggested names are: `error`, `event_`. A more descriptive name will do too                                                                                                                                       unicorn/prevent-abbreviations
 
+/Users/wolf/Desktop/Plubot/plubot-frontend/src/components/onboarding/common/OptionsMenu.jsx
+    2:1   warning  `prop-types` import should occur before import of `react`                                                                                                                                               import/order
+    3:1   warning  There should be at least one empty line between import groups                                                                                                                                           import/order
+    3:1   warning  `lucide-react` import should occur before import of `react`                                                                                                                                             import/order
+   18:5   warning  'ref' is defined but never used. Allowed unused args must match /^_/u                                                                                                                                   no-unused-vars
+   20:3   error    Insert `··`                                                                                                                                                                                             prettier/prettier
+   21:1   error    Insert `··`                                                                                                                                                                                             prettier/prettier
+   22:7   error    Insert `··`                                                                                                                                                                                             prettier/prettier
+   23:1   error    Replace `········` with `··········`                                                                                                                                                                    prettier/prettier
+   24:9   error    Insert `··`                                                                                                                                                                                             prettier/prettier
+   25:1   error    Replace `········` with `··········`                                                                                                                                                                    prettier/prettier
+   26:1   error    Insert `··`                                                                                                                                                                                             prettier/prettier
+   27:9   error    Insert `··`                                                                                                                                                                                             prettier/prettier
+   28:1   error    Insert `··`                                                                                                                                                                                             prettier/prettier
+   29:5   error    Insert `··`                                                                                                                                                                                             prettier/prettier
+   31:1   error    Replace `····` with `······`                                                                                                                                                                            prettier/prettier
+   32:5   error    Insert `··`                                                                                                                                                                                             prettier/prettier
+   33:1   error    Insert `··`                                                                                                                                                                                             prettier/prettier
+   34:1   error    Insert `··`                                                                                                                                                                                             prettier/prettier
+   35:7   error    Insert `··`                                                                                                                                                                                             prettier/prettier
+   36:1   error    Insert `··`                                                                                                                                                                                             prettier/prettier
+   37:7   error    Insert `··`                                                                                                                                                                                             prettier/prettier
+   38:1   error    Replace `········` with `··········`                                                                                                                                                                    prettier/prettier
+   39:11  error    Insert `··`                                                                                                                                                                                             prettier/prettier
+   40:9   error    Insert `··`                                                                                                                                                                                             prettier/prettier
+   41:1   error    Insert `··`                                                                                                                                                                                             prettier/prettier
+   42:5   error    Insert `··`                                                                                                                                                                                             prettier/prettier
+   43:1   error    Insert `··`                                                                                                                                                                                             prettier/prettier
+   44:7   error    Insert `··`                                                                                                                                                                                             prettier/prettier
+   45:1   error    Replace `····` with `······`                                                                                                                                                                            prettier/prettier
+   47:1   error    Insert `··`                                                                                                                                                                                             prettier/prettier
+   48:5   error    Insert `··`                                                                                                                                                                                             prettier/prettier
+   49:1   error    Replace `······` with `········`                                                                                                                                                                        prettier/prettier
+   50:7   error    Insert `··`                                                                                                                                                                                             prettier/prettier
+   51:7   error    Insert `··`                                                                                                                                                                                             prettier/prettier
+   52:1   error    Insert `··`                                                                                                                                                                                             prettier/prettier
+   53:7   error    Insert `··`                                                                                                                                                                                             prettier/prettier
+   54:1   error    Insert `··`                                                                                                                                                                                             prettier/prettier
+   55:11  error    Insert `··`                                                                                                                                                                                             prettier/prettier
+   56:1   error    Replace `········` with `··········`                                                                                                                                                                    prettier/prettier
+   57:1   error    Insert `··`                                                                                                                                                                                             prettier/prettier
+   58:5   error    Insert `··`                                                                                                                                                                                             prettier/prettier
+   59:1   error    Insert `··`                                                                                                                                                                                             prettier/prettier
+   60:7   error    Insert `··`                                                                                                                                                                                             prettier/prettier
+   61:1   error    Insert `··`                                                                                                                                                                                             prettier/prettier
+   63:5   error    Insert `··`                                                                                                                                                                                             prettier/prettier
+   64:1   error    Replace `····` with `······`                                                                                                                                                                            prettier/prettier
+   65:1   error    Insert `··`                                                                                                                                                                                             prettier/prettier
+   66:1   error    Replace `······` with `········`                                                                                                                                                                        prettier/prettier
+   67:1   error    Insert `··`                                                                                                                                                                                             prettier/prettier
+   68:9   error    Insert `··`                                                                                                                                                                                             prettier/prettier
+   69:1   error    Insert `··`                                                                                                                                                                                             prettier/prettier
+   70:13  error    Insert `··`                                                                                                                                                                                             prettier/prettier
+   71:1   error    Replace `············` with `··············`                                                                                                                                                            prettier/prettier
+   72:1   error    Insert `··`                                                                                                                                                                                             prettier/prettier
+   73:13  error    Insert `··`                                                                                                                                                                                             prettier/prettier
+   74:1   error    Insert `··`                                                                                                                                                                                             prettier/prettier
+   75:11  error    Insert `··`                                                                                                                                                                                             prettier/prettier
+   76:1   error    Replace `············<span·className='performance-stats-label'>Tiempo·de·guardado:` with `··············<span·className='performance-stats-label'>⏎················Tiempo·de·guardado:⏎··············`  prettier/prettier
+   77:1   error    Insert `··`                                                                                                                                                                                             prettier/prettier
+   78:15  error    Insert `··`                                                                                                                                                                                             prettier/prettier
+   79:1   error    Replace `················` with `··················`                                                                                                                                                    prettier/prettier
+   80:17  error    Insert `··`                                                                                                                                                                                             prettier/prettier
+   81:13  error    Insert `··`                                                                                                                                                                                             prettier/prettier
+   82:1   error    Insert `··`                                                                                                                                                                                             prettier/prettier
+   83:9   error    Insert `··</div>⏎········`                                                                                                                                                                              prettier/prettier
+   85:1   error    Delete `····</div>`                                                                                                                                                                                     prettier/prettier
+   86:1   error    Replace `⏎····` with `······`                                                                                                                                                                           prettier/prettier
+   88:1   error    Insert `··`                                                                                                                                                                                             prettier/prettier
+   89:7   error    Insert `··`                                                                                                                                                                                             prettier/prettier
+   90:1   error    Replace `······` with `········`                                                                                                                                                                        prettier/prettier
+   91:1   error    Insert `··`                                                                                                                                                                                             prettier/prettier
+   92:1   error    Replace `······` with `········`                                                                                                                                                                        prettier/prettier
+   93:1   error    Insert `··`                                                                                                                                                                                             prettier/prettier
+   94:11  error    Insert `··`                                                                                                                                                                                             prettier/prettier
+   95:9   error    Insert `··`                                                                                                                                                                                             prettier/prettier
+   96:1   error    Insert `··`                                                                                                                                                                                             prettier/prettier
+   97:1   error    Replace `····` with `······`                                                                                                                                                                            prettier/prettier
+   98:1   error    Insert `··`                                                                                                                                                                                             prettier/prettier
+   99:7   error    Insert `··`                                                                                                                                                                                             prettier/prettier
+  100:1   error    Insert `··`                                                                                                                                                                                             prettier/prettier
+  102:5   error    Insert `··`                                                                                                                                                                                             prettier/prettier
+  103:1   error    Insert `··`                                                                                                                                                                                             prettier/prettier
+  104:7   error    Insert `··`                                                                                                                                                                                             prettier/prettier
+  105:1   error    Replace `······` with `········`                                                                                                                                                                        prettier/prettier
+  106:1   error    Insert `··`                                                                                                                                                                                             prettier/prettier
+  107:1   error    Replace `······` with `········`                                                                                                                                                                        prettier/prettier
+  108:1   error    Insert `··`                                                                                                                                                                                             prettier/prettier
+  109:11  error    Insert `··`                                                                                                                                                                                             prettier/prettier
+  110:9   error    Insert `··`                                                                                                                                                                                             prettier/prettier
+  111:1   error    Insert `··`                                                                                                                                                                                             prettier/prettier
+  112:1   error    Replace `····` with `······`                                                                                                                                                                            prettier/prettier
+  113:1   error    Insert `··`                                                                                                                                                                                             prettier/prettier
+  114:7   error    Insert `··`                                                                                                                                                                                             prettier/prettier
+  115:5   error    Insert `··`                                                                                                                                                                                             prettier/prettier
+  116:1   error    Insert `··`                                                                                                                                                                                             prettier/prettier
+  117:1   error    Replace `)` with `··),⏎`                                                                                                                                                                                prettier/prettier
+
 /Users/wolf/Desktop/Plubot/plubot-frontend/src/components/onboarding/flow-editor/FlowEditor.jsx
-   44:1   warning  There should be no empty line within import group                                                                 import/order
-   77:1   warning  `prop-types` import should occur before import of `react`                                                         import/order
-   84:3   error    state should be placed after getDerivedStateFromError                                                             react/sort-comp
-  107:23  warning  'children' is missing in props validation                                                                         react/prop-types
-  115:25  warning  Arrow function has too many lines (336). Maximum allowed is 150                                                   max-lines-per-function
-  154:5   warning  'toggleUltraMode' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]|^_/u                no-unused-vars
-  154:5   error    Remove the declaration of the unused 'toggleUltraMode' variable                                                   sonarjs/no-unused-vars
-  154:5   error    Remove this useless assignment to variable "toggleUltraMode"                                                      sonarjs/no-dead-store
-  185:10  warning  'hasChanges' is assigned a value but never used. Allowed unused elements of array destructuring must match /^_/u  no-unused-vars
-  185:10  error    Remove the declaration of the unused 'hasChanges' variable                                                        sonarjs/no-unused-vars
-  185:10  error    Remove this useless assignment to variable "hasChanges"                                                           sonarjs/no-dead-store
-  368:9   warning  'toggleEdgeAnimations' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]|^_/u           no-unused-vars
-  368:9   error    Remove the declaration of the unused 'toggleEdgeAnimations' variable                                              sonarjs/no-unused-vars
-  368:9   error    Remove this useless assignment to variable "toggleEdgeAnimations"                                                 sonarjs/no-dead-store
-  381:9   warning  'onNodeDragStop' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]|^_/u                 no-unused-vars
-  381:9   error    Remove the declaration of the unused 'onNodeDragStop' variable                                                    sonarjs/no-unused-vars
-  381:9   error    Remove this useless assignment to variable "onNodeDragStop"                                                       sonarjs/no-dead-store
-  411:9   warning  'onEdgeClick' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]|^_/u                    no-unused-vars
-  411:9   error    Remove the declaration of the unused 'onEdgeClick' variable                                                       sonarjs/no-unused-vars
-  411:9   error    Remove this useless assignment to variable "onEdgeClick"                                                          sonarjs/no-dead-store
-  431:47  warning  Please rename the variable `e`. Suggested names are: `error`, `event_`. A more descriptive name will do too       unicorn/prevent-abbreviations
-  457:32  warning  Please rename the variable `e`. Suggested names are: `error`, `event_`. A more descriptive name will do too       unicorn/prevent-abbreviations
-  633:30  error    Complete the task associated to this "TODO" comment                                                               sonarjs/todo-tag
+   22:1   warning  There should be at least one empty line between import groups                                                                                                             import/order
+  104:25  warning  Arrow function has too many lines (293). Maximum allowed is 150                                                                                                           max-lines-per-function
+  354:1   error    Delete `⏎`                                                                                                                                                                prettier/prettier
+  371:1   error    Replace `⏎··const·onEdgeUpdate·=·useCallback(` with `··const·onEdgeUpdate·=·useCallback(⏎····`                                                                            prettier/prettier
+  404:35  error    Replace `·currentEdges.filter((currentEdge)·=>·currentEdge.id·!==·edge.id)` with `⏎··········currentEdges.filter((currentEdge)·=>·currentEdge.id·!==·edge.id),⏎········`  prettier/prettier
+  408:5   warning  React Hook useCallback has an unnecessary dependency: 'edges'. Either exclude it or remove the dependency array                                                           react-hooks/exhaustive-deps
+  574:30  error    Complete the task associated to this "TODO" comment                                                                                                                       sonarjs/todo-tag
 
 /Users/wolf/Desktop/Plubot/plubot-frontend/src/components/onboarding/flow-editor/backup/drop-position-fix.js
    16:5   warning  Unexpected console statement                                          no-console
@@ -679,16 +770,7 @@
   28:46  error    Use `undefined` instead of `null`                                     unicorn/no-null
 
 /Users/wolf/Desktop/Plubot/plubot-frontend/src/components/onboarding/flow-editor/ui/SyncButton.jsx
-  12:20  warning  Arrow function has too many lines (159). Maximum allowed is 150                                              max-lines-per-function
-  14:50  error    Use `undefined` instead of `null`                                                                            unicorn/no-null
-  15:52  error    Use `undefined` instead of `null`                                                                            unicorn/no-null
-  18:11  warning  'syncState' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]|^_/u                 no-unused-vars
-  18:11  error    Remove the declaration of the unused 'syncState' variable                                                    sonarjs/no-unused-vars
-  18:11  error    Remove this useless assignment to variable "syncState"                                                       sonarjs/no-dead-store
-  37:29  warning  Please rename the variable `e`. Suggested names are: `error`, `event_`. A more descriptive name will do too  unicorn/prevent-abbreviations
-  56:40  error    Use `undefined` instead of `null`                                                                            unicorn/no-null
-  69:29  error    Move arrow function 'getStatusColor' to the outer scope                                                      unicorn/consistent-function-scoping
-  74:39  error    Move arrow function 'getSyncStatusText' to the outer scope                                                   unicorn/consistent-function-scoping
+  4:8  warning  Using exported name 'useSyncService' as identifier for default import  import/no-named-as-default
 
 /Users/wolf/Desktop/Plubot/plubot-frontend/src/components/onboarding/flow-editor/ui/UltraModeManager.js
    64:17  error    Refactor this function to reduce its Cognitive Complexity from 28 to the 15 allowed          sonarjs/cognitive-complexity
@@ -1332,18 +1414,9 @@
   30:28  error    Component definition is missing display name  react/display-name
 
 /Users/wolf/Desktop/Plubot/plubot-frontend/src/components/onboarding/nodes/messagenode/MessageNode.jsx
-   163:25  error    Found non-literal argument to RegExp Constructor                                                                                                            security/detect-non-literal-regexp
-   276:24  warning  Arrow function has too many lines (198). Maximum allowed is 150                                                                                             max-lines-per-function
-   337:36  warning  Generic Object Injection Sink                                                                                                                               security/detect-object-injection
-   347:6   warning  'e' is defined but never used. Allowed unused args must match /^_/u                                                                                         no-unused-vars
-   347:6   warning  Please rename the variable `e`. Suggested names are: `error`, `event_`. A more descriptive name will do too                                                 unicorn/prevent-abbreviations
-   466:20  warning  Do not use Array index in keys                                                                                                                              react/no-array-index-key
-   601:30  warning  'DEFAULT_MESSAGE' is defined but never used. Allowed unused args must match /^_/u                                                                           no-unused-vars
-   845:30  warning  Arrow function has too many lines (337). Maximum allowed is 150                                                                                             max-lines-per-function
-   940:20  error    Use `undefined` instead of `null`                                                                                                                           unicorn/no-null
-   951:18  error    Use `undefined` instead of `null`                                                                                                                           unicorn/no-null
-  1154:6   warning  React Hook useMemo has unnecessary dependencies: 'isUltraMode', 'lodLevel', 'safeData', and 'selected'. Either exclude them or remove the dependency array  react-hooks/exhaustive-deps
-  1173:7   error    `tabIndex` should only be declared on interactive elements                                                                                                  jsx-a11y/no-noninteractive-tabindex
+  158:25  error    Found non-literal argument to RegExp Constructor                 security/detect-non-literal-regexp
+  271:24  warning  Arrow function has too many lines (201). Maximum allowed is 150  max-lines-per-function
+  840:30  warning  Arrow function has too many lines (342). Maximum allowed is 150  max-lines-per-function
 
 /Users/wolf/Desktop/Plubot/plubot-frontend/src/components/onboarding/nodes/messagenode/MessageNodeIcon.jsx
   21:14  error  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
@@ -2246,5 +2319,6 @@
 /Users/wolf/Desktop/Plubot/plubot-frontend/src/utils/flow-utilities.js
   136:11  warning  Generic Object Injection Sink  security/detect-object-injection
 
-✖ 1891 problems (990 errors, 901 warnings)
+✖ 1962 problems (1061 errors, 901 warnings)
+  97 errors and 10 warnings potentially fixable with the `--fix` option.
 

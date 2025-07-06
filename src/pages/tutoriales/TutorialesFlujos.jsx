@@ -128,10 +128,7 @@ const TutorialesFlujos = () => {
   };
 
   return (
-    <div
-      className='tutoriales-flujos-page flujos-wrapper'
-      ref={containerReference}
-    >
+    <div className='tutoriales-page about-wrapper' ref={containerReference}>
       <div className='scanner-line' />
       <div
         className='digital-cursor'
@@ -141,7 +138,7 @@ const TutorialesFlujos = () => {
           opacity: isHovering ? 1 : 0,
         }}
       />
-      <div className='flujos-container'>
+      <div className='about-container'>
         <motion.h1
           className='glitch-title cyberpunk-text'
           data-text='FLUJOS EN EL PLUNIVERSE'
@@ -156,7 +153,7 @@ const TutorialesFlujos = () => {
         </motion.h1>
 
         <motion.div
-          className='byte-section glass holographic-card'
+          className='about-card glass holographic-card'
           initial={{ opacity: 0, y: 80 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -190,15 +187,12 @@ const TutorialesFlujos = () => {
             <div className='avatar-container'>
               <img
                 src={byteAvatar}
-                alt='Byte'
+                alt='Byte, el guía de flujos'
                 className='byte-avatar'
-                style={{ objectFit: 'contain' }}
               />
-              <div className='avatar-rings'>
-                <div className='ring ring1' />
-                <div className='ring ring2' />
-                <div className='ring ring3' />
-              </div>
+              <div className='ring ring1' />
+              <div className='ring ring2' />
+              <div className='ring ring3' />
             </div>
 
             <AnimatePresence mode='wait'>
@@ -258,7 +252,7 @@ const TutorialesFlujos = () => {
           </motion.p>
 
           <motion.button
-            className='flujos-toggle cyberpunk-button'
+            className='cyberpunk-button'
             variants={buttonVariants}
             whileHover='hover'
             whileTap='tap'
@@ -277,7 +271,7 @@ const TutorialesFlujos = () => {
           <AnimatePresence>
             {showMore && (
               <motion.div
-                className='flujos-story'
+                className='expansion-story'
                 variants={expandableContentVariants}
                 initial='hidden'
                 animate='visible'
@@ -293,13 +287,13 @@ const TutorialesFlujos = () => {
                   </div>
                 </div>
 
-                <motion.p className='flujos-text terminal-text'>
+                <motion.p className='expansion-text terminal-text'>
                   <span className='code-line'>{'>'} Definiendo nodos...</span>
                   Nodos son los bloques básicos de un flujo: acciones,
                   condiciones o integraciones.
                 </motion.p>
 
-                <motion.p className='flujos-text terminal-text'>
+                <motion.p className='expansion-text terminal-text'>
                   <span className='code-line'>
                     {'>'} Construyendo flujos...
                   </span>
@@ -307,7 +301,7 @@ const TutorialesFlujos = () => {
                   Plubot, como saludar o procesar pagos.
                 </motion.p>
 
-                <motion.p className='flujos-text terminal-text'>
+                <motion.p className='expansion-text terminal-text'>
                   <span className='code-line'>
                     {'>'} Estableciendo conexiones...
                   </span>
@@ -315,13 +309,13 @@ const TutorialesFlujos = () => {
                   crear lógica personalizada.
                 </motion.p>
 
-                <motion.p className='flujos-text terminal-text'>
+                <motion.p className='expansion-text terminal-text'>
                   <span className='code-line'>{'>'} Activando poderes...</span>
                   Integra herramientas como WhatsApp, Stripe o MercadoPago para
                   potenciar tu Plubot.
                 </motion.p>
 
-                <motion.p className='flujos-text terminal-text'>
+                <motion.p className='expansion-text terminal-text'>
                   <span className='code-line'>
                     {'>'} Construyendo un flujo...
                   </span>
@@ -329,7 +323,7 @@ const TutorialesFlujos = () => {
                   que puedes probar en tiempo real.
                 </motion.p>
 
-                <motion.p className='flujos-text terminal-text'>
+                <motion.p className='expansion-text terminal-text'>
                   <span className='code-line'>
                     {'>'} Conectando WhatsApp...
                   </span>
@@ -337,20 +331,20 @@ const TutorialesFlujos = () => {
                   clientes en minutos.
                 </motion.p>
 
-                <motion.p className='flujos-text terminal-text'>
+                <motion.p className='expansion-text terminal-text'>
                   <span className='code-line'>{'>'} Integrando pagos...</span>
                   Añade Stripe o MercadoPago para que tu Plubot procese pagos
                   directamente.
                 </motion.p>
 
-                <motion.p className='flujos-text terminal-text'>
+                <motion.p className='expansion-text terminal-text'>
                   <span className='code-line'>{'>'} Optimizando flujos...</span>
                   Mantén los flujos simples, prueba en el simulador y usa
                   plantillas del PluBazaar.
                 </motion.p>
 
                 <motion.div
-                  className='flujos-cta'
+                  className='expansion-cta'
                   initial={{ opacity: 0, y: 30 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.9 }}

@@ -45,27 +45,15 @@ const useToast = () => {
       toastElement.style.alignItems = 'center';
 
       // Aplicar estilos según el tipo
-      switch (type) {
-        case 'success': {
-          toastElement.style.backgroundColor = '#4caf50';
-          toastElement.style.color = 'white';
-          break;
-        }
-        case 'error': {
-          toastElement.style.backgroundColor = '#f44336';
-          toastElement.style.color = 'white';
-          break;
-        }
-        case 'warning': {
-          toastElement.style.backgroundColor = '#ff9800';
-          toastElement.style.color = 'white';
-          break;
-        }
-        default: {
-          toastElement.style.backgroundColor = '#4facfe';
-          toastElement.style.color = 'white';
-        }
-      }
+      const styleMap = {
+        success: { backgroundColor: '#4caf50', color: 'white' },
+        error: { backgroundColor: '#f44336', color: 'white' },
+        warning: { backgroundColor: '#ff9800', color: 'white' },
+        info: { backgroundColor: '#4facfe', color: 'white' },
+      };
+
+      const toastStyles = styleMap[type] || styleMap.info;
+      Object.assign(toastElement.style, toastStyles);
 
       // Crear contenido del toast
       const messageElement = document.createElement('span');

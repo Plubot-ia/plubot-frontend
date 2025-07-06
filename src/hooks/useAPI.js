@@ -18,8 +18,6 @@ const useAPI = () => {
         ...config.headers,
       };
 
-      // Para depuración
-
       const response = await instance({
         method,
         url,
@@ -29,15 +27,13 @@ const useAPI = () => {
       });
       setLoading(false);
       return response.data;
-    } catch (error_) {
+    } catch (requestError) {
       setLoading(false);
-      const status = error_.response?.status || 'unknown';
+      const status = requestError.response?.status || 'unknown';
       const errorMessage =
-        error_.response?.data?.message ||
-        error_.message ||
+        requestError.response?.data?.message ||
+        requestError.message ||
         'Error en la solicitud';
-
-      // Log detallado del error
 
       // Las sentencias if vacías, posiblemente para depuración, han sido eliminadas.
 

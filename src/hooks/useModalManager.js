@@ -1,7 +1,7 @@
 /**
- * Hook personalizado para gestionar modales de manera eficiente en la aplicaciu00f3n.
- * Proporciona una manera centralizada de controlar quu00e9 modales estu00e1n abiertos
- * y coordina su interacciu00f3n para evitar problemas de UI.
+ * Hook personalizado para gestionar modales de manera eficiente en la aplicación.
+ * Proporciona una manera centralizada de controlar qué modales están abiertos
+ * y coordina su interacción para evitar problemas de UI.
  */
 import {
   useState,
@@ -21,16 +21,16 @@ const ModalContext = createContext();
  * @param {React.ReactNode} props.children - Componentes hijos
  */
 export const ModalProvider = ({ children }) => {
-  // Estado central para todos los modales de la aplicaciu00f3n
+  // Estado central para todos los modales de la aplicación
   const [modals, setModals] = useState(new Map());
 
-  // Historial de modales para gestionar la navegaciu00f3n entre ellos
+  // Historial de modales para gestionar la navegación entre ellos
   const [modalHistory, setModalHistory] = useState([]);
 
-  // Contador para generar IDs u00fanicos para modales dinu00e1micos
+  // Contador para generar IDs únicos para modales dinámicos
   const [idCounter, setIdCounter] = useState(1);
 
-  // Estado para controlar si hay algu00fan modal bloqueante activo
+  // Estado para controlar si hay algún modal bloqueante activo
   const [hasBlockingModal, setHasBlockingModal] = useState(false);
 
   // Efecto para actualizar el estado de bloqueo basado en modales activos
@@ -43,12 +43,12 @@ export const ModalProvider = ({ children }) => {
 
   /**
    * Registra un nuevo modal en el sistema
-   * @param {string} id - Identificador u00fanico del modal
-   * @param {Object} options - Opciones de configuraciu00f3n
-   * @param {boolean} options.blocking - Si el modal bloquea la interacciu00f3n con otros elementos
-   * @param {number} options.zIndex - u00cdndice Z para posicionamiento
-   * @param {string} options.size - Tamau00f1o del modal (small, medium, large, fullscreen)
-   * @param {Function} options.onBeforeClose - Funciu00f3n a ejecutar antes de cerrar
+   * @param {string} id - Identificador único del modal
+   * @param {Object} options - Opciones de configuración
+   * @param {boolean} options.blocking - Si el modal bloquea la interacción con otros elementos
+   * @param {number} options.zIndex - Índice Z para posicionamiento
+   * @param {string} options.size - Tamaño del modal (small, medium, large, fullscreen)
+   * @param {Function} options.onBeforeClose - Función a ejecutar antes de cerrar
    * @returns {string} ID del modal registrado
    */
   const registerModal = useCallback(
@@ -67,7 +67,7 @@ export const ModalProvider = ({ children }) => {
           // Si el modal ya existe, solo actualizar sus opciones
           newModals.set(modalId, { ...existingModal, ...options });
         } else {
-          // Si es un modal nuevo, crear su configuraciu00f3n completa
+          // Si es un modal nuevo, crear su configuración completa
           newModals.set(modalId, {
             id: modalId,
             isOpen: false,
@@ -92,37 +92,33 @@ export const ModalProvider = ({ children }) => {
   );
 
   /**
-   * Abre un modal especu00edfico
+   * Abre un modal específico
    * @param {string} id - ID del modal a abrir
    * @param {Object} data - Datos a pasar al modal
    */
-  const openModal = useCallback(
-    (id, data) => {
-      if (!modals.has(id)) {
-        return;
+  const openModal = useCallback((id, data) => {
+    setModals((previousModals) => {
+      const modal = previousModals.get(id);
+      if (!modal) {
+        return previousModals;
       }
-      const modal = modals.get(id);
 
-      // Actualizar el modal especu00edfico
-      setModals((previous) => {
-        const newModals = new Map(previous);
-        const currentModal = newModals.get(id);
-        if (currentModal) {
-          newModals.set(id, { ...currentModal, isOpen: true, data });
-        }
-        return newModals;
-      });
+      const newModals = new Map(previousModals);
+      newModals.set(id, { ...modal, isOpen: true, data });
 
-      // Au00f1adir al historial si corresponde
       if (modal.history) {
-        setModalHistory((previous) => [...previous, { id, data }]);
+        setModalHistory((previousHistory) => [
+          ...previousHistory,
+          { id, data },
+        ]);
       }
-    },
-    [modals],
-  );
+
+      return newModals;
+    });
+  }, []);
 
   /**
-   * Cierra un modal especu00edfico
+   * Cierra un modal específico
    * @param {string} id - ID del modal a cerrar
    * @param {Object} result - Resultado o datos de salida del modal
    */
@@ -132,7 +128,7 @@ export const ModalProvider = ({ children }) => {
         return;
       }
 
-      // Ejecutar funciu00f3n onBeforeClose si existe
+      // Ejecutar función onBeforeClose si existe
       const modal = modals.get(id);
       if (modal.onBeforeClose) {
         try {
@@ -173,24 +169,25 @@ export const ModalProvider = ({ children }) => {
    * Cierra todos los modales abiertos
    */
   const closeAllModals = useCallback(() => {
-    // Identificar modales abiertos
-    const openModalIds = [...modals.entries()]
-      .filter(([, modal]) => modal.isOpen)
-      .map(([id]) => id);
+    setModals((previousModals) => {
+      const newModals = new Map(previousModals);
+      let hasChanged = false;
+      for (const [id, modal] of newModals.entries()) {
+        if (modal.isOpen) {
+          newModals.set(id, { ...modal, isOpen: false, data: undefined });
+          hasChanged = true;
+        }
+      }
+      return hasChanged ? newModals : previousModals;
+    });
 
-    // Cerrar cada modal abierto
-    for (const id of openModalIds) {
-      closeModal(id);
-    }
-
-    // Limpiar historial
     setModalHistory([]);
-  }, [modals, closeModal]);
+  }, []);
 
   /**
    * Obtiene datos sobre el estado de un modal
    * @param {string} id - ID del modal
-   * @returns {Object} Informaciu00f3n del modal o null si no existe
+   * @returns {Object} Información del modal o null si no existe
    */
   const getModalState = useCallback(
     (id) => {
@@ -232,7 +229,7 @@ export const ModalProvider = ({ children }) => {
 
 /**
  * Hook para usar el sistema de modales en cualquier componente
- * @returns {Object} API de gestiu00f3n de modales
+ * @returns {Object} API de gestión de modales
  */
 export const useModalManager = () => {
   const context = useContext(ModalContext);

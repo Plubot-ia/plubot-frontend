@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import useAuthStore from '@/stores/use-auth-store';
@@ -10,16 +10,16 @@ const useForgotPasswordForm = () => {
   const navigate = useNavigate();
   const { forgotPassword, error: authError } = useAuthStore();
 
-  const showMessage = (text, type) => {
+  const showMessage = useCallback((text, type) => {
     setMessage({ text, type });
     setTimeout(() => setMessage({ text: '', type: '' }), 5000);
-  };
+  }, []);
 
   useEffect(() => {
     if (authError) {
       showMessage(authError, 'error');
     }
-  }, [authError]);
+  }, [authError, showMessage]);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -55,9 +55,9 @@ const useForgotPasswordForm = () => {
         showMessage('Error al enviar el correo. Intenta nuevamente.', 'error');
         setIsSubmitting(false);
       }
-    } catch (error) {
+    } catch (submissionError) {
       const errorMessage =
-        error.response?.data?.message ||
+        submissionError.response?.data?.message ||
         'Error de conexión. Verifica tu conexión a internet.';
       showMessage(errorMessage, 'error');
       setIsSubmitting(false);

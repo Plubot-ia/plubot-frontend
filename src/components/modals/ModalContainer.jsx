@@ -1,12 +1,12 @@
 import React, { lazy, Suspense } from 'react';
 
 // Importar componentes de modal directamente
+import useFlowStore from '@/stores/use-flow-store';
+
+import useGlobalContext from '../../hooks/useGlobalContext';
 import EmbedModal from '../onboarding/modals/EmbedModal';
 import ImportExportModal from '../onboarding/modals/ImportExportModal';
 import SyncModal from '../onboarding/modals/SyncModal';
-
-import useFlowStore from '@/stores/use-flow-store';
-import useGlobalContext from '../../hooks/useGlobalContext';
 
 // Cargar componentes pesados con lazy loading
 const TemplateSelector = lazy(
@@ -44,7 +44,7 @@ const ModalContainer = () => {
 
   // Si no hay modales activos, no renderizar nada.
   if (!activeModalEntry) {
-    return null;
+    return;
   }
 
   // Función para manejar sincronización (pasada a SyncModal)
@@ -183,8 +183,9 @@ const ModalContainer = () => {
           }
 
           default: {
-            return null;
-          } // No renderizar nada si no hay modal activo
+            // No renderizar nada si no hay modal activo
+            break;
+          }
         }
       })()}
     </>

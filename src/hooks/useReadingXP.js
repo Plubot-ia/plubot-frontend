@@ -6,6 +6,14 @@ const LEVEL_THRESHOLDS = [
   0, 1000, 3000, 6000, 10_000, 15_000, 25_000, 40_000, 60_000,
 ]; // Umbrales más altos
 
+const calculateLevel = (xp) => {
+  const currentLevel = LEVEL_THRESHOLDS.findIndex((threshold, index) => {
+    const isLastLevel = index === LEVEL_THRESHOLDS.length - 1;
+    return xp >= threshold && (isLastLevel || xp < LEVEL_THRESHOLDS[index + 1]);
+  });
+  return currentLevel === -1 ? 0 : currentLevel;
+};
+
 const showNotification = (message) => {
   const notification = document.createElement('div');
   // Estilos para la notificación de subida de nivel.
@@ -40,14 +48,7 @@ const useReadingXP = (postId) => {
       localStorage.getItem('plubot_xp_total') || '0',
       10,
     );
-    const currentLevel = LEVEL_THRESHOLDS.findIndex((threshold, index) => {
-      const isLastLevel = index === LEVEL_THRESHOLDS.length - 1;
-      return (
-        totalXP >= threshold &&
-        (isLastLevel || totalXP < LEVEL_THRESHOLDS[index + 1])
-      );
-    });
-    return currentLevel;
+    return calculateLevel(totalXP);
   });
 
   const addXPToGlobal = useCallback(
@@ -60,15 +61,9 @@ const useReadingXP = (postId) => {
       localStorage.setItem('plubot_xp_total', newXP);
 
       // Actualizar nivel
-      const newLevel = LEVEL_THRESHOLDS.findIndex((threshold, index) => {
-        const isLastLevel = index === LEVEL_THRESHOLDS.length - 1;
-        return (
-          newXP >= threshold &&
-          (isLastLevel || newXP < LEVEL_THRESHOLDS[index + 1])
-        );
-      });
+      const newLevel = calculateLevel(newXP);
 
-      if (newLevel !== level) {
+      if (newLevel > level) {
         setLevel(newLevel);
         showNotification(`¡Subiste al Nivel ${newLevel}!`);
       }
@@ -81,15 +76,7 @@ const useReadingXP = (postId) => {
     const isPostCompleted =
       JSON.parse(localStorage.getItem(`xp_completed_${postId}`)) || false;
     if (isPostCompleted) {
-      return () => {
-        // No es necesario desconectar el observer si el post ya está completado.
-        // Se devuelve una función vacía para mantener la consistencia del hook.
-        // Esta función se utiliza para evitar el error 'no-empty-function'
-        // y cumplir con las reglas de linting.
-        // Se divide la línea larga en varias partes para corregir el error de max-len.
-        // Esta función vacía se utiliza para evitar el error 'no-empty-function'
-        // y cumplir con las reglas de linting.
-      };
+      return; // No se crea el observer, no se necesita limpieza.
     }
 
     const observer = new IntersectionObserver(

@@ -9,7 +9,7 @@ import { useState, useEffect } from 'react';
  * @returns {boolean} - True si el elemento está en el viewport.
  */
 export function useIntersection(
-  ref,
+  elementReference,
   { threshold = 0.1, rootMargin = '200px' } = {},
 ) {
   const [isInView, setIsInView] = useState(false);
@@ -29,7 +29,7 @@ export function useIntersection(
       },
     );
 
-    const currentRef = ref.current;
+    const currentRef = elementReference.current;
     if (currentRef) {
       observer.observe(currentRef);
     }
@@ -40,7 +40,7 @@ export function useIntersection(
       }
       observer.disconnect();
     };
-  }, [ref, threshold, rootMargin]);
+  }, [elementReference, threshold, rootMargin]);
 
   return isInView;
 }

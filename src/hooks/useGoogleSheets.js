@@ -1,5 +1,5 @@
 // hooks/useGoogleSheets.js
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
 import useAuthStore from '@/stores/use-auth-store';
 
