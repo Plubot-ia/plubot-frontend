@@ -29,7 +29,7 @@ interface UndoRedoStoreSlice {
 
 // Define el valor de retorno del hook.
 export interface UseUndoRedoReturn {
-  addToHistory: (entry: HistoryEntry) => void;
+  addToHistory: () => void;
   undo: () => void;
   redo: () => void;
   canUndo: () => boolean;
@@ -53,20 +53,22 @@ export const useUndoRedo = (): UseUndoRedoReturn => {
     shallow,
   );
 
-  const addToHistory = useCallback(
-    (entry: HistoryEntry) => {
-      if (!history) return;
-      // Clonación profunda para prevenir mutaciones.
-      const deepCloneEntry = JSON.parse(JSON.stringify(entry)) as HistoryEntry;
-      setHistory((previous) => {
-        const updatedPast = [...previous.past, deepCloneEntry].slice(
-          -previous.maxHistory,
-        );
-        return { ...previous, past: updatedPast, future: [] };
-      });
-    },
-    [history, setHistory],
-  );
+  const addToHistory = useCallback(() => {
+    if (!history) return;
+
+    const { nodes, edges } = useFlowStore.getState();
+    const entry = { type: 'snapshot', nodes, edges };
+
+    // Clonación profunda para prevenir mutaciones.
+    const deepCloneEntry = JSON.parse(JSON.stringify(entry)) as HistoryEntry;
+
+    setHistory((previous) => {
+      const updatedPast = [...previous.past, deepCloneEntry].slice(
+        -previous.maxHistory,
+      );
+      return { ...previous, past: updatedPast, future: [] };
+    });
+  }, [history, setHistory]);
 
   const canUndo = useCallback(() => {
     return (

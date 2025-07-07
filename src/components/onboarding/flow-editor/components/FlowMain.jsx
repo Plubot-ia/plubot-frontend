@@ -167,8 +167,8 @@ const FlowMain = ({
   // ACCESO AL STORE DE ZUSTAND (SELECTORES)
   // -----------------------------------------
   // Selectores optimizados para minimizar renderizaciones
-  const zustandNodes = useFlowStore((state) => state.nodes);
-  const zustandEdges = useFlowStore((state) => state.edges);
+  const zustandNodes = useFlowStore((state) => state.nodes || []);
+  const zustandEdges = useFlowStore((state) => state.edges || []);
   const isUltraMode = useFlowStore((state) => state.isUltraMode);
   const plubotId = useFlowStore((state) => state.plubotId);
   const flowName = useFlowStore((state) => state.flowName);
@@ -208,9 +208,9 @@ const FlowMain = ({
   } = useFlowStore();
 
   // Determinar si se están usando nodos externos o internos
-  const nodes = externalNodes || zustandNodes;
+  const nodes = externalNodes ?? zustandNodes;
   const edges = useMemo(
-    () => (areEdgesReady ? externalEdges || zustandEdges : []),
+    () => (areEdgesReady ? externalEdges ?? zustandEdges : []),
     [areEdgesReady, externalEdges, zustandEdges],
   );
 

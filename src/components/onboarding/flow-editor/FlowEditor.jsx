@@ -6,7 +6,7 @@
 
 // Third-party libraries
 import PropTypes from 'prop-types';
-import React, { lazy, useEffect, useRef, useState } from 'react';
+import React, { lazy, useCallback, useEffect, useRef, useState } from 'react';
 import { ReactFlowProvider } from 'reactflow';
 import { shallow } from 'zustand/shallow';
 
@@ -15,6 +15,7 @@ import ContextMenu from '@/components/onboarding/ui/context-menu';
 import { useUndoRedo } from '@/hooks/useUndoRedo';
 import useAuthStore from '@/stores/use-auth-store';
 import useFlowStore from '@/stores/use-flow-store';
+import { onEvent } from '@/utils/event-bus';
 
 // Local components, hooks, and utils
 import EpicHeader from '../common/EpicHeader';
@@ -24,11 +25,13 @@ import EmergencyRecovery from './components/EmergencyRecovery';
 import FlowMain from './components/FlowMain';
 import useConnectionValidator from './hooks/useConnectionValidator';
 import useDragAndDropManager from './hooks/useDragAndDropManager';
-import { useFlowEvents } from './hooks/useFlowEvents';
+import useFlowElementsManager from './hooks/useFlowElementsManager';
+import useLocalBackupManager from './hooks/useLocalBackupManager';
+import useNodeStyles from './hooks/useNodeStyles';
+import { prepareEdgesForSaving } from './utils/edgeFixUtil';
+import { MIN_ZOOM, NODE_EXTENT, TRANSLATE_EXTENT } from './utils/flow-extents';
 import { useFlowSaver } from './hooks/useFlowSaver';
 import { useModalManager } from './hooks/useModalManager';
-import useNodeStyles from './hooks/useNodeStyles';
-import { MIN_ZOOM, NODE_EXTENT, TRANSLATE_EXTENT } from './utils/flow-extents';
 
 // Styles and patches
 import './FlowEditor.css';
@@ -110,129 +113,195 @@ const FlowEditorInner = ({
   handleError,
   hideContextMenu,
 }) => {
-  // ==============================================
-  // SECCIÓN 1: ESTADO Y REFERENCIAS
-  // ==============================================
-  const reactFlowWrapperReference = useRef(null);
-  const [isRecoveryModalOpen, setRecoveryModalOpen] = useState(false);
+  // Referencias y navegación
+  const reactFlowWrapperReference = useRef();
 
   // ==============================================
-  // SECCIÓN 2: HOOKS DE ZUSTAND (STORE GLOBAL)
+  // SECCIÓN 1: ACCESO AL STORE DE ZUSTAND
   // ==============================================
   const {
     nodes,
     edges,
-    onNodesChange: onNodesChangeOptimized,
-    onEdgesChange: onEdgesChangeOptimized,
-    setEdges,
-    deleteElements,
-    flowName,
     isUltraMode,
-    reactFlowInstance,
-    setReactFlowInstance,
-    loadFlow,
-    setHasChanges,
+    lastSaved,
+    setNodes,
+    setEdges,
+    onNodesChange,
+    onEdgesChange,
+    setPlubotId,
+    setFlowName,
+    saveLocalBackup,
   } = useFlowStore(
     (state) => ({
       nodes: state.nodes,
       edges: state.edges,
+      isUltraMode: state.isUltraMode,
+      lastSaved: state.lastSaved,
+      setNodes: state.setNodes,
+      setEdges: state.setEdges,
       onNodesChange: state.onNodesChange,
       onEdgesChange: state.onEdgesChange,
-      setEdges: state.setEdges,
-      deleteElements: state.deleteElements,
-      flowName: state.name,
-      isUltraMode: state.isUltraMode,
-      reactFlowInstance: state.reactFlowInstance,
-      setReactFlowInstance: state.setReactFlowInstance,
-      loadFlow: state.loadFlow,
-      setHasChanges: state.setHasChanges,
+      setPlubotId: state.setPlubotId,
+      setFlowName: state.setFlowName,
+      saveLocalBackup: state.saveLocalBackup,
     }),
     shallow,
   );
 
   // ==============================================
-  // SECCIÓN 3: HOOKS ESPECIALIZADOS LOCALES
+  // SECCIÓN 2: ESTADO LOCAL Y HOOKS BÁSICOS
+  // ==============================================
+  const [flowName, setLocalFlowName] = useState(name || '');
+  const [, setHasChanges] = useState(false);
+  const [reactFlowInstance, setReactFlowInstance] = useState();
+
+  // Estado para la recuperación de emergencia
+  const [isRecoveryOpen, setRecoveryOpen] = useState(false);
+  const [backupExists, setBackupExists] = useState(false);
+
+  const { isValidConnection } = useConnectionValidator(nodes, edges);
+  const { addToHistory } = useUndoRedo();
+
+  // Hook para gestionar respaldos locales
+  const { recoverFromBackup, hasLocalBackup } = useLocalBackupManager(plubotId);
+
+  // ==============================================
+  // SECCIÓN 3: EFECTOS SECUNDARIOS (useEffect)
   // ==============================================
 
-  // Hook para la gestión de Deshacer/Rehacer
-  const { takeSnapshot } = useUndoRedo();
+  // Sincronizar datos con el store global cuando cambia el ID o nombre
+  useEffect(() => {
+    if (plubotId) {
+      setPlubotId(plubotId);
+    }
+    if (flowName !== name && name) {
+      setLocalFlowName(name);
+      setFlowName(name);
+    }
+  }, [plubotId, name, flowName, setPlubotId, setFlowName]);
 
-  // Hook para la validación de conexiones
-  const { isValidConnection } = useConnectionValidator();
+  // Guardado automático de respaldo al cerrar la pestaña
+  useEffect(() => {
+    const handleBeforeUnload = () => saveLocalBackup();
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [saveLocalBackup]);
 
-  // Hook para la gestión de eventos de React Flow
-  const {
-    onConnectNodes,
-    onEdgeUpdateStart,
-    onEdgeUpdate,
-    onEdgeUpdateEnd,
-    onSelectionDragStop,
-  } = useFlowEvents(isValidConnection, setEdges, deleteElements, takeSnapshot);
+  // Comprobar si existe un respaldo al montar el componente
+  useEffect(() => {
+    if (hasLocalBackup()) {
+      setBackupExists(true);
+      setRecoveryOpen(true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Solo se ejecuta una vez al montar
 
-  // Hook para la gestión de arrastrar y soltar
+  // ==============================================
+  // SECCIÓN 4: FUNCIONES Y CALLBACKS
+  // ==============================================
+
+  const saveHistoryState = useCallback(() => {
+    const flowState = {
+      nodes: useFlowStore.getState().nodes,
+      edges: useFlowStore.getState().edges,
+    };
+    addToHistory(flowState);
+  }, [addToHistory]);
+
+  const { onConnectNodes } = useFlowElementsManager(
+    saveHistoryState,
+    setHasChanges,
+  );
+
   const { onDragOver, onDrop } = useDragAndDropManager(
     reactFlowWrapperReference,
     reactFlowInstance,
+    setHasChanges,
   );
 
-  // Hook para la gestión de modales
+  useNodeStyles(isUltraMode);
+
   const { openModal, closeModal } = useModalManager();
 
-  // Hook para la lógica de guardado, notificaciones y respaldos
   const {
+    show: showSaveStatus,
+    status: saveStatus,
+    message: saveMessage,
     saveFlowHandler,
-    lastSaved,
-    saveStatus,
-    showSaveStatus,
-    saveMessage,
-    attemptBackupRecovery,
-    isLoaded,
-    isBackupLoaded,
-    hasLocalBackup,
   } = useFlowSaver(plubotId, handleError, setHasChanges);
 
-  // Hook para la gestión de estilos y modos de performance
-  useNodeStyles();
+  const onNodesChangeOptimized = useCallback(
+    (changes) => {
+      onNodesChange(changes);
+      setHasChanges(true);
+    },
+    [onNodesChange],
+  );
 
-  // ==============================================
-  // SECCIÓN 4: EFECTOS SECUNDARIOS (useEffect)
-  // ==============================================
+  const onEdgesChangeOptimized = useCallback(
+    (changes) => {
+      onEdgesChange(changes);
+      setHasChanges(true);
+    },
+    [onEdgesChange],
+  );
 
-  // Sincronizar el nombre del plubot con el store global
-  useEffect(() => {
-    if (name) {
-      useFlowStore.setState({ flowName: name });
+  const onSelectionDragStop = useCallback(() => {
+    saveHistoryState();
+    setHasChanges(true);
+  }, [saveHistoryState]);
+
+  const onEdgeUpdate = useCallback(
+    (oldEdge, newConnection) => {
+      saveHistoryState();
+
+      setEdges((currentEdges) => {
+        const filtered = currentEdges.filter((edge) => edge.id !== oldEdge.id);
+        const newEdge = {
+          ...newConnection,
+          id: `e-${newConnection.source}-${newConnection.target}-${Date.now()}`,
+          type: oldEdge.type || 'elite-edge',
+          animated: oldEdge.animated || false,
+          data: oldEdge.data || { text: '' },
+        };
+        return [...filtered, newEdge];
+      });
+
+      setHasChanges(true);
+    },
+    [setEdges, saveHistoryState],
+  );
+
+  const [edgeUpdateSuccessful, setEdgeUpdateSuccessful] = useState(false);
+
+  const onEdgeUpdateStart = useCallback(() => {
+    setEdgeUpdateSuccessful(false);
+  }, []);
+
+  const onEdgeUpdateEnd = useCallback(
+    (_event, edge) => {
+      if (!edgeUpdateSuccessful) {
+        setEdges((currentEdges) =>
+          currentEdges.filter((currentEdge) => currentEdge.id !== edge.id),
+        );
+      }
+    },
+    [edgeUpdateSuccessful, setEdges],
+  );
+
+  // Handlers para el diálogo de recuperación
+  const handleRecover = useCallback(() => {
+    const backup = recoverFromBackup();
+    if (backup && backup.nodes && backup.edges) {
+      setNodes(backup.nodes);
+      setEdges(prepareEdgesForSaving(backup.edges)); // Asegurar compatibilidad
     }
-  }, [name]);
+    setRecoveryOpen(false);
+  }, [recoverFromBackup, setNodes, setEdges]);
 
-  // Cargar el flujo desde el servidor cuando el componente se monta o el ID cambia
-  useEffect(() => {
-    if (plubotId) {
-      loadFlow(plubotId);
-    }
-  }, [plubotId, loadFlow]);
-
-  // Intentar recuperación de backup solo si la carga inicial desde el servidor falla o está pendiente
-  useEffect(() => {
-    if (!isLoaded) {
-      attemptBackupRecovery();
-    }
-  }, [isLoaded, attemptBackupRecovery]);
-
-  useEffect(() => {
-    if (hasLocalBackup && hasLocalBackup()) {
-      setRecoveryModalOpen(true);
-    }
-  }, [hasLocalBackup]);
-
-  const handleRecover = () => {
-    attemptBackupRecovery();
-    setRecoveryModalOpen(false);
-  };
-
-  const handleDismiss = () => {
-    setRecoveryModalOpen(false);
-  };
+  const handleDismiss = useCallback(() => {
+    setRecoveryOpen(false);
+  }, []);
 
   // ==============================================
   // SECCIÓN 5: RENDERIZADO DEL COMPONENTE
@@ -241,7 +310,7 @@ const FlowEditorInner = ({
     <div className='flow-editor-container'>
       <EpicHeader
         title={flowName || 'Flujo sin título'}
-        setTitle={(newTitle) => useFlowStore.setState({ flowName: newTitle })}
+        setTitle={setLocalFlowName}
         showChangeLog={false}
         onSave={saveFlowHandler}
         lastSaved={lastSaved}
@@ -263,10 +332,10 @@ const FlowEditorInner = ({
 
       <div className='flow-main-wrapper' ref={reactFlowWrapperReference}>
         <EmergencyRecovery
-          isOpen={isRecoveryModalOpen}
+          isOpen={isRecoveryOpen}
           onRecover={handleRecover}
           onDismiss={handleDismiss}
-          hasBackup={hasLocalBackup ? hasLocalBackup() : false}
+          hasBackup={backupExists}
         />
 
         <FlowMain
@@ -326,7 +395,6 @@ const FlowEditor = ({
     isAuthenticated: state.isAuthenticated,
   }));
   const isPublic = false; // TODO: Implementar lógica de visibilidad pública
-
   const {
     contextMenuVisible,
     contextMenuPosition,
@@ -353,9 +421,13 @@ const FlowEditor = ({
   return (
     <ReactFlowProvider>
       <FlowEditorInner
+        selectedNode={selectedNode}
+        setSelectedNode={setSelectedNode}
         handleError={handleError}
         plubotId={plubotId}
         name={name}
+        saveFlowData={saveFlowData}
+        hideHeader={hideHeader}
         hideContextMenu={hideContextMenu}
       />
       {/* Global Context Menu Renderer */}
