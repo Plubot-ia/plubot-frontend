@@ -31,9 +31,21 @@ const useLocalBackupManager = (plubotId) => {
     }
   }, [plubotId]);
 
+  const hasLocalBackup = useCallback(() => {
+    if (!plubotId) return false;
+
+    try {
+      const backupData = safeGetItem(`plubot-backup-${plubotId}`);
+      return !!backupData;
+    } catch {
+      return false;
+    }
+  }, [plubotId]);
+
   return {
     createBackup,
     recoverFromBackup,
+    hasLocalBackup,
   };
 };
 

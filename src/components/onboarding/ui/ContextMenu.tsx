@@ -83,11 +83,21 @@ export const ContextMenu = ({
       }}>Node: {nodeId}</p> */}
       {items.map((item, index) => {
         if (item.type === 'separator') {
-          {
-          }
+          const prevLabel =
+            items[index - 1] &&
+            'label' in items[index - 1] &&
+            items[index - 1].label
+              ? items[index - 1].label
+              : '';
+          const nextLabel =
+            items[index + 1] &&
+            'label' in items[index + 1] &&
+            items[index + 1].label
+              ? items[index + 1].label
+              : '';
           return (
             <hr
-              key={`sep-${index}-${nodeId ?? 'global'}`}
+              key={`sep-between-${prevLabel}-and-${nextLabel}-${nodeId ?? 'global'}`}
               style={{ margin: '4px 0', borderColor: '#eee' }}
             />
           );

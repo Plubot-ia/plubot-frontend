@@ -209,8 +209,6 @@ const useFlowStore = createWithEqualityFn(
     (set, get) => ({
       ...initialState,
 
-      setHasChanges: (hasChanges) => set({ hasChanges }),
-
       resetFlow: (plubotId, flowName, options = {}) =>
         set((state) => ({
           ...state,

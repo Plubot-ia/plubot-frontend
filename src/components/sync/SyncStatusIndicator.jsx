@@ -1,8 +1,18 @@
-import { motion, AnimatePresence } from 'framer-motion';
 import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import PropTypes from 'prop-types';
 
-import { useSyncService, getSyncState } from '../../services/syncService';
+import useSyncService, { getSyncState } from '../../services/syncService';
+
 import './SyncStatusIndicator.css';
+
+// Helper para obtener el texto del estado de sincronización
+const getSyncStatusText = (details) => {
+  if (details.isSyncing) return 'Sincronizando...';
+  if (details.syncStatus === 'success') return 'Sincronizado';
+  if (details.syncStatus === 'error') return 'Error de sincronización';
+  return 'Listo para sincronizar';
+};
 
 /**
  * Componente que muestra el estado de sincronización de plubots
@@ -10,10 +20,10 @@ import './SyncStatusIndicator.css';
  */
 const SyncStatusIndicator = ({ expanded = false, showControls = true }) => {
   const [isExpanded, setIsExpanded] = useState(expanded);
-  const [syncDetails, setSyncDetails] = useState(null);
+  const [syncDetails, setSyncDetails] = useState();
 
   // Usar el servicio de sincronización
-  const { syncState, syncAllPlubots } = useSyncService();
+  const { syncAllPlubots } = useSyncService();
 
   // Actualizar estado y detalles de sincronización
   useEffect(() => {
@@ -33,8 +43,8 @@ const SyncStatusIndicator = ({ expanded = false, showControls = true }) => {
   };
 
   // Forzar sincronización manual
-  const handleSync = (e) => {
-    e.stopPropagation();
+  const handleSync = (event) => {
+    event.stopPropagation();
     syncAllPlubots();
   };
 
@@ -75,14 +85,6 @@ const SyncStatusIndicator = ({ expanded = false, showControls = true }) => {
         return 'var(--color-gray)';
       }
     }
-  };
-
-  // Helper para obtener el texto del estado de sincronización
-  const getSyncStatusText = (details) => {
-    if (details.isSyncing) return 'Sincronizando...';
-    if (details.syncStatus === 'success') return 'Sincronizado';
-    if (details.syncStatus === 'error') return 'Error de sincronización';
-    return 'Listo para sincronizar';
   };
 
   // Si no hay detalles de sincronización, mostrar indicador de carga
@@ -164,6 +166,11 @@ const SyncStatusIndicator = ({ expanded = false, showControls = true }) => {
       </AnimatePresence>
     </button>
   );
+};
+
+SyncStatusIndicator.propTypes = {
+  expanded: PropTypes.bool,
+  showControls: PropTypes.bool,
 };
 
 export default SyncStatusIndicator;

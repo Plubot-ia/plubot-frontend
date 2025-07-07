@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React, { useState, useRef, useEffect } from 'react';
 import ReactDOM from 'react-dom';
 
@@ -24,11 +25,6 @@ const Tooltip = ({ content, children, position = 'top', delay = 500 }) => {
       const tooltipWidth = tooltipNode ? tooltipNode.offsetWidth : 100;
 
       switch (position) {
-        case 'top': {
-          top = triggerRect.top - tooltipHeight - 5;
-          left = triggerRect.left + triggerRect.width / 2 - tooltipWidth / 2;
-          break;
-        }
         case 'bottom': {
           top = triggerRect.bottom + 5;
           left = triggerRect.left + triggerRect.width / 2 - tooltipWidth / 2;
@@ -44,9 +40,11 @@ const Tooltip = ({ content, children, position = 'top', delay = 500 }) => {
           left = triggerRect.right + 5;
           break;
         }
+
         default: {
           top = triggerRect.top - tooltipHeight - 5;
           left = triggerRect.left + triggerRect.width / 2 - tooltipWidth / 2;
+          break;
         }
       }
 
@@ -72,19 +70,12 @@ const Tooltip = ({ content, children, position = 'top', delay = 500 }) => {
     setIsVisible(true);
   };
 
-  const handleMouseLeaveTrigger = () => {
-    // Iniciar temporizador para ocultar el tooltip
-    hideTimeoutReference.current = setTimeout(() => {
-      setIsVisible(false);
-    }, delay);
-  };
-
   const handleMouseEnterTooltipContent = () => {
     clearTimeout(hideTimeoutReference.current); // Mantener visible si el mouse entra al contenido
   };
 
-  const handleMouseLeaveTooltipContent = () => {
-    // Iniciar temporizador para ocultar el tooltip si el mouse sale de su contenido
+  const hideTooltipWithDelay = () => {
+    // Iniciar temporizador para ocultar el tooltip
     hideTimeoutReference.current = setTimeout(() => {
       setIsVisible(false);
     }, delay);
@@ -108,7 +99,7 @@ const Tooltip = ({ content, children, position = 'top', delay = 500 }) => {
             pointerEvents: 'all', // Asegurar que el tooltip capture eventos del mouse
           }}
           onMouseEnter={handleMouseEnterTooltipContent}
-          onMouseLeave={handleMouseLeaveTooltipContent}
+          onMouseLeave={hideTooltipWithDelay}
         >
           {typeof content === 'string' ? (
             <ReactMarkdown>{content}</ReactMarkdown>
@@ -118,16 +109,16 @@ const Tooltip = ({ content, children, position = 'top', delay = 500 }) => {
         </div>,
         portalRoot,
       )
-    : null;
+    : undefined;
 
   return (
     <div
       className='tooltip-trigger-wrapper'
       ref={triggerReference}
       onMouseEnter={handleMouseEnterTrigger}
-      onMouseLeave={handleMouseLeaveTrigger}
+      onMouseLeave={hideTooltipWithDelay}
       onFocus={handleMouseEnterTrigger} // Reutilizar lógica para mostrar en foco
-      onBlur={handleMouseLeaveTrigger} // Ocultar en blur para consistencia
+      onBlur={hideTooltipWithDelay} // Ocultar en blur para consistencia
       onKeyDown={handleKeyDown}
       role='button'
       tabIndex={0}
@@ -136,6 +127,13 @@ const Tooltip = ({ content, children, position = 'top', delay = 500 }) => {
       {tooltipJsx}
     </div>
   );
+};
+
+Tooltip.propTypes = {
+  content: PropTypes.oneOfType([PropTypes.string, PropTypes.node]).isRequired,
+  children: PropTypes.node.isRequired,
+  position: PropTypes.oneOf(['top', 'bottom', 'left', 'right']),
+  delay: PropTypes.number,
 };
 
 export default Tooltip;

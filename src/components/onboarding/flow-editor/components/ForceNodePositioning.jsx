@@ -220,7 +220,7 @@ const ForceNodePositioning = () => {
     };
   }, []);
 
-  return null; // Este componente no renderiza nada visible
+  // Este componente no renderiza nada visible
 };
 
 export default ForceNodePositioning;

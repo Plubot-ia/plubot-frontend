@@ -5,7 +5,7 @@ import {
   exportAllPlubots,
   importPlubots,
 } from '../../services/exportImportService';
-import { useSyncService } from '../../services/syncService';
+import useSyncService from '../../services/syncService';
 import useAuthStore from '../../stores/use-auth-store';
 import './DataBackupPanel.css';
 
@@ -47,8 +47,8 @@ const DataBackupPanel = () => {
   };
 
   // Manejar importación de plubots
-  const handleImport = async (e) => {
-    e.preventDefault();
+  const handleImport = async (event) => {
+    event.preventDefault();
     const fileInput = fileInputReference.current; // Evitar race conditions
 
     if (!fileInput.files || fileInput.files.length === 0) {

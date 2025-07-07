@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import { useState } from 'react';
 
 import byteImage from '@/assets/img/byte.png'; // Usa el alias @
@@ -6,7 +7,7 @@ import './ByteGuide.css'; // Importar los estilos
 const ByteGuide = ({ message, position }) => {
   const [isVisible, setIsVisible] = useState(true);
 
-  if (!isVisible) return null;
+  if (!isVisible) return;
 
   return (
     <div className={`byte-guide-container ${position}`}>
@@ -19,6 +20,11 @@ const ByteGuide = ({ message, position }) => {
       </div>
     </div>
   );
+};
+
+ByteGuide.propTypes = {
+  message: PropTypes.string.isRequired,
+  position: PropTypes.string.isRequired,
 };
 
 export default ByteGuide;

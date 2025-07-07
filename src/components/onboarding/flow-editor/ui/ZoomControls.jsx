@@ -8,18 +8,17 @@ import {
 } from 'react-icons/fi';
 import { useReactFlow } from 'reactflow';
 
-import './ZoomControls.css';
 import { useUndoRedo } from '@/stores/selectors';
 
+import './ZoomControls.css';
+
 /**
- * Componente para controles de zoom, historial y versiones en el editor de flujos
+ * Componente para controles de zoom e historial en el editor de flujos
  * @param {Object} props - Propiedades del componente
  * @param {Function} props.onUndo - Función para deshacer cambios
  * @param {Function} props.onRedo - Función para rehacer cambios
- * @param {Function} props.onToggleHistory - Función para mostrar/ocultar el panel de historial
- * @param {boolean} props.historyActive - Indica si el panel de historial está activo
  */
-const ZoomControls = ({ onUndo, onRedo, onToggleHistory, historyActive }) => {
+const ZoomControls = ({ onUndo, onRedo }) => {
   // Obtener funciones de historial del store de Zustand
   const { undo, redo, canUndo, canRedo } = useUndoRedo();
 

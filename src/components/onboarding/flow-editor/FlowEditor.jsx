@@ -6,7 +6,7 @@
 
 // Third-party libraries
 import PropTypes from 'prop-types';
-import React, { lazy, useEffect, useRef } from 'react';
+import React, { lazy, useEffect, useRef, useState } from 'react';
 import { ReactFlowProvider } from 'reactflow';
 import { shallow } from 'zustand/shallow';
 
@@ -114,6 +114,7 @@ const FlowEditorInner = ({
   // SECCIÓN 1: ESTADO Y REFERENCIAS
   // ==============================================
   const reactFlowWrapperReference = useRef(null);
+  const [isRecoveryModalOpen, setRecoveryModalOpen] = useState(false);
 
   // ==============================================
   // SECCIÓN 2: HOOKS DE ZUSTAND (STORE GLOBAL)
@@ -186,6 +187,8 @@ const FlowEditorInner = ({
     saveMessage,
     attemptBackupRecovery,
     isLoaded,
+    isBackupLoaded,
+    hasLocalBackup,
   } = useFlowSaver(plubotId, handleError, setHasChanges);
 
   // Hook para la gestión de estilos y modos de performance
@@ -216,6 +219,21 @@ const FlowEditorInner = ({
     }
   }, [isLoaded, attemptBackupRecovery]);
 
+  useEffect(() => {
+    if (hasLocalBackup && hasLocalBackup()) {
+      setRecoveryModalOpen(true);
+    }
+  }, [hasLocalBackup]);
+
+  const handleRecover = () => {
+    attemptBackupRecovery();
+    setRecoveryModalOpen(false);
+  };
+
+  const handleDismiss = () => {
+    setRecoveryModalOpen(false);
+  };
+
   // ==============================================
   // SECCIÓN 5: RENDERIZADO DEL COMPONENTE
   // ==============================================
@@ -244,7 +262,12 @@ const FlowEditorInner = ({
       )}
 
       <div className='flow-main-wrapper' ref={reactFlowWrapperReference}>
-        <EmergencyRecovery />
+        <EmergencyRecovery
+          isOpen={isRecoveryModalOpen}
+          onRecover={handleRecover}
+          onDismiss={handleDismiss}
+          hasBackup={hasLocalBackup ? hasLocalBackup() : false}
+        />
 
         <FlowMain
           reactFlowInstance={reactFlowInstance}
@@ -330,13 +353,9 @@ const FlowEditor = ({
   return (
     <ReactFlowProvider>
       <FlowEditorInner
-        selectedNode={selectedNode}
-        setSelectedNode={setSelectedNode}
         handleError={handleError}
         plubotId={plubotId}
         name={name}
-        saveFlowData={saveFlowData}
-        hideHeader={hideHeader}
         hideContextMenu={hideContextMenu}
       />
       {/* Global Context Menu Renderer */}

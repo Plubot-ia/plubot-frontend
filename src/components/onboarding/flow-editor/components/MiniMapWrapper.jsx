@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 
 import CustomMiniMap from '../ui/CustomMiniMap';
@@ -29,8 +30,15 @@ const MiniMapWrapper = ({
       />
     );
   }
+};
 
-  return null;
+MiniMapWrapper.propTypes = {
+  nodes: PropTypes.array.isRequired,
+  edges: PropTypes.array.isRequired,
+  isExpanded: PropTypes.bool.isRequired,
+  isUltraMode: PropTypes.bool.isRequired,
+  viewport: PropTypes.object.isRequired,
+  setByteMessage: PropTypes.func.isRequired,
 };
 
 export default MiniMapWrapper;

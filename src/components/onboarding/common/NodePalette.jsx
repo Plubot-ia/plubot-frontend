@@ -1,42 +1,55 @@
-import './NodePalette.css';
 import {
-  Database,
-  Link,
-  Brain,
-  Filter,
-  MessageCircle,
-  PlayCircle,
-  StopCircle,
-  GitBranch,
-  CornerUpRight,
-  Zap,
-  Star,
-  Settings2,
-  PlugZap,
-  Languages,
-  FileText,
   AlertTriangle,
+  Brain,
   ChevronDown,
   ChevronRight,
+  CornerUpRight,
+  Database,
+  FileText,
+  Filter,
+  GitBranch,
+  Languages,
+  Link,
+  MessageCircle,
+  PlayCircle,
+  PlugZap,
+  Settings2,
+  Star,
+  StopCircle,
+  Zap,
 } from 'lucide-react';
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { v4 as uuidv4 } from 'uuid'; // Importar para generar IDs únicos
+import { v4 as uuidv4 } from 'uuid';
 
 import { powers as powerNodesDataList } from '@/data/powers.js';
-// Importar los stores de Zustand
 import useFlowStore from '@/stores/use-flow-store';
 import useTrainingStore from '@/stores/use-training-store';
 import {
-  NODE_TYPES,
-  NODE_LABELS,
-  NODE_DESCRIPTIONS,
   NODE_CATEGORIES,
+  NODE_DESCRIPTIONS,
+  NODE_LABELS,
+  NODE_TYPES,
 } from '@/utils/node-config.js';
+
+import './NodePalette.css';
+
+const filterItems = (items, term, isPower = false) => {
+  if (!term) return items;
+  const lowercasedTerm = term.toLowerCase();
+  return items.filter((item) => {
+    const label = isPower ? item.name : item.label;
+    const description = isPower ? item.description : item.description;
+    return (
+      (label && label.toLowerCase().includes(lowercasedTerm)) ||
+      (description && description.toLowerCase().includes(lowercasedTerm))
+    );
+  });
+};
 
 const getNodeIcon = (iconIdentifier) => {
   if (
     typeof iconIdentifier === 'object' &&
-    iconIdentifier !== null &&
+    iconIdentifier !== undefined &&
     typeof iconIdentifier.type === 'function'
   ) {
     return iconIdentifier;
@@ -153,7 +166,7 @@ const NodePalette = () => {
   const setByteMessage = useTrainingStore((state) => state?.setByteMessage);
 
   // Referencia al store completo para acceso directo en handlers
-  const flowStoreReference = useRef(null);
+  const flowStoreReference = useRef(undefined);
 
   // Inicializar de forma segura
   useEffect(() => {
@@ -194,8 +207,8 @@ const NodePalette = () => {
 
   // Función optimizada para manejar el inicio de arrastre
   const onDragStart = useCallback(
-    (event, nodeType, nodeLabel, category, powerItemData = null) => {
-      event.stopPropagation(); // Evitar propagación para evitar conflictos
+    (event_, nodeType, nodeLabel, category, powerItemData) => {
+      event_.stopPropagation(); // Evitar propagación para evitar conflictos
 
       // Generar un ID único para el nodo
       const nodeId = `${nodeType}-${uuidv4().slice(0, 8)}`;
@@ -250,19 +263,22 @@ const NodePalette = () => {
           ultraMode: nodeInfo.data.ultraMode ?? false,
           // Estados de runtime siempre se inicializan así para un nodo nuevo:
           isLoading: false,
-          error: null,
-          lastResponse: null,
+          error: undefined,
+          lastResponse: undefined,
           interpolatedPromptPreview: '',
         };
       }
 
       try {
         const serializedNodeInfo = JSON.stringify(nodeInfo);
-        event.dataTransfer.setData('application/reactflow', serializedNodeInfo);
-        event.dataTransfer.effectAllowed = 'move';
+        event_.dataTransfer.setData(
+          'application/reactflow',
+          serializedNodeInfo,
+        );
+        event_.dataTransfer.effectAllowed = 'move';
 
         // Drag image logic for visual feedback during drag
-        const targetElement = event.target.closest('.node-palette-item');
+        const targetElement = event_.target.closest('.node-palette-item');
         if (targetElement) {
           const dragImage = document.createElement('div');
           dragImage.style.position = 'absolute';
@@ -281,7 +297,7 @@ const NodePalette = () => {
           dragImage.textContent = nodeLabel || 'Nodo';
           document.body.append(dragImage);
 
-          event.dataTransfer.setDragImage(dragImage, 50, 20);
+          event_.dataTransfer.setDragImage(dragImage, 50, 20);
 
           requestAnimationFrame(() => {
             if (document.body.contains(dragImage)) {
@@ -302,12 +318,12 @@ const NodePalette = () => {
             label: finalNodeLabel,
             data: { id: nodeId, label: finalNodeLabel, ...powerItemData },
           });
-          event.dataTransfer.setData('application/reactflow', minimalNodeData);
+          event_.dataTransfer.setData('application/reactflow', minimalNodeData);
         } catch {
           // Si incluso esto falla, es un problema grave con los datos base.
 
           // Como último recurso absoluto, y sabiendo que causará problemas en onDrop:
-          event.dataTransfer.setData('application/reactflow', finalNodeType); // Esto llevará al error JSON.parse en FlowEditor
+          event_.dataTransfer.setData('application/reactflow', finalNodeType); // Esto llevará al error JSON.parse en FlowEditor
         }
       }
     },
@@ -322,16 +338,8 @@ const NodePalette = () => {
     }
   }, []);
 
-  const filterItems = (items, term, isPower = false) => {
-    if (!term) return items;
-    return items.filter((item) => {
-      const label = isPower ? item.title : item.label;
-      const desc = item.description;
-      return (
-        label.toLowerCase().includes(term.toLowerCase()) ||
-        (desc && desc.toLowerCase().includes(term.toLowerCase()))
-      );
-    });
+  const handleSearchChange = (event) => {
+    setSearchTerm(event.target.value);
   };
 
   const filteredBasicNodes = filterItems(basicNodeDefinitions, searchTerm);
@@ -361,31 +369,31 @@ const NodePalette = () => {
       // For other nodes, use their defined type (e.g., 'message')
       const nodeType = isPower ? item.id : item.type;
 
-      const nodeReference = useRef(null);
+      const nodeReference = useRef(undefined);
 
       const handleDragStart = useCallback(
-        (e) => {
+        (event_) => {
           if (nodeReference.current) {
             nodeReference.current.classList.add('dragging');
           }
           // Pass the corrected nodeType to the onDragStart handler from NodePalette props
           onDragStart(
-            e,
+            event_,
             nodeType,
             label,
             item.category || 'basic',
-            isPower ? item : null,
+            isPower ? item : undefined,
           );
         },
         [nodeType, label, item, isPower, onDragStart],
       ); // Added onDragStart to dependencies
 
       const handleDragEnd = useCallback(
-        (e) => {
+        (event_) => {
           if (nodeReference.current) {
             nodeReference.current.classList.remove('dragging');
           }
-          onDragEndNode(e); // onDragEndNode is from NodePalette props
+          onDragEndNode(event_); // onDragEndNode is from NodePalette props
         },
         [onDragEndNode],
       ); // Added onDragEndNode to dependencies
@@ -404,8 +412,8 @@ const NodePalette = () => {
           <div className='ts-node-label'>{label}</div>
           <button
             className='ts-favorite-button'
-            onClick={(e) => {
-              e.stopPropagation();
+            onClick={(event_) => {
+              event_.stopPropagation();
               const nodeId = isPower ? `power-${item.id}` : item.type;
               // Use functional updates for setting state based on previous state
               if (isFavorite) {
@@ -450,7 +458,7 @@ const NodePalette = () => {
               type='text'
               placeholder='Buscar nodos...'
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={handleSearchChange}
               className='ts-search-input'
             />
             {searchTerm && (

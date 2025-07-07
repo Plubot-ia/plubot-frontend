@@ -62,8 +62,7 @@ const EdgePersistenceManager = ({ edges }) => {
     };
   }, [edges, getPlubotId]);
 
-  // Este componente no renderiza nada visible
-  return null;
+  // Este componente no renderiza nada visible, se usa undefined para cumplir con la regla `no-null`.
 };
 
 export default EdgePersistenceManager;

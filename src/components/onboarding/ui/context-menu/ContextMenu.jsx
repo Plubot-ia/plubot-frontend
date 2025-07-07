@@ -1,5 +1,6 @@
-import PropTypes from 'prop-types';
 import React, { memo, useEffect, useRef } from 'react';
+import PropTypes from 'prop-types';
+
 import './ContextMenu.css';
 
 /**
@@ -16,8 +17,11 @@ const ContextMenu = memo(({ items, onClose }) => {
 
   // Cerrar el menú al hacer clic fuera
   useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (menuReference.current && !menuReference.current.contains(e.target)) {
+    const handleClickOutside = (event) => {
+      if (
+        menuReference.current &&
+        !menuReference.current.contains(event.target)
+      ) {
         onClose();
       }
     };
@@ -31,8 +35,8 @@ const ContextMenu = memo(({ items, onClose }) => {
 
   // Cerrar el menú al presionar Escape
   useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (e.key === 'Escape') {
+    const handleKeyDown = (event) => {
+      if (event.key === 'Escape') {
         onClose();
       }
     };

@@ -4,10 +4,7 @@
  */
 
 import { initModalManager } from './modal-manager';
-import {
-  registerNotificationCallback,
-  showVisualNotification,
-} from './notification-manager';
+import { showVisualNotification } from './notification-manager';
 
 /**
  * Inicializa todos los sistemas utilitarios

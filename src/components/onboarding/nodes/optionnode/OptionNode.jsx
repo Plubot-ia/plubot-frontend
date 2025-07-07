@@ -6,22 +6,15 @@
  */
 
 import { debounce } from 'lodash';
-import {
-  Check,
-  X,
-  HelpCircle,
-  Circle,
-  Edit2,
-  CornerDownRight,
-} from 'lucide-react';
+import { Check, X, HelpCircle, Circle, CornerDownRight } from 'lucide-react';
 import PropTypes from 'prop-types';
 import React, {
-  useState,
+  memo,
   useCallback,
+  useEffect,
   useMemo,
   useRef,
-  useEffect,
-  memo,
+  useState,
 } from 'react';
 import { useUpdateNodeInternals, Position, Handle } from 'reactflow';
 import { shallow } from 'zustand/shallow';
@@ -31,7 +24,6 @@ import useFlowStore from '@/stores/use-flow-store';
 import { formatDateRelative } from '@/utils/date.js';
 
 import Tooltip from '../../ui/ToolTip';
-import { getConnectorColor } from '../decisionnode/DecisionNode.types';
 
 import './OptionNode.css';
 
@@ -41,16 +33,39 @@ const NODE_CONFIG = {
   MAX_TEXTAREA_HEIGHT: 200,
 };
 
+const getPosition = (position) => {
+  if (position instanceof Object) {
+    return position;
+  }
+  switch (position) {
+    case 'top': {
+      return Position.Top;
+    }
+    case 'right': {
+      return Position.Right;
+    }
+    case 'left': {
+      return Position.Left;
+    }
+    default: {
+      return Position.Bottom;
+    }
+  }
+};
+
 /**
  * Componente para el ícono del nodo de opción
  */
 const OptionNodeIcon = React.memo(
   ({ label, isUltraPerformanceMode = false }) => {
-    const iconProperties = {
-      size: isUltraPerformanceMode ? 14 : 16,
-      strokeWidth: isUltraPerformanceMode ? 2 : 1.75,
-      className: isUltraPerformanceMode ? '' : 'option-node__icon-svg',
-    };
+    const iconProperties = useMemo(
+      () => ({
+        size: isUltraPerformanceMode ? 14 : 16,
+        strokeWidth: isUltraPerformanceMode ? 2 : 1.75,
+        className: isUltraPerformanceMode ? '' : 'option-node__icon-svg',
+      }),
+      [isUltraPerformanceMode],
+    );
 
     const renderIcon = useCallback(() => {
       const currentLabelText = label?.toLowerCase() || '';
@@ -112,18 +127,7 @@ const OptionNodeHandle = React.memo(
     ...rest
   }) => {
     // Garantizar que position siempre sea un objeto Position
-    const positionObject =
-      position instanceof Object
-        ? position
-        : position === 'top'
-          ? Position.Top
-          : position === 'right'
-            ? Position.Right
-            : position === 'bottom'
-              ? Position.Bottom
-              : position === 'left'
-                ? Position.Left
-                : Position.Bottom;
+    const positionObject = getPosition(position);
 
     const baseStyle = {
       zIndex: 50,
@@ -176,7 +180,7 @@ const OptionNodeComponent = ({
   id,
   selected = false,
   isConnectable = true,
-  lodLevel, // <-- Prop recibida del HOC para que React.memo la detecte
+  _lodLevel, // <-- Prop recibida del HOC para que React.memo la detecte
 }) => {
   // --- REFS ---
   const textareaReference = useRef(null);
@@ -230,7 +234,6 @@ const OptionNodeComponent = ({
   const [currentInstruction, setCurrentInstruction] = useState(
     initialInstruction || '',
   );
-  const [isHovered, setIsHovered] = useState(false);
 
   // --- MEMOIZED VALUES ---
   const instruction = useMemo(
@@ -321,8 +324,8 @@ const OptionNodeComponent = ({
   }, [id, updateNodeInternals]);
 
   // --- CALLBACKS ---
-  const handleInstructionChange = useCallback((e) => {
-    setCurrentInstruction(e.target.value);
+  const handleInstructionChange = useCallback((event_) => {
+    setCurrentInstruction(event_.target.value);
     const ta = textareaReference.current;
     if (ta) {
       ta.style.height = 'auto';
@@ -358,20 +361,20 @@ const OptionNodeComponent = ({
   }, [sourceNode, panToNode]);
 
   const handleKeyDown = useCallback(
-    (e) => {
+    (event_) => {
       if (isEditing) {
-        if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
-          e.preventDefault();
+        if (event_.key === 'Enter' && (event_.ctrlKey || event_.metaKey)) {
+          event_.preventDefault();
           finishEditing();
-        } else if (e.key === 'Escape') {
-          e.preventDefault();
+        } else if (event_.key === 'Escape') {
+          event_.preventDefault();
           cancelEditing();
         }
-      } else if (e.key === 'Enter' && !e.ctrlKey && !e.metaKey) {
-        e.preventDefault();
+      } else if (event_.key === 'Enter' && !event_.ctrlKey && !event_.metaKey) {
+        event_.preventDefault();
         startEditing();
-      } else if (e.key === 'p' && e.ctrlKey && sourceNode) {
-        e.preventDefault();
+      } else if (event_.key === 'p' && event_.ctrlKey && sourceNode) {
+        event_.preventDefault();
         navigateToParent();
       }
     },
@@ -392,11 +395,10 @@ const OptionNodeComponent = ({
       className={nodeClasses}
       style={nodeStyle}
       onDoubleClick={startEditing}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
       onKeyDown={handleKeyDown}
       tabIndex={0}
-      role='group'
+      role='treeitem'
+      aria-selected={selected}
       aria-label={`Nodo de opción: ${label || 'Opción sin etiqueta'}`}
       aria-expanded={isEditing}
       aria-describedby={`option-node-description-${id}`}
@@ -450,9 +452,21 @@ const OptionNodeComponent = ({
               aria-label='Instrucciones para esta opción'
             />
           ) : (
-            <p className='option-node__instruction-text' onClick={startEditing}>
+            <div
+              className='option-node__instruction-text'
+              onClick={startEditing}
+              onKeyDown={(event_) => {
+                // Allow starting edit with Enter or Space, as expected for a button role
+                if (event_.key === 'Enter' || event_.key === ' ') {
+                  event_.preventDefault();
+                  startEditing();
+                }
+              }}
+              role='button'
+              tabIndex={0}
+            >
               {instruction}
-            </p>
+            </div>
           )}
         </div>
 

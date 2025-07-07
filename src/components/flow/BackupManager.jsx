@@ -2,7 +2,7 @@ import { formatDistanceToNow } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { History, X, RotateCcw, Info } from 'lucide-react';
 import PropTypes from 'prop-types';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 
 import useFlowStore from '@/stores/use-flow-store';
 import './BackupManager.css';
@@ -45,6 +45,27 @@ const BackupManager = ({ plubotId }) => {
     }
   }, [plubotId, setPlubotId]);
 
+  // Cerrar el diálogo
+  const handleClose = useCallback(() => {
+    setOpen(false);
+    setSelectedBackup();
+    setError();
+  }, []);
+
+  // Manejar cierre con la tecla Escape
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (open && event.key === 'Escape') {
+        handleClose();
+      }
+    };
+
+    globalThis.addEventListener('keydown', handleKeyDown);
+    return () => {
+      globalThis.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [open, handleClose]);
+
   // Cargar la lista de copias de seguridad
   const loadBackups = async () => {
     if (!plubotId) {
@@ -75,13 +96,6 @@ const BackupManager = ({ plubotId }) => {
     loadBackups();
   };
 
-  // Cerrar el diálogo
-  const handleClose = () => {
-    setOpen(false);
-    setSelectedBackup();
-    setError();
-  };
-
   // Restaurar una copia de seguridad
   const handleRestore = async (backupId) => {
     if (!plubotId || !backupId) {
@@ -110,26 +124,97 @@ const BackupManager = ({ plubotId }) => {
     }
   };
 
+  const renderContent = () => {
+    if (loading) {
+      return (
+        <div className='backup-manager-loading'>
+          <div className='backup-manager-spinner' />
+        </div>
+      );
+    }
+
+    if (error) {
+      return (
+        <div className='backup-manager-error'>
+          <Info size={18} />
+          <p>{error}</p>
+        </div>
+      );
+    }
+
+    if (backups.length === 0) {
+      return (
+        <div className='backup-manager-empty'>
+          <p>No hay copias de seguridad disponibles</p>
+        </div>
+      );
+    }
+
+    return (
+      <div className='backup-manager-list'>
+        {backups.map((backup) => (
+          <div
+            key={backup.id}
+            className={`backup-manager-item ${
+              selectedBackup?.id === backup.id ? 'selected' : ''
+            }`}
+            onClick={() => setSelectedBackup(backup)}
+            onKeyDown={(event) => {
+              if (event.key === 'Enter' || event.key === ' ') {
+                setSelectedBackup(backup);
+              }
+            }}
+            role='button'
+            tabIndex={0}
+          >
+            <div className='backup-manager-item-content'>
+              <h4>{backup.name || `Copia #${backup.id}`}</h4>
+              <p className='backup-manager-item-date'>
+                Creada {formatDate(backup.created_at)}
+              </p>
+              {backup.metadata && (
+                <p className='backup-manager-item-meta'>
+                  {backup.metadata.nodes_count || 0} nodos ·{' '}
+                  {backup.metadata.edges_count || 0} conexiones
+                </p>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  };
+
   return (
     <>
       <div
         className='backup-manager-trigger'
         onClick={handleOpen}
+        onKeyDown={(event) => {
+          if (event.key === 'Enter' || event.key === ' ') {
+            handleOpen();
+          }
+        }}
+        role='button'
+        tabIndex={0}
         title='Gestionar copias de seguridad'
       >
         <History size={16} />
       </div>
 
       {open && (
-        <div className='backup-manager-overlay' onClick={handleClose}>
+        <div className='backup-manager-overlay'>
           <div
             className='backup-manager-dialog'
-            onClick={(event) => event.stopPropagation()}
+            role='dialog'
+            aria-modal='true'
+            aria-labelledby='backup-manager-dialog-title'
+            tabIndex={-1}
           >
             <div className='backup-manager-header'>
               <div className='backup-manager-title'>
                 <History size={18} />
-                <h3>Copias de seguridad</h3>
+                <h3 id='backup-manager-dialog-title'>Copias de seguridad</h3>
               </div>
               <button
                 className='backup-manager-close-btn'
@@ -141,45 +226,7 @@ const BackupManager = ({ plubotId }) => {
 
             <div className='backup-manager-divider' />
 
-            <div className='backup-manager-content'>
-              {loading ? (
-                <div className='backup-manager-loading'>
-                  <div className='backup-manager-spinner' />
-                </div>
-              ) : error ? (
-                <div className='backup-manager-error'>
-                  <Info size={18} />
-                  <p>{error}</p>
-                </div>
-              ) : backups.length === 0 ? (
-                <div className='backup-manager-empty'>
-                  <p>No hay copias de seguridad disponibles</p>
-                </div>
-              ) : (
-                <div className='backup-manager-list'>
-                  {backups.map((backup) => (
-                    <div
-                      key={backup.id}
-                      className={`backup-manager-item ${selectedBackup?.id === backup.id ? 'selected' : ''}`}
-                      onClick={() => setSelectedBackup(backup)}
-                    >
-                      <div className='backup-manager-item-content'>
-                        <h4>{backup.name || `Copia #${backup.id}`}</h4>
-                        <p className='backup-manager-item-date'>
-                          Creada {formatDate(backup.created_at)}
-                        </p>
-                        {backup.metadata && (
-                          <p className='backup-manager-item-meta'>
-                            {backup.metadata.nodes_count || 0} nodos ·{' '}
-                            {backup.metadata.edges_count || 0} conexiones
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
+            <div className='backup-manager-content'>{renderContent()}</div>
 
             <div className='backup-manager-divider' />
 

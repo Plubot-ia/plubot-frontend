@@ -1,11 +1,14 @@
 import { useCallback, useState, useEffect } from 'react';
+
 import useFlowStore from '@/stores/use-flow-store';
+
 import { prepareEdgesForSaving } from '../utils/edgeFixUtil';
+
 import useLocalBackupManager from './useLocalBackupManager';
 
 export const useFlowSaver = (plubotId, handleError, setHasChanges) => {
-  const { nodes, edges, saveFlow, setNodes, setEdges, lastSaved, isLoaded } = useFlowStore(
-    (state) => ({
+  const { nodes, edges, saveFlow, setNodes, setEdges, lastSaved, isLoaded } =
+    useFlowStore((state) => ({
       nodes: state.nodes,
       edges: state.edges,
       saveFlow: state.saveFlow,
@@ -13,10 +16,10 @@ export const useFlowSaver = (plubotId, handleError, setHasChanges) => {
       setEdges: state.setEdges,
       lastSaved: state.lastSaved,
       isLoaded: state.isLoaded,
-    }),
-  );
+    }));
 
-  const { createBackup, recoverFromBackup } = useLocalBackupManager(plubotId);
+  const { createBackup, recoverFromBackup, hasLocalBackup } =
+    useLocalBackupManager(plubotId);
 
   const [status, setStatus] = useState('idle'); // idle, saving, success, error
   const [message, setMessage] = useState('');
@@ -87,14 +90,7 @@ export const useFlowSaver = (plubotId, handleError, setHasChanges) => {
     } catch (error) {
       handleSaveError(error, preparedEdges);
     }
-  }, [
-    plubotId,
-    status,
-    edges,
-    saveFlow,
-    handleSaveSuccess,
-    handleSaveError,
-  ]);
+  }, [plubotId, status, edges, saveFlow, handleSaveSuccess, handleSaveError]);
 
   return {
     saveFlowHandler,
@@ -105,5 +101,6 @@ export const useFlowSaver = (plubotId, handleError, setHasChanges) => {
     attemptBackupRecovery,
     isBackupLoaded,
     isLoaded,
+    hasLocalBackup,
   };
 };

@@ -27,7 +27,6 @@ const StorageQuotaManager = () => {
   }, []);
 
   // Este componente no renderiza nada visible
-  return null;
 };
 
 export default StorageQuotaManager;

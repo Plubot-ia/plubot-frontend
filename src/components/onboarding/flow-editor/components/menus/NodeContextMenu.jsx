@@ -1,9 +1,18 @@
 import PropTypes from 'prop-types';
 import React, { useEffect, useRef } from 'react';
-import { FiEdit, FiTrash2, FiCopy } from 'react-icons/fi';
 import { shallow } from 'zustand/shallow';
 
 import useFlowStore from '@/stores/use-flow-store';
+
+const handleMouseEnter = (event) => {
+  event.currentTarget.style.backgroundColor = 'rgba(0, 190, 255, 0.15)';
+  event.currentTarget.style.color = '#67e8f9';
+};
+
+const handleMouseLeave = (event) => {
+  event.currentTarget.style.backgroundColor = 'transparent';
+  event.currentTarget.style.color = '#e2e8f0';
+};
 
 const NodeContextMenu = ({ position, onClose }) => {
   const menuReference = useRef();
@@ -68,16 +77,6 @@ const NodeContextMenu = ({ position, onClose }) => {
     fontSize: '16px',
     display: 'flex',
     alignItems: 'center',
-  };
-
-  const handleMouseEnter = (e) => {
-    e.currentTarget.style.backgroundColor = 'rgba(0, 190, 255, 0.15)';
-    e.currentTarget.style.color = '#67e8f9';
-  };
-
-  const handleMouseLeave = (e) => {
-    e.currentTarget.style.backgroundColor = 'transparent';
-    e.currentTarget.style.color = '#e2e8f0';
   };
 
   return (

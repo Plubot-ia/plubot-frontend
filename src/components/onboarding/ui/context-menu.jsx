@@ -202,7 +202,7 @@ const ContextMenu = React.forwardRef(
     // If it's in context menu mode, render only the menu
     if (isContextMenuMode) {
       if (!items || items.length === 0 || !position) {
-        return null;
+        return;
       }
       return (
         <Menu
@@ -259,7 +259,7 @@ ContextMenu.defaultProps = {
   // eslint-disable-next-line no-empty-function
   onClose: () => {},
   options: [],
-  children: null,
+  children: undefined,
 };
 
 export default ContextMenu;

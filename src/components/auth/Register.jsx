@@ -108,7 +108,7 @@ const Register = () => {
       return;
     }
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const emailRegex = /[^\s@]{1,64}@[^\s@]{1,255}\.[a-zA-Z]{2,63}$/;
     if (!emailRegex.test(email)) {
       showMessage('Por favor ingresa un email válido', 'error');
       setIsSubmitting(false);

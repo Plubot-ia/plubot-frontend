@@ -2,129 +2,81 @@ import axios from 'axios';
 
 import { emitEvent } from './event-bus';
 
-const isDevelopment = import.meta.env.MODE === 'development';
-const apiUrl = (
-  import.meta.env.VITE_API_URL || 'https://plubot-backend.onrender.com'
-).trim();
-
-// Normalizar la URL base de forma segura: se elimina cualquier barra final y el sufijo '/api'.
-// Se evita una expresión regular vulnerable (ReDoS) usando un bucle.
-let baseApiUrl = apiUrl;
-while (baseApiUrl.endsWith('/')) {
-  baseApiUrl = baseApiUrl.slice(0, -1);
-}
-baseApiUrl = baseApiUrl.replace(/\/api$/, '');
-
-// En desarrollo, usamos el proxy de Vite. En producción, construimos la URL completa
-// asegurando que '/api' esté presente solo una vez.
-const baseURL = isDevelopment ? '/api' : `${baseApiUrl}/api`;
+// Determina la URL base de la API a partir de las variables de entorno de Vite.
+// En desarrollo, las solicitudes irán al proxy de Vite. En producción, a la URL completa.
+const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
 
 const instance = axios.create({
-  baseURL,
-  withCredentials: true,
+  baseURL: API_BASE_URL,
+  withCredentials: true, // Permite el envío de cookies, crucial para sesiones
   headers: {
     'Content-Type': 'application/json',
     Accept: 'application/json',
   },
-  timeout: 20_000,
-  validateStatus(status) {
-    return status >= 200 && status < 500;
-  },
+  timeout: 20_000, // Timeout de 20 segundos para las solicitudes
 });
 
-let refreshTokenPromise;
-
+// Interceptor de Solicitudes: Adjunta el token de autenticación a las cabeceras.
 instance.interceptors.request.use(
   (config) => {
-    const publicEndpoints = [
-      'auth/login',
-      'auth/register',
-      'contact',
-      'opinion',
-    ];
-    const isPublicEndpoint = publicEndpoints.some((endpoint) =>
-      config.url?.includes(endpoint),
-    );
-
-    if (!isPublicEndpoint) {
-      const token =
-        localStorage.getItem('access_token') ||
-        sessionStorage.getItem('access_token');
-      if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
-      } else {
-        // If no token is found for a private endpoint, we reject the request
-        // to prevent sending an unauthenticated request.
-        return Promise.reject(
-          new Error('Authentication token not found. Request canceled.'),
-        );
-      }
+    const token = localStorage.getItem('access_token');
+    if (token) {
+      // Si existe un token, lo añade a la cabecera de autorización.
+      config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
   },
-  // eslint-disable-next-line promise/no-promise-in-callback
-  (error) => Promise.reject(error),
+  (error) => {
+    // Si hay un error en la configuración de la solicitud, se rechaza la promesa.
+    return Promise.reject(error);
+  },
 );
 
+// Interceptor de Respuestas: Maneja errores, especialmente para refrescar tokens.
 instance.interceptors.response.use(
+  // Si la respuesta es exitosa, la devuelve directamente.
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
 
-    // Si el error es 401 y no es un reintento
+    // Manejo de error de autenticación (401) para refrescar el token.
+    // Se comprueba `!originalRequest._retry` para evitar bucles infinitos de reintentos.
     if (error.response?.status === 401 && !originalRequest._retry) {
-      if (!refreshTokenPromise) {
-        // Marcar este reintento para evitar bucles infinitos
-        originalRequest._retry = true;
+      originalRequest._retry = true; // Marca la solicitud como reintentada.
 
-        // Iniciar la promesa de actualización del token
-        refreshTokenPromise = new Promise((resolve, reject) => {
-          (async () => {
-            try {
-              const refreshToken =
-                localStorage.getItem('refresh_token') ||
-                sessionStorage.getItem('refresh_token');
-              if (!refreshToken) {
-                throw new Error('Session expired: No refresh token');
-              }
+      try {
+        const refreshToken = localStorage.getItem('refresh_token');
+        if (!refreshToken) {
+          // Si no hay refresh token, se emite un evento de logout y se rechaza.
+          emitEvent('auth:logout');
+          return Promise.reject(new Error('No refresh token available.'));
+        }
 
-              const { data } = await instance.post('auth/refresh', {
-                refresh_token: refreshToken,
-              });
-
-              if (data && data.access_token) {
-                const newAccessToken = data.access_token;
-                localStorage.setItem('access_token', newAccessToken);
-                sessionStorage.setItem('access_token', newAccessToken);
-                resolve(newAccessToken);
-              } else {
-                throw new Error('Session expired: Could not refresh token');
-              }
-            } catch (refreshError) {
-              // Si la actualización falla, desloguear al usuario
-              emitEvent('auth:logout');
-              reject(refreshError);
-            } finally {
-              // Limpiar la promesa para futuros reintentos
-              refreshTokenPromise = undefined;
-            }
-          })();
+        // Solicita un nuevo access token usando el refresh token.
+        const response = await instance.post('/auth/refresh', {
+          refresh_token: refreshToken,
         });
+
+        const { access_token: newAccessToken } = response.data;
+
+        if (newAccessToken) {
+          // Almacena el nuevo token y actualiza la cabecera de la solicitud original.
+          localStorage.setItem('access_token', newAccessToken);
+          originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+          // Reintenta la solicitud original con el nuevo token.
+          return instance(originalRequest);
+        }
+      } catch (refreshError) {
+        // Si el refresco del token falla, se desloguea al usuario.
+        emitEvent('auth:logout');
+        return Promise.reject(refreshError);
       }
-
-      // Esperar a que la promesa de actualización del token se resuelva.
-      // Si la promesa se rechaza (la actualización del token falló), el `await` lanzará
-      // el error, que será capturado por el interceptor de respuesta y propagado.
-      const newAccessToken = await refreshTokenPromise;
-
-      // Actualizar la cabecera de la solicitud original y reintentarla.
-      originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
-      return instance(originalRequest);
     }
 
-    // Para cualquier otro error, simplemente lo rechazamos
-    throw error;
+    // Para cualquier otro tipo de error, se rechaza la promesa.
+    return Promise.reject(error);
   },
 );
 
 export default instance;
+

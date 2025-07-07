@@ -5,8 +5,7 @@ import React from 'react';
  * Mantenido por compatibilidad
  */
 const NodeVisibilityFix = () => {
-  // Este componente no hace nada, solo está para evitar errores
-  return null;
+  // Este componente no hace nada, solo está para evitar errores. Se usa undefined para cumplir la regla no-null.
 };
 
 export default NodeVisibilityFix;

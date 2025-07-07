@@ -1,8 +1,8 @@
 import React from 'react';
 import { FiRotateCcw, FiRotateCw } from 'react-icons/fi';
 
-import './HistoryControls.css';
 import { useUndoRedo } from '@/stores/selectors';
+import './HistoryControls.css';
 
 /**
  * Componente para controles de historial (deshacer/rehacer) en el editor de flujos

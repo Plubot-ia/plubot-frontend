@@ -1,113 +1,60 @@
 
-> lint
-> eslint 'src/**/*.{js,jsx,ts,tsx}' --max-warnings 0 --no-cache
-
-
 /Users/wolf/Desktop/Plubot/plubot-frontend/src/components/auth/Login.jsx
-   13:15  warning  Arrow function has too many lines (272). Maximum allowed is 150                                                                   max-lines-per-function
-  133:24  error    Make sure the regex used here, which is vulnerable to super-linear runtime due to backtracking, cannot lead to denial of service  sonarjs/slow-regex
+   2:1   warning  `framer-motion` import should occur before import of `react`     import/order
+   8:1   warning  There should be at least one empty line between import groups    import/order
+  12:15  warning  Arrow function has too many lines (272). Maximum allowed is 150  max-lines-per-function
 
 /Users/wolf/Desktop/Plubot/plubot-frontend/src/components/auth/Register.jsx
-   13:18  warning  Arrow function has too many lines (307). Maximum allowed is 150                                                                   max-lines-per-function
-   83:24  warning  Async arrow function has a complexity of 18. Maximum allowed is 15                                                                complexity
-  111:24  error    Make sure the regex used here, which is vulnerable to super-linear runtime due to backtracking, cannot lead to denial of service  sonarjs/slow-regex
+  13:18  warning  Arrow function has too many lines (307). Maximum allowed is 150     max-lines-per-function
+  83:24  warning  Async arrow function has a complexity of 18. Maximum allowed is 15  complexity
 
 /Users/wolf/Desktop/Plubot/plubot-frontend/src/components/auth/ResetPassword.jsx
   11:23  warning  Arrow function has too many lines (231). Maximum allowed is 150  max-lines-per-function
 
 /Users/wolf/Desktop/Plubot/plubot-frontend/src/components/flow/BackupManager.jsx
-   28:23  warning  Arrow function has too many lines (165). Maximum allowed is 150                                                                                                                                    max-lines-per-function
-  115:7   error    Visible, non-interactive elements with click handlers must have at least one keyboard listener                                                                                                     jsx-a11y/click-events-have-key-events
-  115:7   error    Avoid non-native interactive elements. If using native HTML is not possible, add an appropriate role and support for tabbing, mouse, keyboard, and touch inputs to an interactive content element  jsx-a11y/no-static-element-interactions
-  124:9   error    Visible, non-interactive elements with click handlers must have at least one keyboard listener                                                                                                     jsx-a11y/click-events-have-key-events
-  124:9   error    Avoid non-native interactive elements. If using native HTML is not possible, add an appropriate role and support for tabbing, mouse, keyboard, and touch inputs to an interactive content element  jsx-a11y/no-static-element-interactions
-  125:11  error    Visible, non-interactive elements with click handlers must have at least one keyboard listener                                                                                                     jsx-a11y/click-events-have-key-events
-  125:11  error    Avoid non-native interactive elements. If using native HTML is not possible, add an appropriate role and support for tabbing, mouse, keyboard, and touch inputs to an interactive content element  jsx-a11y/no-static-element-interactions
-  145:16  warning  Do not nest ternary expressions                                                                                                                                                                    no-nested-ternary
-  149:19  warning  Do not nest ternary expressions                                                                                                                                                                    no-nested-ternary
-  149:19  error    Extract this nested ternary operation into an independent statement                                                                                                                                sonarjs/no-nested-conditional
-  154:19  error    Extract this nested ternary operation into an independent statement                                                                                                                                sonarjs/no-nested-conditional
-  161:21  error    Visible, non-interactive elements with click handlers must have at least one keyboard listener                                                                                                     jsx-a11y/click-events-have-key-events
-  161:21  error    Avoid non-native interactive elements. If using native HTML is not possible, add an appropriate role and support for tabbing, mouse, keyboard, and touch inputs to an interactive content element  jsx-a11y/no-static-element-interactions
+  28:23  warning  Arrow function has too many lines (205). Maximum allowed is 150  max-lines-per-function
 
 /Users/wolf/Desktop/Plubot/plubot-frontend/src/components/flow/PerformanceStats.jsx
   10:26  warning  Arrow function has too many lines (292). Maximum allowed is 150  max-lines-per-function
 
-/Users/wolf/Desktop/Plubot/plubot-frontend/src/components/modals/ModalContainer.jsx
-   47:12  error  Use `undefined` instead of `null`  unicorn/no-null
-  186:20  error  Use `undefined` instead of `null`  unicorn/no-null
-
 /Users/wolf/Desktop/Plubot/plubot-frontend/src/components/onboarding/common/EpicHeader.jsx
-    4:1   warning  `lucide-react` import should occur before import of `prop-types`                                                                                                                                   import/order
-   16:1   warning  There should be no empty line within import group                                                                                                                                                  import/order
-   33:20  warning  Arrow function has too many lines (462). Maximum allowed is 150                                                                                                                                    max-lines-per-function
-   33:20  warning  Arrow function has a complexity of 19. Maximum allowed is 15                                                                                                                                       complexity
-  134:23  error    Use `undefined` instead of `null`                                                                                                                                                                  unicorn/no-null
-  189:34  warning  'nodes' is already declared in the upper scope on line 60 column 11                                                                                                                                no-shadow
-  314:11  error    Visible, non-interactive elements with click handlers must have at least one keyboard listener                                                                                                     jsx-a11y/click-events-have-key-events
-  314:11  error    Non-interactive elements should not be assigned mouse or keyboard event listeners                                                                                                                  jsx-a11y/no-noninteractive-element-interactions
-  329:11  error    Visible, non-interactive elements with click handlers must have at least one keyboard listener                                                                                                     jsx-a11y/click-events-have-key-events
-  329:11  error    Avoid non-native interactive elements. If using native HTML is not possible, add an appropriate role and support for tabbing, mouse, keyboard, and touch inputs to an interactive content element  jsx-a11y/no-static-element-interactions
-  372:99  error    Refactor this code to not use nested template literals                                                                                                                                             sonarjs/no-nested-template-literals
-  523:17  error    Visible, non-interactive elements with click handlers must have at least one keyboard listener                                                                                                     jsx-a11y/click-events-have-key-events
-  523:17  error    Avoid non-native interactive elements. If using native HTML is not possible, add an appropriate role and support for tabbing, mouse, keyboard, and touch inputs to an interactive content element  jsx-a11y/no-static-element-interactions
-  539:17  error    Visible, non-interactive elements with click handlers must have at least one keyboard listener                                                                                                     jsx-a11y/click-events-have-key-events
-  539:17  error    Avoid non-native interactive elements. If using native HTML is not possible, add an appropriate role and support for tabbing, mouse, keyboard, and touch inputs to an interactive content element  jsx-a11y/no-static-element-interactions
-  580:17  error    Visible, non-interactive elements with click handlers must have at least one keyboard listener                                                                                                     jsx-a11y/click-events-have-key-events
-  580:17  error    Avoid non-native interactive elements. If using native HTML is not possible, add an appropriate role and support for tabbing, mouse, keyboard, and touch inputs to an interactive content element  jsx-a11y/no-static-element-interactions
-  604:17  error    Visible, non-interactive elements with click handlers must have at least one keyboard listener                                                                                                     jsx-a11y/click-events-have-key-events
-  604:17  error    Avoid non-native interactive elements. If using native HTML is not possible, add an appropriate role and support for tabbing, mouse, keyboard, and touch inputs to an interactive content element  jsx-a11y/no-static-element-interactions
+   23:20  warning  Arrow function has too many lines (419). Maximum allowed is 150      max-lines-per-function
+   23:20  warning  Arrow function has a complexity of 17. Maximum allowed is 15         complexity
+  222:34  error    'nodes' is already declared in the upper scope on line 50 column 11  no-shadow
+  413:99  error    Refactor this code to not use nested template literals               sonarjs/no-nested-template-literals
 
 /Users/wolf/Desktop/Plubot/plubot-frontend/src/components/onboarding/common/NodePalette.jsx
-   36:21  warning  Arrow function has a complexity of 28. Maximum allowed is 15                                                                                                                                                                                      complexity
-  151:21  warning  Arrow function has too many lines (356). Maximum allowed is 150                                                                                                                                                                                   max-lines-per-function
-  151:21  warning  Arrow function has a complexity of 27. Maximum allowed is 15                                                                                                                                                                                      complexity
-  197:5   warning  Arrow function has a complexity of 22. Maximum allowed is 15                                                                                                                                                                                      complexity
-  197:60  error    Use `undefined` instead of `null`                                                                                                                                                                                                                 unicorn/no-null
-  211:24  warning  Generic Object Injection Sink                                                                                                                                                                                                                     security/detect-object-injection
-  253:18  error    Use `undefined` instead of `null`                                                                                                                                                                                                                 unicorn/no-null
-  254:25  error    Use `undefined` instead of `null`                                                                                                                                                                                                                 unicorn/no-null
-  325:54  error    Move arrow function 'filterItems' to the outer scope                                                                                                                                                                                              unicorn/consistent-function-scoping
-  347:21  warning  Generic Object Injection Sink                                                                                                                                                                                                                     security/detect-object-injection
-  364:29  error    React Hook "useRef" cannot be called inside a callback. React Hooks must be called in a React function component or a custom React Hook function                                                                                                  react-hooks/rules-of-hooks
-  366:31  error    React Hook "useCallback" cannot be called inside a callback. React Hooks must be called in a React function component or a custom React Hook function                                                                                             react-hooks/rules-of-hooks
-  367:10  warning  Please rename the variable `e`. Suggested names are: `error`, `event_`. A more descriptive name will do too                                                                                                                                       unicorn/prevent-abbreviations
-  377:30  error    Use `undefined` instead of `null`                                                                                                                                                                                                                 unicorn/no-null
-  380:9   warning  React Hook useCallback has an unnecessary dependency: 'onDragStart'. Either exclude it or remove the dependency array. Outer scope values like 'onDragStart' aren't valid dependencies because mutating them doesn't re-render the component      react-hooks/exhaustive-deps
-  383:29  error    React Hook "useCallback" cannot be called inside a callback. React Hooks must be called in a React function component or a custom React Hook function                                                                                             react-hooks/rules-of-hooks
-  384:10  warning  Please rename the variable `e`. Suggested names are: `error`, `event_`. A more descriptive name will do too                                                                                                                                       unicorn/prevent-abbreviations
-  390:9   warning  React Hook useCallback has an unnecessary dependency: 'onDragEndNode'. Either exclude it or remove the dependency array. Outer scope values like 'onDragEndNode' aren't valid dependencies because mutating them doesn't re-render the component  react-hooks/exhaustive-deps
-  407:23  warning  Please rename the variable `e`. Suggested names are: `error`, `event_`. A more descriptive name will do too                                                                                                                                       unicorn/prevent-abbreviations
-  413:53  error    Refactor this code to not nest functions more than 4 levels deep                                                                                                                                                                                  sonarjs/no-nested-functions
-  428:5   warning  React Hook useCallback has an unnecessary dependency: 'getNodeIcon'. Either exclude it or remove the dependency array. Outer scope values like 'getNodeIcon' aren't valid dependencies because mutating them doesn't re-render the component      react-hooks/exhaustive-deps
-  436:7   error    Visible, non-interactive elements with click handlers must have at least one keyboard listener                                                                                                                                                    jsx-a11y/click-events-have-key-events
-  436:7   error    Avoid non-native interactive elements. If using native HTML is not possible, add an appropriate role and support for tabbing, mouse, keyboard, and touch inputs to an interactive content element                                                 jsx-a11y/no-static-element-interactions
-  453:26  warning  Please rename the variable `e`. Suggested names are: `error`, `event_`. A more descriptive name will do too                                                                                                                                       unicorn/prevent-abbreviations
+    2:1   warning  `lucide-react` import should occur before import of `react`                                                                                                                                                                                       import/order
+   41:25  error    This conditional operation returns the same value whether the condition is "true" or "false"                                                                                                                                                      sonarjs/no-all-duplicated-branches
+   49:21  warning  Arrow function has a complexity of 28. Maximum allowed is 15                                                                                                                                                                                      complexity
+  164:21  warning  Arrow function has too many lines (351). Maximum allowed is 150                                                                                                                                                                                   max-lines-per-function
+  164:21  warning  Arrow function has a complexity of 27. Maximum allowed is 15                                                                                                                                                                                      complexity
+  210:5   warning  Arrow function has a complexity of 21. Maximum allowed is 15                                                                                                                                                                                      complexity
+  224:24  warning  Generic Object Injection Sink                                                                                                                                                                                                                     security/detect-object-injection
+  341:9   warning  'handleSearchChange' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]|^_/u                                                                                                                                             no-unused-vars
+  341:9   error    Remove the declaration of the unused 'handleSearchChange' variable                                                                                                                                                                                sonarjs/no-unused-vars
+  341:9   error    Remove this useless assignment to variable "handleSearchChange"                                                                                                                                                                                   sonarjs/no-dead-store
+  355:21  warning  Generic Object Injection Sink                                                                                                                                                                                                                     security/detect-object-injection
+  372:29  error    React Hook "useRef" cannot be called inside a callback. React Hooks must be called in a React function component or a custom React Hook function                                                                                                  react-hooks/rules-of-hooks
+  374:31  error    React Hook "useCallback" cannot be called inside a callback. React Hooks must be called in a React function component or a custom React Hook function                                                                                             react-hooks/rules-of-hooks
+  388:9   warning  React Hook useCallback has an unnecessary dependency: 'onDragStart'. Either exclude it or remove the dependency array. Outer scope values like 'onDragStart' aren't valid dependencies because mutating them doesn't re-render the component      react-hooks/exhaustive-deps
+  391:29  error    React Hook "useCallback" cannot be called inside a callback. React Hooks must be called in a React function component or a custom React Hook function                                                                                             react-hooks/rules-of-hooks
+  398:9   warning  React Hook useCallback has an unnecessary dependency: 'onDragEndNode'. Either exclude it or remove the dependency array. Outer scope values like 'onDragEndNode' aren't valid dependencies because mutating them doesn't re-render the component  react-hooks/exhaustive-deps
+  421:53  error    Refactor this code to not nest functions more than 4 levels deep                                                                                                                                                                                  sonarjs/no-nested-functions
+  436:5   warning  React Hook useCallback has an unnecessary dependency: 'getNodeIcon'. Either exclude it or remove the dependency array. Outer scope values like 'getNodeIcon' aren't valid dependencies because mutating them doesn't re-render the component      react-hooks/exhaustive-deps
+  444:7   error    Visible, non-interactive elements with click handlers must have at least one keyboard listener                                                                                                                                                    jsx-a11y/click-events-have-key-events
+  444:7   error    Avoid non-native interactive elements. If using native HTML is not possible, add an appropriate role and support for tabbing, mouse, keyboard, and touch inputs to an interactive content element                                                 jsx-a11y/no-static-element-interactions
 
 /Users/wolf/Desktop/Plubot/plubot-frontend/src/components/onboarding/flow-editor/FlowEditor.jsx
-   44:1   warning  There should be no empty line within import group                                                                 import/order
-   77:1   warning  `prop-types` import should occur before import of `react`                                                         import/order
-   84:3   error    state should be placed after getDerivedStateFromError                                                             react/sort-comp
-  107:23  warning  'children' is missing in props validation                                                                         react/prop-types
-  115:25  warning  Arrow function has too many lines (336). Maximum allowed is 150                                                   max-lines-per-function
-  154:5   warning  'toggleUltraMode' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]|^_/u                no-unused-vars
-  154:5   error    Remove the declaration of the unused 'toggleUltraMode' variable                                                   sonarjs/no-unused-vars
-  154:5   error    Remove this useless assignment to variable "toggleUltraMode"                                                      sonarjs/no-dead-store
-  185:10  warning  'hasChanges' is assigned a value but never used. Allowed unused elements of array destructuring must match /^_/u  no-unused-vars
-  185:10  error    Remove the declaration of the unused 'hasChanges' variable                                                        sonarjs/no-unused-vars
-  185:10  error    Remove this useless assignment to variable "hasChanges"                                                           sonarjs/no-dead-store
-  368:9   warning  'toggleEdgeAnimations' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]|^_/u           no-unused-vars
-  368:9   error    Remove the declaration of the unused 'toggleEdgeAnimations' variable                                              sonarjs/no-unused-vars
-  368:9   error    Remove this useless assignment to variable "toggleEdgeAnimations"                                                 sonarjs/no-dead-store
-  381:9   warning  'onNodeDragStop' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]|^_/u                 no-unused-vars
-  381:9   error    Remove the declaration of the unused 'onNodeDragStop' variable                                                    sonarjs/no-unused-vars
-  381:9   error    Remove this useless assignment to variable "onNodeDragStop"                                                       sonarjs/no-dead-store
-  411:9   warning  'onEdgeClick' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]|^_/u                    no-unused-vars
-  411:9   error    Remove the declaration of the unused 'onEdgeClick' variable                                                       sonarjs/no-unused-vars
-  411:9   error    Remove this useless assignment to variable "onEdgeClick"                                                          sonarjs/no-dead-store
-  431:47  warning  Please rename the variable `e`. Suggested names are: `error`, `event_`. A more descriptive name will do too       unicorn/prevent-abbreviations
-  457:32  warning  Please rename the variable `e`. Suggested names are: `error`, `event_`. A more descriptive name will do too       unicorn/prevent-abbreviations
-  633:30  error    Complete the task associated to this "TODO" comment                                                               sonarjs/todo-tag
+  104:25  warning  Arrow function has too many lines (151). Maximum allowed is 150                                    max-lines-per-function
+  190:5   warning  'isBackupLoaded' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]|^_/u  no-unused-vars
+  190:5   error    Remove the declaration of the unused 'isBackupLoaded' variable                                     sonarjs/no-unused-vars
+  190:5   error    Remove this useless assignment to variable "isBackupLoaded"                                        sonarjs/no-dead-store
+  317:3   warning  'selectedNode' is defined but never used. Allowed unused args must match /^_/u                     no-unused-vars
+  318:3   warning  'setSelectedNode' is defined but never used. Allowed unused args must match /^_/u                  no-unused-vars
+  322:3   warning  'saveFlowData' is defined but never used. Allowed unused args must match /^_/u                     no-unused-vars
+  323:3   warning  'hideHeader' is assigned a value but never used. Allowed unused args must match /^_/u              no-unused-vars
+  328:30  error    Complete the task associated to this "TODO" comment                                                sonarjs/todo-tag
 
 /Users/wolf/Desktop/Plubot/plubot-frontend/src/components/onboarding/flow-editor/backup/drop-position-fix.js
    16:5   warning  Unexpected console statement                                          no-console
@@ -128,23 +75,9 @@
   333:47  error    Complete the task associated to this "TODO" comment                                  sonarjs/todo-tag
   380:10  error    'cleanup' was used before it was defined                                             no-use-before-define
 
-/Users/wolf/Desktop/Plubot/plubot-frontend/src/components/onboarding/flow-editor/components/EdgePersistenceManager.jsx
-  14:35  warning  'edges' is missing in props validation         react/prop-types
-  23:63  warning  'edges.length' is missing in props validation  react/prop-types
-  36:28  warning  'edges.length' is missing in props validation  react/prop-types
-  53:50  warning  'edges.length' is missing in props validation  react/prop-types
-  66:10  error    Use `undefined` instead of `null`              unicorn/no-null
-
 /Users/wolf/Desktop/Plubot/plubot-frontend/src/components/onboarding/flow-editor/components/EmergencyRecovery.jsx
-   7:30  warning  'isOpen' is missing in props validation                                                                      react/prop-types
-   7:38  warning  'onRecover' is missing in props validation                                                                   react/prop-types
-   7:49  warning  'onDismiss' is missing in props validation                                                                   react/prop-types
-   7:60  warning  'hasBackup' is missing in props validation                                                                   react/prop-types
-  25:12  error    Use `undefined` instead of `null`                                                                            unicorn/no-null
-  92:9   error    onMouseOver must be accompanied by onFocus for accessibility                                                 jsx-a11y/mouse-events-have-key-events
-  92:23  warning  Please rename the variable `e`. Suggested names are: `error`, `event_`. A more descriptive name will do too  unicorn/prevent-abbreviations
-  96:9   error    onMouseOut must be accompanied by onBlur for accessibility                                                   jsx-a11y/mouse-events-have-key-events
-  96:22  warning  Please rename the variable `e`. Suggested names are: `error`, `event_`. A more descriptive name will do too  unicorn/prevent-abbreviations
+  95:9  error  onMouseOver must be accompanied by onFocus for accessibility  jsx-a11y/mouse-events-have-key-events
+  99:9  error  onMouseOut must be accompanied by onBlur for accessibility    jsx-a11y/mouse-events-have-key-events
 
 /Users/wolf/Desktop/Plubot/plubot-frontend/src/components/onboarding/flow-editor/components/FlowControls.jsx
   6:26  warning  Unable to resolve path to module '@/stores/useFlowStore'  import/no-unresolved
@@ -158,65 +91,35 @@
 
 /Users/wolf/Desktop/Plubot/plubot-frontend/src/components/onboarding/flow-editor/components/FlowRestorer.jsx
     3:26  warning  Unable to resolve path to module '@/stores/useFlowStore'              import/no-unresolved
-    9:22  warning  Arrow function has too many lines (155). Maximum allowed is 150       max-lines-per-function
+    9:22  warning  Arrow function has too many lines (154). Maximum allowed is 150       max-lines-per-function
    10:13  warning  Arrow function has too many lines (152). Maximum allowed is 150       max-lines-per-function
   105:31  error    Make sure that using this pseudorandom number generator is safe here  sonarjs/pseudo-random
   106:31  error    Make sure that using this pseudorandom number generator is safe here  sonarjs/pseudo-random
-  114:12  error    Prefer `Number.isNaN` over `isNaN`                                    unicorn/prefer-number-properties
-  116:12  error    Prefer `Number.isNaN` over `isNaN`                                    unicorn/prefer-number-properties
   151:25  error    Refactor this code to not nest functions more than 4 levels deep      sonarjs/no-nested-functions
-  197:10  error    Use `undefined` instead of `null`                                     unicorn/no-null
 
 /Users/wolf/Desktop/Plubot/plubot-frontend/src/components/onboarding/flow-editor/components/ForceNodePositioning.jsx
     3:26  warning  Unable to resolve path to module '@/stores/useFlowStore'                             import/no-unresolved
-   10:30  warning  Arrow function has too many lines (154). Maximum allowed is 150                      max-lines-per-function
+   10:30  warning  Arrow function has too many lines (153). Maximum allowed is 150                      max-lines-per-function
    11:13  warning  Arrow function has too many lines (151). Maximum allowed is 150                      max-lines-per-function
    88:51  error    Make sure that using this pseudorandom number generator is safe here                 sonarjs/pseudo-random
    89:51  error    Make sure that using this pseudorandom number generator is safe here                 sonarjs/pseudo-random
   107:21  error    Refactor this function to reduce its Cognitive Complexity from 18 to the 15 allowed  sonarjs/cognitive-complexity
   117:24  warning  Variable Assigned to Object Injection Sink                                           security/detect-object-injection
   182:29  error    Refactor this code to not nest functions more than 4 levels deep                     sonarjs/no-nested-functions
-  223:10  error    Use `undefined` instead of `null`                                                    unicorn/no-null
 
 /Users/wolf/Desktop/Plubot/plubot-frontend/src/components/onboarding/flow-editor/components/HistoryManagement.jsx
-   9:30  warning  'historyState' is missing in props validation                                                                                   react/prop-types
-   9:44  warning  'setStatusMessage' is missing in props validation                                                                               react/prop-types
-  10:11  warning  'historyState.undo' is missing in props validation                                                                              react/prop-types
-  10:17  warning  'historyState.redo' is missing in props validation                                                                              react/prop-types
-  10:23  warning  'historyState.canUndo' is missing in props validation                                                                           react/prop-types
-  10:32  warning  'historyState.canRedo' is missing in props validation                                                                           react/prop-types
-  15:9   warning  'handleUndo' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]|^_/u                                   no-unused-vars
-  15:9   error    Remove the declaration of the unused 'handleUndo' variable                                                                      sonarjs/no-unused-vars
-  15:9   error    Remove this useless assignment to variable "handleUndo"                                                                         sonarjs/no-dead-store
-  25:9   warning  'handleRedo' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]|^_/u                                   no-unused-vars
-  25:9   error    Remove the declaration of the unused 'handleRedo' variable                                                                      sonarjs/no-unused-vars
-  25:9   error    Remove this useless assignment to variable "handleRedo"                                                                         sonarjs/no-dead-store
-  32:10  error    Use `undefined` instead of `null`                                                                                               unicorn/no-null
-  38:14  error    Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
-
-/Users/wolf/Desktop/Plubot/plubot-frontend/src/components/onboarding/flow-editor/components/MiniMapWrapper.jsx
-  10:3   warning  'nodes' is missing in props validation           react/prop-types
-  11:3   warning  'edges' is missing in props validation           react/prop-types
-  12:3   warning  'isExpanded' is missing in props validation      react/prop-types
-  13:3   warning  'isUltraMode' is missing in props validation     react/prop-types
-  14:3   warning  'viewport' is missing in props validation        react/prop-types
-  15:3   warning  'setByteMessage' is missing in props validation  react/prop-types
-  33:10  error    Use `undefined` instead of `null`                unicorn/no-null
+  16:9   warning  'handleUndo' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]|^_/u                                   no-unused-vars
+  16:9   error    Remove the declaration of the unused 'handleUndo' variable                                                                      sonarjs/no-unused-vars
+  16:9   error    Remove this useless assignment to variable "handleUndo"                                                                         sonarjs/no-dead-store
+  26:9   warning  'handleRedo' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]|^_/u                                   no-unused-vars
+  26:9   error    Remove the declaration of the unused 'handleRedo' variable                                                                      sonarjs/no-unused-vars
+  26:9   error    Remove this useless assignment to variable "handleRedo"                                                                         sonarjs/no-dead-store
+  49:14  error    Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
 
 /Users/wolf/Desktop/Plubot/plubot-frontend/src/components/onboarding/flow-editor/components/NodeManagement.jsx
-    5:10  error    nodeConfig not found in '@/utils/node-config.js'                                                                                import/named
-    7:26  warning  Unable to resolve path to module '@/stores/useFlowStore'                                                                        import/no-unresolved
-   13:14  error    Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
-   28:9   warning  'reactFlowInstance' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]|^_/u                            no-unused-vars
-   28:9   error    Remove the declaration of the unused 'reactFlowInstance' variable                                                               sonarjs/no-unused-vars
-   28:9   error    Remove this useless assignment to variable "reactFlowInstance"                                                                  sonarjs/no-dead-store
-   36:24  warning  Variable Assigned to Object Injection Sink                                                                                      security/detect-object-injection
-   38:16  error    Use `undefined` instead of `null`                                                                                               unicorn/no-null
-   83:23  error    Use `undefined` instead of `null`                                                                                               unicorn/no-null
-  144:10  error    Use `undefined` instead of `null`                                                                                               unicorn/no-null
-
-/Users/wolf/Desktop/Plubot/plubot-frontend/src/components/onboarding/flow-editor/components/NodeVisibilityFix.jsx
-  9:10  error  Use `undefined` instead of `null`  unicorn/no-null
+   4:10  error    nodeConfig not found in '@/utils/node-config.js'          import/named
+   6:26  warning  Unable to resolve path to module '@/stores/useFlowStore'  import/no-unresolved
+  33:24  warning  Variable Assigned to Object Injection Sink                security/detect-object-injection
 
 /Users/wolf/Desktop/Plubot/plubot-frontend/src/components/onboarding/flow-editor/components/NodeWrappers.jsx
     4:10  error    POWER_COLORS not found in '@/utils/node-config.js'                      import/named
@@ -254,37 +157,20 @@
   91:6   warning  React Hook useEffect has a missing dependency: 'updatePerformance'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
   99:6   warning  React Hook useMemo has a missing dependency: 'stats'. Either include it or remove the dependency array                react-hooks/exhaustive-deps
 
-/Users/wolf/Desktop/Plubot/plubot-frontend/src/components/onboarding/flow-editor/components/StorageQuotaManager.jsx
-  30:10  error  Use `undefined` instead of `null`  unicorn/no-null
-
 /Users/wolf/Desktop/Plubot/plubot-frontend/src/components/onboarding/flow-editor/components/menus/EdgeContextMenu.jsx
-    2:10  error    Remove this unused import of 'FiEdit'                                                                                                                                                              sonarjs/unused-import
-   12:28  warning  'position' is missing in props validation                                                                                                                                                          react/prop-types
-   12:38  warning  'onClose' is missing in props validation                                                                                                                                                           react/prop-types
-   14:23  warning  Please rename the variable `e`. Suggested names are: `error`, `event_`. A more descriptive name will do too                                                                                        unicorn/prevent-abbreviations
-   18:29  error    Use `undefined` instead of `null`                                                                                                                                                                  unicorn/no-null
-   39:23  warning  'position.x' is missing in props validation                                                                                                                                                        react/prop-types
-   40:22  warning  'position.y' is missing in props validation                                                                                                                                                        react/prop-types
-   64:7   error    Visible, non-interactive elements with click handlers must have at least one keyboard listener                                                                                                     jsx-a11y/click-events-have-key-events
-   64:7   error    Avoid non-native interactive elements. If using native HTML is not possible, add an appropriate role and support for tabbing, mouse, keyboard, and touch inputs to an interactive content element  jsx-a11y/no-static-element-interactions
-   75:7   error    Visible, non-interactive elements with click handlers must have at least one keyboard listener                                                                                                     jsx-a11y/click-events-have-key-events
-   75:7   error    Avoid non-native interactive elements. If using native HTML is not possible, add an appropriate role and support for tabbing, mouse, keyboard, and touch inputs to an interactive content element  jsx-a11y/no-static-element-interactions
-   92:7   error    Visible, non-interactive elements with click handlers must have at least one keyboard listener                                                                                                     jsx-a11y/click-events-have-key-events
-   92:7   error    Avoid non-native interactive elements. If using native HTML is not possible, add an appropriate role and support for tabbing, mouse, keyboard, and touch inputs to an interactive content element  jsx-a11y/no-static-element-interactions
-  100:7   error    Visible, non-interactive elements with click handlers must have at least one keyboard listener                                                                                                     jsx-a11y/click-events-have-key-events
-  100:7   error    Avoid non-native interactive elements. If using native HTML is not possible, add an appropriate role and support for tabbing, mouse, keyboard, and touch inputs to an interactive content element  jsx-a11y/no-static-element-interactions
-  108:7   error    Visible, non-interactive elements with click handlers must have at least one keyboard listener                                                                                                     jsx-a11y/click-events-have-key-events
-  108:7   error    Avoid non-native interactive elements. If using native HTML is not possible, add an appropriate role and support for tabbing, mouse, keyboard, and touch inputs to an interactive content element  jsx-a11y/no-static-element-interactions
+   65:7  error  Visible, non-interactive elements with click handlers must have at least one keyboard listener                                                                                                     jsx-a11y/click-events-have-key-events
+   65:7  error  Avoid non-native interactive elements. If using native HTML is not possible, add an appropriate role and support for tabbing, mouse, keyboard, and touch inputs to an interactive content element  jsx-a11y/no-static-element-interactions
+   76:7  error  Visible, non-interactive elements with click handlers must have at least one keyboard listener                                                                                                     jsx-a11y/click-events-have-key-events
+   76:7  error  Avoid non-native interactive elements. If using native HTML is not possible, add an appropriate role and support for tabbing, mouse, keyboard, and touch inputs to an interactive content element  jsx-a11y/no-static-element-interactions
+   93:7  error  Visible, non-interactive elements with click handlers must have at least one keyboard listener                                                                                                     jsx-a11y/click-events-have-key-events
+   93:7  error  Avoid non-native interactive elements. If using native HTML is not possible, add an appropriate role and support for tabbing, mouse, keyboard, and touch inputs to an interactive content element  jsx-a11y/no-static-element-interactions
+  101:7  error  Visible, non-interactive elements with click handlers must have at least one keyboard listener                                                                                                     jsx-a11y/click-events-have-key-events
+  101:7  error  Avoid non-native interactive elements. If using native HTML is not possible, add an appropriate role and support for tabbing, mouse, keyboard, and touch inputs to an interactive content element  jsx-a11y/no-static-element-interactions
+  109:7  error  Visible, non-interactive elements with click handlers must have at least one keyboard listener                                                                                                     jsx-a11y/click-events-have-key-events
+  109:7  error  Avoid non-native interactive elements. If using native HTML is not possible, add an appropriate role and support for tabbing, mouse, keyboard, and touch inputs to an interactive content element  jsx-a11y/no-static-element-interactions
 
 /Users/wolf/Desktop/Plubot/plubot-frontend/src/components/onboarding/flow-editor/components/menus/NodeContextMenu.jsx
-   3:10  error    Remove this unused import of 'FiEdit'                                                                        sonarjs/unused-import
-   3:18  error    Remove this unused import of 'FiTrash2'                                                                      sonarjs/unused-import
-   3:28  error    Remove this unused import of 'FiCopy'                                                                        sonarjs/unused-import
-  73:29  warning  Please rename the variable `e`. Suggested names are: `error`, `event_`. A more descriptive name will do too  unicorn/prevent-abbreviations
-  73:32  error    Move arrow function 'handleMouseEnter' to the outer scope                                                    unicorn/consistent-function-scoping
-  78:29  warning  Please rename the variable `e`. Suggested names are: `error`, `event_`. A more descriptive name will do too  unicorn/prevent-abbreviations
-  78:32  error    Move arrow function 'handleMouseLeave' to the outer scope                                                    unicorn/consistent-function-scoping
-  86:9   error    Visible, non-interactive elements with click handlers must have at least one keyboard listener               jsx-a11y/click-events-have-key-events
+  85:9  error  Visible, non-interactive elements with click handlers must have at least one keyboard listener  jsx-a11y/click-events-have-key-events
 
 /Users/wolf/Desktop/Plubot/plubot-frontend/src/components/onboarding/flow-editor/drop-position-fix.js
   25:5  warning  Unexpected console statement              no-console
@@ -310,10 +196,6 @@
 
 /Users/wolf/Desktop/Plubot/plubot-frontend/src/components/onboarding/flow-editor/hooks/useConnectionValidator.js
   10:16  warning  Function 'useConnectionValidator' has too many lines (170). Maximum allowed is 150  max-lines-per-function
-
-/Users/wolf/Desktop/Plubot/plubot-frontend/src/components/onboarding/flow-editor/hooks/useContextMenu.js
-   9:36  error  Use `undefined` instead of `null`  unicorn/no-null
-  42:13  error  Use `undefined` instead of `null`  unicorn/no-null
 
 /Users/wolf/Desktop/Plubot/plubot-frontend/src/components/onboarding/flow-editor/hooks/useDragAndDropManager.js
   113:41  error  Prefer the spread operator over `Array#concat(…)`  unicorn/prefer-spread
@@ -384,14 +266,19 @@
   68:22  error  Use `undefined` instead of `null`  unicorn/no-null
 
 /Users/wolf/Desktop/Plubot/plubot-frontend/src/components/onboarding/flow-editor/hooks/useLocalBackupManager.js
-  22:27  error  Use `undefined` instead of `null`  unicorn/no-null
-  26:23  error  Empty block statement              no-empty
-  30:14  error  Use `undefined` instead of `null`  unicorn/no-null
+  22:27  error  Use `undefined` instead of `null`                                            unicorn/no-null
+  26:23  error  Empty block statement                                                        no-empty
+  30:14  error  Use `undefined` instead of `null`                                            unicorn/no-null
+  39:14  error  Unexpected implicit coercion encountered. Use `Boolean(backupData)` instead  no-implicit-coercion
 
 /Users/wolf/Desktop/Plubot/plubot-frontend/src/components/onboarding/flow-editor/hooks/useModalManagement.js
   12:3   warning  'registerModalListener' is defined but never used. Allowed unused vars must match /^[A-Z_]|^_/u  no-unused-vars
   12:3   error    Remove this unused import of 'registerModalListener'                                             sonarjs/unused-import
   20:28  warning  Arrow function has too many lines (165). Maximum allowed is 150                                  max-lines-per-function
+
+/Users/wolf/Desktop/Plubot/plubot-frontend/src/components/onboarding/flow-editor/hooks/useModalManager.js
+  15:9  warning  Unexpected console statement  no-console
+  31:9  warning  Unexpected console statement  no-console
 
 /Users/wolf/Desktop/Plubot/plubot-frontend/src/components/onboarding/flow-editor/hooks/useNodeVirtualization.js
   34:33  error  Use `undefined` instead of `null`  unicorn/no-null
@@ -454,11 +341,11 @@
    49:34  error    Use `undefined` instead of `null`                                                                            unicorn/no-null
    57:11  error    'reflowTimeout' is not defined                                                                               no-undef
    57:39  error    'reflowTimeout' is not defined                                                                               no-undef
-   67:13  warning  'canvas' is already declared in the upper scope on line 51 column 11                                         no-shadow
-   68:13  warning  'staticCanvas' is already declared in the upper scope on line 52 column 11                                   no-shadow
+   67:13  error    'canvas' is already declared in the upper scope on line 51 column 11                                         no-shadow
+   68:13  error    'staticCanvas' is already declared in the upper scope on line 52 column 11                                   no-shadow
    89:7   error    'drawStaticElements' was used before it was defined                                                          no-use-before-define
-   95:15  warning  'width' is already declared in the upper scope on line 28 column 11                                          no-shadow
-   96:15  warning  'height' is already declared in the upper scope on line 28 column 18                                         no-shadow
+   95:15  error    'width' is already declared in the upper scope on line 28 column 11                                          no-shadow
+   96:15  error    'height' is already declared in the upper scope on line 28 column 18                                         no-shadow
   142:7   error    Stateless functional components should not use `this`                                                        react/no-this-in-sfc
   143:9   error    Stateless functional components should not use `this`                                                        react/no-this-in-sfc
   143:19  error    Make sure that using this pseudorandom number generator is safe here                                         sonarjs/pseudo-random
@@ -511,16 +398,16 @@
   294:38  error    Use `undefined` instead of `null`                                                                            unicorn/no-null
 
 /Users/wolf/Desktop/Plubot/plubot-frontend/src/components/onboarding/flow-editor/ui/ContextMenuComponent.jsx
-  12:3   warning  'position' is missing in props validation                                                                                                                                                          react/prop-types
-  13:3   warning  'onClose' is missing in props validation                                                                                                                                                           react/prop-types
-  14:3   warning  'onAddNode' is missing in props validation                                                                                                                                                         react/prop-types
-  15:3   warning  'nodeTypes' is missing in props validation                                                                                                                                                         react/prop-types
-  37:25  error    Use `undefined` instead of `null`                                                                                                                                                                  unicorn/no-null
-  44:23  warning  'position.y' is missing in props validation                                                                                                                                                        react/prop-types
-  45:24  warning  'position.x' is missing in props validation                                                                                                                                                        react/prop-types
-  51:11  error    Visible, non-interactive elements with click handlers must have at least one keyboard listener                                                                                                     jsx-a11y/click-events-have-key-events
-  51:11  error    Avoid non-native interactive elements. If using native HTML is not possible, add an appropriate role and support for tabbing, mouse, keyboard, and touch inputs to an interactive content element  jsx-a11y/no-static-element-interactions
-  55:45  warning  'position.flowPosition' is missing in props validation                                                                                                                                             react/prop-types
+  13:3   warning  'position' is missing in props validation                                                                                                                                                          react/prop-types
+  14:3   warning  'onClose' is missing in props validation                                                                                                                                                           react/prop-types
+  15:3   warning  'onAddNode' is missing in props validation                                                                                                                                                         react/prop-types
+  16:3   warning  'nodeTypes' is missing in props validation                                                                                                                                                         react/prop-types
+  38:25  error    Use `undefined` instead of `null`                                                                                                                                                                  unicorn/no-null
+  45:23  warning  'position.y' is missing in props validation                                                                                                                                                        react/prop-types
+  46:24  warning  'position.x' is missing in props validation                                                                                                                                                        react/prop-types
+  52:11  error    Visible, non-interactive elements with click handlers must have at least one keyboard listener                                                                                                     jsx-a11y/click-events-have-key-events
+  52:11  error    Avoid non-native interactive elements. If using native HTML is not possible, add an appropriate role and support for tabbing, mouse, keyboard, and touch inputs to an interactive content element  jsx-a11y/no-static-element-interactions
+  56:45  warning  'position.flowPosition' is missing in props validation                                                                                                                                             react/prop-types
 
 /Users/wolf/Desktop/Plubot/plubot-frontend/src/components/onboarding/flow-editor/ui/CustomMiniMap.jsx
    26:23  warning  Arrow function has too many lines (683). Maximum allowed is 150                                                                                                                                                             max-lines-per-function
@@ -555,9 +442,9 @@
   316:13  error    Remove this useless assignment to variable "bounds"                                                                                                                                                                         sonarjs/no-dead-store
   370:12  error    Prefer `Number.isFinite` over `isFinite`                                                                                                                                                                                    unicorn/prefer-number-properties
   561:13  error    Blocks are nested too deeply (5). Maximum allowed is 4                                                                                                                                                                      max-depth
-  574:17  warning  'nodeRadius' is already declared in the upper scope on line 72 column 9                                                                                                                                                     no-shadow
+  574:17  error    'nodeRadius' is already declared in the upper scope on line 72 column 9                                                                                                                                                     no-shadow
   652:57  error    Prefer `Number.isFinite` over `isFinite`                                                                                                                                                                                    unicorn/prefer-number-properties
-  657:17  warning  'scaleY' is already declared in the upper scope on line 345 column 13                                                                                                                                                       no-shadow
+  657:17  error    'scaleY' is already declared in the upper scope on line 345 column 13                                                                                                                                                       no-shadow
   695:7   error    'setHasError' was used before it was defined                                                                                                                                                                                no-use-before-define
   697:6   warning  React Hook useCallback has missing dependencies: 'edgeColors' and 'nodeColors'. Either include them or remove the dependency array                                                                                          react-hooks/exhaustive-deps
   747:7   error    Visible, non-interactive elements with click handlers must have at least one keyboard listener                                                                                                                              jsx-a11y/click-events-have-key-events
@@ -674,21 +561,9 @@
 
 /Users/wolf/Desktop/Plubot/plubot-frontend/src/components/onboarding/flow-editor/ui/SafeEdgeWrapper.jsx
    9:25  warning  Arrow function has a complexity of 18. Maximum allowed is 15          complexity
-  13:34  error    Make sure that using this pseudorandom number generator is safe here  sonarjs/pseudo-random
-  27:46  error    Use `undefined` instead of `null`                                     unicorn/no-null
-  28:46  error    Use `undefined` instead of `null`                                     unicorn/no-null
-
-/Users/wolf/Desktop/Plubot/plubot-frontend/src/components/onboarding/flow-editor/ui/SyncButton.jsx
-  12:20  warning  Arrow function has too many lines (159). Maximum allowed is 150                                              max-lines-per-function
-  14:50  error    Use `undefined` instead of `null`                                                                            unicorn/no-null
-  15:52  error    Use `undefined` instead of `null`                                                                            unicorn/no-null
-  18:11  warning  'syncState' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]|^_/u                 no-unused-vars
-  18:11  error    Remove the declaration of the unused 'syncState' variable                                                    sonarjs/no-unused-vars
-  18:11  error    Remove this useless assignment to variable "syncState"                                                       sonarjs/no-dead-store
-  37:29  warning  Please rename the variable `e`. Suggested names are: `error`, `event_`. A more descriptive name will do too  unicorn/prevent-abbreviations
-  56:40  error    Use `undefined` instead of `null`                                                                            unicorn/no-null
-  69:29  error    Move arrow function 'getStatusColor' to the outer scope                                                      unicorn/consistent-function-scoping
-  74:39  error    Move arrow function 'getSyncStatusText' to the outer scope                                                   unicorn/consistent-function-scoping
+  15:34  error    Make sure that using this pseudorandom number generator is safe here  sonarjs/pseudo-random
+  29:46  error    Use `undefined` instead of `null`                                     unicorn/no-null
+  30:46  error    Use `undefined` instead of `null`                                     unicorn/no-null
 
 /Users/wolf/Desktop/Plubot/plubot-frontend/src/components/onboarding/flow-editor/ui/UltraModeManager.js
    64:17  error    Refactor this function to reduce its Cognitive Complexity from 28 to the 15 allowed          sonarjs/cognitive-complexity
@@ -724,7 +599,7 @@
   23:3   warning  'targetHandleId' is missing in props validation                         react/prop-types
   24:3   warning  'interactionWidth' is missing in props validation                       react/prop-types
   25:6   warning  'rest' is defined but never used. Allowed unused args must match /^_/u  no-unused-vars
-  29:12  warning  'path' is already declared in the upper scope on line 28 column 10      no-shadow
+  29:12  error    'path' is already declared in the upper scope on line 28 column 10      no-shadow
 
 /Users/wolf/Desktop/Plubot/plubot-frontend/src/components/onboarding/flow-editor/ui/UltraOptimizedNode.jsx
    15:28  warning  Arrow function has too many lines (253). Maximum allowed is 150                                   max-lines-per-function
@@ -756,12 +631,8 @@
   262:33  error    Extract this nested ternary operation into an independent statement                               sonarjs/no-nested-conditional
 
 /Users/wolf/Desktop/Plubot/plubot-frontend/src/components/onboarding/flow-editor/ui/ZoomControls.jsx
-  22:25  warning  'onUndo' is missing in props validation                                            react/prop-types
-  22:33  warning  'onRedo' is missing in props validation                                            react/prop-types
-  22:41  warning  'onToggleHistory' is defined but never used. Allowed unused args must match /^_/u  no-unused-vars
-  22:41  warning  'onToggleHistory' is missing in props validation                                   react/prop-types
-  22:58  warning  'historyActive' is defined but never used. Allowed unused args must match /^_/u    no-unused-vars
-  22:58  warning  'historyActive' is missing in props validation                                     react/prop-types
+  21:25  warning  'onUndo' is missing in props validation  react/prop-types
+  21:33  warning  'onRedo' is missing in props validation  react/prop-types
 
 /Users/wolf/Desktop/Plubot/plubot-frontend/src/components/onboarding/flow-editor/ui/minimap-sanitizer.js
    13:39  error  Prefer `Number.isFinite` over `isFinite`                               unicorn/prefer-number-properties
@@ -996,7 +867,7 @@
    91:23  warning  'importData.trim' is missing in props validation                                    react/prop-types
   143:10  error    Unexpected confirm                                                                  no-alert
   170:11  error    Use array destructuring                                                             prefer-destructuring
-  173:38  warning  'event' is already declared in the upper scope on line 169 column 27                no-shadow
+  173:38  error    'event' is already declared in the upper scope on line 169 column 27                no-shadow
   176:12  error    Prefer `Blob#text()` over `FileReader#readAsText(blob)`                             unicorn/prefer-blob-reading-methods
 
 /Users/wolf/Desktop/Plubot/plubot-frontend/src/components/onboarding/modals/SuggestionsModal.jsx
@@ -1029,6 +900,8 @@
 
 /Users/wolf/Desktop/Plubot/plubot-frontend/src/components/onboarding/modals/TemplateSelector.jsx
     1:36  error    Remove this unused import of 'XCircle'                                                                                                                                                             sonarjs/unused-import
+    7:1   error    Remove this commented out code                                                                                                                                                                     sonarjs/no-commented-code
+    7:46  error    Complete the task associated to this "TODO" comment                                                                                                                                                sonarjs/todo-tag
     9:26  warning  Arrow function has too many lines (703). Maximum allowed is 150                                                                                                                                    max-lines-per-function
     9:29  warning  'onSelectTemplate' is missing in props validation                                                                                                                                                  react/prop-types
     9:47  warning  'onClose' is missing in props validation                                                                                                                                                           react/prop-types
@@ -1052,6 +925,10 @@
   106:26  warning  Generic Object Injection Sink                                    security/detect-object-injection
   261:20  warning  Arrow function has too many lines (293). Maximum allowed is 150  max-lines-per-function
   261:20  warning  Arrow function has a complexity of 22. Maximum allowed is 15     complexity
+
+/Users/wolf/Desktop/Plubot/plubot-frontend/src/components/onboarding/nodes/ainode/AiNode.tsx
+   5:3   error  'Brain' is defined but never used                            @typescript-eslint/no-unused-vars
+  64:30  error  '_setIsSettingsExpanded' is assigned a value but never used  @typescript-eslint/no-unused-vars
 
 /Users/wolf/Desktop/Plubot/plubot-frontend/src/components/onboarding/nodes/ainode/useAINode.ts
     6:7   error  Member key should be declared before all field definitions                                                 @typescript-eslint/member-ordering
@@ -1156,16 +1033,19 @@
   173:17  error    Dangerous property 'dangerouslySetInnerHTML' found                                                                                react/no-danger
   175:21  error    Make sure the regex used here, which is vulnerable to super-linear runtime due to backtracking, cannot lead to denial of service  sonarjs/slow-regex
 
+/Users/wolf/Desktop/Plubot/plubot-frontend/src/components/onboarding/nodes/discordnode/DiscordNode.tsx
+  1:8  error  'PropTypes' is defined but never used  @typescript-eslint/no-unused-vars
+
 /Users/wolf/Desktop/Plubot/plubot-frontend/src/components/onboarding/nodes/emotiondetectionnode/useEmotionDetectionNode.ts
-   75:11  warning  Generic Object Injection Sink                                           security/detect-object-injection
-   81:7   warning  Generic Object Injection Sink                                           security/detect-object-injection
-   98:3   error    'data' is defined but never used. Allowed unused args must match /^_/u  @typescript-eslint/no-unused-vars
-  100:11  error    Unsafe array destructuring of a tuple element with an `any` value       @typescript-eslint/no-unsafe-assignment
-  101:5   error    Unsafe assignment of an `any` value                                     @typescript-eslint/no-unsafe-assignment
-  101:27  error    Unsafe member access .updateNodeData on an `any` value                  @typescript-eslint/no-unsafe-member-access
-  108:7   error    Unsafe call of a(n) `any` typed value                                   @typescript-eslint/no-unsafe-call
-  120:9   error    Unsafe call of a(n) `any` typed value                                   @typescript-eslint/no-unsafe-call
-  127:9   error    Unsafe call of a(n) `any` typed value                                   @typescript-eslint/no-unsafe-call
+   75:11  warning  Generic Object Injection Sink                                      security/detect-object-injection
+   81:7   warning  Generic Object Injection Sink                                      security/detect-object-injection
+   98:3   error    'data' is defined but never used                                   @typescript-eslint/no-unused-vars
+  100:11  error    Unsafe array destructuring of a tuple element with an `any` value  @typescript-eslint/no-unsafe-assignment
+  101:5   error    Unsafe assignment of an `any` value                                @typescript-eslint/no-unsafe-assignment
+  101:27  error    Unsafe member access .updateNodeData on an `any` value             @typescript-eslint/no-unsafe-member-access
+  108:7   error    Unsafe call of a(n) `any` typed value                              @typescript-eslint/no-unsafe-call
+  120:9   error    Unsafe call of a(n) `any` typed value                              @typescript-eslint/no-unsafe-call
+  127:9   error    Unsafe call of a(n) `any` typed value                              @typescript-eslint/no-unsafe-call
 
 /Users/wolf/Desktop/Plubot/plubot-frontend/src/components/onboarding/nodes/emotiondetectionnodeOLD/EmotionDetectionNode.tsx
   22:66  error  Unsafe argument of type error typed assigned to a parameter of type `string`                               @typescript-eslint/no-unsafe-argument
@@ -1183,22 +1063,25 @@
   69:53  error  Unsafe member access .detectedEmotion on an `error` typed value                                            @typescript-eslint/no-unsafe-member-access
 
 /Users/wolf/Desktop/Plubot/plubot-frontend/src/components/onboarding/nodes/emotiondetectionnodeOLD/useEmotionDetectionNode.ts
-  12:26  error  Unable to resolve path to module '@/stores/useFlowStore'                import/no-unresolved
-  26:3   error  'data' is defined but never used. Allowed unused args must match /^_/u  @typescript-eslint/no-unused-vars
-  28:9   error  Unsafe assignment of an error typed value                               @typescript-eslint/no-unsafe-assignment
-  28:30  error  Unsafe call of a(n) `error` type typed value                            @typescript-eslint/no-unsafe-call
-  29:5   error  Unsafe assignment of an `any` value                                     @typescript-eslint/no-unsafe-assignment
-  29:27  error  Unsafe member access .updateNodeData on an `any` value                  @typescript-eslint/no-unsafe-member-access
-  35:7   error  Unsafe call of a(n) `error` type typed value                            @typescript-eslint/no-unsafe-call
+  12:26  error  Unable to resolve path to module '@/stores/useFlowStore'  import/no-unresolved
+  26:3   error  'data' is defined but never used                          @typescript-eslint/no-unused-vars
+  28:9   error  Unsafe assignment of an error typed value                 @typescript-eslint/no-unsafe-assignment
+  28:30  error  Unsafe call of a(n) `error` type typed value              @typescript-eslint/no-unsafe-call
+  29:5   error  Unsafe assignment of an `any` value                       @typescript-eslint/no-unsafe-assignment
+  29:27  error  Unsafe member access .updateNodeData on an `any` value    @typescript-eslint/no-unsafe-member-access
+  35:7   error  Unsafe call of a(n) `error` type typed value              @typescript-eslint/no-unsafe-call
 
 /Users/wolf/Desktop/Plubot/plubot-frontend/src/components/onboarding/nodes/endnode/EndNode.tsx
+  17:10  error  'END_NODE_ZOD_SCHEMA' is defined but never used      @typescript-eslint/no-unused-vars
   25:11  error  Unsafe assignment of an `any` value                  @typescript-eslint/no-unsafe-assignment
   25:56  error  Unsafe return of a value of type `any`               @typescript-eslint/no-unsafe-return
   25:62  error  Unsafe member access .isUltraMode on an `any` value  @typescript-eslint/no-unsafe-member-access
   44:13  error  Unsafe assignment of an `any` value                  @typescript-eslint/no-unsafe-assignment
 
 /Users/wolf/Desktop/Plubot/plubot-frontend/src/components/onboarding/nodes/endnode/EndNodeHeader.tsx
-  12:3   error  'useRef' is defined but never used. Allowed unused vars must match /^[A-Z_]|^_/u                           @typescript-eslint/no-unused-vars
+  12:3   error  'useRef' is defined but never used                                                                         @typescript-eslint/no-unused-vars
+  15:20  error  'ReactKeyboardEvent' is defined but never used                                                             @typescript-eslint/no-unused-vars
+  16:17  error  'ReactMouseEvent' is defined but never used                                                                @typescript-eslint/no-unused-vars
   88:21  error  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
 
 /Users/wolf/Desktop/Plubot/plubot-frontend/src/components/onboarding/nodes/endnode/EndNodeOLD.jsx
@@ -1252,9 +1135,10 @@
   711:25  warning  Please rename the variable `e`. Suggested names are: `error`, `event_`. A more descriptive name will do too                                                                                        unicorn/prevent-abbreviations
 
 /Users/wolf/Desktop/Plubot/plubot-frontend/src/components/onboarding/nodes/endnode/EndNodeOLD.tsx
-   25:10  error    'toast' is defined but never used. Allowed unused vars must match /^[A-Z_]|^_/u                                           @typescript-eslint/no-unused-vars
-   28:10  error    'shallow' is defined but never used. Allowed unused vars must match /^[A-Z_]|^_/u                                         @typescript-eslint/no-unused-vars
+   25:10  error    'toast' is defined but never used                                                                                         @typescript-eslint/no-unused-vars
+   28:10  error    'shallow' is defined but never used                                                                                       @typescript-eslint/no-unused-vars
    34:57  error    '/Users/wolf/Desktop/Plubot/plubot-frontend/src/components/onboarding/ui/VariableEditor.tsx' imported multiple times      import/no-duplicates
+   72:7   error    'END_NODE_ZOD_SCHEMA' is assigned a value but only used as a type                                                         @typescript-eslint/no-unused-vars
    95:1   error    `lucide-react` import should occur before type import of `react`                                                          import/order
   140:1   error    `../../ui/VariableEditor` import should occur before import of `./EndNodeContent`                                         import/order
   140:31  error    '/Users/wolf/Desktop/Plubot/plubot-frontend/src/components/onboarding/ui/VariableEditor.tsx' imported multiple times      import/no-duplicates
@@ -1264,15 +1148,15 @@
   189:12  warning  Generic Object Injection Sink                                                                                             security/detect-object-injection
   197:47  warning  Unexpected any. Specify a different type                                                                                  @typescript-eslint/no-explicit-any
   201:46  error    Component definition is missing display name                                                                              react/display-name
-  210:13  error    't' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]|^_/u                                      @typescript-eslint/no-unused-vars
+  210:13  error    't' is assigned a value but never used                                                                                    @typescript-eslint/no-unused-vars
   212:44  error    Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator                 @typescript-eslint/prefer-nullish-coalescing
-  214:22  error    'canDelete' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]|^_/u                              @typescript-eslint/no-unused-vars
+  214:22  error    'canDelete' is assigned a value but never used                                                                            @typescript-eslint/no-unused-vars
   248:17  error    Unsafe assignment of an `any` value                                                                                       @typescript-eslint/no-unsafe-assignment
   283:8   error    React Hook useCallback has a missing dependency: 'effectiveTrackEvent'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
   316:8   error    React Hook useCallback has a missing dependency: 'effectiveTrackEvent'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
-  319:11  error    'handleDuplicateNode' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]|^_/u                    @typescript-eslint/no-unused-vars
+  319:11  error    'handleDuplicateNode' is assigned a value but never used                                                                  @typescript-eslint/no-unused-vars
   345:8   error    React Hook useCallback has a missing dependency: 'effectiveTrackEvent'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
-  347:11  error    'handleDeleteNode' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]|^_/u                       @typescript-eslint/no-unused-vars
+  347:11  error    'handleDeleteNode' is assigned a value but never used                                                                     @typescript-eslint/no-unused-vars
   350:8   error    React Hook useCallback has a missing dependency: 'effectiveTrackEvent'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
   513:36  error    Unexpected empty arrow function                                                                                           @typescript-eslint/no-empty-function
 
@@ -1332,18 +1216,9 @@
   30:28  error    Component definition is missing display name  react/display-name
 
 /Users/wolf/Desktop/Plubot/plubot-frontend/src/components/onboarding/nodes/messagenode/MessageNode.jsx
-   163:25  error    Found non-literal argument to RegExp Constructor                                                                                                            security/detect-non-literal-regexp
-   276:24  warning  Arrow function has too many lines (198). Maximum allowed is 150                                                                                             max-lines-per-function
-   337:36  warning  Generic Object Injection Sink                                                                                                                               security/detect-object-injection
-   347:6   warning  'e' is defined but never used. Allowed unused args must match /^_/u                                                                                         no-unused-vars
-   347:6   warning  Please rename the variable `e`. Suggested names are: `error`, `event_`. A more descriptive name will do too                                                 unicorn/prevent-abbreviations
-   466:20  warning  Do not use Array index in keys                                                                                                                              react/no-array-index-key
-   601:30  warning  'DEFAULT_MESSAGE' is defined but never used. Allowed unused args must match /^_/u                                                                           no-unused-vars
-   845:30  warning  Arrow function has too many lines (337). Maximum allowed is 150                                                                                             max-lines-per-function
-   940:20  error    Use `undefined` instead of `null`                                                                                                                           unicorn/no-null
-   951:18  error    Use `undefined` instead of `null`                                                                                                                           unicorn/no-null
-  1154:6   warning  React Hook useMemo has unnecessary dependencies: 'isUltraMode', 'lodLevel', 'safeData', and 'selected'. Either exclude them or remove the dependency array  react-hooks/exhaustive-deps
-  1173:7   error    `tabIndex` should only be declared on interactive elements                                                                                                  jsx-a11y/no-noninteractive-tabindex
+  158:25  error    Found non-literal argument to RegExp Constructor                 security/detect-non-literal-regexp
+  271:24  warning  Arrow function has too many lines (201). Maximum allowed is 150  max-lines-per-function
+  840:30  warning  Arrow function has too many lines (342). Maximum allowed is 150  max-lines-per-function
 
 /Users/wolf/Desktop/Plubot/plubot-frontend/src/components/onboarding/nodes/messagenode/MessageNodeIcon.jsx
   21:14  error  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
@@ -1374,32 +1249,10 @@
   263:27  warning  Please rename the variable `e`. Suggested names are: `error`, `event_`. A more descriptive name will do too                                                                                        unicorn/prevent-abbreviations
 
 /Users/wolf/Desktop/Plubot/plubot-frontend/src/components/onboarding/nodes/optionnode/OptionNode.jsx
-   14:3   error    Remove this unused import of 'Edit2'                                                                                                                                                                                                       sonarjs/unused-import
-   34:10  warning  'getConnectorColor' is defined but never used. Allowed unused vars must match /^[A-Z_]|^_/u                                                                                                                                                no-unused-vars
-   34:10  error    Remove this unused import of 'getConnectorColor'                                                                                                                                                                                           sonarjs/unused-import
-   49:11  warning  The 'iconProperties' object makes the dependencies of useCallback Hook (at line 78) change on every render. Move it inside the useCallback callback. Alternatively, wrap the initialization of 'iconProperties' in its own useMemo() Hook  react-hooks/exhaustive-deps
-  113:6   error    Refactor this function to reduce its Cognitive Complexity from 18 to the 15 allowed                                                                                                                                                        sonarjs/cognitive-complexity
-  116:7   warning  Do not nest ternary expressions                                                                                                                                                                                                            no-nested-ternary
-  118:11  warning  Do not nest ternary expressions                                                                                                                                                                                                            no-nested-ternary
-  118:11  error    Extract this nested ternary operation into an independent statement                                                                                                                                                                        sonarjs/no-nested-conditional
-  120:13  warning  Do not nest ternary expressions                                                                                                                                                                                                            no-nested-ternary
-  120:13  error    Extract this nested ternary operation into an independent statement                                                                                                                                                                        sonarjs/no-nested-conditional
-  122:15  warning  Do not nest ternary expressions                                                                                                                                                                                                            no-nested-ternary
-  122:15  error    Extract this nested ternary operation into an independent statement                                                                                                                                                                        sonarjs/no-nested-conditional
-  124:17  error    Extract this nested ternary operation into an independent statement                                                                                                                                                                        sonarjs/no-nested-conditional
-  175:29  warning  Arrow function has too many lines (298). Maximum allowed is 150                                                                                                                                                                            max-lines-per-function
-  175:29  warning  Arrow function has a complexity of 18. Maximum allowed is 15                                                                                                                                                                               complexity
-  179:3   warning  'lodLevel' is defined but never used. Allowed unused args must match /^_/u                                                                                                                                                                 no-unused-vars
-  233:10  warning  'isHovered' is assigned a value but never used. Allowed unused elements of array destructuring must match /^_/u                                                                                                                            no-unused-vars
-  233:10  error    Remove the declaration of the unused 'isHovered' variable                                                                                                                                                                                  sonarjs/no-unused-vars
-  233:10  error    Remove this useless assignment to variable "isHovered"                                                                                                                                                                                     sonarjs/no-dead-store
-  324:48  warning  Please rename the variable `e`. Suggested names are: `error`, `event_`. A more descriptive name will do too                                                                                                                                unicorn/prevent-abbreviations
-  361:6   warning  Please rename the variable `e`. Suggested names are: `error`, `event_`. A more descriptive name will do too                                                                                                                                unicorn/prevent-abbreviations
-  390:5   error    Non-interactive elements should not be assigned mouse or keyboard event listeners                                                                                                                                                          jsx-a11y/no-noninteractive-element-interactions
-  390:5   error    The attribute aria-expanded is not supported by the role group                                                                                                                                                                             jsx-a11y/role-supports-aria-props
-  398:7   error    `tabIndex` should only be declared on interactive elements                                                                                                                                                                                 jsx-a11y/no-noninteractive-tabindex
-  453:13  error    Visible, non-interactive elements with click handlers must have at least one keyboard listener                                                                                                                                             jsx-a11y/click-events-have-key-events
-  453:13  error    Non-interactive elements should not be assigned mouse or keyboard event listeners                                                                                                                                                          jsx-a11y/no-noninteractive-element-interactions
+  179:29  warning  Arrow function has too many lines (307). Maximum allowed is 150  max-lines-per-function
+  179:29  warning  Arrow function has a complexity of 18. Maximum allowed is 15     complexity
+  183:3   warning  '_lodLevel' is missing in props validation                       react/prop-types
+  532:3   error    'lodLevel' PropType is defined but prop is never used            react/no-unused-prop-types
 
 /Users/wolf/Desktop/Plubot/plubot-frontend/src/components/onboarding/nodes/optionnode/OptionNode.temp.jsx
     8:1   warning  The filename `OptionNode.temp.jsx` should be named `OptionNode.temporary.jsx`. A more descriptive name will do too                                                                                                                         unicorn/prevent-abbreviations
@@ -1425,10 +1278,14 @@
   459:13  error    Visible, non-interactive elements with click handlers must have at least one keyboard listener                                                                                                                                             jsx-a11y/click-events-have-key-events
 
 /Users/wolf/Desktop/Plubot/plubot-frontend/src/components/onboarding/nodes/startnode/StartNode.tsx
+   10:11  error  'InfoIcon' is defined but never used                                                                       @typescript-eslint/no-unused-vars
+   11:14  error  'WarningIcon' is defined but never used                                                                    @typescript-eslint/no-unused-vars
+   12:12  error  'ErrorIcon' is defined but never used                                                                      @typescript-eslint/no-unused-vars
+   13:20  error  'DeleteIcon' is defined but never used                                                                     @typescript-eslint/no-unused-vars
   193:22  error  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
   264:15  error  The autoFocus prop should not be used, as it can reduce usability and accessibility for users              jsx-a11y/no-autofocus
-  325:11  error  'memoStatus' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]|^_/u              @typescript-eslint/no-unused-vars
-  328:20  error  'setNodes' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]|^_/u                @typescript-eslint/no-unused-vars
+  325:11  error  'memoStatus' is assigned a value but never used                                                            @typescript-eslint/no-unused-vars
+  328:20  error  'setNodes' is assigned a value but never used                                                              @typescript-eslint/no-unused-vars
   329:9   error  Unsafe assignment of an `any` value                                                                        @typescript-eslint/no-unsafe-assignment
   329:50  error  Unsafe return of a value of type `any`                                                                     @typescript-eslint/no-unsafe-return
   329:56  error  Unsafe member access .updateNode on an `any` value                                                         @typescript-eslint/no-unsafe-member-access
@@ -1444,11 +1301,11 @@
   357:35  error  Unsafe member access .isUltraMode on an `any` value                                                        @typescript-eslint/no-unsafe-member-access
   357:48  error  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
   362:9   error  Unsafe call of a(n) `any` typed value                                                                      @typescript-eslint/no-unsafe-call
-  456:6   error  'event' is defined but never used. Allowed unused args must match /^_/u                                    @typescript-eslint/no-unused-vars
-  460:15  error  'nodeElement' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]|^_/u             @typescript-eslint/no-unused-vars
+  456:6   error  'event' is defined but never used                                                                          @typescript-eslint/no-unused-vars
+  460:15  error  'nodeElement' is assigned a value but never used                                                           @typescript-eslint/no-unused-vars
   472:11  error  Prefer using an optional chain expression instead, as it's more concise and easier to read                 @typescript-eslint/prefer-optional-chain
-  524:15  error  'x' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]|^_/u                       @typescript-eslint/no-unused-vars
-  524:18  error  'y' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]|^_/u                       @typescript-eslint/no-unused-vars
+  524:15  error  'x' is assigned a value but never used                                                                     @typescript-eslint/no-unused-vars
+  524:18  error  'y' is assigned a value but never used                                                                     @typescript-eslint/no-unused-vars
   524:46  error  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
   525:7   error  Unsafe call of a(n) `any` typed value                                                                      @typescript-eslint/no-unsafe-call
   529:25  error  Unsafe return of a value of type `any`                                                                     @typescript-eslint/no-unsafe-return
@@ -1486,10 +1343,10 @@
     97:9   warning  The 'personalityMessages' object makes the dependencies of useCallback Hook (at line 429) change on every render. To fix this, wrap the initialization of 'personalityMessages' in its own useMemo() Hook  react-hooks/exhaustive-deps
    175:5   warning  Async arrow function has a complexity of 22. Maximum allowed is 15                                                                                                                                         complexity
    175:16  error    Refactor this function to reduce its Cognitive Complexity from 17 to the 15 allowed                                                                                                                        sonarjs/cognitive-complexity
-   185:38  warning  'powers' is already declared in the upper scope on line 14 column 10                                                                                                                                       no-shadow
+   185:38  error    'powers' is already declared in the upper scope on line 14 column 10                                                                                                                                       no-shadow
    190:36  warning  Do not nest ternary expressions                                                                                                                                                                            no-nested-ternary
    192:15  error    Extract this nested ternary operation into an independent statement                                                                                                                                        sonarjs/no-nested-conditional
-   220:16  warning  'error' is already declared in the upper scope on line 48 column 40                                                                                                                                        no-shadow
+   220:16  error    'error' is already declared in the upper scope on line 48 column 40                                                                                                                                        no-shadow
    267:17  warning  Generic Object Injection Sink                                                                                                                                                                              security/detect-object-injection
    272:20  warning  Function Call Object Injection Sink                                                                                                                                                                        security/detect-object-injection
    275:6   warning  React Hook useEffect has a missing dependency: 'messages'. Either include it or remove the dependency array                                                                                                react-hooks/exhaustive-deps
@@ -1498,17 +1355,17 @@
    297:30  warning  Please rename the variable `e`. Suggested names are: `error_`, `event_`. A more descriptive name will do too                                                                                               unicorn/prevent-abbreviations
    374:5   warning  Async arrow function has a complexity of 20. Maximum allowed is 15                                                                                                                                         complexity
    417:32  error    This conditional operation returns the same value whether the condition is "true" or "false"                                                                                                               sonarjs/no-all-duplicated-branches
-   421:16  warning  'error' is already declared in the upper scope on line 48 column 40                                                                                                                                        no-shadow
+   421:16  error    'error' is already declared in the upper scope on line 48 column 40                                                                                                                                        no-shadow
    442:5   warning  Async arrow function has a complexity of 31. Maximum allowed is 15                                                                                                                                         complexity
    442:21  error    Refactor this function to reduce its Cognitive Complexity from 16 to the 15 allowed                                                                                                                        sonarjs/cognitive-complexity
    463:20  error    'handleRecoverableError' was used before it was defined                                                                                                                                                    no-use-before-define
    504:13  error    Remove this conditional structure or edit its code blocks so that they're not all the same                                                                                                                 sonarjs/no-all-duplicated-branches
    504:34  error    Empty block statement                                                                                                                                                                                      no-empty
    505:20  error    Empty block statement                                                                                                                                                                                      no-empty
-   540:16  warning  'error' is already declared in the upper scope on line 48 column 40                                                                                                                                        no-shadow
+   540:16  error    'error' is already declared in the upper scope on line 48 column 40                                                                                                                                        no-shadow
    562:5   warning  React Hook useCallback has missing dependencies: 'handleRecoverableError', 'request', 'setUser', and 'updateProfile'. Either include them or remove the dependency array                                   react-hooks/exhaustive-deps
    574:15  warning  'response' is defined but never used. Allowed unused args must match /^_/u                                                                                                                                 no-unused-vars
-   654:18  warning  'error' is already declared in the upper scope on line 48 column 40                                                                                                                                        no-shadow
+   654:18  error    'error' is already declared in the upper scope on line 48 column 40                                                                                                                                        no-shadow
    688:25  warning  Arrow function has too many lines (212). Maximum allowed is 150                                                                                                                                            max-lines-per-function
    688:25  warning  Arrow function has a complexity of 16. Maximum allowed is 15                                                                                                                                               complexity
    897:16  error    Use `undefined` instead of `null`                                                                                                                                                                          unicorn/no-null
@@ -1740,12 +1597,12 @@
    690:26  warning  Generic Object Injection Sink                                                                                                                                                                                                                                                             security/detect-object-injection
    715:33  error    React Hook "useCallback" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?                                                                                             react-hooks/rules-of-hooks
    747:29  error    React Hook "useCallback" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?                                                                                             react-hooks/rules-of-hooks
-   748:6   warning  'nodes' is already declared in the upper scope on line 190 column 5                                                                                                                                                                                                                       no-shadow
-   748:13  warning  'edges' is already declared in the upper scope on line 191 column 5                                                                                                                                                                                                                       no-shadow
+   748:6   error    'nodes' is already declared in the upper scope on line 190 column 5                                                                                                                                                                                                                       no-shadow
+   748:13  error    'edges' is already declared in the upper scope on line 191 column 5                                                                                                                                                                                                                       no-shadow
    764:16  error    Use `undefined` instead of `null`                                                                                                                                                                                                                                                         unicorn/no-null
    771:26  error    React Hook "useCallback" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?                                                                                             react-hooks/rules-of-hooks
    788:30  error    Prefer `structuredClone(…)` over `JSON.parse(JSON.stringify(…))` to create a deep clone                                                                                                                                                                                                   unicorn/prefer-structured-clone
-   834:14  warning  'error' is already declared in the upper scope on line 208 column 5                                                                                                                                                                                                                       no-shadow
+   834:14  error    'error' is already declared in the upper scope on line 208 column 5                                                                                                                                                                                                                       no-shadow
    842:6   warning  React Hook useCallback has unnecessary dependencies: 'backupEdgesToLocalStorage' and 'plubotId'. Either exclude them or remove the dependency array. Outer scope values like 'backupEdgesToLocalStorage' aren't valid dependencies because mutating them doesn't re-render the component  react-hooks/exhaustive-deps
    860:18  warning  'saveFlowData' is defined but never used. Allowed unused vars must match /^[A-Z_]|^_/u                                                                                                                                                                                                    no-unused-vars
    865:9   warning  'handleUndo' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]|^_/u                                                                                                                                                                                             no-unused-vars
@@ -1798,7 +1655,7 @@
   1201:13  error    Prefer `Number.isNaN` over `isNaN`                                                                                                                                                                                                                                                        unicorn/prefer-number-properties
   1201:40  error    Prefer `Number.isNaN` over `isNaN`                                                                                                                                                                                                                                                        unicorn/prefer-number-properties
   1211:30  error    React Hook "useCallback" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?                                                                                             react-hooks/rules-of-hooks
-  1231:16  warning  'error' is already declared in the upper scope on line 208 column 5                                                                                                                                                                                                                       no-shadow
+  1231:16  error    'error' is already declared in the upper scope on line 208 column 5                                                                                                                                                                                                                       no-shadow
   1238:26  error    React Hook "useCallback" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?                                                                                             react-hooks/rules-of-hooks
   1264:26  error    React Hook "useCallback" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?                                                                                             react-hooks/rules-of-hooks
   1383:12  error    Use `undefined` instead of `null`                                                                                                                                                                                                                                                         unicorn/no-null
@@ -1912,7 +1769,7 @@
   312:9   error    Remove the declaration of the unused 'initialStartNodeId' variable                                                                                                                             sonarjs/no-unused-vars
   312:9   error    Remove this useless assignment to variable "initialStartNodeId"                                                                                                                                sonarjs/no-dead-store
   328:22  error    Use `undefined` instead of `null`                                                                                                                                                              unicorn/no-null
-  344:13  warning  'startNode' is already declared in the upper scope on line 301 column 9                                                                                                                        no-shadow
+  344:13  error    'startNode' is already declared in the upper scope on line 301 column 9                                                                                                                        no-shadow
   372:9   warning  Unexpected console statement                                                                                                                                                                   no-console
   392:5   warning  Async arrow function has too many lines (398). Maximum allowed is 150                                                                                                                          max-lines-per-function
   392:5   warning  Async arrow function has a complexity of 48. Maximum allowed is 15                                                                                                                             complexity
@@ -1941,72 +1798,11 @@
   939:36  warning  Please rename the variable `e`. Suggested names are: `error`, `event_`. A more descriptive name will do too                                                                                    unicorn/prevent-abbreviations
   954:24  warning  Please rename the variable `e`. Suggested names are: `error`, `event_`. A more descriptive name will do too                                                                                    unicorn/prevent-abbreviations
 
-/Users/wolf/Desktop/Plubot/plubot-frontend/src/components/onboarding/ui/ContextMenu.tsx
-  90:20  warning  Do not use Array index in keys  react/no-array-index-key
-
-/Users/wolf/Desktop/Plubot/plubot-frontend/src/components/onboarding/ui/ToolTip.jsx
-    7:20  warning  'content' is missing in props validation                                                react/prop-types
-    7:29  warning  'children' is missing in props validation                                               react/prop-types
-    7:39  warning  'position' is missing in props validation                                               react/prop-types
-    7:57  warning  'delay' is missing in props validation                                                  react/prop-types
-   47:9   error    This case's code block is the same as the block for the case on line 27                 sonarjs/no-duplicated-branches
-   86:45  error    Update this function so that its implementation is not identical to the one on line 75  sonarjs/no-identical-functions
-  121:7   error    Use `undefined` instead of `null`                                                       unicorn/no-null
-
-/Users/wolf/Desktop/Plubot/plubot-frontend/src/components/onboarding/ui/context-menu.jsx
-  205:16  error  Use `undefined` instead of `null`  unicorn/no-null
-  262:13  error  Use `undefined` instead of `null`  unicorn/no-null
-
 /Users/wolf/Desktop/Plubot/plubot-frontend/src/components/onboarding/ui/context-menu/ContextMenu.jsx
-  19:33  warning  Please rename the variable `e`. Suggested names are: `error`, `event_`. A more descriptive name will do too  unicorn/prevent-abbreviations
-  34:28  warning  Please rename the variable `e`. Suggested names are: `error`, `event_`. A more descriptive name will do too  unicorn/prevent-abbreviations
-
-/Users/wolf/Desktop/Plubot/plubot-frontend/src/components/onboarding/utils/init-systems.js
-  8:3  warning  'registerNotificationCallback' is defined but never used. Allowed unused vars must match /^[A-Z_]|^_/u  no-unused-vars
-  8:3  error    Remove this unused import of 'registerNotificationCallback'                                             sonarjs/unused-import
-
-/Users/wolf/Desktop/Plubot/plubot-frontend/src/components/onboarding/utils/modal-manager.js
-  104:59  error  Use `undefined` instead of `null`  unicorn/no-null
-
-/Users/wolf/Desktop/Plubot/plubot-frontend/src/components/onboarding/utils/notification-manager.js
-  81:7  error  Useless case in switch statement  unicorn/no-useless-switch-case
-
-/Users/wolf/Desktop/Plubot/plubot-frontend/src/components/plubot-edit/PlubotEdit.jsx
-  132:19  error  Move arrow function 'noOp' to the outer scope  unicorn/consistent-function-scoping
-
-/Users/wolf/Desktop/Plubot/plubot-frontend/src/components/pluniverse/ByteGuide.jsx
-  6:22  warning  'message' is missing in props validation   react/prop-types
-  6:31  warning  'position' is missing in props validation  react/prop-types
-  9:26  error    Use `undefined` instead of `null`          unicorn/no-null
-
-/Users/wolf/Desktop/Plubot/plubot-frontend/src/components/pluniverse/MapRegion.jsx
-  3:22  warning  'name' is missing in props validation           react/prop-types
-  3:28  warning  'path' is missing in props validation           react/prop-types
-  3:34  warning  'position' is missing in props validation       react/prop-types
-  9:30  warning  'position.top' is missing in props validation   react/prop-types
-  9:50  warning  'position.left' is missing in props validation  react/prop-types
-
-/Users/wolf/Desktop/Plubot/plubot-frontend/src/components/sync/DataBackupPanel.jsx
-  50:31  warning  Please rename the variable `e`. Suggested names are: `error`, `event_`. A more descriptive name will do too  unicorn/prevent-abbreviations
-
-/Users/wolf/Desktop/Plubot/plubot-frontend/src/components/sync/SyncButton.jsx
-   5:8   warning  Unable to resolve path to module './SyncButton.css'                                                          import/no-unresolved
-  14:50  error    Use `undefined` instead of `null`                                                                            unicorn/no-null
-  17:11  warning  'syncState' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]|^_/u                 no-unused-vars
-  17:11  error    Remove the declaration of the unused 'syncState' variable                                                    sonarjs/no-unused-vars
-  17:11  error    Remove this useless assignment to variable "syncState"                                                       sonarjs/no-dead-store
-  36:23  warning  Please rename the variable `e`. Suggested names are: `error`, `event_`. A more descriptive name will do too  unicorn/prevent-abbreviations
-  82:39  error    Move arrow function 'getSyncStatusText' to the outer scope                                                   unicorn/consistent-function-scoping
+  2:1  warning  `prop-types` import should occur before import of `react`  import/order
 
 /Users/wolf/Desktop/Plubot/plubot-frontend/src/components/sync/SyncStatusIndicator.jsx
-  11:32  warning  'expanded' is missing in props validation                                                                    react/prop-types
-  11:50  warning  'showControls' is missing in props validation                                                                react/prop-types
-  13:50  error    Use `undefined` instead of `null`                                                                            unicorn/no-null
-  16:11  warning  'syncState' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]|^_/u                 no-unused-vars
-  16:11  error    Remove the declaration of the unused 'syncState' variable                                                    sonarjs/no-unused-vars
-  16:11  error    Remove this useless assignment to variable "syncState"                                                       sonarjs/no-dead-store
-  36:23  warning  Please rename the variable `e`. Suggested names are: `error`, `event_`. A more descriptive name will do too  unicorn/prevent-abbreviations
-  81:39  error    Move arrow function 'getSyncStatusText' to the outer scope                                                   unicorn/consistent-function-scoping
+  1:1  warning  `react` import should occur after import of `prop-types`  import/order
 
 /Users/wolf/Desktop/Plubot/plubot-frontend/src/context/GamificationContext.jsx
   5:33  warning  'children' is missing in props validation  react/prop-types
@@ -2061,52 +1857,36 @@
   146:42  error    `Array#reduce()` is not allowed. Prefer other types of loop for readability             unicorn/no-array-reduce
 
 /Users/wolf/Desktop/Plubot/plubot-frontend/src/hooks/legacy-compatibility.js
-  21:37  warning  'nodeId' is defined but never used. Allowed unused args must match /^_/u                              no-unused-vars
-  21:45  warning  'historyEntry' is defined but never used. Allowed unused args must match /^_/u                        no-unused-vars
-  23:35  warning  'nodeId' is defined but never used. Allowed unused args must match /^_/u                              no-unused-vars
-  36:3   warning  'enabled' is assigned a value but never used. Allowed unused args must match /^_/u                    no-unused-vars
-  38:3   warning  'idleTimeout' is assigned a value but never used. Allowed unused args must match /^_/u                no-unused-vars
-  39:3   warning  'onIdleChange' is assigned a value but never used. Allowed unused args must match /^_/u               no-unused-vars
-  43:5   warning  'updatePerformance' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]|^_/u  no-unused-vars
-  43:5   error    Remove the declaration of the unused 'updatePerformance' variable                                     sonarjs/no-unused-vars
-  43:5   error    Remove this useless assignment to variable "updatePerformance"                                        sonarjs/no-dead-store
-  46:5   warning  'fpsRef' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]|^_/u             no-unused-vars
-  46:5   error    Remove the declaration of the unused 'fpsRef' variable                                                sonarjs/no-unused-vars
-  46:5   error    Remove this useless assignment to variable "fpsRef"                                                   sonarjs/no-dead-store
-  68:8   warning  'viewport' is defined but never used. Allowed unused args must match /^_/u                            no-unused-vars
+  37:3  warning  'enabled' is assigned a value but never used. Allowed unused args must match /^_/u                    no-unused-vars
+  39:3  warning  'idleTimeout' is assigned a value but never used. Allowed unused args must match /^_/u                no-unused-vars
+  40:3  warning  'onIdleChange' is assigned a value but never used. Allowed unused args must match /^_/u               no-unused-vars
+  44:5  warning  'updatePerformance' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]|^_/u  no-unused-vars
+  44:5  error    Remove the declaration of the unused 'updatePerformance' variable                                     sonarjs/no-unused-vars
+  44:5  error    Remove this useless assignment to variable "updatePerformance"                                        sonarjs/no-dead-store
+  47:5  warning  'fpsRef' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]|^_/u             no-unused-vars
+  47:5  error    Remove the declaration of the unused 'fpsRef' variable                                                sonarjs/no-unused-vars
+  47:5  error    Remove this useless assignment to variable "fpsRef"                                                   sonarjs/no-dead-store
 
 /Users/wolf/Desktop/Plubot/plubot-frontend/src/hooks/useAOS.jsx
-   6:13  warning  Each then() should return a value or throw  promise/always-return
-  17:15  warning  Each then() should return a value or throw  promise/always-return
+  10:16  error  Use `undefined` instead of `null`  unicorn/no-null
+  20:18  error  Use `undefined` instead of `null`  unicorn/no-null
 
 /Users/wolf/Desktop/Plubot/plubot-frontend/src/hooks/useAPI.js
-   34:13  warning  'status' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]|^_/u  no-unused-vars
-   34:13  error    Remove the declaration of the unused 'status' variable                                     sonarjs/no-unused-vars
-   34:13  error    Remove this useless assignment to variable "status"                                        sonarjs/no-dead-store
-   54:24  error    Refactor this function to reduce its Cognitive Complexity from 20 to the 15 allowed        sonarjs/cognitive-complexity
-   97:15  error    Blocks are nested too deeply (5). Maximum allowed is 4                                     max-depth
-  116:17  error    Blocks are nested too deeply (6). Maximum allowed is 4                                     max-depth
-  120:19  error    Blocks are nested too deeply (7). Maximum allowed is 4                                     max-depth
+   32:13  warning  'status' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]|^_/u  no-unused-vars
+   32:13  error    Remove the declaration of the unused 'status' variable                                     sonarjs/no-unused-vars
+   32:13  error    Remove this useless assignment to variable "status"                                        sonarjs/no-dead-store
+   50:24  error    Refactor this function to reduce its Cognitive Complexity from 20 to the 15 allowed        sonarjs/cognitive-complexity
+   93:15  error    Blocks are nested too deeply (5). Maximum allowed is 4                                     max-depth
+  112:17  error    Blocks are nested too deeply (6). Maximum allowed is 4                                     max-depth
+  116:19  error    Blocks are nested too deeply (7). Maximum allowed is 4                                     max-depth
 
 /Users/wolf/Desktop/Plubot/plubot-frontend/src/hooks/useAnalytics.js
-   2:26  warning  'nodeId' is defined but never used. Allowed unused args must match /^_/u     no-unused-vars
-   2:34  warning  'type' is defined but never used. Allowed unused args must match /^_/u       no-unused-vars
-   2:40  warning  'data' is defined but never used. Allowed unused args must match /^_/u       no-unused-vars
-   2:46  error    Move arrow function 'trackNodeEdit' to the outer scope                       unicorn/consistent-function-scoping
-   6:31  warning  'nodeId' is defined but never used. Allowed unused args must match /^_/u     no-unused-vars
-   6:39  warning  'targetId' is defined but never used. Allowed unused args must match /^_/u   no-unused-vars
-   6:49  warning  'option' is defined but never used. Allowed unused args must match /^_/u     no-unused-vars
-   6:57  error    Move arrow function 'trackNodeConnected' to the outer scope                  unicorn/consistent-function-scoping
-  10:23  warning  'eventName' is defined but never used. Allowed unused args must match /^_/u  no-unused-vars
-  10:34  warning  'eventData' is defined but never used. Allowed unused args must match /^_/u  no-unused-vars
-  10:45  error    Move arrow function 'trackEvent' to the outer scope                          unicorn/consistent-function-scoping
+   2:49  error  Move arrow function 'trackNodeEdit' to the outer scope       unicorn/consistent-function-scoping
+   6:60  error  Move arrow function 'trackNodeConnected' to the outer scope  unicorn/consistent-function-scoping
+  10:47  error  Move arrow function 'trackEvent' to the outer scope          unicorn/consistent-function-scoping
 
-/Users/wolf/Desktop/Plubot/plubot-frontend/src/hooks/useByteAssistant.js
-  51:35  error  Move arrow function 'analyzeSentiment' to the outer scope  unicorn/consistent-function-scoping
-
-/Users/wolf/Desktop/Plubot/plubot-frontend/src/hooks/useGoogleSheets.js
-  2:20  warning  'useEffect' is defined but never used. Allowed unused vars must match /^[A-Z_]|^_/u  no-unused-vars
-  2:20  error    Remove this unused import of 'useEffect'                                             sonarjs/unused-import
+/Users/wolf/Desktop/Plubot/plubot-frontend/src/hooks/useFlowValidation.ts
+  23:21  error  '_nodeId' is defined but never used  @typescript-eslint/no-unused-vars
 
 /Users/wolf/Desktop/Plubot/plubot-frontend/src/hooks/useHistory.js
   31:28  error  Prefer `structuredClone(…)` over `JSON.parse(JSON.stringify(…))` to create a deep clone  unicorn/prefer-structured-clone
@@ -2116,39 +1896,24 @@
   77:19  error    Use `.size > 0` when checking size is not zero  unicorn/explicit-length-check
 
 /Users/wolf/Desktop/Plubot/plubot-frontend/src/hooks/useNode.js
-    9:17  warning  Arrow function has too many lines (267). Maximum allowed is 150                                              max-lines-per-function
-    9:17  warning  Arrow function has a complexity of 19. Maximum allowed is 15                                                 complexity
-   37:5   warning  'trackNodeConnected' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]|^_/u        no-unused-vars
-   37:5   error    Remove the declaration of the unused 'trackNodeConnected' variable                                           sonarjs/no-unused-vars
-   51:21  error    Unexpected empty arrow function                                                                              no-empty-function
-   52:15  warning  'setFlowNodes' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]|^_/u              no-unused-vars
-   52:15  error    Remove the declaration of the unused 'setFlowNodes' variable                                                 sonarjs/no-unused-vars
-  101:30  warning  Please rename the variable `e`. Suggested names are: `error`, `event_`. A more descriptive name will do too  unicorn/prevent-abbreviations
-  156:6   warning  Please rename the variable `e`. Suggested names are: `error`, `event_`. A more descriptive name will do too  unicorn/prevent-abbreviations
-  173:42  warning  Please rename the variable `e`. Suggested names are: `error`, `event_`. A more descriptive name will do too  unicorn/prevent-abbreviations
-  180:6   warning  Please rename the variable `e`. Suggested names are: `error`, `event_`. A more descriptive name will do too  unicorn/prevent-abbreviations
-  190:6   warning  Please rename the variable `e`. Suggested names are: `error`, `event_`. A more descriptive name will do too  unicorn/prevent-abbreviations
+  9:17  warning  Arrow function has too many lines (213). Maximum allowed is 150  max-lines-per-function
 
 /Users/wolf/Desktop/Plubot/plubot-frontend/src/hooks/useNodeCreator.js
-    6:16  warning  'uuidv4' is defined but never used. Allowed unused vars must match /^[A-Z_]|^_/u  no-unused-vars
-    6:16  error    Remove this unused import of 'uuidv4'                                             sonarjs/unused-import
-   17:24  warning  Arrow function has too many lines (208). Maximum allowed is 150                   max-lines-per-function
-   20:43  warning  Arrow function has a complexity of 19. Maximum allowed is 15                      complexity
-  245:33  error    Do not call `Array#push()` multiple times                                         unicorn/prefer-single-call
-  246:33  error    Do not call `Array#push()` multiple times                                         unicorn/prefer-single-call
-  247:62  error    Use `undefined` instead of `null`                                                 unicorn/no-null
-  251:33  error    Do not call `Array#push()` multiple times                                         unicorn/prefer-single-call
-  252:60  error    Use `undefined` instead of `null`                                                 unicorn/no-null
-  256:33  error    Do not call `Array#push()` multiple times                                         unicorn/prefer-single-call
-  257:33  error    Do not call `Array#push()` multiple times                                         unicorn/prefer-single-call
+  16:24  warning  Arrow function has too many lines (235). Maximum allowed is 150  max-lines-per-function
 
 /Users/wolf/Desktop/Plubot/plubot-frontend/src/hooks/usePlubotLoader.js
-  24:13  warning  Arrow function has a complexity of 28. Maximum allowed is 15                         complexity
-  24:16  error    Refactor this function to reduce its Cognitive Complexity from 18 to the 15 allowed  sonarjs/cognitive-complexity
+  22:9   warning  'setFlowName' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]|^_/u             no-unused-vars
+  22:9   error    Remove the declaration of the unused 'setFlowName' variable                                                sonarjs/no-unused-vars
+  22:9   error    Remove this useless assignment to variable "setFlowName"                                                   sonarjs/no-dead-store
+  24:13  warning  Arrow function has a complexity of 16. Maximum allowed is 15                                               complexity
+  27:17  warning  'currentFlowNameInStore' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]|^_/u  no-unused-vars
+  27:17  error    Remove the declaration of the unused 'currentFlowNameInStore' variable                                     sonarjs/no-unused-vars
+  27:17  error    Remove this useless assignment to variable "currentFlowNameInStore"                                        sonarjs/no-dead-store
 
 /Users/wolf/Desktop/Plubot/plubot-frontend/src/hooks/useToast.js
-  100:32  error  Refactor this code to not nest functions more than 4 levels deep  sonarjs/no-nested-functions
-  155:55  error  Refactor this code to not nest functions more than 4 levels deep  sonarjs/no-nested-functions
+   55:27  warning  Generic Object Injection Sink                                     security/detect-object-injection
+   88:32  error    Refactor this code to not nest functions more than 4 levels deep  sonarjs/no-nested-functions
+  143:55  error    Refactor this code to not nest functions more than 4 levels deep  sonarjs/no-nested-functions
 
 /Users/wolf/Desktop/Plubot/plubot-frontend/src/pages/AboutPlubot/ByteEmbajador.jsx
   118:23  warning  Arrow function has too many lines (225). Maximum allowed is 150  max-lines-per-function
@@ -2246,5 +2011,6 @@
 /Users/wolf/Desktop/Plubot/plubot-frontend/src/utils/flow-utilities.js
   136:11  warning  Generic Object Injection Sink  security/detect-object-injection
 
-✖ 1891 problems (990 errors, 901 warnings)
+✖ 1692 problems (912 errors, 780 warnings)
+  1 error and 5 warnings potentially fixable with the `--fix` option.
 

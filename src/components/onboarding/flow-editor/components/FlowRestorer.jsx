@@ -111,9 +111,9 @@ const FlowRestorer = () => {
         const hasValidPosition =
           node.position &&
           typeof node.position.x === 'number' &&
-          !isNaN(node.position.x) &&
+          !Number.isNaN(node.position.x) &&
           typeof node.position.y === 'number' &&
-          !isNaN(node.position.y);
+          !Number.isNaN(node.position.y);
 
         const position = hasValidPosition
           ? { x: Math.round(node.position.x), y: Math.round(node.position.y) }
@@ -194,7 +194,7 @@ const FlowRestorer = () => {
     return executeRestoration();
   }, []);
 
-  return null; // Componente invisible
+  // Componente invisible
 };
 
 export default FlowRestorer;

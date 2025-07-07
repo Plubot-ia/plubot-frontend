@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React, { useCallback } from 'react';
 
 /**
@@ -29,7 +30,17 @@ const HistoryManagement = ({ historyState, setStatusMessage }) => {
     }
   }, [redo, canRedo, setStatusMessage]);
 
-  return null; // Este componente no renderiza nada, solo proporciona funcionalidad
+  // Este componente no renderiza nada, solo proporciona funcionalidad
+};
+
+HistoryManagement.propTypes = {
+  historyState: PropTypes.shape({
+    undo: PropTypes.func.isRequired,
+    redo: PropTypes.func.isRequired,
+    canUndo: PropTypes.func.isRequired,
+    canRedo: PropTypes.func.isRequired,
+  }).isRequired,
+  setStatusMessage: PropTypes.func.isRequired,
 };
 
 export default HistoryManagement;

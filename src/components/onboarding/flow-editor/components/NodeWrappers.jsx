@@ -11,51 +11,53 @@ import { POWER_COLORS } from '@/utils/node-config.js';
  * @param {Array} props.inputs - Tipos de entradas del nodo
  * @param {Array} props.outputs - Tipos de salidas del nodo
  */
-const NodeWrapper = memo(({ node, children, inputs = [], outputs = [] }) => {
-  return (
-    <div className='custom-node-wrapper'>
-      {/* Handles de entrada */}
-      {inputs.map((type, index) => (
-        <Handle
-          key={`input-${type}-${index}`}
-          type='target'
-          position={Position.Left}
-          id={type}
-          style={{
-            top: `${20 + index * 20}px`,
-            background: POWER_COLORS[type] || '#555',
-            width: '12px',
-            height: '12px',
-          }}
-        />
-      ))}
+const NodeWrapper = memo(
+  ({ node: _node, children, inputs = [], outputs = [] }) => {
+    return (
+      <div className='custom-node-wrapper'>
+        {/* Handles de entrada */}
+        {inputs.map((type, index) => (
+          <Handle
+            key={`input-${type}-${index}`}
+            type='target'
+            position={Position.Left}
+            id={type}
+            style={{
+              top: `${20 + index * 20}px`,
+              background: POWER_COLORS[type] || '#555',
+              width: '12px',
+              height: '12px',
+            }}
+          />
+        ))}
 
-      {/* Contenido del nodo */}
-      {children}
+        {/* Contenido del nodo */}
+        {children}
 
-      {/* Handles de salida */}
-      {outputs.map((type, index) => (
-        <Handle
-          key={`output-${type}-${index}`}
-          type='source'
-          position={Position.Right}
-          id={type}
-          style={{
-            top: `${20 + index * 20}px`,
-            background: POWER_COLORS[type] || '#555',
-            width: '12px',
-            height: '12px',
-          }}
-        />
-      ))}
-    </div>
-  );
-});
+        {/* Handles de salida */}
+        {outputs.map((type, index) => (
+          <Handle
+            key={`output-${type}-${index}`}
+            type='source'
+            position={Position.Right}
+            id={type}
+            style={{
+              top: `${20 + index * 20}px`,
+              background: POWER_COLORS[type] || '#555',
+              width: '12px',
+              height: '12px',
+            }}
+          />
+        ))}
+      </div>
+    );
+  },
+);
 
 /**
  * Componente que envuelve los nodos de tipo trigger
  */
-const TriggerNodeWrapper = memo(({ node, children, outputs = [] }) => {
+const TriggerNodeWrapper = memo(({ node: _node, children, outputs = [] }) => {
   return (
     <div className='trigger-node-wrapper'>
       {/* Contenido del nodo */}
@@ -84,7 +86,7 @@ const TriggerNodeWrapper = memo(({ node, children, outputs = [] }) => {
 /**
  * Componente que envuelve los nodos de tipo action
  */
-const ActionNodeWrapper = memo(({ node, children, inputs = [] }) => {
+const ActionNodeWrapper = memo(({ node: _node, children, inputs = [] }) => {
   return (
     <div className='action-node-wrapper'>
       {/* Handles de entrada */}

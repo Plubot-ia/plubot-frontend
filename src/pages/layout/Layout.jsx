@@ -10,7 +10,7 @@ import Header from '@components/common/Header';
 
 import StatusBubble from '../../components/onboarding/common/StatusBubble';
 import useGlobalContext from '../../hooks/useGlobalContext';
-import { useSyncService } from '../../services/syncService';
+import useSyncService from '../../services/syncService';
 
 import 'aos/dist/aos.css';
 import '@fortawesome/fontawesome-free/css/all.min.css';

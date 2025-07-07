@@ -9,6 +9,8 @@ import EliteEdge from './EliteEdge';
 const SafeEdgeWrapper = (properties) => {
   // Asegurar que todas las propiedades requeridas estén disponibles
   const safeProperties = {
+    // Resto de propiedades que puedan llegar
+    ...properties,
     // Propiedades básicas con valores por defecto
     id: properties.id || `edge-${Math.random().toString(36).slice(2, 11)}`,
     source: properties.source || '',
@@ -27,14 +29,14 @@ const SafeEdgeWrapper = (properties) => {
     sourceHandle: properties.sourceHandle || null,
     targetHandle: properties.targetHandle || null,
     className: properties.className || '',
-    // Resto de propiedades que puedan llegar
-    ...properties,
   };
 
   // Intentar renderizar EliteEdge con propiedades seguras
   try {
     return <EliteEdge {...safeProperties} />;
-  } catch {
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error('Error al renderizar EliteEdge, usando fallback:', error);
     // Renderizar una arista básica en caso de error
     return (
       <g>

@@ -48,14 +48,68 @@ export default [
     },
   },
   {
+    // Patrones de archivos y directorios a ignorar, sincronizados con .gitignore
+    // para asegurar que los archivos no rastreados no sean analizados por el linter.
     ignores: [
-      'dist',
-      'build',
-      'node_modules',
-      'coverage',
-      '.nyc_output',
-      // Los archivos de configuración como vite.config.js y eslint.config.js
-      // se manejan explícitamente en otras secciones y no deben ser ignorados globalmente.
+      // Directorios de compilación y dependencias
+      'dist/',
+      'dist-ssr/',
+      'build/',
+      'node_modules/',
+      '.vite/',
+      '.vercel/',
+      
+      // Logs
+      '*.log',
+      '*.log.*',
+      'npm-debug.log*',
+      'yarn-debug.log*',
+      'yarn-error.log*',
+      'pnpm-debug.log*',
+      'lerna-debug.log*',
+
+      // Archivos de entorno
+      '.env',
+      '.env.*',
+      '!.env.example',
+
+      // Archivos de sistema y editor
+      '.DS_Store',
+      '.Trash/',
+      '.idea/',
+      '.vscode/',
+
+      // Cache y reportes
+      'coverage/',
+      '*.lcov',
+      '.nyc_output/',
+      '.eslintcache',
+      '.stylelintcache',
+
+      // Archivos temporales y backups
+      '*.db',
+      '*.pyc',
+      '__pycache__/',
+      '*.bak',
+      '*.backup',
+      '*.temp.jsx',
+      'backup/',
+      'backup-old-files/',
+      'Plubot-backup-*/',
+      'Plubot-backup-2025-05-09/',
+
+      // Archivos no relacionados con el frontend
+      'plubot-backend/',
+      'PAGROK/',
+      'edge-fix.js',
+      'fix_edge_type.js',
+      'dump.rdb',
+      'plubot.py',
+      'plubots6.py',
+      'static/js/create-claude.js',
+
+      // Otros
+      '*.local',
     ],
   },
 
@@ -221,10 +275,10 @@ export default [
         argsIgnorePattern: '^_',
         ignoreRestSiblings: true,
         destructuredArrayIgnorePattern: '^_'
-      }], // ADVERTENCIA: Pasado a warn.
+      }],
       'no-undef': 'error',
       'no-redeclare': 'error',
-      'no-shadow': 'warn', // ADVERTENCIA: Pasado a warn.
+      'no-shadow': 'error',
       'no-shadow-restricted-names': 'error',
       'prefer-const': 'error',
       'no-var': 'error',
@@ -390,12 +444,7 @@ export default [
       'prefer-promise-reject-errors': 'off',
       
       // Activar versiones TypeScript
-      '@typescript-eslint/no-unused-vars': ['error', { 
-        varsIgnorePattern: '^[A-Z_]|^_',
-        argsIgnorePattern: '^_',
-        ignoreRestSiblings: true,
-        destructuredArrayIgnorePattern: '^_'
-      }],
+      '@typescript-eslint/no-unused-vars': 'error',
       '@typescript-eslint/no-redeclare': 'error',
       '@typescript-eslint/no-use-before-define': ['error', { functions: false, classes: true, variables: true }],
       '@typescript-eslint/no-shadow': 'warn',

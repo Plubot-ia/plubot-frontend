@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 
 /**
@@ -21,8 +22,10 @@ const EmergencyRecovery = ({ isOpen, onRecover, onDismiss, hasBackup }) => {
 
   // Si no está abierto o no hay backup, no renderizar nada.
   // TrainingScreen decidirá si mostrar este modal o uno para "empezar de nuevo".
+  // Si no está abierto o no hay backup, no renderizar nada.
+  // TrainingScreen decidirá si mostrar este modal o uno para "empezar de nuevo".
   if (!isOpen || !hasBackup) {
-    return null;
+    return;
   }
 
   return (
@@ -89,12 +92,12 @@ const EmergencyRecovery = ({ isOpen, onRecover, onDismiss, hasBackup }) => {
           boxShadow: '0 0 10px #FF00FF',
           transition: 'all 0.3s ease',
         }}
-        onMouseOver={(e) =>
-          (e.currentTarget.style.boxShadow =
+        onMouseOver={(event_) =>
+          (event_.currentTarget.style.boxShadow =
             '0 0 15px #FF00FF, 0 0 5px #FFFFFF')
         }
-        onMouseOut={(e) =>
-          (e.currentTarget.style.boxShadow = '0 0 10px #FF00FF')
+        onMouseOut={(event_) =>
+          (event_.currentTarget.style.boxShadow = '0 0 10px #FF00FF')
         }
       >
         Recuperar Continuidad Nodal
@@ -104,6 +107,13 @@ const EmergencyRecovery = ({ isOpen, onRecover, onDismiss, hasBackup }) => {
           cuando no hay backup. El botón de cerrar (X) llamará a onDismiss. */}
     </div>
   );
+};
+
+EmergencyRecovery.propTypes = {
+  isOpen: PropTypes.bool.isRequired,
+  onRecover: PropTypes.func.isRequired,
+  onDismiss: PropTypes.func.isRequired,
+  hasBackup: PropTypes.bool.isRequired,
 };
 
 export default EmergencyRecovery;

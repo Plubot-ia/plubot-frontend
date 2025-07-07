@@ -6,7 +6,7 @@ import { useState, useCallback } from 'react';
  * @returns {{menu: Object, onNodeContextMenu: Function, onEdgeContextMenu: Function, onPaneClick: Function, closeContextMenu: Function}}
  */
 const useContextMenu = () => {
-  const [menu, setMenu] = useState(null);
+  const [menu, setMenu] = useState();
 
   const onNodeContextMenu = useCallback((event, node) => {
     event.preventDefault();
@@ -39,7 +39,7 @@ const useContextMenu = () => {
   }, []);
 
   const closeContextMenu = useCallback(() => {
-    setMenu(null);
+    setMenu(undefined);
   }, []);
 
   return {

@@ -1,8 +1,16 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import React, { useState, useEffect } from 'react';
 
-import { useSyncService, getSyncState } from '../../services/syncService';
-import './SyncButton.css';
+import useSyncService, { getSyncState } from '../../services/syncService';
+import '../onboarding/flow-editor/ui/SyncButton.css';
+
+// Helper para obtener el texto del estado de sincronización
+const getSyncStatusText = (details) => {
+  if (details.isSyncing) return 'Sincronizando...';
+  if (details.syncStatus === 'success') return 'Sincronizado';
+  if (details.syncStatus === 'error') return 'Error de sincronización';
+  return 'Listo para sincronizar';
+};
 
 /**
  * Botón de sincronización para el editor de flujos
@@ -11,10 +19,10 @@ import './SyncButton.css';
  */
 const SyncButton = () => {
   const [isExpanded, setIsExpanded] = useState(false);
-  const [syncDetails, setSyncDetails] = useState(null);
+  const [syncDetails, setSyncDetails] = useState();
 
   // Usar el servicio de sincronización
-  const { syncState, syncAllPlubots } = useSyncService();
+  const { syncAllPlubots } = useSyncService();
 
   // Actualizar estado y detalles de sincronización
   useEffect(() => {
@@ -33,8 +41,8 @@ const SyncButton = () => {
   };
 
   // Forzar sincronización manual
-  const handleSync = (e) => {
-    e.stopPropagation();
+  const handleSync = (event_) => {
+    event_.stopPropagation();
     syncAllPlubots();
   };
 
@@ -76,14 +84,6 @@ const SyncButton = () => {
         return 'var(--color-gray)';
       }
     }
-  };
-
-  // Helper para obtener el texto del estado de sincronización
-  const getSyncStatusText = (details) => {
-    if (details.isSyncing) return 'Sincronizando...';
-    if (details.syncStatus === 'success') return 'Sincronizado';
-    if (details.syncStatus === 'error') return 'Error de sincronización';
-    return 'Listo para sincronizar';
   };
 
   // Si no hay detalles de sincronización, mostrar indicador de carga

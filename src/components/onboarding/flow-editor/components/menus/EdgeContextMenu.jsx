@@ -1,5 +1,6 @@
+import PropTypes from 'prop-types';
 import React from 'react';
-import { FiEdit, FiTrash2, FiLink } from 'react-icons/fi';
+import { FiTrash2, FiLink } from 'react-icons/fi';
 
 import useFlowStore from '@/stores/use-flow-store';
 
@@ -11,11 +12,11 @@ import useFlowStore from '@/stores/use-flow-store';
  */
 const EdgeContextMenu = ({ position, onClose }) => {
   const selectedEdge = useFlowStore((state) =>
-    state.edges.find((e) => e.id === state.selectedEdge),
+    state.edges.find((edge) => edge.id === state.selectedEdge),
   );
   const { removeEdge, updateEdge } = useFlowStore();
 
-  if (!selectedEdge) return null;
+  if (!selectedEdge) return;
 
   const handleRemove = () => {
     removeEdge(selectedEdge.id);
@@ -114,6 +115,14 @@ const EdgeContextMenu = ({ position, onClose }) => {
       </div>
     </div>
   );
+};
+
+EdgeContextMenu.propTypes = {
+  position: PropTypes.shape({
+    x: PropTypes.number.isRequired,
+    y: PropTypes.number.isRequired,
+  }).isRequired,
+  onClose: PropTypes.func.isRequired,
 };
 
 export default EdgeContextMenu;

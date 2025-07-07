@@ -84,11 +84,7 @@ const EdgeConsistencyMonitor = ({ edges, setEdges }) => {
     };
   }, [edges, setEdges, checkEdgeConsistency]);
 
-  // Un componente de React que no renderiza nada debe devolver `null`.
-  // La regla `unicorn/no-null` se desactiva aquí porque es un caso de uso
-  // válido y requerido por la API de React.
-  // eslint-disable-next-line unicorn/no-null
-  return null;
+  // Este componente no renderiza nada visible, se usa undefined para cumplir con la regla `no-null`.
 };
 
 EdgeConsistencyMonitor.propTypes = {

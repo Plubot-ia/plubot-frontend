@@ -78,7 +78,6 @@ export const showVisualNotification = (message, type = 'info') => {
         notification.style.color = 'white';
         break;
       }
-      case 'info':
       default: {
         notification.style.backgroundColor = '#2196f3';
         notification.style.color = 'white';

@@ -1,5 +1,4 @@
 import React, { useCallback } from 'react';
-import { useReactFlow } from 'reactflow';
 
 import useTrainingStore from '@/stores/use-training-store';
 import { nodeConfig } from '@/utils/node-config.js';
@@ -25,8 +24,6 @@ export const useNodeManagement = () => {
   // Obtener acciones del store de Training
   const { setByteMessage } = useTrainingStore();
 
-  const reactFlowInstance = useReactFlow();
-
   /**
    * Crea un nuevo nodo en la posición especificada
    */
@@ -35,7 +32,7 @@ export const useNodeManagement = () => {
       // Obtener configuración del tipo de nodo
       const nodeType = nodeConfig[type];
       if (!nodeType) {
-        return null;
+        return;
       }
 
       // Crear datos iniciales para el nodo
@@ -80,7 +77,7 @@ export const useNodeManagement = () => {
 
       // Eliminar el nodo
       removeNode(nodeId);
-      setSelectedNode(null);
+      setSelectedNode(undefined);
       setByteMessage('Nodo eliminado');
     },
     [edges, removeEdge, removeNode, setSelectedNode, setByteMessage],
@@ -134,14 +131,3 @@ export const useNodeManagement = () => {
     duplicateNode,
   };
 };
-
-/**
- * Componente para la gestión de nodos en el editor de flujos
- * Este componente no renderiza nada, solo proporciona funcionalidad
- * a través del hook useNodeManagement
- */
-const NodeManagement = () => {
-  return null;
-};
-
-export default NodeManagement;

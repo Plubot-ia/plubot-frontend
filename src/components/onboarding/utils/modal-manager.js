@@ -101,7 +101,7 @@ export const isModalOpen = (modalName) => {
  */
 export const getModalProps = (modalName) => {
   // Usar Map previene 'prototype pollution'
-  return modalState.activeModals.get(modalName)?.props || null;
+  return modalState.activeModals.get(modalName)?.props;
 };
 
 // Exponer las funciones al objeto window para acceso global

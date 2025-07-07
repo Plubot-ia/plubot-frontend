@@ -247,7 +247,7 @@ export const getSyncState = () => {
  * @param {number} options.interval - Intervalo de sincronización en ms
  * @returns {Object} - Estado y funciones de sincronización
  */
-export const useSyncService = (options = {}) => {
+const useSyncService = (options = {}) => {
   const { autoSync = true, interval = SYNC_INTERVAL } = options;
 
   // Iniciar sincronización periódica
