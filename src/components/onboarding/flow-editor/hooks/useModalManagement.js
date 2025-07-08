@@ -6,11 +6,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 
-import {
-  openModal,
-  closeModal,
-  registerModalListener,
-} from '../../utils/modal-manager';
+import { openModal, closeModal } from '../../utils/modal-manager';
 
 /**
  * Hook para gestionar el estado de los modales con soporte para los sistemas

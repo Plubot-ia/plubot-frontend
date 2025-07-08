@@ -1,5 +1,5 @@
-import React, { memo, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
+import React, { memo, useEffect, useRef } from 'react';
 
 import './ContextMenu.css';
 
@@ -15,7 +15,7 @@ import './ContextMenu.css';
 const ContextMenu = memo(({ items, onClose }) => {
   const menuReference = useRef(null);
 
-  // Cerrar el menú al hacer clic fuera
+  // Efecto para manejar el cierre del menú (clic fuera o tecla Escape)
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (
@@ -26,24 +26,17 @@ const ContextMenu = memo(({ items, onClose }) => {
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
-
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [onClose]);
-
-  // Cerrar el menú al presionar Escape
-  useEffect(() => {
     const handleKeyDown = (event) => {
       if (event.key === 'Escape') {
         onClose();
       }
     };
 
+    document.addEventListener('mousedown', handleClickOutside);
     document.addEventListener('keydown', handleKeyDown);
 
     return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
       document.removeEventListener('keydown', handleKeyDown);
     };
   }, [onClose]);

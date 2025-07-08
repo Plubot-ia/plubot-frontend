@@ -33,29 +33,6 @@ const useEdgeHandleFixer = () => {
 
       // Usar un timeout para garantizar que no haya actualizaciones continuas
       validationTimeout.current = setTimeout(() => {
-        const ALLOWED_CONNECTIONS = {
-          emotionDetection: [
-            'message',
-            'ai',
-            'end',
-            'lead',
-            'condition',
-            'data',
-            'date',
-            'delay',
-            'email',
-            'math',
-            'notification',
-            'random',
-            'response',
-            'variable',
-            'webhook',
-            'zapier',
-            'script',
-            'tag',
-            'note',
-          ],
-        };
         const currentEdges = getEdges();
         if (!currentEdges || currentEdges.length === 0) {
           validationRunning.current = false;
@@ -64,12 +41,12 @@ const useEdgeHandleFixer = () => {
 
         // Comparar aristas antes de aplicar cambios para evitar actualizaciones innecesarias
         const edgeIdsString = currentEdges
-          .map((e) => e.id)
+          .map((edge) => edge.id)
           .sort()
           .join(',');
         const fixedEdges = fixAllEdgeHandles(currentEdges);
         const fixedEdgeIdsString = fixedEdges
-          .map((e) => e.id)
+          .map((edge) => edge.id)
           .sort()
           .join(',');
 

@@ -1,4 +1,4 @@
-import React, { memo, useEffect, useState } from 'react';
+import { memo, useEffect, useState } from 'react';
 import { getBezierPath, EdgeText } from 'reactflow';
 
 import { useFlowNodesEdges } from '@/stores/selectors';

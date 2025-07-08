@@ -4,14 +4,14 @@
  * Esto mejora el rendimiento al evitar re-renders innecesarios cuando solo cambian aspectos visuales
  */
 
-import { useState, useCallback, useMemo, useRef } from 'react';
+import { useState, useCallback, useRef } from 'react';
 
 /**
  * Hook para gestionar el estado visual de los nodos y aristas
  * @param {Object} options - Opciones de configuración
  * @returns {Object} - Métodos y estado para gestionar el estado visual
  */
-const useVisualState = (options = {}) => {
+const useVisualState = (_options = {}) => {
   // Estado para posiciones visuales (no afecta al estado lógico)
   const [visualPositions, setVisualPositions] = useState({});
 
@@ -170,7 +170,7 @@ const useVisualState = (options = {}) => {
   const processNodesWithVisualStyles = useCallback(
     (nodes) => {
       if (!Array.isArray(nodes)) return nodes;
-      return nodes.map(applyVisualStyles);
+      return nodes.map((node) => applyVisualStyles(node));
     },
     [applyVisualStyles],
   );
@@ -183,7 +183,7 @@ const useVisualState = (options = {}) => {
   const processEdgesWithVisualStyles = useCallback(
     (edges) => {
       if (!Array.isArray(edges)) return edges;
-      return edges.map(applyEdgeVisualStyles);
+      return edges.map((edge) => applyEdgeVisualStyles(edge));
     },
     [applyEdgeVisualStyles],
   );

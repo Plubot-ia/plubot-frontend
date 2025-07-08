@@ -1,6 +1,4 @@
 import PropTypes from 'prop-types';
-import React from 'react';
-
 /**
  * Componente para las pestañas de navegación del perfil
  * @param {Object} props - Propiedades del componente

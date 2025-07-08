@@ -4,6 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 import useFlowStore from '@/stores/use-flow-store';
 
 import { calculateCorrectDropPosition } from '../drop-position-fix';
+import { applyNodeVisibilityFix } from '../utils/optimized-flow-fixes';
 
 /**
  * Hook para gestionar la lógica de arrastrar y soltar (Drag and Drop) en el editor de flujos.
@@ -110,14 +111,14 @@ const useDragAndDropManager = (
 
         const { nodes: currentNodes, edges: currentEdges } =
           useFlowStore.getState();
-        const finalNodes = currentNodes.concat(newNode, ...optionNodes);
-        const finalEdges = currentEdges.concat(newEdges);
+        const finalNodes = [...currentNodes, newNode, ...optionNodes];
+        const finalEdges = [...currentEdges, ...newEdges];
 
         setNodes(finalNodes);
         setEdges(finalEdges);
       } else {
         const { nodes: currentNodes } = useFlowStore.getState();
-        const finalNodes = currentNodes.concat(newNode);
+        const finalNodes = [...currentNodes, newNode];
         setNodes(finalNodes);
       }
 

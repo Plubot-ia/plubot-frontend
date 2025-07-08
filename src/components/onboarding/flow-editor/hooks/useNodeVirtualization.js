@@ -22,7 +22,7 @@ const useNodeVirtualization = ({
   containerDimensions: containerSize,
 }) => {
   const [throttledViewport, setThrottledViewport] = useState(viewport);
-  const throttleTimeout = useRef(null);
+  const throttleTimeout = useRef(undefined);
 
   useEffect(() => {
     if (throttleTimeout.current) {
@@ -31,7 +31,7 @@ const useNodeVirtualization = ({
 
     throttleTimeout.current = setTimeout(() => {
       setThrottledViewport(viewport);
-      throttleTimeout.current = null;
+      throttleTimeout.current = undefined;
     }, 50); // 50ms throttle delay
 
     return () => {

@@ -663,7 +663,6 @@ const SimulationInterface = ({
           }
           break;
         }
-
         case 'aiNode':
         case 'aiNodePro': {
           const hasPrompt =

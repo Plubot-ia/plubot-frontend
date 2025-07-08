@@ -97,6 +97,7 @@ export default [
       'backup-old-files/',
       'Plubot-backup-*/',
       'Plubot-backup-2025-05-09/',
+      'src/components/onboarding/flow-editor/backup/', // Directorio de backups específicos del editor de flujos
 
       // Archivos no relacionados con el frontend
       'plubot-backend/',
@@ -244,7 +245,7 @@ export default [
       
       // === PROMESAS ===
       ...promisePlugin.configs.recommended.rules,
-      'promise/always-return': 'warn',
+      'promise/always-return': 'off', // Desactivada para evitar conflictos con Unicorn
       'promise/catch-or-return': 'error',
       'promise/no-callback-in-promise': 'error',
       'promise/no-nesting': 'error',
@@ -270,12 +271,7 @@ export default [
       'security/detect-unsafe-regex': 'error',
       
       // === VARIABLES Y FUNCIONES ===
-      'no-unused-vars': ['warn', { 
-        varsIgnorePattern: '^[A-Z_]|^_',
-        argsIgnorePattern: '^_',
-        ignoreRestSiblings: true,
-        destructuredArrayIgnorePattern: '^_'
-      }],
+      'no-unused-vars': 'off', // Desactivada. Se usa sonarjs/no-unused-vars en su lugar.
       'no-undef': 'error',
       'no-redeclare': 'error',
       'no-shadow': 'error',

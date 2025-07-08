@@ -1,6 +1,4 @@
 import PropTypes from 'prop-types';
-import React from 'react';
-
 /**
  * Componente que muestra la sección de actividades recientes del usuario
  * @param {Object} props - Propiedades del componente

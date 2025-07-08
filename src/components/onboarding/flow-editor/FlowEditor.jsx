@@ -15,7 +15,6 @@ import ContextMenu from '@/components/onboarding/ui/context-menu';
 import { useUndoRedo } from '@/hooks/useUndoRedo';
 import useAuthStore from '@/stores/use-auth-store';
 import useFlowStore from '@/stores/use-flow-store';
-import { onEvent } from '@/utils/event-bus';
 
 // Local components, hooks, and utils
 import EpicHeader from '../common/EpicHeader';
@@ -26,12 +25,12 @@ import FlowMain from './components/FlowMain';
 import useConnectionValidator from './hooks/useConnectionValidator';
 import useDragAndDropManager from './hooks/useDragAndDropManager';
 import useFlowElementsManager from './hooks/useFlowElementsManager';
+import { useFlowSaver } from './hooks/useFlowSaver';
 import useLocalBackupManager from './hooks/useLocalBackupManager';
+import { useModalManager } from './hooks/useModalManager';
 import useNodeStyles from './hooks/useNodeStyles';
 import { prepareEdgesForSaving } from './utils/edgeFixUtil';
 import { MIN_ZOOM, NODE_EXTENT, TRANSLATE_EXTENT } from './utils/flow-extents';
-import { useFlowSaver } from './hooks/useFlowSaver';
-import { useModalManager } from './hooks/useModalManager';
 
 // Styles and patches
 import './FlowEditor.css';
@@ -193,8 +192,7 @@ const FlowEditorInner = ({
       setBackupExists(true);
       setRecoveryOpen(true);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Solo se ejecuta una vez al montar
+  }, [hasLocalBackup]); // Se ejecuta si la función de backup cambia
 
   // ==============================================
   // SECCIÓN 4: FUNCIONES Y CALLBACKS
@@ -394,7 +392,7 @@ const FlowEditor = ({
   const { isAuthenticated } = useAuthStore((state) => ({
     isAuthenticated: state.isAuthenticated,
   }));
-  const isPublic = false; // TODO: Implementar lógica de visibilidad pública
+  const isPublic = false;
   const {
     contextMenuVisible,
     contextMenuPosition,

@@ -8,7 +8,7 @@
  */
 
 import PropTypes from 'prop-types';
-import React, { memo } from 'react';
+import { memo } from 'react';
 
 import { LOD_LEVELS } from '@/components/onboarding/flow-editor/utils/lodUtils';
 
@@ -34,13 +34,14 @@ const GlobalLODNode = memo(
       case LOD_LEVELS.MINI: {
         return <MiniNode data={data} {...properties} />;
       }
-      case LOD_LEVELS.FULL:
       default: {
         return <FullNode data={data} {...properties} />;
       }
     }
   },
 );
+
+GlobalLODNode.displayName = 'GlobalLODNode';
 
 GlobalLODNode.propTypes = {
   data: PropTypes.shape({

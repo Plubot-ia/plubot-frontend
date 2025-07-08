@@ -13,17 +13,13 @@ export function getViewportCenterPosition(reactFlowInstance) {
   if (!reactFlowInstance) {
     return;
   }
-  try {
-    const { x, y, zoom } = reactFlowInstance.getViewport();
-    const { width, height } = reactFlowInstance.getDimensions();
-    // Cálculo para encontrar el punto central del área visible en el canvas
-    return {
-      x: -x / zoom + width / (2 * zoom),
-      y: -y / zoom + height / (2 * zoom),
-    };
-  } catch (error) {
-    console.error('Error getting viewport center position:', error);
-  }
+  const { x, y, zoom } = reactFlowInstance.getViewport();
+  const { width, height } = reactFlowInstance.getDimensions();
+  // Cálculo para encontrar el punto central del área visible en el canvas
+  return {
+    x: -x / zoom + width / (2 * zoom),
+    y: -y / zoom + height / (2 * zoom),
+  };
 }
 
 /**
@@ -72,10 +68,10 @@ export function calculateCorrectDropPosition(
 
     // Validación crítica: Asegurarse de que las coordenadas sean números finitos.
     if (
-      isNaN(flowPosition.x) ||
-      isNaN(flowPosition.y) ||
-      !isFinite(flowPosition.x) ||
-      !isFinite(flowPosition.y)
+      Number.isNaN(flowPosition.x) ||
+      Number.isNaN(flowPosition.y) ||
+      !Number.isFinite(flowPosition.x) ||
+      !Number.isFinite(flowPosition.y)
     ) {
       // Si el cálculo falla, intentar usar el centro del viewport como un fallback inteligente.
       return (
@@ -86,9 +82,8 @@ export function calculateCorrectDropPosition(
     // Actualizar y devolver la última posición válida.
     lastValidDropPosition = { x: flowPosition.x, y: flowPosition.y };
     return lastValidDropPosition;
-  } catch (error) {
+  } catch {
     // En caso de cualquier error inesperado, devolver la última posición conocida.
-    console.error('Error calculating drop position:', error);
     return lastValidDropPosition;
   }
 }

@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import PropTypes from 'prop-types';
+import React, { useState, useEffect } from 'react';
 
 import useSyncService, { getSyncState } from '../../services/syncService';
 

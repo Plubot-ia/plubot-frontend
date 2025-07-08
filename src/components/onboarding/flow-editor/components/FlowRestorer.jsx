@@ -1,6 +1,6 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 
-import useFlowStore from '@/stores/useFlowStore';
+import useFlowStore from '@/stores/use-flow-store';
 
 /**
  * FlowRestorer - Componente para restaurar completamente la funcionalidad del editor de flujos
@@ -92,9 +92,9 @@ const FlowRestorer = () => {
         let y = baseY;
 
         for (let index = 0; index < 20; index++) {
-          const posKey = `${x},${y}`;
-          if (!usedPositions.has(posKey)) {
-            usedPositions.add(posKey);
+          const positionKey = `${x},${y}`;
+          if (!usedPositions.has(positionKey)) {
+            usedPositions.add(positionKey);
             return { x, y };
           }
           x += offset;

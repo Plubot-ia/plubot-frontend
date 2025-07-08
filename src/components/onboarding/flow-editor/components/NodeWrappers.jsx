@@ -1,7 +1,8 @@
-import React, { memo } from 'react';
+import PropTypes from 'prop-types';
+import { memo } from 'react';
 import { Handle, Position } from 'reactflow';
 
-import { POWER_COLORS } from '@/utils/node-config.js';
+import { EDGE_COLORS } from '@/utils/node-config.js';
 
 /**
  * Componente que envuelve los nodos personalizados y agrega handles
@@ -11,53 +12,60 @@ import { POWER_COLORS } from '@/utils/node-config.js';
  * @param {Array} props.inputs - Tipos de entradas del nodo
  * @param {Array} props.outputs - Tipos de salidas del nodo
  */
-const NodeWrapper = memo(
-  ({ node: _node, children, inputs = [], outputs = [] }) => {
-    return (
-      <div className='custom-node-wrapper'>
-        {/* Handles de entrada */}
-        {inputs.map((type, index) => (
-          <Handle
-            key={`input-${type}-${index}`}
-            type='target'
-            position={Position.Left}
-            id={type}
-            style={{
-              top: `${20 + index * 20}px`,
-              background: POWER_COLORS[type] || '#555',
-              width: '12px',
-              height: '12px',
-            }}
-          />
-        ))}
+const NodeWrapper = memo(({ children, inputs = [], outputs = [] }) => {
+  return (
+    <div className='custom-node-wrapper'>
+      {/* Handles de entrada */}
+      {inputs.map((type, index) => (
+        <Handle
+          key={`input-${type}`}
+          type='target'
+          position={Position.Left}
+          id={type}
+          style={{
+            top: `${20 + index * 20}px`,
+            background: EDGE_COLORS[type] || '#555',
+            width: '12px',
+            height: '12px',
+          }}
+        />
+      ))}
 
-        {/* Contenido del nodo */}
-        {children}
+      {/* Contenido del nodo */}
+      {children}
 
-        {/* Handles de salida */}
-        {outputs.map((type, index) => (
-          <Handle
-            key={`output-${type}-${index}`}
-            type='source'
-            position={Position.Right}
-            id={type}
-            style={{
-              top: `${20 + index * 20}px`,
-              background: POWER_COLORS[type] || '#555',
-              width: '12px',
-              height: '12px',
-            }}
-          />
-        ))}
-      </div>
-    );
-  },
-);
+      {/* Handles de salida */}
+      {outputs.map((type, index) => (
+        <Handle
+          key={`output-${type}`}
+          type='source'
+          position={Position.Right}
+          id={type}
+          style={{
+            top: `${20 + index * 20}px`,
+            background: EDGE_COLORS[type] || '#555',
+            width: '12px',
+            height: '12px',
+          }}
+        />
+      ))}
+    </div>
+  );
+});
+
+NodeWrapper.displayName = 'NodeWrapper';
+
+NodeWrapper.propTypes = {
+  children: PropTypes.node.isRequired,
+  inputs: PropTypes.array,
+  outputs: PropTypes.array,
+  getStats: PropTypes.func,
+};
 
 /**
  * Componente que envuelve los nodos de tipo trigger
  */
-const TriggerNodeWrapper = memo(({ node: _node, children, outputs = [] }) => {
+const TriggerNodeWrapper = memo(({ children, outputs = [] }) => {
   return (
     <div className='trigger-node-wrapper'>
       {/* Contenido del nodo */}
@@ -66,14 +74,14 @@ const TriggerNodeWrapper = memo(({ node: _node, children, outputs = [] }) => {
       {/* Handles de salida */}
       {outputs.map((type, index) => (
         <Handle
-          key={`output-${type}-${index}`}
+          key={`output-${type}`}
           type='source'
           position={Position.Bottom}
           id={type}
           style={{
             left: `${50 + (index * 30 - outputs.length * 15)}%`,
             bottom: '-6px',
-            background: POWER_COLORS[type] || '#555',
+            background: EDGE_COLORS[type] || '#555',
             width: '12px',
             height: '12px',
           }}
@@ -83,23 +91,31 @@ const TriggerNodeWrapper = memo(({ node: _node, children, outputs = [] }) => {
   );
 });
 
+TriggerNodeWrapper.displayName = 'TriggerNodeWrapper';
+
+TriggerNodeWrapper.propTypes = {
+  children: PropTypes.node.isRequired,
+  outputs: PropTypes.array,
+  getStats: PropTypes.func,
+};
+
 /**
  * Componente que envuelve los nodos de tipo action
  */
-const ActionNodeWrapper = memo(({ node: _node, children, inputs = [] }) => {
+const ActionNodeWrapper = memo(({ children, inputs = [] }) => {
   return (
     <div className='action-node-wrapper'>
       {/* Handles de entrada */}
       {inputs.map((type, index) => (
         <Handle
-          key={`input-${type}-${index}`}
+          key={`input-${type}`}
           type='target'
           position={Position.Top}
           id={type}
           style={{
             left: `${50 + (index * 30 - inputs.length * 15)}%`,
             top: '-6px',
-            background: POWER_COLORS[type] || '#555',
+            background: EDGE_COLORS[type] || '#555',
             width: '12px',
             height: '12px',
           }}
@@ -111,5 +127,13 @@ const ActionNodeWrapper = memo(({ node: _node, children, inputs = [] }) => {
     </div>
   );
 });
+
+ActionNodeWrapper.displayName = 'ActionNodeWrapper';
+
+ActionNodeWrapper.propTypes = {
+  children: PropTypes.node.isRequired,
+  inputs: PropTypes.array,
+  getStats: PropTypes.func,
+};
 
 export { NodeWrapper, TriggerNodeWrapper, ActionNodeWrapper };

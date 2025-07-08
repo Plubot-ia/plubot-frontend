@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback } from 'react';
+import { useEffect, useCallback } from 'react';
 
 import { saveEdgesToLocalStorage } from '../utils/edgeRecoveryUtil';
 // Importar EliteEdge para asegurar compatibilidad

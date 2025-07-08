@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import { useEffect, Suspense, lazy, Component, useRef } from 'react';
+import React, { useEffect, Suspense, lazy, Component, useRef } from 'react';
 import {
   BrowserRouter,
   Routes,

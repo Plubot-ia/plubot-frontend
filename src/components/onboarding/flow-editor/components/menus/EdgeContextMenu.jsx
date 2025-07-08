@@ -1,8 +1,14 @@
 import PropTypes from 'prop-types';
-import React from 'react';
 import { FiTrash2, FiLink } from 'react-icons/fi';
 
 import useFlowStore from '@/stores/use-flow-store';
+
+const handleKeyDown = (event, action) => {
+  if (event.key === 'Enter' || event.key === ' ') {
+    event.preventDefault();
+    action();
+  }
+};
 
 /**
  * Menu00fa contextual para aristas del flujo
@@ -66,6 +72,9 @@ const EdgeContextMenu = ({ position, onClose }) => {
         className='menu-item animate-item'
         style={menuItemStyle}
         onClick={handleToggleAnimate}
+        onKeyDown={(event) => handleKeyDown(event, handleToggleAnimate)}
+        role='button'
+        tabIndex={0}
       >
         <FiLink style={iconStyle} />
         {selectedEdge.animated
@@ -77,6 +86,9 @@ const EdgeContextMenu = ({ position, onClose }) => {
         className='menu-item delete-item'
         style={menuItemStyle}
         onClick={handleRemove}
+        onKeyDown={(event) => handleKeyDown(event, handleRemove)}
+        role='button'
+        tabIndex={0}
       >
         <FiTrash2 style={iconStyle} /> Eliminar Conexiu00f3n
       </div>
@@ -94,6 +106,13 @@ const EdgeContextMenu = ({ position, onClose }) => {
         className='menu-item style-item'
         style={{ ...menuItemStyle, color: '#3498db' }}
         onClick={() => handleStyleChange({ stroke: '#3498db', strokeWidth: 2 })}
+        onKeyDown={(event) =>
+          handleKeyDown(event, () =>
+            handleStyleChange({ stroke: '#3498db', strokeWidth: 2 }),
+          )
+        }
+        role='button'
+        tabIndex={0}
       >
         Azul
       </div>
@@ -102,6 +121,13 @@ const EdgeContextMenu = ({ position, onClose }) => {
         className='menu-item style-item'
         style={{ ...menuItemStyle, color: '#2ecc71' }}
         onClick={() => handleStyleChange({ stroke: '#2ecc71', strokeWidth: 2 })}
+        onKeyDown={(event) =>
+          handleKeyDown(event, () =>
+            handleStyleChange({ stroke: '#2ecc71', strokeWidth: 2 }),
+          )
+        }
+        role='button'
+        tabIndex={0}
       >
         Verde
       </div>
@@ -110,6 +136,13 @@ const EdgeContextMenu = ({ position, onClose }) => {
         className='menu-item style-item'
         style={{ ...menuItemStyle, color: '#e74c3c' }}
         onClick={() => handleStyleChange({ stroke: '#e74c3c', strokeWidth: 2 })}
+        onKeyDown={(event) =>
+          handleKeyDown(event, () =>
+            handleStyleChange({ stroke: '#e74c3c', strokeWidth: 2 }),
+          )
+        }
+        role='button'
+        tabIndex={0}
       >
         Rojo
       </div>

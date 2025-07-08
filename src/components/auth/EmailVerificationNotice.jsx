@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
 import useAuthStore from '@/stores/use-auth-store';
@@ -9,6 +10,7 @@ import useCardTiltEffect from '../../hooks/useCardTiltEffect';
 import './EmailVerificationNotice.css';
 
 const EmailVerificationNotice = () => {
+  const { t: translation } = useTranslation();
   const navigate = useNavigate();
   const { user } = useAuthStore();
   const cardRef = useCardTiltEffect();
@@ -60,13 +62,10 @@ const EmailVerificationNotice = () => {
             <img src='/logo.svg' alt='PLUBOT' />
           </div>
           <h2 className='email-verification-card-title'>
-            ¡Gracias por registrarte!
+            {translation('thankYouForRegistering')}
           </h2>
           <p className='email-verification-card-subtitle'>
-            Te hemos enviado un correo {user?.email ? `a ${user.email}` : ''}{' '}
-            para verificar tu cuenta. Por favor, revisa tu bandeja de entrada (o
-            spam) y haz clic en el enlace para activar tu cuenta. Serás
-            redirigido al inicio de sesión en 10 segundos.
+            {translation('verificationEmailSent', { email: user?.email })}
           </p>
         </div>
         <button
@@ -74,7 +73,7 @@ const EmailVerificationNotice = () => {
           className='email-verification-button'
           onClick={handleNavigateToLogin}
         >
-          Ir a Iniciar Sesión
+          {translation('goToLogin')}
         </button>
       </motion.div>
     </motion.div>

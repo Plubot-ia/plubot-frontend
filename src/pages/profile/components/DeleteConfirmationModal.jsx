@@ -1,5 +1,4 @@
 import PropTypes from 'prop-types';
-import React from 'react';
 
 const DeleteConfirmationModal = ({ isOpen, plubot, onConfirm, onCancel }) => {
   if (!isOpen || !plubot) {

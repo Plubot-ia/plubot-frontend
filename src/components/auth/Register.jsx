@@ -1,192 +1,30 @@
-import { useState, useEffect } from 'react';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
-import useAuthStore from '@/stores/use-auth-store';
-
-import useWindowSize from '../../hooks/useWindowSize';
+import useRegister from '../../hooks/useRegister';
 
 import GoogleAuthButton from './GoogleAuthButton';
-
 import './Register.css';
 
 const Register = () => {
-  const { width } = useWindowSize();
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [message, setMessage] = useState({ text: '', type: '' });
-  const [strength, setStrength] = useState({
-    width: 0,
-    color: '#333',
-    text: 'Sin verificar',
-  });
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const navigate = useNavigate();
-  const { register, error: authError } = useAuthStore();
-
-  const showMessage = (text, type) => {
-    setMessage({ text, type });
-    setTimeout(() => setMessage({ text: '', type: '' }), 5000);
-  };
-
-  // Efecto para manejar errores del store
-  useEffect(() => {
-    if (authError) {
-      showMessage(authError, 'error');
-    }
-  }, [authError]);
-
-  // Función para manejar cambios en el campo de email
-  const handleEmailChange = (event) => {
-    const { value } = event.target;
-    setEmail(value);
-
-    // Guardar el email para usarlo en la autenticación con Google
-    if (value) {
-      localStorage.setItem('last_email_used', value);
-    }
-  };
-
-  const evaluatePasswordStrength = (newPassword) => {
-    let strengthValue = 0;
-    let feedbackText = 'Sin verificar';
-    let color = '#333';
-
-    if (newPassword.length > 0) {
-      if (newPassword.length >= 8) strengthValue += 25;
-      if (/[A-Z]/.test(newPassword)) strengthValue += 25;
-      if (/\d/.test(newPassword)) strengthValue += 25;
-      if (/[^A-Za-z0-9]/.test(newPassword)) strengthValue += 25;
-
-      if (strengthValue <= 25) {
-        feedbackText = 'Débil';
-        color = '#ff4747';
-      } else if (strengthValue <= 50) {
-        feedbackText = 'Media';
-        color = '#ffa500';
-      } else if (strengthValue <= 75) {
-        feedbackText = 'Buena';
-        color = '#2de6ac';
-      } else {
-        feedbackText = 'Fuerte';
-        color = '#00ff96';
-      }
-    }
-
-    setStrength({ width: strengthValue, color, text: feedbackText });
-  };
-
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    setIsSubmitting(true);
-
-    if (!name || !email || !password || !confirmPassword) {
-      showMessage('Por favor completa todos los campos', 'error');
-      setIsSubmitting(false);
-      return;
-    }
-
-    // Guardar el email para usarlo en la autenticación con Google
-    if (email) {
-      localStorage.setItem('last_email_used', email);
-    }
-
-    if (password.length < 8) {
-      showMessage('La contraseña debe tener al menos 8 caracteres', 'error');
-      setIsSubmitting(false);
-      return;
-    }
-
-    const passwordsMatch = password === confirmPassword;
-    if (!passwordsMatch) {
-      showMessage('Las contraseñas no coinciden', 'error');
-      setIsSubmitting(false);
-      return;
-    }
-
-    const emailRegex = /[^\s@]{1,64}@[^\s@]{1,255}\.[a-zA-Z]{2,63}$/;
-    if (!emailRegex.test(email)) {
-      showMessage('Por favor ingresa un email válido', 'error');
-      setIsSubmitting(false);
-      return;
-    }
-
-    try {
-      const response = await register(name, email, password);
-
-      if (!response) {
-        showMessage(
-          'Error en el registro. Respuesta inesperada del servidor.',
-          'error',
-        );
-        setIsSubmitting(false);
-        return;
-      }
-
-      if (response.success === true) {
-        showMessage(
-          '¡Registro exitoso! Revisa tu correo para verificar.',
-          'success',
-        );
-        navigate('/auth/verify-email', { replace: true });
-      } else {
-        const errorMessage =
-          response.data?.message || 'Error en el registro. Intenta nuevamente.';
-        showMessage(errorMessage, 'error');
-        setIsSubmitting(false);
-      }
-    } catch (error) {
-      // EXCEPTION CASE (e.g., network error, 500 server error)
-      setIsSubmitting(false);
-      const errorMessage =
-        error?.response?.data?.message || 'Ocurrió un error inesperado.';
-      showMessage(errorMessage, 'error');
-    }
-  };
-
-  useEffect(() => {
-    const card = document.querySelector('.register-register-card');
-    const light1 = document.querySelector('.register-light-beam-1');
-    const light2 = document.querySelector('.register-light-beam-2');
-
-    const handleMouseMove = (event) => {
-      if (!card) return;
-      const rect = card.getBoundingClientRect();
-      const x = event.clientX - rect.left;
-      const y = event.clientY - rect.top;
-      const rotateX = -((y / rect.height) * 2 - 1) * 10;
-      const rotateY = ((x / rect.width) * 2 - 1) * 10;
-      const perspective = 'perspective(1000px)';
-      const rotationX = `rotateX(${rotateX}deg)`;
-      const rotationY = `rotateY(${rotateY}deg)`;
-      const scale = 'scale3d(1, 1, 1)';
-      card.style.transform = `${perspective} ${rotationX} ${rotationY} ${scale}`;
-
-      if (light1 && light2) {
-        light1.style.transform = `translateX(${(x / width) * 50}px) rotate(45deg)`;
-        light2.style.transform = `translateX(${(x / width) * 50}px) rotate(-45deg)`;
-      }
-    };
-
-    const handleMouseLeave = () => {
-      if (card) {
-        card.style.transform =
-          'perspective(1000px) rotateX(0) rotateY(0) scale3d(1, 1, 1)';
-      }
-    };
-
-    document.addEventListener('mousemove', handleMouseMove);
-    document.addEventListener('mouseleave', handleMouseLeave);
-
-    return () => {
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseleave', handleMouseLeave);
-    };
-  }, [width]);
+  const {
+    name,
+    setName,
+    email,
+    password,
+    confirmPassword,
+    setConfirmPassword,
+    message,
+    strength,
+    isSubmitting,
+    showPassword,
+    setShowPassword,
+    showConfirmPassword,
+    setShowConfirmPassword,
+    handleEmailChange,
+    handlePasswordChange,
+    handleSubmit,
+  } = useRegister();
 
   return (
     <div className='register-register-container'>
@@ -263,10 +101,7 @@ const Register = () => {
                 className='register-form-input'
                 placeholder='Crea una contraseña segura'
                 value={password}
-                onChange={(event) => {
-                  setPassword(event.target.value);
-                  evaluatePasswordStrength(event.target.value);
-                }}
+                onChange={handlePasswordChange}
                 required
               />
               <button

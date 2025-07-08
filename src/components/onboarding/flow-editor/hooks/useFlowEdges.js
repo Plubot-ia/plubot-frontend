@@ -44,7 +44,7 @@ const useFlowEdges = (initialEdges, setEdges, addToHistory) => {
               });
             }
           } else {
-            const updatedEdge = newEdges.find((e) => e.id === change.id);
+            const updatedEdge = newEdges.find((edge) => edge.id === change.id);
             if (updatedEdge) {
               edgesMap.set(change.id, updatedEdge);
             }
@@ -123,8 +123,8 @@ const useFlowEdges = (initialEdges, setEdges, addToHistory) => {
           (edge) => edge.source !== nodeId && edge.target !== nodeId,
         );
 
-        for (const edge of edgesToRemove) {
-          edgesMapReference.current.delete(edge.id);
+        for (const edgeToRemove of edgesToRemove) {
+          edgesMapReference.current.delete(edgeToRemove.id);
         }
 
         setTimeout(() => setEdges(newEdges), 0);

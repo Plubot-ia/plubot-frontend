@@ -1,5 +1,3 @@
-import React from 'react';
-
 import EliteEdge from '../../flow-editor/ui/EliteEdge';
 
 /**

@@ -32,7 +32,6 @@ export const resetAndVerifyNodeTypes = (reactFlowInstance, nodeTypes) => {
 
         if (node.id.startsWith('start-')) correctedType = 'start';
         else if (node.id.startsWith('end-')) correctedType = 'end';
-        else if (node.id.startsWith('message-')) correctedType = 'message';
         else if (node.id.startsWith('decision-')) correctedType = 'decision';
         else if (node.id.startsWith('action-')) correctedType = 'action';
         else if (node.id.startsWith('option-')) correctedType = 'option';

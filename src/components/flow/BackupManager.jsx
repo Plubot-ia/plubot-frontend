@@ -2,7 +2,7 @@ import { formatDistanceToNow } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { History, X, RotateCcw, Info } from 'lucide-react';
 import PropTypes from 'prop-types';
-import React, { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 import useFlowStore from '@/stores/use-flow-store';
 import './BackupManager.css';

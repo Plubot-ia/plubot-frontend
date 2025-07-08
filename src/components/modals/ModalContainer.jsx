@@ -1,4 +1,4 @@
-import React, { lazy, Suspense } from 'react';
+import { lazy, Suspense } from 'react';
 
 // Importar componentes de modal directamente
 import useFlowStore from '@/stores/use-flow-store';

@@ -1,10 +1,11 @@
-import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import plubotLogo from '../../assets/img/logo.svg';
 import useCardTiltEffect from '../../hooks/useCardTiltEffect';
 import usePasswordForm from '../../hooks/usePasswordForm';
 
 import PasswordInputField from './PasswordInputField';
+
 import './ChangePassword.css';
 
 /**
@@ -13,6 +14,7 @@ import './ChangePassword.css';
  * a través de hooks personalizados.
  */
 const ChangePassword = () => {
+  const { t: translation } = useTranslation();
   const cardRef = useCardTiltEffect();
   const {
     passwords,
@@ -45,26 +47,26 @@ const ChangePassword = () => {
         <form onSubmit={handleSubmit} noValidate>
           <PasswordInputField
             id='currentPassword'
-            label='Contraseña Actual'
+            label={translation('currentPassword')}
             value={passwords.currentPassword}
             onChange={handlePasswordChange}
-            placeholder='Ingresa tu clave actual'
+            placeholder={translation('enterCurrentPassword')}
           />
 
           <PasswordInputField
             id='newPassword'
-            label='Nueva Contraseña'
+            label={translation('newPassword')}
             value={passwords.newPassword}
             onChange={handlePasswordChange}
-            placeholder='Crea una nueva clave segura'
+            placeholder={translation('createNewPassword')}
           />
 
           <PasswordInputField
             id='confirmPassword'
-            label='Confirmar Nueva Contraseña'
+            label={translation('confirmNewPassword')}
             value={passwords.confirmPassword}
             onChange={handlePasswordChange}
-            placeholder='Confirma tu nueva clave'
+            placeholder={translation('confirmYourNewPassword')}
           />
 
           {error && <p className='change-password-error-message'>{error}</p>}
@@ -73,7 +75,7 @@ const ChangePassword = () => {
           )}
 
           <button type='submit' className='change-password-btn'>
-            Actualizar Contraseña
+            {translation('updatePassword')}
           </button>
         </form>
       </div>

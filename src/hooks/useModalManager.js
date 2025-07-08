@@ -3,6 +3,7 @@
  * Proporciona una manera centralizada de controlar qué modales están abiertos
  * y coordina su interacción para evitar problemas de UI.
  */
+import PropTypes from 'prop-types';
 import {
   useState,
   useCallback,
@@ -20,7 +21,7 @@ const ModalContext = createContext();
  * @param {Object} props - Props del componente
  * @param {React.ReactNode} props.children - Componentes hijos
  */
-export const ModalProvider = ({ children }) => {
+export function ModalProvider({ children }) {
   // Estado central para todos los modales de la aplicación
   const [modals, setModals] = useState(new Map());
 
@@ -61,24 +62,22 @@ export const ModalProvider = ({ children }) => {
 
       setModals((previous) => {
         const newModals = new Map(previous);
-        const existingModal = newModals.get(modalId);
+        // Get existing modal or create a base for a new one
+        const baseModal = newModals.get(modalId) || {
+          id: modalId,
+          isOpen: false,
+          data: undefined,
+          blocking: false,
+          zIndex: 1000,
+          size: 'medium',
+          onBeforeClose: undefined,
+          history: false,
+        };
 
-        if (existingModal) {
-          // Si el modal ya existe, solo actualizar sus opciones
-          newModals.set(modalId, { ...existingModal, ...options });
-        } else {
-          // Si es un modal nuevo, crear su configuración completa
-          newModals.set(modalId, {
-            id: modalId,
-            isOpen: false,
-            data: undefined,
-            blocking: options.blocking || false,
-            zIndex: options.zIndex || 1000,
-            size: options.size || 'medium',
-            onBeforeClose: options.onBeforeClose || undefined,
-            history: options.preserveHistory || false,
-          });
-        }
+        // Merge base with new options to get the final state
+        const finalModal = { ...baseModal, ...options };
+
+        newModals.set(modalId, finalModal);
         return newModals;
       });
 
@@ -225,6 +224,10 @@ export const ModalProvider = ({ children }) => {
       {children}
     </ModalContext.Provider>
   );
+}
+
+ModalProvider.propTypes = {
+  children: PropTypes.node.isRequired,
 };
 
 /**

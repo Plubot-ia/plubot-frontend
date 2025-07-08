@@ -2,11 +2,11 @@
  * Componente para monitorear el rendimiento del editor de flujos.
  * Muestra estad\u00edsticas \u00fatiles como FPS, n\u00famero de nodos, memoria utilizada, etc.
  */
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 
-import useFlowStore from '@/stores/useFlowStore';
+import useFlowStore from '@/stores/use-flow-store';
 
-const PerformanceMonitor = ({ flowInstance, getStats }) => {
+const PerformanceMonitor = ({ getStats }) => {
   // Estados para monitoreo
   const [isOpen, setIsOpen] = useState(false);
   const [stats, setStats] = useState({
@@ -36,10 +36,10 @@ const PerformanceMonitor = ({ flowInstance, getStats }) => {
   };
 
   // Formato para n\u00fameros
-  const format = (number_) => Math.round(number_ * 10) / 10;
+  const format = (numberToFormat) => Math.round(numberToFormat * 10) / 10;
 
   // Medir y actualizar rendimiento
-  const updatePerformance = () => {
+  const updatePerformance = useCallback(() => {
     const now = performance.now();
     const elapsed = now - lastUpdateReference.current;
     lastUpdateReference.current = now;
@@ -73,7 +73,7 @@ const PerformanceMonitor = ({ flowInstance, getStats }) => {
 
     // Programar siguiente actualizaci\u00f3n
     animationFrameReference.current = requestAnimationFrame(updatePerformance);
-  };
+  }, [nodes, edges, getStats]);
 
   // Iniciar/detener monitor
   useEffect(() => {
@@ -88,15 +88,15 @@ const PerformanceMonitor = ({ flowInstance, getStats }) => {
         cancelAnimationFrame(animationFrameReference.current);
       }
     };
-  }, [isOpen, nodes.length, edges.length]);
+  }, [isOpen, nodes.length, edges.length, updatePerformance]);
 
-  // Determinar color seg\u00fan rendimiento
+  // Determinar color según rendimiento
+  const { fps } = stats;
   const getStatusColor = useMemo(() => {
-    const { fps } = stats;
     if (fps >= 50) return 'text-green-500';
     if (fps >= 30) return 'text-yellow-500';
     return 'text-red-500';
-  }, [stats.fps]);
+  }, [fps]);
 
   // No renderizar nada si est\u00e1 cerrado
   if (!isOpen) {

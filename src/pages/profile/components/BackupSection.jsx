@@ -1,5 +1,3 @@
-import React from 'react';
-
 import DataBackupPanel from '../../../components/sync/DataBackupPanel';
 import '../styles/BackupSection.css';
 

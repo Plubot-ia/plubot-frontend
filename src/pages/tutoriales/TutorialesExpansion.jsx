@@ -34,13 +34,16 @@ const TutorialesExpansion = () => {
   );
 
   const [phraseIndex, setPhraseIndex] = useState(0);
+  const [currentPhrase, setCurrentPhrase] = useState(phrases[0]);
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setPhraseIndex((previous) => (previous + 1) % phrases.length);
+      const nextIndex = (phraseIndex + 1) % phrases.length;
+      setPhraseIndex(nextIndex);
+      setCurrentPhrase(phrases[nextIndex]);
     }, 4000);
     return () => clearInterval(interval);
-  }, [phrases]);
+  }, [phrases, phraseIndex]);
 
   useEffect(() => {
     const handleMouseMove = (event) => {
@@ -146,7 +149,7 @@ const TutorialesExpansion = () => {
           <div className='dialog-corner tr' />
           <div className='dialog-corner bl' />
           <div className='dialog-corner br' />
-          {phrases[phraseIndex]}
+          {currentPhrase}
         </motion.div>
       </AnimatePresence>
     </motion.div>

@@ -1,9 +1,8 @@
 // OPTIMIZACIÓN DEFINITIVA para el arrastre de nodos y aristas
 // Implementación elite con máximo rendimiento y fluidez
-import { throttle, debounce } from 'lodash';
-import { useCallback, useMemo, useRef, useEffect } from 'react';
+import { useCallback, useRef, useEffect } from 'react';
 
-import useFlowStore from '@/stores/useFlowStore';
+import useFlowStore from '@/stores/use-flow-store';
 
 /**
  * Hook de optimización avanzada para el arrastre de nodos
@@ -18,7 +17,7 @@ const useEdgeDragOptimizer = () => {
   // Usar el store de Zustand directamente
   const edges = useFlowStore((state) => state.edges);
   const nodes = useFlowStore((state) => state.nodes);
-  const setEdges = useFlowStore((state) => state.setEdges);
+
   // Sistema avanzado de caché de conexiones para minimizar búsquedas
   const nodeConnectionsCache = useRef(new Map());
 
@@ -74,7 +73,9 @@ const useEdgeDragOptimizer = () => {
 
       // Verificar validez del nodo
       const draggedNode =
-        typeof node === 'string' ? nodes.find((n) => n.id === node) : node;
+        typeof node === 'string'
+          ? nodes.find((nodeItem) => nodeItem.id === node)
+          : node;
 
       if (!draggedNode || !draggedNode.id || !draggedNode.position) return;
 
@@ -109,7 +110,7 @@ const useEdgeDragOptimizer = () => {
       // Actualizar aristas donde este nodo es origen
       if (connections.sourcesOf.length > 0) {
         for (const edgeId of connections.sourcesOf) {
-          const edgeIndex = edges.findIndex((e) => e.id === edgeId);
+          const edgeIndex = edges.findIndex((edge) => edge.id === edgeId);
           if (edgeIndex !== -1) {
             edgeUpdates.push({
               id: edgeId,
@@ -123,7 +124,7 @@ const useEdgeDragOptimizer = () => {
       // Actualizar aristas donde este nodo es destino
       if (connections.targetsOf.length > 0) {
         for (const edgeId of connections.targetsOf) {
-          const edgeIndex = edges.findIndex((e) => e.id === edgeId);
+          const edgeIndex = edges.findIndex((edge) => edge.id === edgeId);
           if (edgeIndex !== -1) {
             edgeUpdates.push({
               id: edgeId,
@@ -176,10 +177,10 @@ const useEdgeDragOptimizer = () => {
   const dragState = useRef({
     isDragging: false,
     lastUpdateTime: 0,
-    lastNode: null,
+    lastNode: undefined,
     pendingUpdate: false,
-    dragStartPosition: null,
-    dragCurrentPosition: null,
+    dragStartPosition: undefined,
+    dragCurrentPosition: undefined,
   });
 
   // Configuración de rendimiento ajustable
@@ -232,7 +233,7 @@ const useEdgeDragOptimizer = () => {
           ...dragState.current,
           isDragging: false,
           pendingUpdate: false,
-          lastNode: null,
+          lastNode: undefined,
         };
         return;
       }

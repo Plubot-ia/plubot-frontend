@@ -1,6 +1,5 @@
 import { motion } from 'framer-motion';
 import PropTypes from 'prop-types';
-import React from 'react';
 
 // Animation variants can be defined outside the component
 // as they don't depend on props or state.

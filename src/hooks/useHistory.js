@@ -28,7 +28,7 @@ const useHistory = ({ maxHistory = 100 } = {}) => {
       }
 
       // Agregar el nuevo estado al historial
-      history.current.push(JSON.parse(JSON.stringify(state)));
+      history.current.push(structuredClone(state));
 
       // Limitar el tamaño del historial
       if (history.current.length > maxHistory) {

@@ -1,5 +1,4 @@
-import { Zap, AlertTriangle } from 'lucide-react';
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 
 import './PerformanceModeButton.css';
 import { useFlowMeta } from '@/stores/selectors';

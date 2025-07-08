@@ -19,12 +19,10 @@ export default function usePlubotLoader({
   initialNodes,
   initialEdges,
 }) {
-  const setFlowName = useFlowStore((state) => state.setFlowName);
-
   useEffect(() => {
     const {
       plubotId: currentPlubotIdInStore,
-      flowName: currentFlowNameInStore,
+
       nodes: currentNodesInStore,
       isLoaded: currentIsLoadedInStore,
       setFlowName: setFlowNameFromStore,

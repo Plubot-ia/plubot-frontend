@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { EDGE_COLORS } from '@/utils/node-config.js';
 
 /**

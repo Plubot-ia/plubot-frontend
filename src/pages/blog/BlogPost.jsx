@@ -17,9 +17,10 @@ const BlogPost = () => {
 
   useEffect(() => {
     try {
-      const postData = Object.prototype.hasOwnProperty.call(staticPosts, slug)
-        ? staticPosts[slug]
-        : undefined;
+      const foundPost = Object.entries(staticPosts).find(
+        ([postSlug]) => postSlug === slug,
+      );
+      const postData = foundPost ? foundPost[1] : undefined;
 
       if (postData) {
         setPost(postData);

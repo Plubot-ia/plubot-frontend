@@ -1,5 +1,3 @@
-import React from 'react';
-
 import './SuggestionsModal.css';
 // Importar el contexto global
 import useGlobalContext from '../../../hooks/useGlobalContext';

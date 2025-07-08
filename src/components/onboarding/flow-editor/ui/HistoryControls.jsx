@@ -1,4 +1,3 @@
-import React from 'react';
 import { FiRotateCcw, FiRotateCw } from 'react-icons/fi';
 
 import { useUndoRedo } from '@/stores/selectors';

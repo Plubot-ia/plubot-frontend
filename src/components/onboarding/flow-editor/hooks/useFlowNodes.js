@@ -65,7 +65,7 @@ const useFlowNodes = (initialNodes, setNodes, addToHistory) => {
               if (node && node.position) {
                 return { id: change.id, position: { ...node.position } };
               }
-              return null;
+              // o null, pero undefined es más idiomático aquí y se filtrará igual
             })
             .filter(Boolean); // Filtrar nodos nulos
 

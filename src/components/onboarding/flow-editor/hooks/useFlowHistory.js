@@ -62,7 +62,9 @@ const useFlowHistory = (setNodes, setEdges) => {
         // Restaurar posiciones anteriores
         setNodes((nodes) =>
           nodes.map((node) => {
-            const movedNode = action.nodes.find((n) => n.id === node.id);
+            const movedNode = action.nodes.find(
+              (movedNodeItem) => movedNodeItem.id === node.id,
+            );
             if (movedNode && movedNode.prevPosition) {
               return { ...node, position: movedNode.prevPosition };
             }
@@ -128,7 +130,9 @@ const useFlowHistory = (setNodes, setEdges) => {
         // Aplicar movimientos nuevamente
         setNodes((nodes) =>
           nodes.map((node) => {
-            const movedNode = action.nodes.find((n) => n.id === node.id);
+            const movedNode = action.nodes.find(
+              (movedNodeItem) => movedNodeItem.id === node.id,
+            );
             if (movedNode) {
               return { ...node, position: movedNode.position };
             }

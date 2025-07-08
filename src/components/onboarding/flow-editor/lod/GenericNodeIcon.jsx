@@ -21,7 +21,7 @@ import {
   Puzzle, // Default
 } from 'lucide-react';
 import PropTypes from 'prop-types';
-import React, { memo } from 'react';
+import { memo } from 'react';
 
 const iconMap = {
   start: Play,
@@ -51,6 +51,8 @@ const GenericNodeIcon = memo(
     return <IconComponent {...iconProperties} />;
   },
 );
+
+GenericNodeIcon.displayName = 'GenericNodeIcon';
 
 GenericNodeIcon.propTypes = {
   nodeType: PropTypes.string.isRequired,

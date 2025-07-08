@@ -33,24 +33,15 @@ export const useNodeHistory = () => {
  * @param {Object} options - Opciones de configuraciu00f3n
  * @returns {Object} - API compatible con el hook anterior
  */
-const useFlowOptimization = ({
-  enabled = true,
-  throttle = 32,
-  idleTimeout = 2000,
-  onIdleChange,
-} = {}) => {
+const useFlowOptimization = ({ throttle = 32 } = {}) => {
   // Utilizar nuestro sistema unificado de rendimiento
-  const {
-    updatePerformance,
-    throttledUpdatePerformance,
-    optimizationLevel,
-    fpsRef,
-  } = useAdaptivePerformance({
-    lowThreshold: 30,
-    mediumThreshold: 60,
-    highThreshold: 100,
-    monitoringInterval: throttle * 30,
-  });
+  const { throttledUpdatePerformance, optimizationLevel } =
+    useAdaptivePerformance({
+      lowThreshold: 30,
+      mediumThreshold: 60,
+      highThreshold: 100,
+      monitoringInterval: throttle * 30,
+    });
 
   // Referencia para trackear el estado de idle
   const idleStateReference = useRef({

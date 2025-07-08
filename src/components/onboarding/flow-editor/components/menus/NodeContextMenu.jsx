@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import React, { useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { shallow } from 'zustand/shallow';
 
 import useFlowStore from '@/stores/use-flow-store';
@@ -44,7 +44,7 @@ const NodeContextMenu = ({ position, onClose }) => {
   }, [onClose]);
 
   if (!contextMenuItems || contextMenuItems.length === 0) {
-    return false;
+    return;
   }
 
   const menuStyle = {
@@ -81,25 +81,35 @@ const NodeContextMenu = ({ position, onClose }) => {
 
   return (
     <div ref={menuReference} style={menuStyle}>
-      {contextMenuItems.map((item, index) => (
-        <div
-          key={item.label || index}
-          style={menuItemStyle}
-          onClick={() => {
-            if (item.action) {
-              item.action();
-            }
-            onClose();
-          }}
-          onMouseEnter={handleMouseEnter}
-          onMouseLeave={handleMouseLeave}
-          role='menuitem'
-          tabIndex={0}
-        >
-          {item.icon && <span style={iconStyle}>{item.icon}</span>}
-          <span>{item.label}</span>
-        </div>
-      ))}
+      {contextMenuItems.map((item, index) => {
+        const handleAction = () => {
+          if (item.action) {
+            item.action();
+          }
+          onClose();
+        };
+
+        return (
+          <div
+            key={item.label || index}
+            style={menuItemStyle}
+            onClick={handleAction}
+            onKeyDown={(event) => {
+              if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                handleAction();
+              }
+            }}
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
+            role='menuitem'
+            tabIndex={0}
+          >
+            {item.icon && <span style={iconStyle}>{item.icon}</span>}
+            <span>{item.label}</span>
+          </div>
+        );
+      })}
     </div>
   );
 };

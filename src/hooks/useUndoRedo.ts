@@ -1,5 +1,6 @@
 // src/hooks/useUndoRedo.ts
 import { useCallback } from 'react';
+import type { Edge, Node } from 'reactflow';
 import { shallow } from 'zustand/shallow';
 
 import useFlowStore from '@/stores/use-flow-store';
@@ -56,7 +57,10 @@ export const useUndoRedo = (): UseUndoRedoReturn => {
   const addToHistory = useCallback(() => {
     if (!history) return;
 
-    const { nodes, edges } = useFlowStore.getState();
+    const { nodes, edges } = useFlowStore.getState() as {
+      nodes: Node[];
+      edges: Edge[];
+    };
     const entry = { type: 'snapshot', nodes, edges };
 
     // Clonación profunda para prevenir mutaciones.

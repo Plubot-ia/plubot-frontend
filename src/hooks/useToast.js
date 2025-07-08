@@ -1,5 +1,7 @@
 import { useState, useCallback } from 'react';
 
+import { createToastElement, applyToastStyles } from './toast-helpers';
+
 /**
  * Hook personalizado para mostrar notificaciones toast
  * @returns {Object} Métodos para mostrar y ocultar toasts
@@ -29,78 +31,33 @@ const useToast = () => {
   const showToast = useCallback(
     (message, type = 'info', duration = 3000) => {
       const id = Date.now().toString();
-      const toast = { id, message, type, duration };
+      const newToast = { id, message, type, duration };
 
-      // Crear elemento para el toast
-      const toastElement = document.createElement('div');
-      toastElement.id = `toast-${id}`;
-      toastElement.style.padding = '12px 16px';
-      toastElement.style.borderRadius = '8px';
-      toastElement.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.15)';
-      toastElement.style.minWidth = '250px';
-      toastElement.style.maxWidth = '350px';
-      toastElement.style.animation = 'toast-in 0.3s ease forwards';
-      toastElement.style.display = 'flex';
-      toastElement.style.justifyContent = 'space-between';
-      toastElement.style.alignItems = 'center';
+      const removeToastFromState = (previousToasts) =>
+        previousToasts.filter((t) => t.id !== id);
 
-      // Aplicar estilos según el tipo
-      const styleMap = {
-        success: { backgroundColor: '#4caf50', color: 'white' },
-        error: { backgroundColor: '#f44336', color: 'white' },
-        warning: { backgroundColor: '#ff9800', color: 'white' },
-        info: { backgroundColor: '#4facfe', color: 'white' },
+      const handleCloseAnimation = () => {
+        const toastElementToClose = document.querySelector(`#toast-${id}`);
+        if (toastElementToClose) {
+          toastElementToClose.remove();
+        }
+        setToasts(removeToastFromState);
       };
 
-      const toastStyles = styleMap[type] || styleMap.info;
-      Object.assign(toastElement.style, toastStyles);
-
-      // Crear contenido del toast
-      const messageElement = document.createElement('span');
-      messageElement.textContent = message;
-
-      // Crear botón de cierre
-      const closeButton = document.createElement('button');
-      closeButton.textContent = '×';
-      closeButton.style.background = 'none';
-      closeButton.style.border = 'none';
-      closeButton.style.color = 'inherit';
-      closeButton.style.fontSize = '18px';
-      closeButton.style.cursor = 'pointer';
-      closeButton.style.marginLeft = '8px';
-      closeButton.style.opacity = '0.8';
-      closeButton.style.transition = 'opacity 0.2s';
-      closeButton.addEventListener('mouseover', () => {
-        closeButton.style.opacity = '1';
-      });
-      closeButton.addEventListener('mouseout', () => {
-        closeButton.style.opacity = '0.8';
-      });
-
-      // Función para cerrar el toast
       const closeToast = () => {
-        toastElement.style.animation = 'toast-out 0.3s ease forwards';
-        setTimeout(() => {
-          const container = getToastContainer();
-          if (container.contains(toastElement)) {
-            toastElement.remove();
-          }
-          setToasts((previous) => previous.filter((t) => t.id !== id));
-        }, 300);
+        const toastElementToClose = document.querySelector(`#toast-${id}`);
+        if (toastElementToClose) {
+          toastElementToClose.style.animation = 'toast-out 0.3s ease forwards';
+          setTimeout(handleCloseAnimation, 300);
+        }
       };
 
-      // Agregar evento al botón de cierre
-      closeButton.addEventListener('click', closeToast);
+      const toastElement = createToastElement(id, message, closeToast);
+      applyToastStyles(toastElement, type);
 
-      // Agregar elementos al toast
-      toastElement.append(messageElement);
-      toastElement.append(closeButton);
-
-      // Agregar toast al contenedor
       const container = getToastContainer();
       container.append(toastElement);
 
-      // Agregar estilos de animación si no existen
       if (!document.querySelector('#toast-styles')) {
         const styleElement = document.createElement('style');
         styleElement.id = 'toast-styles';
@@ -117,49 +74,55 @@ const useToast = () => {
         document.head.append(styleElement);
       }
 
-      // Configurar cierre automático
       setTimeout(closeToast, duration);
 
-      // Actualizar estado
-      setToasts((previous) => [...previous, toast]);
+      setToasts((previousToasts) => [...previousToasts, newToast]);
 
-      // Retornar ID para posible referencia
       return id;
     },
     [getToastContainer],
   );
 
   // Ocultar un toast específico
-  const hideToast = useCallback(
-    (id) => {
-      const toastElement = document.querySelector(`#toast-${id}`);
-      if (toastElement) {
-        toastElement.style.animation = 'toast-out 0.3s ease forwards';
-        setTimeout(() => {
-          const container = getToastContainer();
-          if (container.contains(toastElement)) {
-            toastElement.remove();
-          }
-          setToasts((previous) => previous.filter((t) => t.id !== id));
-        }, 300);
+  const hideToast = useCallback((id) => {
+    const toastElement = document.querySelector(`#toast-${id}`);
+    if (!toastElement) return;
+
+    const removeToastFromState = (previousToasts) =>
+      previousToasts.filter((toast) => toast.id !== id);
+
+    const handleHide = () => {
+      if (document.body.contains(toastElement)) {
+        toastElement.remove();
       }
-    },
-    [getToastContainer],
-  );
+      setToasts(removeToastFromState);
+    };
+
+    toastElement.style.animation = 'toast-out 0.3s ease forwards';
+    setTimeout(handleHide, 300);
+  }, []);
 
   // Ocultar todos los toasts
   const hideAllToasts = useCallback(() => {
     const container = getToastContainer();
     const toastElements = container.querySelectorAll('[id^="toast-"]');
+
+    const handleHideAll = () => {
+      if (container) {
+        while (container.firstChild) {
+          container.firstChild.remove();
+        }
+      }
+      setToasts([]);
+    };
+
     for (const element of toastElements) {
       element.style.animation = 'toast-out 0.3s ease forwards';
     }
-    setTimeout(() => {
-      while (container.firstChild) {
-        container.firstChild.remove();
-      }
-      setToasts([]);
-    }, 300);
+
+    if (toastElements.length > 0) {
+      setTimeout(handleHideAll, 300);
+    }
   }, [getToastContainer]);
 
   return {

@@ -11,9 +11,7 @@ export const useModalManager = () => {
             detail: { modal: modalName, timestamp: Date.now() },
           }),
         );
-      } catch (error) {
-        console.error('Error dispatching open-modal event:', error);
-      }
+      } catch {}
     }
   }, []);
 
@@ -27,9 +25,7 @@ export const useModalManager = () => {
             detail: { modal: modalName, timestamp: Date.now() },
           }),
         );
-      } catch (error) {
-        console.error('Error dispatching close-modal event:', error);
-      }
+      } catch {}
     }
   }, []);
 

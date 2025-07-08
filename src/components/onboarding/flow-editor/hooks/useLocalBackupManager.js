@@ -13,22 +13,20 @@ const useLocalBackupManager = (plubotId) => {
       try {
         const backupData = { nodes, edges, timestamp: Date.now() };
         safeSetItem(`plubot-backup-${plubotId}`, backupData);
-      } catch {}
+      } catch {
+        // Silently catch errors
+      }
     },
     [plubotId],
   );
 
   const recoverFromBackup = useCallback(() => {
-    if (!plubotId) return null;
+    if (!plubotId) return;
 
     try {
       const backupData = safeGetItem(`plubot-backup-${plubotId}`);
-      if (backupData) {
-      }
       return backupData;
-    } catch {
-      return null;
-    }
+    } catch {}
   }, [plubotId]);
 
   const hasLocalBackup = useCallback(() => {
@@ -36,7 +34,7 @@ const useLocalBackupManager = (plubotId) => {
 
     try {
       const backupData = safeGetItem(`plubot-backup-${plubotId}`);
-      return !!backupData;
+      return Boolean(backupData);
     } catch {
       return false;
     }

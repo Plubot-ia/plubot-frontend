@@ -1,14 +1,6 @@
-import React, {
-  useRef,
-  useEffect,
-  useState,
-  useCallback,
-  useMemo,
-} from 'react';
+import { useRef, useEffect, useState, useCallback, useMemo } from 'react';
 
 import { useFlowNodesEdges, useFlowMeta } from '@/stores/selectors';
-
-import useWindowSize from '../../../../hooks/useWindowSize';
 
 import './CustomMiniMap.css';
 // Importar el sanitizador para prevenir errores con valores no finitos
@@ -42,22 +34,33 @@ const CustomMiniMap = ({
   // Preferir props sobre store (para mayor flexibilidad)
   const nodes = propertyNodes?.length ? propertyNodes : storeNodes || [];
   const edges = propertyEdges?.length ? propertyEdges : storeEdges || [];
-  const isUltraMode =
-    propertyIsUltraMode === undefined ? storeIsUltraMode : propertyIsUltraMode;
+
   // Sanitizar el viewport para evitar valores NaN o Infinity
   const viewport = sanitizeViewport(
     propertyViewport || { x: 0, y: 0, zoom: 1 },
   );
-  const { width: windowWidth, height: windowHeight } = useWindowSize();
   const canvasReference = useRef();
   const containerReference = useRef();
-  const [canvasReady, setCanvasReady] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
+  const [canvasReady, setCanvasReady] = useState(false);
   const [lastPosition, setLastPosition] = useState({ x: 0, y: 0 });
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+  const [windowHeight, setWindowHeight] = useState(window.innerHeight);
   const [isExpanded, setIsExpanded] = useState(propertyIsExpanded || false);
 
   // Función segura para mostrar mensajes
   const setByteMessage = propertySetByteMessage || (() => {});
+
+  // Efecto para actualizar el tamaño de la ventana
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowWidth(window.innerWidth);
+      setWindowHeight(window.innerHeight);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // Función para alternar expansión
   const handleToggle = useCallback(() => {
@@ -88,16 +91,6 @@ const CustomMiniMap = ({
     danger: '#ff2e5b',
   };
 
-  // Tamaños fijos para los nodos en el minimapa según su estado
-  const getNodeSize = (nodeType) => {
-    // Si es un nodo de inicio o fin, ligeramente más grande
-    if (nodeType === 'start' || nodeType === 'end') {
-      return isExpanded ? { width: 18, height: 14 } : { width: 4, height: 4 };
-    }
-    // Tamaño estándar para otros tipos de nodo
-    return isExpanded ? { width: 16, height: 12 } : { width: 3, height: 3 };
-  };
-
   // Filtrar nodos sin posición o dimensiones válidas y sanitizar sus valores
   const validNodes = useMemo(() => {
     if (!nodes || !Array.isArray(nodes)) return [];
@@ -111,8 +104,8 @@ const CustomMiniMap = ({
           typeof node.position.y === 'number' &&
           !Number.isNaN(node.position.x) &&
           !Number.isNaN(node.position.y) &&
-          isFinite(node.position.x) &&
-          isFinite(node.position.y)
+          Number.isFinite(node.position.x) &&
+          Number.isFinite(node.position.y)
         );
       })
       .map((node) => sanitizeNode(node));
@@ -164,7 +157,6 @@ const CustomMiniMap = ({
         bounds.minX -= 50;
         bounds.maxX += 50;
       }
-
       if (bounds.minY === bounds.maxY) {
         bounds.minY -= 50;
         bounds.maxY += 50;
@@ -184,10 +176,34 @@ const CustomMiniMap = ({
       // Sanitizar los bounds para asegurar que todos los valores son números finitos
       return sanitizeBounds({ ...bounds, centerX, centerY });
     } catch {
-      // En caso de error, devolver un límite por defecto para evitar que el componente falle
-      return { minX: 0, minY: 0, maxX: 100, maxY: 100 };
+      return {
+        minX: 0,
+        maxX: 100,
+        minY: 0,
+        maxY: 100,
+        centerX: 50,
+        centerY: 50,
+      };
     }
   }, [validNodes]);
+
+  const { scaleX, scaleY } = useMemo(() => {
+    if (!validNodes || validNodes.length === 0) {
+      return { scaleX: 1, scaleY: 1 };
+    }
+
+    const bounds = diagramBounds;
+
+    const diagramWidth = Math.max(bounds.maxX - bounds.minX, 1); // Evitar división por cero
+    const diagramHeight = Math.max(bounds.maxY - bounds.minY, 1); // Evitar división por cero
+
+    // Calcular la escala para mapear el diagrama al canvas
+    const scaleX = (width - 2 * padding) / diagramWidth;
+    const scaleY = (height - 2 * padding) / diagramHeight;
+    const scale = Math.min(scaleX, scaleY); // Usar la menor escala para mantener proporciones
+
+    return { scaleX, scaleY };
+  }, [validNodes, width, height, padding]);
 
   // Manejo de interacciones con el minimapa
   const handleMouseDown = useCallback(

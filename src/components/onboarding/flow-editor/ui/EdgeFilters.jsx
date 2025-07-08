@@ -1,5 +1,3 @@
-import React from 'react';
-
 /**
  * Componente EdgeFilters
  * Define filtros SVG avanzados para efectos visuales de élite en aristas

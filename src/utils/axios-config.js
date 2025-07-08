@@ -18,17 +18,17 @@ const instance = axios.create({
 
 // Interceptor de Solicitudes: Adjunta el token de autenticación a las cabeceras.
 instance.interceptors.request.use(
-  (config) => {
+  (configuration) => {
     const token = localStorage.getItem('access_token');
     if (token) {
       // Si existe un token, lo añade a la cabecera de autorización.
-      config.headers.Authorization = `Bearer ${token}`;
+      configuration.headers.Authorization = `Bearer ${token}`;
     }
-    return config;
+    return configuration;
   },
   (error) => {
-    // Si hay un error en la configuración de la solicitud, se rechaza la promesa.
-    return Promise.reject(error);
+    // Si hay un error en la configuración de la solicitud, se lanza para que sea capturado.
+    throw error;
   },
 );
 
@@ -42,41 +42,38 @@ instance.interceptors.response.use(
     // Manejo de error de autenticación (401) para refrescar el token.
     // Se comprueba `!originalRequest._retry` para evitar bucles infinitos de reintentos.
     if (error.response?.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true; // Marca la solicitud como reintentada.
+      originalRequest._retry = true;
+
+      const refreshToken = localStorage.getItem('refresh_token');
+
+      if (!refreshToken) {
+        // Si no hay token de refresco, es un logout definitivo.
+        emitEvent('auth:logout');
+        throw error;
+      }
 
       try {
-        const refreshToken = localStorage.getItem('refresh_token');
-        if (!refreshToken) {
-          // Si no hay refresh token, se emite un evento de logout y se rechaza.
-          emitEvent('auth:logout');
-          return Promise.reject(new Error('No refresh token available.'));
-        }
-
-        // Solicita un nuevo access token usando el refresh token.
-        const response = await instance.post('/auth/refresh', {
+        // Intentamos obtener un nuevo token de acceso.
+        const { data } = await instance.post('/auth/refresh', {
           refresh_token: refreshToken,
         });
 
-        const { access_token: newAccessToken } = response.data;
+        const { access_token: newAccessToken } = data;
+        localStorage.setItem('access_token', newAccessToken);
+        originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
 
-        if (newAccessToken) {
-          // Almacena el nuevo token y actualiza la cabecera de la solicitud original.
-          localStorage.setItem('access_token', newAccessToken);
-          originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
-          // Reintenta la solicitud original con el nuevo token.
-          return instance(originalRequest);
-        }
+        // Reintentamos la solicitud original con el nuevo token.
+        return instance(originalRequest);
       } catch (refreshError) {
-        // Si el refresco del token falla, se desloguea al usuario.
+        // Si el refresco falla (e.g., token de refresco inválido), es un logout definitivo.
         emitEvent('auth:logout');
-        return Promise.reject(refreshError);
+        throw refreshError;
       }
     }
 
-    // Para cualquier otro tipo de error, se rechaza la promesa.
-    return Promise.reject(error);
+    // Para cualquier otro error (no 401) o si el reintento ya falló, se rechaza la promesa.
+    throw error;
   },
 );
 
 export default instance;
-

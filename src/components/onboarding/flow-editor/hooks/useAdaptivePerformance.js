@@ -7,7 +7,7 @@
  *
  * VERSIÓN OPTIMIZADA: Se han eliminado los logs excesivos y las comprobaciones redundantes
  */
-import { throttle } from 'lodash';
+
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useStore as useZustandStore } from 'zustand';
 
@@ -26,9 +26,9 @@ const useAdaptivePerformance = ({
   // Estado y referencias para el sistema de rendimiento unificado
   const [optimizationLevel, setOptimizationLevel] = useState('none'); // none, low, medium, high, ultra
   const [hasAutoOptimized, setHasAutoOptimized] = useState(false);
+  const lastActionTime = useRef(Date.now());
 
   // Referencias para mediciones de rendimiento
-  const lastActionTime = useRef(Date.now());
   const monitoringTimerReference = useRef(null);
   const frameTimeReference = useRef([]);
   const fpsReference = useRef(60);
@@ -50,10 +50,6 @@ const useAdaptivePerformance = ({
     useFlowStore,
     (state) => state.isUltraMode,
   );
-  const toggleUltraMode = useZustandStore(
-    useFlowStore,
-    (state) => state.toggleUltraMode,
-  );
 
   /**
    * Calcula el nivel de complejidad del flujo basado en nodos y aristas
@@ -68,10 +64,10 @@ const useAdaptivePerformance = ({
 
     // Factor adicional para tipos de nodos complejos (decisión, acción)
     const complexNodeCount = nodes.filter(
-      (n) =>
-        n.type === 'decisionNode' ||
-        n.type === 'actionNode' ||
-        n.type === 'httpRequestNode',
+      (node) =>
+        node.type === 'decisionNode' ||
+        node.type === 'actionNode' ||
+        node.type === 'httpRequestNode',
     ).length;
 
     // Penalización por nodos complejos
@@ -107,9 +103,6 @@ const useAdaptivePerformance = ({
     const frameTimes = frameTimeReference.current;
 
     if (frameTimes.length > 0) {
-      const lastFrameTime = frameTimes.at(-1);
-      const frameTime = now - lastFrameTime;
-
       // Añadir tiempo actual y mantener solo los últimos 30 frames
       frameTimes.push(now);
       if (frameTimes.length > 30) frameTimes.shift();
@@ -358,9 +351,6 @@ const useAdaptivePerformance = ({
     };
   }, []);
 
-  // Aplicar el throttling a la función de actualización para casos de uso frecuente
-  const throttledUpdatePerformance = throttle(updatePerformance, 1000);
-
   return {
     // Estado
     optimizationLevel,
@@ -368,7 +358,6 @@ const useAdaptivePerformance = ({
 
     // Funciones principales
     updatePerformance,
-    throttledUpdatePerformance,
     startMonitoring,
     measurePerformance,
     getStats,

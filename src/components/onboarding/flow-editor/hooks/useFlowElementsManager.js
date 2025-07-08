@@ -121,10 +121,10 @@ const useFlowElementsManager = (saveHistoryState, setHasChanges) => {
     (nodeId) => {
       if (!nodeId) return;
       saveHistoryState(nodes, edges);
-      const newNodes = nodes.filter((n) => n.id !== nodeId);
+      const newNodes = nodes.filter((node) => node.id !== nodeId);
       setNodes(newNodes);
       const newEdges = edges.filter(
-        (e) => e.source !== nodeId && e.target !== nodeId,
+        (edge) => edge.source !== nodeId && edge.target !== nodeId,
       );
       setEdges(newEdges);
       setHasChanges(true);
@@ -156,7 +156,7 @@ const useFlowElementsManager = (saveHistoryState, setHasChanges) => {
     (edgeId) => {
       if (!edgeId) return;
       saveHistoryState(nodes, edges);
-      const newEdges = edges.filter((e) => e.id !== edgeId);
+      const newEdges = edges.filter((edge) => edge.id !== edgeId);
       setEdges(newEdges);
       setHasChanges(true);
     },

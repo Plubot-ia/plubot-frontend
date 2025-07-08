@@ -256,6 +256,7 @@ ParameterFields.propTypes = {
   parameters: PropTypes.object.isRequired,
   onParameterChange: PropTypes.func.isRequired,
 };
+
 ParameterFields.displayName = 'ParameterFields';
 
 const ActionNode = ({ data, isConnectable = true, selected = false, id }) => {

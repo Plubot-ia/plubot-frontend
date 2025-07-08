@@ -10,7 +10,7 @@ export interface FlowValidationError {
 export interface UseFlowValidationReturn {
   flowErrors: FlowValidationError[];
   validateFlow: () => Promise<FlowValidationError[]>;
-  getNodeErrors: (nodeId: string) => FlowValidationError[];
+  getNodeErrors: () => FlowValidationError[];
 }
 
 export const useFlowValidation = (): UseFlowValidationReturn => {
@@ -20,7 +20,7 @@ export const useFlowValidation = (): UseFlowValidationReturn => {
       // STUB: Futura implementación asíncrona. Se retorna una promesa para mantener la firma.
       return Promise.resolve([]);
     },
-    getNodeErrors: (_nodeId: string) => {
+    getNodeErrors: () => {
       // STUB: El parámetro no se utiliza en la implementación actual.
       return [];
     },

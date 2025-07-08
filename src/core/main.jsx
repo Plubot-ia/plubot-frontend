@@ -13,12 +13,7 @@ if (globalThis.isMobile) {
   (async () => {
     try {
       await import('./mobile-optimizations.css');
-      // eslint-disable-next-line no-console
-      console.info('Optimizaciones móviles cargadas exitosamente.');
-    } catch (error) {
-      // eslint-disable-next-line no-console
-      console.error('Error al cargar las optimizaciones móviles:', error);
-    }
+    } catch {}
   })();
 }
 

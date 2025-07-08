@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import React, { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect } from 'react';
 
 import { fixAllEdgeHandles, nodesExistInDOM } from '../utils/handleFixer';
 
@@ -14,8 +14,6 @@ import { fixAllEdgeHandles, nodesExistInDOM } from '../utils/handleFixer';
  * @param {Function} props.setEdges - Función para establecer las aristas
  */
 const EdgeConsistencyMonitor = ({ edges, setEdges }) => {
-  const previousEdgesReference = useRef([]);
-
   // Función para verificar la consistencia de las aristas, extraída y optimizada
   const checkEdgeConsistency = useCallback(() => {
     const localEdges = localStorage.getItem('plubot-flow-edges');
@@ -70,8 +68,6 @@ const EdgeConsistencyMonitor = ({ edges, setEdges }) => {
 
   useEffect(() => {
     if (!edges || !Array.isArray(edges) || !setEdges) return;
-
-    previousEdgesReference.current = [...edges];
 
     const timer = setTimeout(checkEdgeConsistency, 1000);
     const handleEdgesChanged = () => setTimeout(checkEdgeConsistency, 100);

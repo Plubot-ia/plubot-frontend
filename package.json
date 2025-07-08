@@ -5,7 +5,7 @@
     "build": "vite build",
     "dev": "vite",
     "preview": "vite preview",
-    "lint": "eslint --ext .js,.jsx,.ts,.tsx --max-warnings 0"
+    "lint": "eslint src --max-warnings 0"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
@@ -73,6 +73,7 @@
     "@vitejs/plugin-react": "^4.4.1",
     "eslint": "^9.29.0",
     "eslint-config-prettier": "^10.1.5",
+    "eslint-formatter-unix": "^8.40.0",
     "eslint-import-resolver-alias": "^1.1.2",
     "eslint-import-resolver-typescript": "^4.4.4",
     "eslint-import-resolver-vite": "^2.1.0",

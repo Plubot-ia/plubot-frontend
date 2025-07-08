@@ -6,8 +6,6 @@
  * Se inyecta dinámicamente en la aplicación sin necesidad de modificar los componentes existentes.
  */
 
-import React from 'react';
-
 class PerformanceMonitor {
   constructor() {
     this.container = undefined;

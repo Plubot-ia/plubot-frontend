@@ -8,12 +8,13 @@
 
 // External Libraries
 import PropTypes from 'prop-types';
-import React, {
+import {
   useCallback,
   useEffect,
   useMemo,
   useRef,
   useState,
+  useTransition,
 } from 'react';
 import ReactFlow, { Controls, useReactFlow, useViewport } from 'reactflow';
 import 'reactflow/dist/style.css';
@@ -136,6 +137,7 @@ const FlowMain = ({
   // Props for canvas behavior - utilizamos valores predeterminados si no se proporcionan
   minZoom = MIN_ZOOM,
 }) => {
+  const [, startTransition] = useTransition();
   // Props are now directly available from the function signature's destructuring.
   // For clarity, `setReactFlowInstance` from props is aliased to `externalSetReactFlowInstance` if needed for callbacks.
   const externalSetReactFlowInstance = setReactFlowInstance;
@@ -210,7 +212,7 @@ const FlowMain = ({
   // Determinar si se están usando nodos externos o internos
   const nodes = externalNodes ?? zustandNodes;
   const edges = useMemo(
-    () => (areEdgesReady ? externalEdges ?? zustandEdges : []),
+    () => (areEdgesReady ? (externalEdges ?? zustandEdges) : []),
     [areEdgesReady, externalEdges, zustandEdges],
   );
 
@@ -306,14 +308,19 @@ const FlowMain = ({
 
   // Inyectar el nivel de LOD en las aristas visibles para sincronizar su apariencia.
   const edgesWithLOD = useMemo(() => {
+    // La animación de las aristas depende tanto del modo ultra como del nivel de LOD.
+    // Se animan solo en modo normal y con el máximo nivel de detalle.
+    const areEdgesAnimated = !isUltraMode && lodLevel === LOD_LEVELS.FULL;
+
     return visibleEdges.map((edge) => ({
       ...edge,
+      animated: areEdgesAnimated,
       data: {
         ...edge.data,
         lodLevel, // Inyectar el mismo lodLevel que a los nodos.
       },
     }));
-  }, [visibleEdges, lodLevel]);
+  }, [visibleEdges, lodLevel, isUltraMode]);
 
   // INSTRUMENTATION: Log virtualization stats
   // --- FIN DEL NUEVO SISTEMA DE VIRTUALIZACIÓN ---
@@ -1231,9 +1238,8 @@ const FlowMain = ({
                         }),
                       );
                     }
-                  } catch (error) {
-                    // eslint-disable-next-line no-console
-                    console.error('Error importing flow:', error);
+                  } catch {
+                    // No-op
                   }
                 });
               }}

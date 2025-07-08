@@ -1,9 +1,8 @@
-import React, { useCallback } from 'react';
+import { useCallback } from 'react';
 
+import useFlowStore from '@/stores/use-flow-store';
 import useTrainingStore from '@/stores/use-training-store';
-import { nodeConfig } from '@/utils/node-config.js';
-
-import useFlowStore from '@/stores/useFlowStore';
+import { NODE_LABELS, getNodeInitialData } from '@/utils/node-config.js';
 
 /**
  * Hook para la gestión de nodos en el editor de flujos
@@ -30,15 +29,14 @@ export const useNodeManagement = () => {
   const createNode = useCallback(
     (type, position, customData = {}) => {
       // Obtener configuración del tipo de nodo
-      const nodeType = nodeConfig[type];
-      if (!nodeType) {
+      const label = NODE_LABELS[type];
+      if (!label) {
         return;
       }
 
       // Crear datos iniciales para el nodo
       const initialData = {
-        label: nodeType.label || 'Nuevo Nodo',
-        ...nodeType.defaultData,
+        ...getNodeInitialData(type, label),
         ...customData,
       };
 
@@ -101,7 +99,7 @@ export const useNodeManagement = () => {
    */
   const duplicateNode = useCallback(
     (nodeId) => {
-      const nodeToClone = nodes.find((n) => n.id === nodeId);
+      const nodeToClone = nodes.find((node) => node.id === nodeId);
       if (!nodeToClone) return;
 
       // Crear una nueva posición ligeramente desplazada

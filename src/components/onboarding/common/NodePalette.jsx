@@ -18,7 +18,8 @@ import {
   StopCircle,
   Zap,
 } from 'lucide-react';
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import PropTypes from 'prop-types';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 
 import { powers as powerNodesDataList } from '@/data/powers.js';
@@ -37,10 +38,10 @@ const filterItems = (items, term, isPower = false) => {
   if (!term) return items;
   const lowercasedTerm = term.toLowerCase();
   return items.filter((item) => {
-    const label = isPower ? item.name : item.label;
-    const description = isPower ? item.description : item.description;
+    const { name, label, description } = item;
+    const itemLabel = isPower ? name : label;
     return (
-      (label && label.toLowerCase().includes(lowercasedTerm)) ||
+      (itemLabel && itemLabel.toLowerCase().includes(lowercasedTerm)) ||
       (description && description.toLowerCase().includes(lowercasedTerm))
     );
   });
@@ -128,6 +129,92 @@ const getNodeIcon = (iconIdentifier) => {
       return <AlertTriangle size={20} title='Icono Desconocido' />;
     }
   }
+};
+
+const NodeListItem = ({
+  item,
+  isPower = false,
+  favoriteNodes,
+  setFavoriteNodes,
+  onDragStart,
+  onDragEndNode,
+}) => {
+  const label = isPower ? item.title : item.label;
+  const icon = isPower ? item.icon : getNodeIcon(item.icon || item.type);
+  const isFavorite = favoriteNodes.includes(
+    isPower ? `power-${item.id}` : item.type,
+  );
+  const nodeType = isPower ? item.id : item.type;
+  const nodeReference = useRef(undefined);
+
+  const handleDragStart = useCallback(
+    (event_) => {
+      if (nodeReference.current) {
+        nodeReference.current.classList.add('dragging');
+      }
+      onDragStart(
+        event_,
+        nodeType,
+        label,
+        item.category || 'basic',
+        isPower ? item : undefined,
+      );
+    },
+    [nodeType, label, item, isPower, onDragStart],
+  );
+
+  const handleDragEnd = useCallback(
+    (event_) => {
+      if (nodeReference.current) {
+        nodeReference.current.classList.remove('dragging');
+      }
+      onDragEndNode(event_);
+    },
+    [onDragEndNode],
+  );
+
+  return (
+    <div
+      ref={nodeReference}
+      className='ts-draggable-node'
+      draggable
+      onDragStart={handleDragStart}
+      onDragEnd={handleDragEnd}
+      data-node-type={nodeType}
+      data-node-label={label}
+    >
+      <div className='ts-node-icon'>{icon}</div>
+      <div className='ts-node-label'>{label}</div>
+      <button
+        className='ts-favorite-button'
+        onClick={(event_) => {
+          event_.stopPropagation();
+          const nodeId = isPower ? `power-${item.id}` : item.type;
+          if (isFavorite) {
+            setFavoriteNodes((previousFavoriteNodes) =>
+              previousFavoriteNodes.filter((id) => id !== nodeId),
+            );
+          } else {
+            setFavoriteNodes((previousFavoriteNodes) => [
+              ...previousFavoriteNodes,
+              nodeId,
+            ]);
+          }
+        }}
+      >
+        {isFavorite ? <Star size={16} fill='gold' /> : <Star size={16} />}
+      </button>
+    </div>
+  );
+};
+
+NodeListItem.propTypes = {
+  item: PropTypes.object.isRequired,
+  isPower: PropTypes.bool,
+  favoriteNodes: PropTypes.array.isRequired,
+  setFavoriteNodes: PropTypes.func.isRequired,
+  onDragStart: PropTypes.func.isRequired,
+  onDragEndNode: PropTypes.func.isRequired,
 };
 
 const basicNodesConfig = NODE_CATEGORIES.find((cat) => cat.id === 'basic');
@@ -356,86 +443,6 @@ const NodePalette = () => {
     }));
   };
 
-  const NodeListItem = useCallback(
-    ({ item, isPower = false }) => {
-      const label = isPower ? item.title : item.label;
-      const icon = isPower ? item.icon : getNodeIcon(item.icon || item.type); // getNodeIcon is a helper
-      const isFavorite = favoriteNodes.includes(
-        isPower ? `power-${item.id}` : item.type,
-      );
-
-      // Determine the correct nodeType for React Flow
-      // For power nodes, use their specific ID (e.g., 'discord')
-      // For other nodes, use their defined type (e.g., 'message')
-      const nodeType = isPower ? item.id : item.type;
-
-      const nodeReference = useRef(undefined);
-
-      const handleDragStart = useCallback(
-        (event_) => {
-          if (nodeReference.current) {
-            nodeReference.current.classList.add('dragging');
-          }
-          // Pass the corrected nodeType to the onDragStart handler from NodePalette props
-          onDragStart(
-            event_,
-            nodeType,
-            label,
-            item.category || 'basic',
-            isPower ? item : undefined,
-          );
-        },
-        [nodeType, label, item, isPower, onDragStart],
-      ); // Added onDragStart to dependencies
-
-      const handleDragEnd = useCallback(
-        (event_) => {
-          if (nodeReference.current) {
-            nodeReference.current.classList.remove('dragging');
-          }
-          onDragEndNode(event_); // onDragEndNode is from NodePalette props
-        },
-        [onDragEndNode],
-      ); // Added onDragEndNode to dependencies
-
-      return (
-        <div
-          ref={nodeReference}
-          className='ts-draggable-node'
-          draggable
-          onDragStart={handleDragStart}
-          onDragEnd={handleDragEnd}
-          data-node-type={nodeType} // This data attribute now holds the correct type
-          data-node-label={label}
-        >
-          <div className='ts-node-icon'>{icon}</div>
-          <div className='ts-node-label'>{label}</div>
-          <button
-            className='ts-favorite-button'
-            onClick={(event_) => {
-              event_.stopPropagation();
-              const nodeId = isPower ? `power-${item.id}` : item.type;
-              // Use functional updates for setting state based on previous state
-              if (isFavorite) {
-                setFavoriteNodes((previousFavoriteNodes) =>
-                  previousFavoriteNodes.filter((id) => id !== nodeId),
-                );
-              } else {
-                setFavoriteNodes((previousFavoriteNodes) => [
-                  ...previousFavoriteNodes,
-                  nodeId,
-                ]);
-              }
-            }}
-          >
-            {isFavorite ? <Star size={16} fill='gold' /> : <Star size={16} />}
-          </button>
-        </div>
-      );
-    },
-    [onDragStart, onDragEndNode, favoriteNodes, setFavoriteNodes, getNodeIcon],
-  ); // Added getNodeIcon to dependencies, ensure it's stable or memoized if from props
-
   return (
     <div
       className={`ts-node-palette ${isPaletteExpanded ? 'ts-expanded' : 'ts-collapsed'}`}
@@ -488,7 +495,14 @@ const NodePalette = () => {
               {expandedSections.basic && filteredBasicNodes.length > 0 && (
                 <div className='ts-section-nodes'>
                   {filteredBasicNodes.map((node) => (
-                    <NodeListItem key={node.type} item={node} />
+                    <NodeListItem
+                      key={node.type}
+                      item={node}
+                      favoriteNodes={favoriteNodes}
+                      setFavoriteNodes={setFavoriteNodes}
+                      onDragStart={onDragStart}
+                      onDragEndNode={onDragEndNode}
+                    />
                   ))}
                 </div>
               )}
@@ -518,7 +532,14 @@ const NodePalette = () => {
                 filteredAdvancedNodes.length > 0 && (
                   <div className='ts-section-nodes'>
                     {filteredAdvancedNodes.map((node) => (
-                      <NodeListItem key={node.type} item={node} />
+                      <NodeListItem
+                        key={node.type}
+                        item={node}
+                        favoriteNodes={favoriteNodes}
+                        setFavoriteNodes={setFavoriteNodes}
+                        onDragStart={onDragStart}
+                        onDragEndNode={onDragEndNode}
+                      />
                     ))}
                   </div>
                 )}
@@ -547,7 +568,15 @@ const NodePalette = () => {
               {expandedSections.power && filteredPowerNodes.length > 0 && (
                 <div className='ts-section-nodes'>
                   {filteredPowerNodes.map((powerNode) => (
-                    <NodeListItem key={powerNode.id} item={powerNode} isPower />
+                    <NodeListItem
+                      key={powerNode.id}
+                      item={powerNode}
+                      isPower
+                      favoriteNodes={favoriteNodes}
+                      setFavoriteNodes={setFavoriteNodes}
+                      onDragStart={onDragStart}
+                      onDragEndNode={onDragEndNode}
+                    />
                   ))}
                 </div>
               )}

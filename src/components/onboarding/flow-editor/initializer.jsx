@@ -4,10 +4,7 @@
  * Se debe importar en los puntos de entrada de la aplicación
  */
 
-import React, { useEffect } from 'react';
-
 import '../utils/init-systems';
-import { setByteMessage } from '../utils/notification-manager';
 
 // window.setByteMessage assignment removed, notifications handled by GlobalProvider.
 
@@ -16,12 +13,7 @@ import { setByteMessage } from '../utils/notification-manager';
  * y los pone a disposición de toda la aplicación
  */
 const SystemInitializer = ({ children }) => {
-  useEffect(() => {
-    // Los logs de inicialización y el interceptor de errores
-    // se han eliminado para limpiar el código de producción.
-  }, []);
-
-  return <>{children}</>;
+  return children;
 };
 
 export default SystemInitializer;

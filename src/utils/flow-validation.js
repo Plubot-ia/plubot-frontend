@@ -702,11 +702,6 @@ export const optimizeNodeLayout = (nodes, edges) => {
   const assignLevels = (nodeId, level = 0) => {
     // Guarda de seguridad para prevenir prototype pollution y asegurar la integridad del índice.
     if (typeof level !== 'number' || !Number.isInteger(level) || level < 0) {
-      // eslint-disable-next-line no-console
-      console.error(
-        'Error de seguridad: Se detectó un nivel inválido al optimizar el layout.',
-        level,
-      );
       return;
     }
 

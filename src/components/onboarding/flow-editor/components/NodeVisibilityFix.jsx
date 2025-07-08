@@ -1,5 +1,3 @@
-import React from 'react';
-
 /**
  * Componente simplificado que no hace nada
  * Mantenido por compatibilidad

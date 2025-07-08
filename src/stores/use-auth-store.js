@@ -61,8 +61,11 @@ const useAuthStore = create(
             const { data } = loginResponse;
 
             if (data?.success === true) {
-              // Guardar el token
+              // Guardar los tokens de acceso y refresco
               localStorage.setItem('access_token', data.access_token);
+              if (data.refresh_token) {
+                localStorage.setItem('refresh_token', data.refresh_token);
+              }
 
               // Obtener el perfil del usuario
               const profileResponse = await instance.get('auth/profile', {
@@ -136,8 +139,11 @@ const useAuthStore = create(
             const { data } = response;
 
             if (data?.success === true) {
-              // Guardar el token
+              // Guardar los tokens de acceso y refresco
               localStorage.setItem('access_token', data.access_token);
+              if (data.refresh_token) {
+                localStorage.setItem('refresh_token', data.refresh_token);
+              }
 
               set({
                 user: data.user,
@@ -167,7 +173,6 @@ const useAuthStore = create(
               loading: false,
               error: errorMessage,
             });
-
             throw new Error(errorMessage);
           }
         },
@@ -175,116 +180,63 @@ const useAuthStore = create(
         // Cerrar sesión
         logout: async () => {
           set({ loading: true });
+          const accessToken = localStorage.getItem('access_token');
 
           try {
-            // Limpiar token
-            localStorage.removeItem('access_token');
-
-            // Notificar al backend (esto no debería fallar)
-            try {
-              await instance.post('auth/logout');
-            } catch (error) {
-              logger.error(
-                'Error al notificar al backend sobre el cierre de sesión',
-                error,
-              );
+            // Solo intentar el logout del backend si el usuario está autenticado.
+            if (accessToken) {
+              const refreshToken = localStorage.getItem('refresh_token');
+              await instance.post('/auth/logout', {
+                refresh_token: refreshToken,
+              });
             }
-
-            // Limpiar estado
-            set({
-              user: undefined,
-              isAuthenticated: false,
-              loading: false,
-              profile: {
-                energyLevel: 0,
-                dailyRewardAvailable: true,
-                recentActivities: [],
-                isLoading: false,
-                isLoaded: false,
-                profileId: undefined,
-                terminalId: undefined,
-              },
-            });
-
-            // Limpiar la caché
-            get()._profileCache.clear();
-
-            return { success: true };
           } catch (error) {
-            logger.error('Error al cerrar sesión', error);
-
-            // Limpiar de todos modos
+            // No bloquear el logout si la llamada a la API falla, pero registrarlo.
+            logger.warn(
+              'La llamada a /auth/logout falló, pero se continuará con el logout local.',
+              error,
+            );
+          } finally {
+            // Esta limpieza es crítica y debe ocurrir siempre.
+            get()._profileCache.clear();
+            localStorage.removeItem('access_token');
+            localStorage.removeItem('refresh_token');
             set({
               user: undefined,
               isAuthenticated: false,
               loading: false,
+              error: undefined, // Limpiar errores previos
             });
-
-            return { success: true };
           }
         },
 
         // Verificar autenticación
         checkAuth: async () => {
-          const token = localStorage.getItem('access_token');
-          if (!token) {
-            set({
-              user: undefined,
-              isAuthenticated: false,
-              loading: false,
-            });
-            return { success: false, user: undefined };
+          const accessToken = localStorage.getItem('access_token');
+          const refreshToken = localStorage.getItem('refresh_token');
+
+          // Si falta alguno de los dos tokens, la sesión no es válida.
+          if (!accessToken || !refreshToken) {
+            if (get().isAuthenticated) {
+              // Limpia el estado y los tokens residuales.
+              get().logout();
+            }
+            return;
           }
 
+          // Si tenemos tokens, intentamos cargar el perfil para validar la sesión
           set({ loading: true });
-
           try {
-            const response = await instance.get('auth/profile', {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-              timeout: 10_000,
-            });
-
-            const { data } = response;
-
-            if (data?.user) {
-              if (!data.user.is_verified) {
-                localStorage.removeItem('access_token');
-                set({
-                  user: undefined,
-                  isAuthenticated: false,
-                  loading: false,
-                  error:
-                    'Por favor verifica tu correo antes de iniciar sesión.',
-                });
-                return { success: false, user: undefined };
-              }
-
-              set({
-                user: data.user,
-                isAuthenticated: true,
-                loading: false,
-              });
-              return { success: true, user: data.user };
-            }
-
-            localStorage.removeItem('access_token');
-            set({
-              user: undefined,
-              isAuthenticated: false,
-              loading: false,
-            });
-            return { success: false, user: undefined };
+            // fetchUserProfile ya tiene lógica de caché y manejo de errores robusto
+            await get().fetchUserProfile();
+            set({ loading: false });
           } catch (error) {
-            logger.error('Error al verificar autenticación', error);
-            localStorage.removeItem('access_token');
-            set({
-              user: undefined,
-              isAuthenticated: false,
-              loading: false,
-            });
-            return { success: false, user: undefined };
+            // fetchUserProfile ya maneja el logout en caso de 401
+            logger.error(
+              'checkAuth falló al intentar recargar el perfil',
+              error,
+            );
+            set({ loading: false }); // Asegurarse de que el loading se detenga
           }
         },
 

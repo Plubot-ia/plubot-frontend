@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import React from 'react';
+import { useEffect } from 'react';
 
 import CustomMiniMap from '../ui/CustomMiniMap';
 
@@ -15,21 +15,27 @@ const MiniMapWrapper = ({
   viewport,
   setByteMessage,
 }) => {
-  // Bandera global para controlar si el mapa ya se ha renderizado
-  if (globalThis.window !== undefined && !globalThis._miniMapRendered) {
+  // Efecto para gestionar la bandera global de forma segura y limpia.
+  useEffect(() => {
+    // Marcar como renderizado al montar el componente.
     globalThis._miniMapRendered = true;
 
-    return (
-      <CustomMiniMap
-        nodes={nodes}
-        edges={edges}
-        isExpanded={isExpanded}
-        isUltraMode={isUltraMode}
-        viewport={viewport}
-        setByteMessage={setByteMessage}
-      />
-    );
-  }
+    // Función de limpieza: se ejecuta al desmontar el componente.
+    return () => {
+      globalThis._miniMapRendered = false;
+    };
+  }, []); // El array vacío asegura que el efecto se ejecute solo una vez (al montar/desmontar).
+
+  return (
+    <CustomMiniMap
+      nodes={nodes}
+      edges={edges}
+      isExpanded={isExpanded}
+      isUltraMode={isUltraMode}
+      viewport={viewport}
+      setByteMessage={setByteMessage}
+    />
+  );
 };
 
 MiniMapWrapper.propTypes = {

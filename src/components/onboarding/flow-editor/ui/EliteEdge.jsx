@@ -1,12 +1,5 @@
 import PropTypes from 'prop-types';
-import React, {
-  memo,
-  useState,
-  useEffect,
-  useRef,
-  useMemo,
-  useCallback,
-} from 'react';
+import { memo, useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { getBezierPath } from 'reactflow';
 
 import useFlowStore from '@/stores/use-flow-store';
@@ -946,4 +939,4 @@ EliteEdgeComponent.propTypes = {
 
 EliteEdgeComponent.displayName = 'EliteEdge';
 
-export default React.memo(EliteEdgeComponent);
+export default memo(EliteEdgeComponent);

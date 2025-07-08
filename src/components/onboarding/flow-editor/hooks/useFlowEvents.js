@@ -26,7 +26,7 @@ export const useFlowEvents = (
     (params) => {
       if (isValidConnection(params)) {
         const newEdge = { ...params, type: 'smoothstep' };
-        setEdges((eds) => addEdge(newEdge, eds));
+        setEdges((currentEdges) => addEdge(newEdge, currentEdges));
         takeSnapshot();
       }
     },
@@ -41,7 +41,9 @@ export const useFlowEvents = (
     (oldEdge, newConnection) => {
       if (isValidConnection(newConnection)) {
         edgeUpdateSuccessful.current = true;
-        setEdges((els) => updateEdge(oldEdge, newConnection, els));
+        setEdges((currentEdges) =>
+          updateEdge(oldEdge, newConnection, currentEdges),
+        );
         takeSnapshot();
       }
     },

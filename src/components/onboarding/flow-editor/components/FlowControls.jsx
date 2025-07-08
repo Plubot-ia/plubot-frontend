@@ -1,9 +1,6 @@
 import PropTypes from 'prop-types';
-import React from 'react';
 import { BsLightningFill } from 'react-icons/bs';
-import { FiSave, FiMap, FiRefreshCw } from 'react-icons/fi';
-
-import useFlowStore from '@/stores/useFlowStore';
+import { FiSave, FiMap } from 'react-icons/fi';
 
 /**
  * Controles para el editor de flujo
@@ -25,13 +22,6 @@ const FlowControls = ({
   hasAutoOptimized,
   optimizationLevel,
 }) => {
-  const fitView = useFlowStore((state) => state.reactFlowInstance?.fitView);
-
-  const handleForceFitView = () => {
-    if (fitView) {
-      fitView({ padding: 0.2, duration: 0 });
-    }
-  };
   return (
     <div className='flow-controls'>
       {/* Controles de guardado */}
@@ -62,16 +52,6 @@ const FlowControls = ({
         {hasAutoOptimized && (
           <span className='auto-optimized-indicator'>Auto</span>
         )}
-      </button>
-
-      {/* Botón de diagnóstico temporal */}
-      <button
-        className='control-button diagnostic-button'
-        onClick={handleForceFitView}
-        title='Forzar FitView (Diagnóstico)'
-        style={{ backgroundColor: 'orange', color: 'black' }} // Estilo temporal para visibilidad
-      >
-        <FiRefreshCw /> Test FitView
       </button>
 
       {/* Indicador de nivel de optimización */}

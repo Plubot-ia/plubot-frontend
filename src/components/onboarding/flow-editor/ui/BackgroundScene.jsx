@@ -1,4 +1,4 @@
-import React, { useRef, useCallback, useEffect, useMemo } from 'react';
+import { useRef, useEffect, memo } from 'react';
 
 import useFlowStore from '@/stores/use-flow-store'; // Importar store de Zustand
 
@@ -31,7 +31,7 @@ const BackgroundScene = () => {
   const canvasReference = useRef(null);
   const staticCanvasReference = useRef(null);
   const animationReference = useRef(null);
-  const mousePosition = useRef({ x: null, y: null });
+  const mousePosition = useRef({ x: undefined, y: undefined });
 
   // Efecto para el modo normal con partículas animadas
   useEffect(() => {
@@ -40,13 +40,13 @@ const BackgroundScene = () => {
       // Si hay una animación en curso, la cancelamos.
       if (animationReference.current) {
         cancelAnimationFrame(animationReference.current);
-        animationReference.current = null;
+        animationReference.current = undefined;
       }
       return;
     }
 
     // Usar la referencia global en lugar de una variable local
-    animationReference.current = null;
+    animationReference.current = undefined;
 
     const canvas = canvasReference.current;
     const staticCanvas = staticCanvasReference.current;
@@ -265,21 +265,21 @@ const BackgroundScene = () => {
     animationReference.current = requestAnimationFrame(animate);
 
     let ticking = false;
-    const handleMouseMove = (e) => {
+    const handleMouseMove = (event) => {
       if (!ticking) {
         requestAnimationFrame(() => {
-          mousePosition.current = { x: e.clientX, y: e.clientY };
+          mousePosition.current = { x: event.clientX, y: event.clientY };
           ticking = false;
         });
         ticking = true;
       }
     };
 
-    const handleTouchMove = (e) => {
-      if (e.touches && e.touches[0]) {
+    const handleTouchMove = (event) => {
+      if (event.touches && event.touches[0]) {
         mousePosition.current = {
-          x: e.touches[0].clientX,
-          y: e.touches[0].clientY,
+          x: event.touches[0].clientX,
+          y: event.touches[0].clientY,
         };
       }
     };
@@ -291,7 +291,7 @@ const BackgroundScene = () => {
     return () => {
       if (animationReference.current) {
         cancelAnimationFrame(animationReference.current);
-        animationReference.current = null;
+        animationReference.current = undefined;
       }
       globalThis.removeEventListener('mousemove', handleMouseMove);
       globalThis.removeEventListener('touchmove', handleTouchMove);
@@ -379,4 +379,4 @@ const BackgroundScene = () => {
   );
 };
 
-export default React.memo(BackgroundScene);
+export default memo(BackgroundScene);

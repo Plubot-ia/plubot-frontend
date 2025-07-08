@@ -1,4 +1,4 @@
-import React, { memo } from 'react';
+import { memo } from 'react';
 
 import EliteEdge from './EliteEdge';
 
@@ -34,9 +34,7 @@ const SafeEdgeWrapper = (properties) => {
   // Intentar renderizar EliteEdge con propiedades seguras
   try {
     return <EliteEdge {...safeProperties} />;
-  } catch (error) {
-    // eslint-disable-next-line no-console
-    console.error('Error al renderizar EliteEdge, usando fallback:', error);
+  } catch {
     // Renderizar una arista básica en caso de error
     return (
       <g>

@@ -29,7 +29,7 @@ const useAPI = () => {
       return response.data;
     } catch (requestError) {
       setLoading(false);
-      const status = requestError.response?.status || 'unknown';
+
       const errorMessage =
         requestError.response?.data?.message ||
         requestError.message ||

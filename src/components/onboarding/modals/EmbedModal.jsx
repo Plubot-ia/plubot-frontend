@@ -151,8 +151,7 @@ const EmbedModal = ({ plubotId, plubotName, onClose, onExport, flowData }) => {
         } else {
           generateFallbackResources();
         }
-      } catch (error) {
-        console.error('Error al generar recursos de embebido:', error);
+      } catch {
         generateFallbackResources();
       } finally {
         setIsLoading(false);

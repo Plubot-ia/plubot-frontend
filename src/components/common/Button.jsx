@@ -1,5 +1,4 @@
 import PropTypes from 'prop-types';
-import React from 'react';
 import './Button.css';
 
 const Button = ({
@@ -7,7 +6,7 @@ const Button = ({
   className = '',
   onClick,
   disabled = false,
-  ...properties
+  ...rest
 }) => {
   const combinedClassName = ['quantum-btn', className]
     .filter(Boolean)
@@ -18,7 +17,7 @@ const Button = ({
       className={combinedClassName}
       onClick={onClick}
       disabled={disabled}
-      {...properties}
+      {...rest}
     >
       {children}
     </button>

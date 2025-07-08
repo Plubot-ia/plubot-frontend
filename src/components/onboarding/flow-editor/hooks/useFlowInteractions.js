@@ -151,11 +151,11 @@ const useFlowInteractions = ({
           }
 
           if (typeof setSelectedNode === 'function') {
-            setSelectedNode(null);
+            setSelectedNode(undefined);
           } else {
             const flowStore = useFlowStore.getState();
             if (flowStore && flowStore.setSelectedNode) {
-              flowStore.setSelectedNode(null);
+              flowStore.setSelectedNode(undefined);
             }
           }
         } catch {
@@ -209,11 +209,11 @@ const useFlowInteractions = ({
   const handlePaneClick = useCallback(() => {
     try {
       if (typeof setSelectedNode === 'function') {
-        setSelectedNode(null);
+        setSelectedNode(undefined);
       } else {
         const flowStore = useFlowStore.getState();
         if (flowStore && typeof flowStore.setSelectedNode === 'function') {
-          flowStore.setSelectedNode(null);
+          flowStore.setSelectedNode(undefined);
         }
       }
     } catch {

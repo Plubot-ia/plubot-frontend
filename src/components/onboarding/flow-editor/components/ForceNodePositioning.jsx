@@ -1,6 +1,6 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 
-import useFlowStore from '@/stores/useFlowStore';
+import useFlowStore from '@/stores/use-flow-store';
 
 /**
  * Componente de corrección de emergencia para forzar el posicionamiento correcto de nodos

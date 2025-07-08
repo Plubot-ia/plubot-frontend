@@ -131,13 +131,6 @@ const createSafeMetadata = (userData) => {
 
 // Importar el sistema de persistencia para respaldo adicional
 
-// Module-level variables to manage the position validation logic (integrated from patch)
-let positionValidatorInterval;
-let positionValidatorObserver;
-
-// Función para generar IDs únicos (ahora usa el servicio de flujo)
-const generateNodeId = (type = 'node') => generateId(type);
-
 // Estado inicial
 const initialState = {
   reactFlowInstance: undefined, // Added for storing React Flow instance
@@ -284,53 +277,7 @@ const useFlowStore = createWithEqualityFn(
 
       // Action to set the React Flow instance
       setReactFlowInstance: (instance) => {
-        // Si la instancia ya existe, no hacemos nada para evitar re-renders innecesarios.
-        if (get().reactFlowInstance) return;
-
         set({ reactFlowInstance: instance });
-
-        // Iniciar la validación periódica de posiciones de nodos (lógica del patch integrada)
-        if (instance) {
-          // Limpiar cualquier intervalo o observador anterior
-          if (positionValidatorInterval)
-            clearInterval(positionValidatorInterval);
-          if (positionValidatorObserver) positionValidatorObserver.disconnect();
-
-          // Configurar un intervalo para sanitizar paths de aristas periódicamente
-          positionValidatorInterval = setInterval(() => {
-            if (!get().isNodeBeingDragged) {
-              sanitizeEdgePaths();
-            }
-          }, 2000);
-
-          // Configurar un observador para cambios en el DOM que podrían afectar las aristas
-          const observer = new MutationObserver(() => {
-            if (!get().isNodeBeingDragged) {
-              sanitizeEdgePaths();
-            }
-          });
-
-          const reactFlowElement = document.querySelector('.react-flow');
-          if (reactFlowElement) {
-            observer.observe(reactFlowElement, {
-              childList: true,
-              subtree: true,
-            });
-            positionValidatorObserver = observer;
-          }
-
-          // Registrar limpieza al cerrar/recargar la página
-          // Usamos un listener único para evitar añadir múltiples
-          if (!globalThis.cleanupAttached) {
-            window.addEventListener('beforeunload', () => {
-              if (positionValidatorInterval)
-                clearInterval(positionValidatorInterval);
-              if (positionValidatorObserver)
-                positionValidatorObserver.disconnect();
-            });
-            globalThis.cleanupAttached = true;
-          }
-        }
       },
 
       // Acción para actualizar los umbrales de LOD dinámicamente
@@ -426,7 +373,7 @@ const useFlowStore = createWithEqualityFn(
        */
       _createNodeFromPalette: (nodeType, position, userData) => {
         const { nodes } = get();
-        const nodeId = generateNodeId(nodeType);
+        const nodeId = generateId(nodeType);
         // The key 'nodeType' is validated via hasOwnProperty, making this a safe access.
 
         const defaultLabel = Object.prototype.hasOwnProperty.call(
@@ -1088,6 +1035,7 @@ const useFlowStore = createWithEqualityFn(
             }
             default: {
               defaultParameters = {};
+              break;
             }
           }
 

@@ -1,6 +1,6 @@
 import DOMPurify from 'dompurify';
 import PropTypes from 'prop-types';
-import React, { useState, useEffect, forwardRef, useCallback } from 'react';
+import { useState, useEffect, forwardRef, useCallback } from 'react';
 
 import './RichTextEditor.css';
 

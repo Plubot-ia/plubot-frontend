@@ -85,7 +85,7 @@ const useOptimizedLayout = (nodes, edges) => {
       const sourceNode = nodes.find((n) => n.id === edge.source);
       const targetNode = nodes.find((n) => n.id === edge.target);
 
-      if (!sourceNode || !targetNode) return null;
+      if (!sourceNode || !targetNode) return;
 
       // Calcular puntos de control (simplificado)
       const sourceX = sourceNode.position.x + (sourceNode.width || 150) / 2;
