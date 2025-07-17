@@ -1,0 +1,60 @@
+/**
+ * Estilos CSS para garantizar el correcto posicionamiento y visibilidad de nodos
+ * Esta solución es más directa y menos invasiva que crear componentes adicionales
+ */
+
+/* Asegurar que los nodos siempre sean visibles y arrastrarles */
+.react-flow__node {
+  visibility: visible !important;
+  opacity: 1 !important;
+  pointer-events: all !important;
+  z-index: 5 !important;
+  position: absolute !important;
+  /* ELIMINADO: transform: none !important; - Esta regla estaba interfiriendo con ReactFlow */
+}
+
+/* Asegurar que los handles siempre sean interactivos */
+.react-flow__handle {
+  visibility: visible !important;
+  opacity: 1 !important;
+  pointer-events: all !important;
+  z-index: 6 !important;
+}
+
+/* Garantizar que el pane permita interacción con ratón */
+.react-flow__pane {
+  pointer-events: all !important;
+  z-index: 1 !important;
+}
+
+/* Garantizar que el viewport mantenga las transformaciones */
+.react-flow__viewport {
+  transform-origin: 0 0 !important;
+  will-change: transform !important;
+}
+
+/* Asegurar que los controles de zoom sean visibles */
+.react-flow__controls {
+  visibility: visible !important;
+  opacity: 1 !important;
+  pointer-events: all !important;
+  z-index: 10 !important;
+}
+
+/* Garantizar que las aristas sean visibles */
+.react-flow__edge {
+  visibility: visible !important;
+  pointer-events: stroke !important;
+  z-index: 4 !important;
+}
+
+/* Mantener la capacidad de selección de elementos */
+.react-flow__selection {
+  z-index: 8 !important;
+}
+
+/* Dar un estilo visual que indique que los nodos son arrastrables */
+.react-flow__node:hover {
+  /* La línea de box-shadow que estaba aquí ha sido eliminada */
+  cursor: move !important;
+}

@@ -1,0 +1,48 @@
+.rich-text-editor-container {
+  position: relative;
+}
+
+.rich-text-editor {
+  min-height: 100px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid #d1d5db;
+  outline: none;
+  transition: border-color 0.2s ease;
+  background-color: #fff;
+  color: #333;
+  cursor: text;
+}
+
+.rich-text-editor.high-contrast {
+  background-color: #000;
+  color: #fff;
+}
+
+.rich-text-editor.focused {
+  border-color: #3b82f6;
+}
+
+.rich-text-editor.prefer-reduced-motion {
+  transition: none;
+}
+
+.editor-placeholder {
+  position: absolute;
+  top: 8px;
+  left: 12px;
+  color: #9ca3af;
+  pointer-events: none;
+  user-select: none;
+}
+
+.character-count {
+  text-align: right;
+  font-size: 0.75rem;
+  color: #6b7280;
+  margin-top: 4px;
+}
+
+.character-count.limit-exceeded {
+  color: #ef4444;
+}

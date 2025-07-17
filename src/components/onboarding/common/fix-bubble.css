@@ -1,0 +1,34 @@
+/**
+ * Corrección para eliminar botones detrás de ByteAssistant
+ */
+
+/* SOLUCIÓN DEFINITIVA: Eliminar completamente los botones de control de ReactFlow */
+.react-flow__controls,
+.react-flow__controls-button,
+.react-flow__controls-zoomout,
+.react-flow__controls-zoomin,
+.react-flow__controls-fitview,
+.ts-byte-assistant button.debug-button,
+.ts-byte-assistant .debug-controls,
+.ts-byte-minimized + button.debug-button,
+.ts-byte-minimized + .debug-controls,
+.react-flow__controls button[data-testid="react-flow__controls-button"] {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  overflow: hidden !important;
+  position: absolute !important;
+  left: -9999px !important;
+}
+
+/* Restaurar la posición original de ByteAssistant */
+.ts-byte-assistant,
+.ts-byte-minimized {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  z-index: 9999 !important;
+}

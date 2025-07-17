@@ -1,0 +1,10 @@
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="fbGradient" x1="0" y1="0" x2="24" y2="24" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#00e0ff"/>
+      <stop offset="1" stop-color="#0088ff"/>
+    </linearGradient>
+  </defs>
+  <rect x="2" y="2" width="20" height="20" rx="5" stroke="url(#fbGradient)" stroke-width="2"/>
+  <path d="M13 7C13 6.44772 13.4477 6 14 6H16V3.5C15.5 3.2 14.2 3 13 3C10.8 3 9 4.6 9 7V9H7V12H9V21H12V12H15L16 9H12V7Z" fill="url(#fbGradient)"/>
+</svg>
