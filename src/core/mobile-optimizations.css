@@ -1,0 +1,70 @@
+/* 
+ * Optimizaciones específicas para dispositivos móviles
+ * Este archivo se carga solo en dispositivos móviles para mejorar el rendimiento
+ */
+
+/* Reducir complejidad de animaciones en móviles */
+.mobile-device .animated-element {
+  transition-duration: 0.2s !important;
+  animation-duration: 0.2s !important;
+  will-change: auto !important; /* Evitar will-change innecesario */
+}
+
+/* Optimizar renderizado para elementos con animaciones */
+.mobile-device [data-aos] {
+  transform: none !important;
+  opacity: 1 !important;
+  transition: none !important;
+}
+
+/* Simplificar efectos de hover en móviles */
+.mobile-device .hover-effect:hover {
+  transform: none !important;
+  box-shadow: none !important;
+  filter: none !important;
+}
+
+/* Reducir complejidad de fondos animados en móviles */
+.mobile-device .particles-background canvas {
+  opacity: 0.5 !important;
+  filter: blur(1px) !important;
+}
+
+/* Optimizar rendimiento de elementos con efectos complejos */
+.mobile-device .complex-animation {
+  animation: none !important;
+  transform: none !important;
+}
+
+/* Reducir calidad de sombras en móviles para mejor rendimiento */
+.mobile-device .shadow-element {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2) !important;
+}
+
+/* Optimizar elementos con filtros CSS */
+.mobile-device .filter-element {
+  filter: none !important;
+}
+
+/* Simplificar transiciones */
+.mobile-device * {
+  transition-property: opacity !important;
+  transition-duration: 0.2s !important;
+}
+
+/* Optimizar elementos con transformaciones 3D */
+.mobile-device .transform-3d {
+  transform: none !important;
+  perspective: none !important;
+}
+
+/* Reducir complejidad del layout para evitar reflows */
+.mobile-device .dynamic-layout {
+  contain: layout paint !important;
+}
+
+/* Optimizar imágenes de fondo para móviles */
+.mobile-device .bg-image {
+  background-attachment: scroll !important;
+  background-size: cover !important;
+}

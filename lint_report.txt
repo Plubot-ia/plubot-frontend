@@ -1,0 +1,996 @@
+
+> lint
+> eslint . --max-warnings 0 --no-cache
+
+
+/Users/luz/Desktop/Plubot/plubot-frontend/src/components/benchmarking/FlowBenchmarkTool.jsx
+   65:27  error  Arrow function has too many lines (99). Maximum allowed is 80     max-lines-per-function
+  111:5   error  Arrow function has too many parameters (4). Maximum allowed is 3  max-params
+
+/Users/luz/Desktop/Plubot/plubot-frontend/src/components/chatbots/PreviewChat.jsx
+  69:21  error  Arrow function has too many lines (132). Maximum allowed is 80  max-lines-per-function
+
+/Users/luz/Desktop/Plubot/plubot-frontend/src/components/common/FooterLinks.jsx
+  9:21  error  Arrow function has too many lines (85). Maximum allowed is 80  max-lines-per-function
+
+/Users/luz/Desktop/Plubot/plubot-frontend/src/components/common/FooterSubscriptionForm.jsx
+  6:32  error  Arrow function has too many lines (133). Maximum allowed is 80  max-lines-per-function
+
+/Users/luz/Desktop/Plubot/plubot-frontend/src/components/common/LazyImage.jsx
+  25:28  error  Arrow function has too many lines (113). Maximum allowed is 80  max-lines-per-function
+  25:28  error  Arrow function has a complexity of 13. Maximum allowed is 10    complexity
+
+/Users/luz/Desktop/Plubot/plubot-frontend/src/components/common/NodeHistoryViewer.jsx
+  19:27  error  Arrow function has too many lines (126). Maximum allowed is 80  max-lines-per-function
+
+/Users/luz/Desktop/Plubot/plubot-frontend/src/components/common/RichTextEditor.jsx
+  8:3  error  Arrow function has a complexity of 15. Maximum allowed is 10  complexity
+
+/Users/luz/Desktop/Plubot/plubot-frontend/src/components/common/UserProfile.jsx
+  8:21  error  Arrow function has a complexity of 11. Maximum allowed is 10  complexity
+
+/Users/luz/Desktop/Plubot/plubot-frontend/src/components/flow/BackupManager.jsx
+  28:23  error  Arrow function has too many lines (205). Maximum allowed is 80  max-lines-per-function
+
+/Users/luz/Desktop/Plubot/plubot-frontend/src/components/flow/PerformanceStats.jsx
+  10:26  error  Arrow function has too many lines (292). Maximum allowed is 80  max-lines-per-function
+  10:26  error  Arrow function has a complexity of 12. Maximum allowed is 10    complexity
+
+/Users/luz/Desktop/Plubot/plubot-frontend/src/components/modals/ModalContainer.jsx
+  31:24  error  Arrow function has too many lines (136). Maximum allowed is 80  max-lines-per-function
+
+/Users/luz/Desktop/Plubot/plubot-frontend/src/components/onboarding/common/ByteAssistant.jsx
+  30:23  error  Arrow function has too many lines (138). Maximum allowed is 80  max-lines-per-function
+  30:23  error  Arrow function has a complexity of 13. Maximum allowed is 10    complexity
+
+/Users/luz/Desktop/Plubot/plubot-frontend/src/components/onboarding/common/EpicHeader.jsx
+  19:20  error  Arrow function has too many lines (238). Maximum allowed is 80  max-lines-per-function
+
+/Users/luz/Desktop/Plubot/plubot-frontend/src/components/onboarding/common/NodePalette.jsx
+   50:21  error  Arrow function has too many lines (83). Maximum allowed is 80     max-lines-per-function
+   50:21  error  Arrow function has a complexity of 28. Maximum allowed is 10      complexity
+  251:21  error  Arrow function has too many lines (321). Maximum allowed is 80    max-lines-per-function
+  251:21  error  Arrow function has a complexity of 27. Maximum allowed is 10      complexity
+  297:5   error  Arrow function has too many lines (104). Maximum allowed is 80    max-lines-per-function
+  297:5   error  Arrow function has a complexity of 21. Maximum allowed is 10      complexity
+  297:60  error  Arrow function has too many parameters (5). Maximum allowed is 3  max-params
+  319:15  error  Generic Object Injection Sink                                     security/detect-object-injection
+  458:21  error  Generic Object Injection Sink                                     security/detect-object-injection
+
+/Users/luz/Desktop/Plubot/plubot-frontend/src/components/onboarding/common/OptionsMenu.jsx
+  8:3  error  Arrow function has too many lines (108). Maximum allowed is 80  max-lines-per-function
+
+/Users/luz/Desktop/Plubot/plubot-frontend/src/components/onboarding/flow-editor/FlowEditor.jsx
+   15:8  error  Remove this unused import of 'useDebounce'                      sonarjs/unused-import
+  134:3  error  Arrow function has too many lines (226). Maximum allowed is 80  max-lines-per-function
+
+/Users/luz/Desktop/Plubot/plubot-frontend/src/components/onboarding/flow-editor/components/EmergencyRecovery.jsx
+  15:27  error  Arrow function has too many lines (90). Maximum allowed is 80  max-lines-per-function
+
+/Users/luz/Desktop/Plubot/plubot-frontend/src/components/onboarding/flow-editor/components/FlowMain.jsx
+   66:75  error  Async arrow function has too many parameters (5). Maximum allowed is 3  max-params
+   71:7   error  Unexpected console statement                                            no-console
+   98:5   error  Unexpected console statement                                            no-console
+  116:3   error  Arrow function has too many parameters (5). Maximum allowed is 3        max-params
+  123:51  error  Generic Object Injection Sink                                           security/detect-object-injection
+  149:7   error  Unexpected console statement                                            no-console
+  201:18  error  Arrow function has too many lines (752). Maximum allowed is 80          max-lines-per-function
+  201:18  error  Arrow function has a complexity of 20. Maximum allowed is 10            complexity
+  896:13  error  Arrow function has a complexity of 11. Maximum allowed is 10            complexity
+
+/Users/luz/Desktop/Plubot/plubot-frontend/src/components/onboarding/flow-editor/components/FlowRestorer.jsx
+    9:22  error  Arrow function has too many lines (164). Maximum allowed is 80    max-lines-per-function
+   10:13  error  Arrow function has too many lines (162). Maximum allowed is 80    max-lines-per-function
+   96:19  error  Refactor this code to not nest functions more than 4 levels deep  sonarjs/no-nested-functions
+  165:25  error  Refactor this code to not nest functions more than 4 levels deep  sonarjs/no-nested-functions
+
+/Users/luz/Desktop/Plubot/plubot-frontend/src/components/onboarding/flow-editor/components/ForceNodePositioning.jsx
+   10:30  error  Arrow function has too many lines (163). Maximum allowed is 80                       max-lines-per-function
+   11:13  error  Arrow function has too many lines (161). Maximum allowed is 80                       max-lines-per-function
+   72:32  error  Arrow function has too many lines (93). Maximum allowed is 80                        max-lines-per-function
+   90:19  error  Refactor this code to not nest functions more than 4 levels deep                     sonarjs/no-nested-functions
+  120:18  error  Arrow function has a complexity of 13. Maximum allowed is 10                         complexity
+  120:21  error  Refactor this function to reduce its Cognitive Complexity from 18 to the 15 allowed  sonarjs/cognitive-complexity
+  130:24  error  Variable Assigned to Object Injection Sink                                           security/detect-object-injection
+  195:29  error  Refactor this code to not nest functions more than 4 levels deep                     sonarjs/no-nested-functions
+
+/Users/luz/Desktop/Plubot/plubot-frontend/src/components/onboarding/flow-editor/components/NodeManagement.jsx
+  15:34  error  Arrow function has too many lines (84). Maximum allowed is 80  max-lines-per-function
+  39:21  error  Variable Assigned to Object Injection Sink                     security/detect-object-injection
+
+/Users/luz/Desktop/Plubot/plubot-frontend/src/components/onboarding/flow-editor/components/PerformanceMonitor.jsx
+  10:28  error  Arrow function has too many lines (153). Maximum allowed is 80  max-lines-per-function
+
+/Users/luz/Desktop/Plubot/plubot-frontend/src/components/onboarding/flow-editor/components/menus/EdgeContextMenu.jsx
+  19:25  error  Arrow function has too many lines (119). Maximum allowed is 80  max-lines-per-function
+
+/Users/luz/Desktop/Plubot/plubot-frontend/src/components/onboarding/flow-editor/components/menus/NodeContextMenu.jsx
+  17:25  error  Arrow function has too many lines (90). Maximum allowed is 80  max-lines-per-function
+
+/Users/luz/Desktop/Plubot/plubot-frontend/src/components/onboarding/flow-editor/drop-position-fix.js
+  33:8  error  Function 'calculateCorrectDropPosition' has a complexity of 11. Maximum allowed is 10  complexity
+
+/Users/luz/Desktop/Plubot/plubot-frontend/src/components/onboarding/flow-editor/hooks/useAdaptivePerformance.js
+   16:32  error  Arrow function has too many lines (235). Maximum allowed is 80        max-lines-per-function
+  115:31  error  Generic Object Injection Sink                                         security/detect-object-injection
+  144:5   error  Arrow function has a complexity of 18. Maximum allowed is 10          complexity
+  250:33  error  Make sure that using this pseudorandom number generator is safe here  sonarjs/pseudo-random
+
+/Users/luz/Desktop/Plubot/plubot-frontend/src/components/onboarding/flow-editor/hooks/useConnectionValidator.js
+   10:16  error  Function 'useConnectionValidator' has too many lines (170). Maximum allowed is 80  max-lines-per-function
+   13:5   error  Arrow function has too many lines (128). Maximum allowed is 80                     max-lines-per-function
+  146:5   error  Arrow function has a complexity of 11. Maximum allowed is 10                       complexity
+
+/Users/luz/Desktop/Plubot/plubot-frontend/src/components/onboarding/flow-editor/hooks/useDragAndDropManager.js
+  12:31  error  Arrow function has too many lines (130). Maximum allowed is 80  max-lines-per-function
+  26:5   error  Arrow function has too many lines (105). Maximum allowed is 80  max-lines-per-function
+  26:5   error  Arrow function has a complexity of 14. Maximum allowed is 10    complexity
+
+/Users/luz/Desktop/Plubot/plubot-frontend/src/components/onboarding/flow-editor/hooks/useEdgeDragOptimizer.js
+   26:30  error  Arrow function has too many lines (226). Maximum allowed is 80                       max-lines-per-function
+   84:5   error  Arrow function has a complexity of 19. Maximum allowed is 10                         complexity
+   84:12  error  Refactor this function to reduce its Cognitive Complexity from 19 to the 15 allowed  sonarjs/cognitive-complexity
+  113:32  error  Complete the task associated to this "TODO" comment                                  sonarjs/todo-tag
+  204:5   error  Arrow function has a complexity of 12. Maximum allowed is 10                         complexity
+
+/Users/luz/Desktop/Plubot/plubot-frontend/src/components/onboarding/flow-editor/hooks/useFlowEdges.js
+  14:22  error  Arrow function has too many lines (119). Maximum allowed is 80    max-lines-per-function
+  98:25  error  Refactor this code to not nest functions more than 4 levels deep  sonarjs/no-nested-functions
+
+/Users/luz/Desktop/Plubot/plubot-frontend/src/components/onboarding/flow-editor/hooks/useFlowElementsManager.js
+  12:32  error  Arrow function has too many lines (177). Maximum allowed is 80        max-lines-per-function
+  28:5   error  Arrow function has too many lines (85). Maximum allowed is 80         max-lines-per-function
+  28:5   error  Arrow function has a complexity of 15. Maximum allowed is 10          complexity
+  41:62  error  Make sure that using this pseudorandom number generator is safe here  sonarjs/pseudo-random
+  45:26  error  Generic Object Injection Sink                                         security/detect-object-injection
+  46:15  error  Generic Object Injection Sink                                         security/detect-object-injection
+
+/Users/luz/Desktop/Plubot/plubot-frontend/src/components/onboarding/flow-editor/hooks/useFlowHistory.js
+    9:24  error  Arrow function has too many lines (129). Maximum allowed is 80    max-lines-per-function
+   40:20  error  Variable Assigned to Object Injection Sink                        security/detect-object-injection
+   49:47  error  Refactor this code to not nest functions more than 4 levels deep  sonarjs/no-nested-functions
+   66:31  error  Refactor this code to not nest functions more than 4 levels deep  sonarjs/no-nested-functions
+   82:47  error  Refactor this code to not nest functions more than 4 levels deep  sonarjs/no-nested-functions
+  123:47  error  Refactor this code to not nest functions more than 4 levels deep  sonarjs/no-nested-functions
+  134:31  error  Refactor this code to not nest functions more than 4 levels deep  sonarjs/no-nested-functions
+  156:47  error  Refactor this code to not nest functions more than 4 levels deep  sonarjs/no-nested-functions
+
+/Users/luz/Desktop/Plubot/plubot-frontend/src/components/onboarding/flow-editor/hooks/useFlowInteractions.js
+  20:29  error  Arrow function has too many lines (103). Maximum allowed is 80  max-lines-per-function
+
+/Users/luz/Desktop/Plubot/plubot-frontend/src/components/onboarding/flow-editor/hooks/useFlowNodes.js
+  13:22  error  Arrow function has too many lines (124). Maximum allowed is 80  max-lines-per-function
+
+/Users/luz/Desktop/Plubot/plubot-frontend/src/components/onboarding/flow-editor/hooks/useFlowSaver.js
+  10:29  error  Arrow function has too many lines (88). Maximum allowed is 80  max-lines-per-function
+
+/Users/luz/Desktop/Plubot/plubot-frontend/src/components/onboarding/flow-editor/hooks/useModalManagement.js
+  16:28  error  Arrow function has too many lines (165). Maximum allowed is 80  max-lines-per-function
+
+/Users/luz/Desktop/Plubot/plubot-frontend/src/components/onboarding/flow-editor/hooks/useNodeVirtualization.js
+  60:41  error  Arrow function has a complexity of 11. Maximum allowed is 10  complexity
+
+/Users/luz/Desktop/Plubot/plubot-frontend/src/components/onboarding/flow-editor/hooks/useVisualState.js
+  14:24  error  Arrow function has too many lines (107). Maximum allowed is 80  max-lines-per-function
+
+/Users/luz/Desktop/Plubot/plubot-frontend/src/components/onboarding/flow-editor/lod/GenericCompactNode.jsx
+  26:9   error  Generic Object Injection Sink  security/detect-object-injection
+  26:42  error  Generic Object Injection Sink  security/detect-object-injection
+
+/Users/luz/Desktop/Plubot/plubot-frontend/src/components/onboarding/flow-editor/lod/GenericMiniNode.jsx
+  26:9   error  Generic Object Injection Sink  security/detect-object-injection
+  26:42  error  Generic Object Injection Sink  security/detect-object-injection
+
+/Users/luz/Desktop/Plubot/plubot-frontend/src/components/onboarding/flow-editor/lod/GenericNodeIcon.jsx
+  46:9  error  Generic Object Injection Sink  security/detect-object-injection
+
+/Users/luz/Desktop/Plubot/plubot-frontend/src/components/onboarding/flow-editor/ui/BackgroundScene.jsx
+   26:25  error  Arrow function has too many lines (284). Maximum allowed is 80        max-lines-per-function
+   37:13  error  Arrow function has too many lines (200). Maximum allowed is 80        max-lines-per-function
+  140:13  error  Make sure that using this pseudorandom number generator is safe here  sonarjs/pseudo-random
+  141:13  error  Make sure that using this pseudorandom number generator is safe here  sonarjs/pseudo-random
+  142:15  error  Make sure that using this pseudorandom number generator is safe here  sonarjs/pseudo-random
+  143:17  error  Make sure that using this pseudorandom number generator is safe here  sonarjs/pseudo-random
+  144:17  error  Make sure that using this pseudorandom number generator is safe here  sonarjs/pseudo-random
+  145:20  error  Make sure that using this pseudorandom number generator is safe here  sonarjs/pseudo-random
+  146:16  error  Make sure that using this pseudorandom number generator is safe here  sonarjs/pseudo-random
+  207:22  error  Generic Object Injection Sink                                         security/detect-object-injection
+  207:43  error  Generic Object Injection Sink                                         security/detect-object-injection
+  208:22  error  Generic Object Injection Sink                                         security/detect-object-injection
+  208:43  error  Generic Object Injection Sink                                         security/detect-object-injection
+  219:19  error  Generic Object Injection Sink                                         security/detect-object-injection
+  220:19  error  Generic Object Injection Sink                                         security/detect-object-injection
+  221:19  error  Generic Object Injection Sink                                         security/detect-object-injection
+  222:19  error  Generic Object Injection Sink                                         security/detect-object-injection
+
+/Users/luz/Desktop/Plubot/plubot-frontend/src/components/onboarding/flow-editor/ui/CustomMiniMap.jsx
+   19:23  error  Arrow function has too many lines (699). Maximum allowed is 80                                                                                                                                     max-lines-per-function
+   19:23  error  Arrow function has a complexity of 25. Maximum allowed is 10                                                                                                                                       complexity
+  217:5   error  Arrow function has a complexity of 16. Maximum allowed is 10                                                                                                                                       complexity
+  303:35  error  Arrow function has too many lines (320). Maximum allowed is 80                                                                                                                                     max-lines-per-function
+  303:35  error  Arrow function has a complexity of 39. Maximum allowed is 10                                                                                                                                       complexity
+  303:38  error  Refactor this function to reduce its Cognitive Complexity from 48 to the 15 allowed                                                                                                                sonarjs/cognitive-complexity
+  569:13  error  Blocks are nested too deeply (5). Maximum allowed is 4                                                                                                                                             max-depth
+  582:17  error  'nodeRadius' is already declared in the upper scope on line 78 column 9                                                                                                                            no-shadow
+  665:17  error  'scaleY' is already declared in the upper scope on line 353 column 13                                                                                                                              no-shadow
+  705:6   error  React Hook useCallback has missing dependencies: 'edgeColors' and 'nodeColors'. Either include them or remove the dependency array                                                                 react-hooks/exhaustive-deps
+  752:7   error  Visible, non-interactive elements with click handlers must have at least one keyboard listener                                                                                                     jsx-a11y/click-events-have-key-events
+  752:7   error  Avoid non-native interactive elements. If using native HTML is not possible, add an appropriate role and support for tabbing, mouse, keyboard, and touch inputs to an interactive content element  jsx-a11y/no-static-element-interactions
+  776:5   error  Visible, non-interactive elements with click handlers must have at least one keyboard listener                                                                                                     jsx-a11y/click-events-have-key-events
+
+/Users/luz/Desktop/Plubot/plubot-frontend/src/components/onboarding/flow-editor/ui/EdgeFilters.jsx
+  10:21  error  Arrow function has too many lines (101). Maximum allowed is 80  max-lines-per-function
+
+/Users/luz/Desktop/Plubot/plubot-frontend/src/components/onboarding/flow-editor/ui/EliteEdge.jsx
+   22:28  error  Arrow function has too many lines (639). Maximum allowed is 80                                                                                 max-lines-per-function
+   22:28  error  Arrow function has a complexity of 26. Maximum allowed is 10                                                                                   complexity
+   76:6   error  React Hook useMemo has a missing dependency: 'properties'. Either include it or remove the dependency array                                    react-hooks/exhaustive-deps
+   86:34  error  Arrow function has a complexity of 22. Maximum allowed is 10                                                                                   complexity
+   92:17  error  Make sure that using this pseudorandom number generator is safe here                                                                           sonarjs/pseudo-random
+  115:7   error  'process' is not defined                                                                                                                       no-undef
+  116:7   error  Empty block statement                                                                                                                          no-empty
+  144:13  error  Arrow function has too many lines (135). Maximum allowed is 80                                                                                 max-lines-per-function
+  144:13  error  Arrow function has a complexity of 50. Maximum allowed is 10                                                                                   complexity
+  144:16  error  Refactor this function to reduce its Cognitive Complexity from 59 to the 15 allowed                                                            sonarjs/cognitive-complexity
+  241:13  error  'process' is not defined                                                                                                                       no-undef
+  241:53  error  Empty block statement                                                                                                                          no-empty
+  251:9   error  Remove this conditional structure or edit its code blocks so that they're not all the same                                                     sonarjs/no-all-duplicated-branches
+  270:13  error  'process' is not defined                                                                                                                       no-undef
+  270:53  error  Empty block statement                                                                                                                          no-empty
+  288:13  error  'process' is not defined                                                                                                                       no-undef
+  288:53  error  Empty block statement                                                                                                                          no-empty
+  304:11  error  'process' is not defined                                                                                                                       no-undef
+  304:51  error  Empty block statement                                                                                                                          no-empty
+  320:9   error  'process' is not defined                                                                                                                       no-undef
+  320:49  error  Empty block statement                                                                                                                          no-empty
+  325:9   error  'process' is not defined                                                                                                                       no-undef
+  326:7   error  Remove this conditional structure or edit its code blocks so that they're not all the same                                                     sonarjs/no-all-duplicated-branches
+  331:9   error  Empty block statement                                                                                                                          no-empty
+  349:52  error  Arrow function has a complexity of 11. Maximum allowed is 10                                                                                   complexity
+  351:17  error  This conditional operation returns the same value whether the condition is "true" or "false"                                                   sonarjs/no-all-duplicated-branches
+  376:19  error  Generic Object Injection Sink                                                                                                                  security/detect-object-injection
+  397:13  error  'process' is not defined                                                                                                                       no-undef
+  397:53  error  Empty block statement                                                                                                                          no-empty
+  417:11  error  'process' is not defined                                                                                                                       no-undef
+  417:51  error  Empty block statement                                                                                                                          no-empty
+  422:6   error  React Hook useMemo has an unnecessary dependency: 'id'. Either exclude it or remove the dependency array                                       react-hooks/exhaustive-deps
+  455:35  error  Generic Object Injection Sink                                                                                                                  security/detect-object-injection
+  466:27  error  Do not nest ternary expressions                                                                                                                no-nested-ternary
+  466:44  error  Extract this nested ternary operation into an independent statement                                                                            sonarjs/no-nested-conditional
+  485:5   error  React Hook useCallback has unnecessary dependencies: 'determineEdgeColor' and 'isHovered'. Either exclude them or remove the dependency array  react-hooks/exhaustive-deps
+  518:9   error  Remove this useless assignment to variable "lighterColor"                                                                                      sonarjs/no-dead-store
+  520:9   error  Remove this useless assignment to variable "darkerColor"                                                                                       sonarjs/no-dead-store
+  587:6   error  React Hook useMemo has a missing dependency: 'determineEdgeColor'. Either include it or remove the dependency array                            react-hooks/exhaustive-deps
+  776:26  error  Do not nest ternary expressions                                                                                                                no-nested-ternary
+  776:41  error  Extract this nested ternary operation into an independent statement                                                                            sonarjs/no-nested-conditional
+  828:10  error  'EdgeText' is not defined                                                                                                                      react/jsx-no-undef
+
+/Users/luz/Desktop/Plubot/plubot-frontend/src/components/onboarding/flow-editor/ui/PerformancePatch.js
+  17:5  error  Function 'createStyles' has too many lines (110). Maximum allowed is 80  max-lines-per-function
+
+/Users/luz/Desktop/Plubot/plubot-frontend/src/components/onboarding/flow-editor/ui/RobustEdge.jsx
+   11:20  error  Arrow function has too many lines (145). Maximum allowed is 80                                                                            max-lines-per-function
+  121:6   error  React Hook useEffect has missing dependencies: 'sourcePosition' and 'targetPosition'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+/Users/luz/Desktop/Plubot/plubot-frontend/src/components/onboarding/flow-editor/ui/SafeEdgeWrapper.jsx
+   9:25  error  Arrow function has a complexity of 18. Maximum allowed is 10          complexity
+  15:34  error  Make sure that using this pseudorandom number generator is safe here  sonarjs/pseudo-random
+
+/Users/luz/Desktop/Plubot/plubot-frontend/src/components/onboarding/flow-editor/ui/SyncButton.jsx
+  24:20  error  Arrow function has too many lines (150). Maximum allowed is 80  max-lines-per-function
+  24:20  error  Arrow function has a complexity of 13. Maximum allowed is 10    complexity
+
+/Users/luz/Desktop/Plubot/plubot-frontend/src/components/onboarding/flow-editor/ui/UltraModeManager.js
+   64:8   error  Function 'stopAllAnimations' has a complexity of 14. Maximum allowed is 10           complexity
+   64:17  error  Refactor this function to reduce its Cognitive Complexity from 28 to the 15 allowed  sonarjs/cognitive-complexity
+   74:11  error  Generic Object Injection Sink                                                        security/detect-object-injection
+   84:11  error  Blocks are nested too deeply (5). Maximum allowed is 4                               max-depth
+   85:13  error  Generic Object Injection Sink                                                        security/detect-object-injection
+   88:11  error  Blocks are nested too deeply (5). Maximum allowed is 4                               max-depth
+  107:11  error  Generic Object Injection Sink                                                        security/detect-object-injection
+  132:5   error  Expected an assignment or function call and instead saw an expression                no-unused-expressions
+  152:11  error  Generic Object Injection Sink                                                        security/detect-object-injection
+  157:11  error  Blocks are nested too deeply (5). Maximum allowed is 4                               max-depth
+  158:13  error  Generic Object Injection Sink                                                        security/detect-object-injection
+  216:3   error  Expected an assignment or function call and instead saw an expression                no-unused-expressions
+
+/Users/luz/Desktop/Plubot/plubot-frontend/src/components/onboarding/flow-editor/ui/UltraOptimizedEdge.jsx
+  10:28  error  Arrow function has too many lines (90). Maximum allowed is 80       max-lines-per-function
+  30:12  error  'path' is already declared in the upper scope on line 29 column 10  no-shadow
+
+/Users/luz/Desktop/Plubot/plubot-frontend/src/components/onboarding/flow-editor/ui/UltraOptimizedNode.jsx
+   16:28  error  Arrow function has too many lines (231). Maximum allowed is 80  max-lines-per-function
+   16:28  error  Arrow function has a complexity of 23. Maximum allowed is 10    complexity
+   99:9   error  Generic Object Injection Sink                                   security/detect-object-injection
+  100:23  error  Generic Object Injection Sink                                   security/detect-object-injection
+  115:37  error  Arrow function has too many lines (105). Maximum allowed is 80  max-lines-per-function
+  115:37  error  Arrow function has a complexity of 23. Maximum allowed is 10    complexity
+
+/Users/luz/Desktop/Plubot/plubot-frontend/src/components/onboarding/flow-editor/utils/edge-path-sanitizer.js
+  47:34  error  Function 'patchedGetBezierPath' has too many parameters (8). Maximum allowed is 3  max-params
+
+/Users/luz/Desktop/Plubot/plubot-frontend/src/components/onboarding/flow-editor/utils/edgeRecoveryUtility.js
+   16:45  error  Arrow function has a complexity of 14. Maximum allowed is 10                         complexity
+   16:56  error  Refactor this function to reduce its Cognitive Complexity from 20 to the 15 allowed  sonarjs/cognitive-complexity
+   50:11  error  Blocks are nested too deeply (5). Maximum allowed is 4                               max-depth
+  101:39  error  Empty block statement                                                                no-empty
+  106:45  error  Empty block statement                                                                no-empty
+  151:22  error  Empty block statement                                                                no-empty
+  156:47  error  Empty block statement                                                                no-empty
+  234:12  error  Empty block statement                                                                no-empty
+
+/Users/luz/Desktop/Plubot/plubot-frontend/src/components/onboarding/flow-editor/utils/edgeTypeFixUtility.js
+  49:26  error  Variable Assigned to Object Injection Sink  security/detect-object-injection
+  50:26  error  Variable Assigned to Object Injection Sink  security/detect-object-injection
+
+/Users/luz/Desktop/Plubot/plubot-frontend/src/components/onboarding/flow-editor/utils/flowCacheManager.js
+   45:7   error  Generic Object Injection Sink                                                        security/detect-object-injection
+   55:13  error  Generic Object Injection Sink                                                        security/detect-object-injection
+   55:43  error  Generic Object Injection Sink                                                        security/detect-object-injection
+   56:18  error  Generic Object Injection Sink                                                        security/detect-object-injection
+   80:25  error  Variable Assigned to Object Injection Sink                                           security/detect-object-injection
+   87:16  error  Generic Object Injection Sink                                                        security/detect-object-injection
+  154:45  error  Arrow function has a complexity of 19. Maximum allowed is 10                         complexity
+  154:48  error  Refactor this function to reduce its Cognitive Complexity from 18 to the 15 allowed  sonarjs/cognitive-complexity
+  177:29  error  Variable Assigned to Object Injection Sink                                           security/detect-object-injection
+  178:29  error  Variable Assigned to Object Injection Sink                                           security/detect-object-injection
+
+/Users/luz/Desktop/Plubot/plubot-frontend/src/components/onboarding/flow-editor/utils/flowEditorUtilities.js
+  29:50  error  Make sure that using this pseudorandom number generator is safe here  sonarjs/pseudo-random
+
+/Users/luz/Desktop/Plubot/plubot-frontend/src/components/onboarding/flow-editor/utils/flowInteractionUtils.js
+  1:1  error  The filename `flowInteractionUtils.js` should be named `flowInteractionUtilities.js`. A more descriptive name will do too  unicorn/prevent-abbreviations
+
+/Users/luz/Desktop/Plubot/plubot-frontend/src/components/onboarding/flow-editor/utils/handleFixer.js
+  63:37  error  Arrow function has a complexity of 11. Maximum allowed is 10  complexity
+
+/Users/luz/Desktop/Plubot/plubot-frontend/src/components/onboarding/flow-editor/utils/node-position-validator.js
+   80:21  error  Make sure that using this pseudorandom number generator is safe here                        sonarjs/pseudo-random
+   81:21  error  Make sure that using this pseudorandom number generator is safe here                        sonarjs/pseudo-random
+  124:46  error  Complete the task associated to this "TODO" comment                                         sonarjs/todo-tag
+  214:9   error  Remove this conditional structure or edit its code blocks so that they're not all the same  sonarjs/no-all-duplicated-branches
+  218:16  error  This branch's code block is the same as the block for the branch on line 214                sonarjs/no-duplicated-branches
+
+/Users/luz/Desktop/Plubot/plubot-frontend/src/components/onboarding/flow-editor/utils/persistenceManager.js
+  14:73  error  Arrow function has too many parameters (4). Maximum allowed is 3  max-params
+
+/Users/luz/Desktop/Plubot/plubot-frontend/src/components/onboarding/flow-editor/utils/prevent-flow-reset.js
+  51:33  error  Arrow function has too many lines (103). Maximum allowed is 80   max-lines-per-function
+  97:21  error  Method 'setNodes' has a complexity of 12. Maximum allowed is 10  complexity
+
+/Users/luz/Desktop/Plubot/plubot-frontend/src/components/onboarding/flow-editor/utils/storage-manager.js
+  14:8  error  Function 'cleanupStorage' has a complexity of 11. Maximum allowed is 10  complexity
+  74:8  error  Function 'safeSetItem' has a complexity of 11. Maximum allowed is 10     complexity
+
+/Users/luz/Desktop/Plubot/plubot-frontend/src/components/onboarding/modals/EmbedModal.jsx
+   47:20  error  Arrow function has too many lines (615). Maximum allowed is 80                                                                                                                                                 max-lines-per-function
+   47:20  error  Arrow function has a complexity of 20. Maximum allowed is 10                                                                                                                                                   complexity
+  110:95  error  Refactor this code to not use nested template literals                                                                                                                                                         sonarjs/no-nested-template-literals
+  226:22  error  Make sure that using this pseudorandom number generator is safe here                                                                                                                                           sonarjs/pseudo-random
+  229:41  error  Make sure that using this pseudorandom number generator is safe here                                                                                                                                           sonarjs/pseudo-random
+  231:40  error  Make sure that using this pseudorandom number generator is safe here                                                                                                                                           sonarjs/pseudo-random
+  233:33  error  Make sure that using this pseudorandom number generator is safe here                                                                                                                                           sonarjs/pseudo-random
+  235:31  error  Make sure that using this pseudorandom number generator is safe here                                                                                                                                           sonarjs/pseudo-random
+  237:38  error  Make sure that using this pseudorandom number generator is safe here                                                                                                                                           sonarjs/pseudo-random
+  244:24  error  Make sure that using this pseudorandom number generator is safe here                                                                                                                                           sonarjs/pseudo-random
+  245:23  error  Make sure that using this pseudorandom number generator is safe here                                                                                                                                           sonarjs/pseudo-random
+  435:25  error  Anchor used as a button. Anchors are primarily expected to navigate. Use the button element instead. Learn more: https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/blob/HEAD/docs/rules/anchor-is-valid.md  jsx-a11y/anchor-is-valid
+  435:25  error  Visible, non-interactive elements with click handlers must have at least one keyboard listener                                                                                                                 jsx-a11y/click-events-have-key-events
+  435:25  error  Avoid non-native interactive elements. If using native HTML is not possible, add an appropriate role and support for tabbing, mouse, keyboard, and touch inputs to an interactive content element              jsx-a11y/no-static-element-interactions
+  437:29  error  'e' is not defined                                                                                                                                                                                             no-undef
+  615:23  error  A form label must be associated with a control                                                                                                                                                                 jsx-a11y/label-has-associated-control
+  619:62  error  'e' is not defined                                                                                                                                                                                             no-undef
+  628:23  error  A form label must be associated with a control                                                                                                                                                                 jsx-a11y/label-has-associated-control
+  632:65  error  'e' is not defined                                                                                                                                                                                             no-undef
+  641:23  error  A form label must be associated with a control                                                                                                                                                                 jsx-a11y/label-has-associated-control
+  646:62  error  'e' is not defined                                                                                                                                                                                             no-undef
+  651:23  error  A form label must be associated with a control                                                                                                                                                                 jsx-a11y/label-has-associated-control
+  656:63  error  'e' is not defined                                                                                                                                                                                             no-undef
+  661:23  error  A form label must be associated with a control                                                                                                                                                                 jsx-a11y/label-has-associated-control
+  668:29  error  'e' is not defined                                                                                                                                                                                             no-undef
+  674:23  error  A form label must be associated with a control                                                                                                                                                                 jsx-a11y/label-has-associated-control
+  680:29  error  'e' is not defined                                                                                                                                                                                             no-undef
+  711:19  error  React Hook "useRealPlubotId" cannot be called inside a callback. React Hooks must be called in a React function component or a custom React Hook function                                                      react-hooks/rules-of-hooks
+  711:19  error  'useRealPlubotId' is not defined                                                                                                                                                                               no-undef
+  720:14  error  Do not nest ternary expressions                                                                                                                                                                                no-nested-ternary
+  722:17  error  Extract this nested ternary operation into an independent statement                                                                                                                                            sonarjs/no-nested-conditional
+
+/Users/luz/Desktop/Plubot/plubot-frontend/src/components/onboarding/modals/ImportExportModal.jsx
+   10:27  error  Arrow function has too many lines (290). Maximum allowed is 80         max-lines-per-function
+   26:11  error  Remove the declaration of the unused 'currentFlowData' variable        sonarjs/no-unused-vars
+   26:11  error  Remove this useless assignment to variable "currentFlowData"           sonarjs/no-dead-store
+   26:28  error  Remove the declaration of the unused 'updateCurrentFlowData' variable  sonarjs/no-unused-vars
+   26:28  error  Remove this useless assignment to variable "updateCurrentFlowData"     sonarjs/no-dead-store
+   27:45  error  Remove the declaration of the unused 'globalSetByteMessage' variable   sonarjs/no-unused-vars
+   27:45  error  Remove this useless assignment to variable "globalSetByteMessage"      sonarjs/no-dead-store
+   31:64  error  Use `undefined` instead of `null`                                      unicorn/no-null
+   76:22  error  Arrow function has too many lines (91). Maximum allowed is 80          max-lines-per-function
+   76:22  error  Arrow function has a complexity of 11. Maximum allowed is 10           complexity
+  140:13  error  'notifyMessage' is not defined                                         no-undef
+  145:35  error  Use `undefined` instead of `null`                                      unicorn/no-null
+  177:7   error  'notifyMessage' is not defined                                         no-undef
+  263:58  error  Use `undefined` instead of `null`                                      unicorn/no-null
+
+/Users/luz/Desktop/Plubot/plubot-frontend/src/components/onboarding/modals/SyncModal.jsx
+   17:19  error  Arrow function has too many lines (179). Maximum allowed is 80  max-lines-per-function
+  107:40  error  Return values from promise executor functions cannot be read    no-promise-executor-return
+
+/Users/luz/Desktop/Plubot/plubot-frontend/src/components/onboarding/modals/TemplateSelector.jsx
+    9:26  error  Arrow function has too many lines (703). Maximum allowed is 80                                                                                                                                     max-lines-per-function
+  702:15  error  Visible, non-interactive elements with click handlers must have at least one keyboard listener                                                                                                     jsx-a11y/click-events-have-key-events
+  702:15  error  Avoid non-native interactive elements. If using native HTML is not possible, add an appropriate role and support for tabbing, mouse, keyboard, and touch inputs to an interactive content element  jsx-a11y/no-static-element-interactions
+
+/Users/luz/Desktop/Plubot/plubot-frontend/src/components/onboarding/modals/WhatsappIntegrationPanel.jsx
+  11:34  error  Arrow function has too many lines (141). Maximum allowed is 80  max-lines-per-function
+  81:21  error  Use `undefined` instead of `null`                               unicorn/no-null
+
+/Users/luz/Desktop/Plubot/plubot-frontend/src/components/onboarding/nodes/actionnode/ActionNode.jsx
+   39:3   error  Arrow function has too many lines (292). Maximum allowed is 80  max-lines-per-function
+   39:3   error  Arrow function has a complexity of 11. Maximum allowed is 10    complexity
+   61:28  error  Generic Object Injection Sink                                   security/detect-object-injection
+   80:23  error  Generic Object Injection Sink                                   security/detect-object-injection
+   83:28  error  Generic Object Injection Sink                                   security/detect-object-injection
+   86:47  error  Generic Object Injection Sink                                   security/detect-object-injection
+   89:47  error  Generic Object Injection Sink                                   security/detect-object-injection
+  106:26  error  Generic Object Injection Sink                                   security/detect-object-injection
+  344:20  error  Arrow function has too many lines (293). Maximum allowed is 80  max-lines-per-function
+  344:20  error  Arrow function has a complexity of 22. Maximum allowed is 10    complexity
+
+/Users/luz/Desktop/Plubot/plubot-frontend/src/components/onboarding/nodes/ainode/useAINode.ts
+   67:9   error  Unsafe assignment of an `any` value                                                                        @typescript-eslint/no-unsafe-assignment
+   67:46  error  Unsafe return of a value of type `any`                                                                     @typescript-eslint/no-unsafe-return
+   67:52  error  Unsafe member access .updateNode on an `any` value                                                         @typescript-eslint/no-unsafe-member-access
+   72:7   error  Unsafe call of a(n) `any` typed value                                                                      @typescript-eslint/no-unsafe-call
+   99:24  error  Unsafe assignment of an `any` value                                                                        @typescript-eslint/no-unsafe-assignment
+  155:35  error  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+
+/Users/luz/Desktop/Plubot/plubot-frontend/src/components/onboarding/nodes/ainodepro/useAiNodePro.ts
+   54:34  error  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator                               @typescript-eslint/prefer-nullish-coalescing
+  123:6   error  React Hook useCallback has unnecessary dependencies: 'maxTokens' and 'temperature'. Either exclude them or remove the dependency array  react-hooks/exhaustive-deps
+
+/Users/luz/Desktop/Plubot/plubot-frontend/src/components/onboarding/nodes/customedge/CustomEdge.jsx
+  12:20  error  Arrow function has a complexity of 11. Maximum allowed is 10  complexity
+
+/Users/luz/Desktop/Plubot/plubot-frontend/src/components/onboarding/nodes/decisionnode/DecisionNode.jsx
+  45:30  error  Arrow function has too many lines (295). Maximum allowed is 80  max-lines-per-function
+  45:30  error  Arrow function has a complexity of 31. Maximum allowed is 10    complexity
+
+/Users/luz/Desktop/Plubot/plubot-frontend/src/components/onboarding/nodes/decisionnode/DecisionNode.types.js
+  120:10  error  Generic Object Injection Sink                                         security/detect-object-injection
+  129:23  error  Make sure that using this pseudorandom number generator is safe here  sonarjs/pseudo-random
+
+/Users/luz/Desktop/Plubot/plubot-frontend/src/components/onboarding/nodes/decisionnode/components/DecisionNodeConditions.jsx
+   38:3   error  Arrow function has too many lines (166). Maximum allowed is 80                                                                                                                                             max-lines-per-function
+   38:3   error  Arrow function has a complexity of 12. Maximum allowed is 10                                                                                                                                               complexity
+   74:11  error  The 'handleStartEditing' function makes the dependencies of useCallback Hook (at line 131) change on every render. To fix this, wrap the definition of 'handleStartEditing' in its own useCallback() Hook  react-hooks/exhaustive-deps
+  259:3   error  Arrow function has too many lines (164). Maximum allowed is 80                                                                                                                                             max-lines-per-function
+
+/Users/luz/Desktop/Plubot/plubot-frontend/src/components/onboarding/nodes/decisionnode/components/DecisionNodeHandles.jsx
+   17:29  error  Arrow function has too many lines (99). Maximum allowed is 80                                                                                      max-lines-per-function
+  102:6   error  React Hook useMemo has unnecessary dependencies: 'activeOutputs' and 'isUltraPerformanceMode'. Either exclude them or remove the dependency array  react-hooks/exhaustive-deps
+
+/Users/luz/Desktop/Plubot/plubot-frontend/src/components/onboarding/nodes/decisionnode/components/DecisionNodeOptions.jsx
+  34:3  error  Arrow function has too many lines (131). Maximum allowed is 80  max-lines-per-function
+  34:3  error  Arrow function has a complexity of 19. Maximum allowed is 10    complexity
+
+/Users/luz/Desktop/Plubot/plubot-frontend/src/components/onboarding/nodes/decisionnode/components/DecisionNodeQuestion.jsx
+   33:3   error  Arrow function has too many lines (139). Maximum allowed is 80                                                                    max-lines-per-function
+   99:27  error  Arrow function has too many lines (86). Maximum allowed is 80                                                                     max-lines-per-function
+  150:9   error  Visible, non-interactive elements with click handlers must have at least one keyboard listener                                    jsx-a11y/click-events-have-key-events
+  166:14  error  Do not nest ternary expressions                                                                                                   no-nested-ternary
+  170:17  error  Extract this nested ternary operation into an independent statement                                                               sonarjs/no-nested-conditional
+  173:17  error  Dangerous property 'dangerouslySetInnerHTML' found                                                                                react/no-danger
+  175:21  error  Make sure the regex used here, which is vulnerable to super-linear runtime due to backtracking, cannot lead to denial of service  sonarjs/slow-regex
+
+/Users/luz/Desktop/Plubot/plubot-frontend/src/components/onboarding/nodes/emotiondetectionnode/useEmotionDetectionNode.ts
+   73:11  warning  Generic Object Injection Sink                                      security/detect-object-injection
+   79:7   warning  Generic Object Injection Sink                                      security/detect-object-injection
+   95:11  error    Unsafe array destructuring of a tuple element with an `any` value  @typescript-eslint/no-unsafe-assignment
+   96:5   error    Unsafe assignment of an `any` value                                @typescript-eslint/no-unsafe-assignment
+   96:27  error    Unsafe member access .updateNodeData on an `any` value             @typescript-eslint/no-unsafe-member-access
+  103:7   error    Unsafe call of a(n) `any` typed value                              @typescript-eslint/no-unsafe-call
+  115:9   error    Unsafe call of a(n) `any` typed value                              @typescript-eslint/no-unsafe-call
+  122:9   error    Unsafe call of a(n) `any` typed value                              @typescript-eslint/no-unsafe-call
+
+/Users/luz/Desktop/Plubot/plubot-frontend/src/components/onboarding/nodes/endnode/EndNode.tsx
+  25:11  error  Unsafe assignment of an `any` value                  @typescript-eslint/no-unsafe-assignment
+  25:56  error  Unsafe return of a value of type `any`               @typescript-eslint/no-unsafe-return
+  25:62  error  Unsafe member access .isUltraMode on an `any` value  @typescript-eslint/no-unsafe-member-access
+  44:13  error  Unsafe assignment of an `any` value                  @typescript-eslint/no-unsafe-assignment
+
+/Users/luz/Desktop/Plubot/plubot-frontend/src/components/onboarding/nodes/endnode/EndNodeHeader.tsx
+  82:21  error  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
+
+/Users/luz/Desktop/Plubot/plubot-frontend/src/components/onboarding/nodes/httprequestnode/HttpRequestNode.jsx
+   26:28  error  Arrow function has a complexity of 14. Maximum allowed is 10                                                 complexity
+   52:3   error  Replace this if-then-else flow by a single return statement                                                  sonarjs/prefer-single-boolean-return
+   66:3   error  Arrow function has too many lines (742). Maximum allowed is 80                                               max-lines-per-function
+   66:3   error  Arrow function has a complexity of 49. Maximum allowed is 10                                                 complexity
+   73:6   error  Refactor this function to reduce its Cognitive Complexity from 34 to the 15 allowed                          sonarjs/cognitive-complexity
+   76:21  error  Unexpected empty arrow function                                                                              no-empty-function
+  117:50  error  Use `undefined` instead of `null`                                                                            unicorn/no-null
+  124:15  error  Arrow function has a complexity of 15. Maximum allowed is 10                                                 complexity
+  176:7   error  Arrow function has a complexity of 12. Maximum allowed is 10                                                 complexity
+  355:40  error  Move arrow function 'getPathOrKeyLabel' to the outer scope                                                   unicorn/consistent-function-scoping
+  365:14  error  Complete the task associated to this "TODO" comment                                                          sonarjs/todo-tag
+  381:21  error  Use `undefined` instead of `null`                                                                            unicorn/no-null
+  394:18  error  Use `undefined` instead of `null`                                                                            unicorn/no-null
+  407:45  error  Use `undefined` instead of `null`                                                                            unicorn/no-null
+  418:13  error  Remove this useless assignment to variable "errorDetails"                                                    sonarjs/no-dead-store
+  452:21  error  Please rename the variable `e`. Suggested names are: `error`, `event_`. A more descriptive name will do too  unicorn/prevent-abbreviations
+  514:28  error  Please rename the variable `e`. Suggested names are: `error`, `event_`. A more descriptive name will do too  unicorn/prevent-abbreviations
+  533:28  error  Please rename the variable `e`. Suggested names are: `error`, `event_`. A more descriptive name will do too  unicorn/prevent-abbreviations
+  548:30  error  Please rename the variable `e`. Suggested names are: `error`, `event_`. A more descriptive name will do too  unicorn/prevent-abbreviations
+  558:30  error  Please rename the variable `e`. Suggested names are: `error`, `event_`. A more descriptive name will do too  unicorn/prevent-abbreviations
+  588:28  error  Please rename the variable `e`. Suggested names are: `error`, `event_`. A more descriptive name will do too  unicorn/prevent-abbreviations
+  608:30  error  Please rename the variable `e`. Suggested names are: `error`, `event_`. A more descriptive name will do too  unicorn/prevent-abbreviations
+  634:34  error  Please rename the variable `e`. Suggested names are: `error`, `event_`. A more descriptive name will do too  unicorn/prevent-abbreviations
+  644:34  error  Please rename the variable `e`. Suggested names are: `error`, `event_`. A more descriptive name will do too  unicorn/prevent-abbreviations
+  675:34  error  Arrow function has too many lines (98). Maximum allowed is 80                                                max-lines-per-function
+  682:32  error  Please rename the variable `e`. Suggested names are: `error`, `event_`. A more descriptive name will do too  unicorn/prevent-abbreviations
+  710:34  error  Please rename the variable `e`. Suggested names are: `error`, `event_`. A more descriptive name will do too  unicorn/prevent-abbreviations
+  732:32  error  Please rename the variable `e`. Suggested names are: `error`, `event_`. A more descriptive name will do too  unicorn/prevent-abbreviations
+  752:32  error  Please rename the variable `e`. Suggested names are: `error`, `event_`. A more descriptive name will do too  unicorn/prevent-abbreviations
+  825:70  error  Use `undefined` instead of `null`                                                                            unicorn/no-null
+
+/Users/luz/Desktop/Plubot/plubot-frontend/src/components/onboarding/nodes/messagenode/CompactMessageNode.jsx
+  26:10  error  Generic Object Injection Sink                                  security/detect-object-injection
+  30:28  error  Component definition is missing display name                   react/display-name
+  30:33  error  Arrow function has too many lines (85). Maximum allowed is 80  max-lines-per-function
+
+/Users/luz/Desktop/Plubot/plubot-frontend/src/components/onboarding/nodes/messagenode/MessageNode.jsx
+   157:25  error  Found non-literal argument to RegExp Constructor                security/detect-non-literal-regexp
+   270:24  error  Arrow function has too many lines (201). Maximum allowed is 80  max-lines-per-function
+   839:30  error  Arrow function has too many lines (346). Maximum allowed is 80  max-lines-per-function
+  1301:28  error  Arrow function has a complexity of 11. Maximum allowed is 10    complexity
+
+/Users/luz/Desktop/Plubot/plubot-frontend/src/components/onboarding/nodes/messagenode/MessageNodeIcon.jsx
+  21:14  error  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+  67:9   error  Useless case in switch statement                                                                                                unicorn/no-useless-switch-case
+
+/Users/luz/Desktop/Plubot/plubot-frontend/src/components/onboarding/nodes/messagenode/MiniMessageNode.jsx
+  16:25  error  Component definition is missing display name  react/display-name
+
+/Users/luz/Desktop/Plubot/plubot-frontend/src/components/onboarding/nodes/messagenode/VariableEditor.jsx
+   16:3   error    Arrow function has too many lines (220). Maximum allowed is 80                                                                                                                                     max-lines-per-function
+  108:8   error    Please rename the variable `e`. Suggested names are: `error`, `event_`. A more descriptive name will do too                                                                                        unicorn/prevent-abbreviations
+  153:22  warning  Do not use Array index in keys                                                                                                                                                                     react/no-array-index-key
+  163:34  error    Please rename the variable `e`. Suggested names are: `error`, `event_`. A more descriptive name will do too                                                                                        unicorn/prevent-abbreviations
+  168:23  error    The autoFocus prop should not be used, as it can reduce usability and accessibility for users                                                                                                      jsx-a11y/no-autofocus
+  169:37  error    Please rename the variable `e`. Suggested names are: `error`, `event_`. A more descriptive name will do too                                                                                        unicorn/prevent-abbreviations
+  174:34  error    Please rename the variable `e`. Suggested names are: `error`, `event_`. A more descriptive name will do too                                                                                        unicorn/prevent-abbreviations
+  179:37  error    Please rename the variable `e`. Suggested names are: `error`, `event_`. A more descriptive name will do too                                                                                        unicorn/prevent-abbreviations
+  194:39  error    Please rename the variable `e`. Suggested names are: `error`, `event_`. A more descriptive name will do too                                                                                        unicorn/prevent-abbreviations
+  206:21  error    Visible, non-interactive elements with click handlers must have at least one keyboard listener                                                                                                     jsx-a11y/click-events-have-key-events
+  206:21  error    Avoid non-native interactive elements. If using native HTML is not possible, add an appropriate role and support for tabbing, mouse, keyboard, and touch inputs to an interactive content element  jsx-a11y/no-static-element-interactions
+  242:26  error    Please rename the variable `e`. Suggested names are: `error`, `event_`. A more descriptive name will do too                                                                                        unicorn/prevent-abbreviations
+  243:27  error    Please rename the variable `e`. Suggested names are: `error`, `event_`. A more descriptive name will do too                                                                                        unicorn/prevent-abbreviations
+  247:29  error    Please rename the variable `e`. Suggested names are: `error`, `event_`. A more descriptive name will do too                                                                                        unicorn/prevent-abbreviations
+  252:26  error    Please rename the variable `e`. Suggested names are: `error`, `event_`. A more descriptive name will do too                                                                                        unicorn/prevent-abbreviations
+  253:27  error    Please rename the variable `e`. Suggested names are: `error`, `event_`. A more descriptive name will do too                                                                                        unicorn/prevent-abbreviations
+  257:29  error    Please rename the variable `e`. Suggested names are: `error`, `event_`. A more descriptive name will do too                                                                                        unicorn/prevent-abbreviations
+  263:27  error    Please rename the variable `e`. Suggested names are: `error`, `event_`. A more descriptive name will do too                                                                                        unicorn/prevent-abbreviations
+
+/Users/luz/Desktop/Plubot/plubot-frontend/src/components/onboarding/nodes/optionnode/OptionNode.jsx
+  179:29  error  Arrow function has too many lines (307). Maximum allowed is 80  max-lines-per-function
+  179:29  error  Arrow function has a complexity of 18. Maximum allowed is 10    complexity
+  183:3   error  '_lodLevel' is missing in props validation                      react/prop-types
+  364:5   error  Arrow function has a complexity of 12. Maximum allowed is 10    complexity
+  532:3   error  'lodLevel' PropType is defined but prop is never used           react/no-unused-prop-types
+
+/Users/luz/Desktop/Plubot/plubot-frontend/src/components/onboarding/nodes/optionnode/OptionNode.temp.jsx
+    8:1   error  The filename `OptionNode.temp.jsx` should be named `OptionNode.temporary.jsx`. A more descriptive name will do too                                                                                                                         unicorn/prevent-abbreviations
+    8:10  error  Remove this unused import of 'debounce'                                                                                                                                                                                                    sonarjs/unused-import
+   14:3   error  Remove this unused import of 'Edit2'                                                                                                                                                                                                       sonarjs/unused-import
+   46:11  error  The 'iconProperties' object makes the dependencies of useCallback Hook (at line 75) change on every render. Move it inside the useCallback callback. Alternatively, wrap the initialization of 'iconProperties' in its own useMemo() Hook  react-hooks/exhaustive-deps
+  128:8   error  Please rename the variable `e`. Suggested names are: `error`, `event_`. A more descriptive name will do too                                                                                                                                unicorn/prevent-abbreviations
+  138:43  error  Please rename the variable `e`. Suggested names are: `error`, `event_`. A more descriptive name will do too                                                                                                                                unicorn/prevent-abbreviations
+  185:20  error  Arrow function has too many lines (300). Maximum allowed is 80                                                                                                                                                                             max-lines-per-function
+  185:20  error  Arrow function has a complexity of 17. Maximum allowed is 10                                                                                                                                                                               complexity
+  203:21  error  Use `undefined` instead of `null`                                                                                                                                                                                                          unicorn/no-null
+  204:28  error  Use `undefined` instead of `null`                                                                                                                                                                                                          unicorn/no-null
+  205:22  error  Use `undefined` instead of `null`                                                                                                                                                                                                          unicorn/no-null
+  322:38  error  Return values from promise executor functions cannot be read                                                                                                                                                                               no-promise-executor-return
+  324:7   error  Unexpected console statement                                                                                                                                                                                                               no-console
+  341:48  error  Please rename the variable `e`. Suggested names are: `error`, `event_`. A more descriptive name will do too                                                                                                                                unicorn/prevent-abbreviations
+  377:5   error  Arrow function has a complexity of 12. Maximum allowed is 10                                                                                                                                                                               complexity
+  377:6   error  Please rename the variable `e`. Suggested names are: `error`, `event_`. A more descriptive name will do too                                                                                                                                unicorn/prevent-abbreviations
+  405:5   error  Non-interactive elements should not be assigned mouse or keyboard event listeners                                                                                                                                                          jsx-a11y/no-noninteractive-element-interactions
+  405:5   error  The attribute aria-expanded is not supported by the role group                                                                                                                                                                             jsx-a11y/role-supports-aria-props
+  413:7   error  `tabIndex` should only be declared on interactive elements                                                                                                                                                                                 jsx-a11y/no-noninteractive-tabindex
+  459:13  error  Visible, non-interactive elements with click handlers must have at least one keyboard listener                                                                                                                                             jsx-a11y/click-events-have-key-events
+
+/Users/luz/Desktop/Plubot/plubot-frontend/src/components/onboarding/nodes/startnode/StartNode.tsx
+  189:22  error  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator                   @typescript-eslint/prefer-nullish-coalescing
+  260:15  error  The autoFocus prop should not be used, as it can reduce usability and accessibility for users                               jsx-a11y/no-autofocus
+  321:9   error  Unsafe assignment of an `any` value                                                                                         @typescript-eslint/no-unsafe-assignment
+  321:50  error  Unsafe return of a value of type `any`                                                                                      @typescript-eslint/no-unsafe-return
+  321:56  error  Unsafe member access .updateNode on an `any` value                                                                          @typescript-eslint/no-unsafe-member-access
+  322:9   error  Unsafe assignment of an `any` value                                                                                         @typescript-eslint/no-unsafe-assignment
+  322:51  error  Unsafe return of a value of type `any`                                                                                      @typescript-eslint/no-unsafe-return
+  322:57  error  Unsafe member access .showContextMenu on an `any` value                                                                     @typescript-eslint/no-unsafe-member-access
+  327:16  error  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator                   @typescript-eslint/prefer-nullish-coalescing
+  330:25  error  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator                   @typescript-eslint/prefer-nullish-coalescing
+  335:32  error  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator                   @typescript-eslint/prefer-nullish-coalescing
+  340:27  error  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator                   @typescript-eslint/prefer-nullish-coalescing
+  348:9   error  Unsafe assignment of an `any` value                                                                                         @typescript-eslint/no-unsafe-assignment
+  349:29  error  Unsafe return of a value of type `any`                                                                                      @typescript-eslint/no-unsafe-return
+  349:35  error  Unsafe member access .isUltraMode on an `any` value                                                                         @typescript-eslint/no-unsafe-member-access
+  349:48  error  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator                   @typescript-eslint/prefer-nullish-coalescing
+  354:9   error  Unsafe call of a(n) `any` typed value                                                                                       @typescript-eslint/no-unsafe-call
+  462:9   error  Prefer using an optional chain expression instead, as it's more concise and easier to read                                  @typescript-eslint/prefer-optional-chain
+  513:7   error  Unsafe call of a(n) `any` typed value                                                                                       @typescript-eslint/no-unsafe-call
+  521:27  error  Unsafe return of a value of type `any`                                                                                      @typescript-eslint/no-unsafe-return
+  521:27  error  Unsafe call of a(n) `any` typed value                                                                                       @typescript-eslint/no-unsafe-call
+  521:51  error  Unsafe member access .deleteNode on an `any` value                                                                          @typescript-eslint/no-unsafe-member-access
+  526:5   error  React Hook useCallback has unnecessary dependencies: 'xPos' and 'yPos'. Either exclude them or remove the dependency array  react-hooks/exhaustive-deps
+  543:24  error  Unsafe assignment of an `any` value                                                                                         @typescript-eslint/no-unsafe-assignment
+  556:24  error  Unsafe assignment of an `any` value                                                                                         @typescript-eslint/no-unsafe-assignment
+
+/Users/luz/Desktop/Plubot/plubot-frontend/src/components/onboarding/screens/FactoryScreen.jsx
+    2:18  error    Remove this unused import of 'AnimatePresence'                  sonarjs/unused-import
+    3:31  error    Remove this unused import of 'useMemo'                          sonarjs/unused-import
+   19:23  error    Arrow function has too many lines (205). Maximum allowed is 80  max-lines-per-function
+   34:33  error    Generic Object Injection Sink                                   security/detect-object-injection
+   37:11  error    Generic Object Injection Sink                                   security/detect-object-injection
+   63:40  error    Move async arrow function 'particlesInit' to the outer scope    unicorn/consistent-function-scoping
+  118:18  warning  Do not use Array index in keys                                  react/no-array-index-key
+
+/Users/luz/Desktop/Plubot/plubot-frontend/src/components/onboarding/screens/PersonalizationForm.jsx
+    16:29  error    Arrow function has too many lines (933). Maximum allowed is 80                                                                                                                                         max-lines-per-function
+    16:29  error    Arrow function has a complexity of 16. Maximum allowed is 10                                                                                                                                           complexity
+    27:10  error    Remove the declaration of the unused 'errorMessage' variable                                                                                                                                           sonarjs/no-unused-vars
+    27:10  error    Remove this useless assignment to variable "errorMessage"                                                                                                                                              sonarjs/no-dead-store
+    42:11  error    Remove the declaration of the unused 'user' variable                                                                                                                                                   sonarjs/no-unused-vars
+    42:11  error    Remove this useless assignment to variable "user"                                                                                                                                                      sonarjs/no-dead-store
+    42:17  error    Remove the declaration of the unused 'updateProfile' variable                                                                                                                                          sonarjs/no-unused-vars
+    42:17  error    Remove this useless assignment to variable "updateProfile"                                                                                                                                             sonarjs/no-dead-store
+    46:9   error    Remove the declaration of the unused 'source' variable                                                                                                                                                 sonarjs/no-unused-vars
+    46:9   error    Remove this useless assignment to variable "source"                                                                                                                                                    sonarjs/no-dead-store
+    90:9   error    The 'personalityMessages' object makes the dependencies of useMemo Hook (at line 362) change on every render. To fix this, wrap the initialization of 'personalityMessages' in its own useMemo() Hook  react-hooks/exhaustive-deps
+   168:5   error    Async arrow function has a complexity of 22. Maximum allowed is 10                                                                                                                                     complexity
+   168:16  error    Refactor this function to reduce its Cognitive Complexity from 17 to the 15 allowed                                                                                                                    sonarjs/cognitive-complexity
+   178:38  error    'powers' is already declared in the upper scope on line 9 column 10                                                                                                                                    no-shadow
+   183:36  error    Do not nest ternary expressions                                                                                                                                                                        no-nested-ternary
+   185:15  error    Extract this nested ternary operation into an independent statement                                                                                                                                    sonarjs/no-nested-conditional
+   259:17  error    Generic Object Injection Sink                                                                                                                                                                          security/detect-object-injection
+   264:20  error    Function Call Object Injection Sink                                                                                                                                                                    security/detect-object-injection
+   267:6   error    React Hook useEffect has a missing dependency: 'messages'. Either include it or remove the dependency array                                                                                            react-hooks/exhaustive-deps
+   277:28  error    Generic Object Injection Sink                                                                                                                                                                          security/detect-object-injection
+   287:6   error    React Hook useEffect has a missing dependency: 'messages'. Either include it or remove the dependency array                                                                                            react-hooks/exhaustive-deps
+   289:30  error    Please rename the variable `e`. Suggested names are: `error`, `event_`. A more descriptive name will do too                                                                                            unicorn/prevent-abbreviations
+   365:5   error    Async arrow function has a complexity of 12. Maximum allowed is 10                                                                                                                                     complexity
+   380:34  error    Prefer `structuredClone(…)` over `JSON.parse(JSON.stringify(…))` to create a deep clone                                                                                                                unicorn/prefer-structured-clone
+   388:9   error    Unexpected console statement                                                                                                                                                                           no-console
+   400:5   error    Async arrow function has a complexity of 14. Maximum allowed is 10                                                                                                                                     complexity
+   413:9   error    Unreachable code                                                                                                                                                                                       no-unreachable
+   414:11  error    'isOfflineMode' is not defined                                                                                                                                                                         no-undef
+   422:57  error    'newPlubotId' is not defined                                                                                                                                                                           no-undef
+   447:5   error    React Hook useCallback has an unnecessary dependency: 'updatePlubotData'. Either exclude it or remove the dependency array                                                                             react-hooks/exhaustive-deps
+   458:9   error    Remove the declaration of the unused 'handleRecoverableError' variable                                                                                                                                 sonarjs/no-unused-vars
+   458:9   error    Remove this useless assignment to variable "handleRecoverableError"                                                                                                                                    sonarjs/no-dead-store
+   499:27  error    Async arrow function has a complexity of 16. Maximum allowed is 10                                                                                                                                     complexity
+   499:36  error    Refactor this function to reduce its Cognitive Complexity from 20 to the 15 allowed                                                                                                                    sonarjs/cognitive-complexity
+   546:15  error    Blocks are nested too deeply (5). Maximum allowed is 4                                                                                                                                                 max-depth
+   593:25  error    Arrow function has too many lines (212). Maximum allowed is 80                                                                                                                                         max-lines-per-function
+   593:25  error    Arrow function has a complexity of 16. Maximum allowed is 10                                                                                                                                           complexity
+   802:16  error    Use `undefined` instead of `null`                                                                                                                                                                      unicorn/no-null
+   807:40  error    Move async arrow function 'particlesInit' to the outer scope                                                                                                                                           unicorn/consistent-function-scoping
+   854:22  warning  Do not use Array index in keys                                                                                                                                                                         react/no-array-index-key
+   857:33  error    Make sure that using this pseudorandom number generator is safe here                                                                                                                                   sonarjs/pseudo-random
+   858:36  error    Make sure that using this pseudorandom number generator is safe here                                                                                                                                   sonarjs/pseudo-random
+   859:32  error    Make sure that using this pseudorandom number generator is safe here                                                                                                                                   sonarjs/pseudo-random
+   869:21  warning  Do not use Array index in keys                                                                                                                                                                         react/no-array-index-key
+   914:26  warning  Do not use Array index in keys                                                                                                                                                                         react/no-array-index-key
+   952:24  warning  Do not use Array index in keys                                                                                                                                                                         react/no-array-index-key
+   961:24  warning  Do not use Array index in keys                                                                                                                                                                         react/no-array-index-key
+  1026:16  error    Do not nest ternary expressions                                                                                                                                                                        no-nested-ternary
+  1031:19  error    Do not nest ternary expressions                                                                                                                                                                        no-nested-ternary
+  1031:19  error    Extract this nested ternary operation into an independent statement                                                                                                                                    sonarjs/no-nested-conditional
+  1033:19  error    Extract this nested ternary operation into an independent statement                                                                                                                                    sonarjs/no-nested-conditional
+
+/Users/luz/Desktop/Plubot/plubot-frontend/src/components/onboarding/screens/TrainingScreen.jsx
+     7:3   error    Remove this unused import of 'lazy'                                                                                                                                                                                                                                                       sonarjs/unused-import
+    11:1   warning  There should be no empty line within import group                                                                                                                                                                                                                                         import/order
+    11:8   error    Remove this unused import of 'ReactFlow'                                                                                                                                                                                                                                                  sonarjs/unused-import
+    15:10  error    Remove this unused import of 'shallow'                                                                                                                                                                                                                                                    sonarjs/unused-import
+    19:10  error    Remove this unused import of 'useGamification'                                                                                                                                                                                                                                            sonarjs/unused-import
+    21:8   error    Remove this unused import of 'logger'                                                                                                                                                                                                                                                     sonarjs/unused-import
+    25:3   error    Remove this unused import of 'useUndoRedo'                                                                                                                                                                                                                                                sonarjs/unused-import
+    30:3   error    Remove this unused import of 'analyzeFlowRoutes'                                                                                                                                                                                                                                          sonarjs/unused-import
+    31:3   error    Remove this unused import of 'generateNodeSuggestions'                                                                                                                                                                                                                                    sonarjs/unused-import
+    33:1   warning  There should be no empty line within import group                                                                                                                                                                                                                                         import/order
+    33:10  error    Remove this unused import of 'NODE_TYPES'                                                                                                                                                                                                                                                 sonarjs/unused-import
+    33:28  error    '/Users/luz/Desktop/Plubot/plubot-frontend/src/utils/node-config.js' imported multiple times                                                                                                                                                                                              import/no-duplicates
+    37:29  error    '/Users/luz/Desktop/Plubot/plubot-frontend/src/utils/node-config.js' imported multiple times                                                                                                                                                                                              import/no-duplicates
+    41:8   error    Remove this unused import of 'EpicHeader'                                                                                                                                                                                                                                                 sonarjs/unused-import
+    49:18  error    'title' is missing in props validation                                                                                                                                                                                                                                                    react/prop-types
+    49:25  error    'isOpen' is missing in props validation                                                                                                                                                                                                                                                   react/prop-types
+    49:33  error    'onClose' is missing in props validation                                                                                                                                                                                                                                                  react/prop-types
+    49:42  error    'children' is missing in props validation                                                                                                                                                                                                                                                 react/prop-types
+    66:25  error    'modals' is missing in props validation                                                                                                                                                                                                                                                   react/prop-types
+    66:33  error    'modalProps' is missing in props validation                                                                                                                                                                                                                                               react/prop-types
+    66:45  error    'onClose' is missing in props validation                                                                                                                                                                                                                                                  react/prop-types
+    71:15  error    'modals.showConnectionEditor' is missing in props validation                                                                                                                                                                                                                              react/prop-types
+    72:10  error    'ConnectionEditor' is not defined                                                                                                                                                                                                                                                         react/jsx-no-undef
+    73:34  error    'modalProps.selectedConnection' is missing in props validation                                                                                                                                                                                                                            react/prop-types
+    74:34  error    'modalProps.connectionProperties' is missing in props validation                                                                                                                                                                                                                          react/prop-types
+    75:30  error    'modalProps.onSaveConnection' is missing in props validation                                                                                                                                                                                                                              react/prop-types
+    82:24  error    'modals.showSuggestionsModal' is missing in props validation                                                                                                                                                                                                                              react/prop-types
+    85:10  error    'SuggestionsModal' is not defined                                                                                                                                                                                                                                                         react/jsx-no-undef
+    86:35  error    'modalProps.nodeSuggestions' is missing in props validation                                                                                                                                                                                                                               react/prop-types
+    88:33  error    'modalProps.onAddSuggestedNode' is missing in props validation                                                                                                                                                                                                                            react/prop-types
+    94:24  error    'modals.showTemplateSelector' is missing in props validation                                                                                                                                                                                                                              react/prop-types
+    97:10  error    'TemplateSelector' is not defined                                                                                                                                                                                                                                                         react/jsx-no-undef
+    98:40  error    'modalProps.onSelectTemplate' is missing in props validation                                                                                                                                                                                                                              react/prop-types
+   105:24  error    'modals.showExportMode' is missing in props validation                                                                                                                                                                                                                                    react/prop-types
+   108:10  error    'ImportExportModal' is not defined                                                                                                                                                                                                                                                        react/jsx-no-undef
+   109:29  error    'modalProps.nodes' is missing in props validation                                                                                                                                                                                                                                         react/prop-types
+   110:29  error    'modalProps.edges' is missing in props validation                                                                                                                                                                                                                                         react/prop-types
+   111:30  error    'modalProps.exportFormat' is missing in props validation                                                                                                                                                                                                                                  react/prop-types
+   112:32  error    'modalProps.plubotId' is missing in props validation                                                                                                                                                                                                                                      react/prop-types
+   119:24  error    'modals.showEmbedModal' is missing in props validation                                                                                                                                                                                                                                    react/prop-types
+   122:10  error    'EmbedModal' is not defined                                                                                                                                                                                                                                                               react/jsx-no-undef
+   123:32  error    'modalProps.plubotId' is missing in props validation                                                                                                                                                                                                                                      react/prop-types
+   124:29  error    'modalProps.nodes' is missing in props validation                                                                                                                                                                                                                                         react/prop-types
+   125:29  error    'modalProps.edges' is missing in props validation                                                                                                                                                                                                                                         react/prop-types
+   145:25  error    Prefer `Number.isNaN` over `isNaN`                                                                                                                                                                                                                                                        unicorn/prefer-number-properties
+   145:31  error    Missing radix parameter                                                                                                                                                                                                                                                                   radix
+   151:20  error    Prefer `Number.isNaN` over `isNaN`                                                                                                                                                                                                                                                        unicorn/prefer-number-properties
+   151:26  error    Missing radix parameter                                                                                                                                                                                                                                                                   radix
+   160:24  error    Arrow function has too many lines (1005). Maximum allowed is 80                                                                                                                                                                                                                           max-lines-per-function
+   160:24  error    Arrow function has a complexity of 14. Maximum allowed is 10                                                                                                                                                                                                                              complexity
+   185:5   error    Remove the declaration of the unused 'setNodes' variable                                                                                                                                                                                                                                  sonarjs/no-unused-vars
+   185:5   error    Remove this useless assignment to variable "setNodes"                                                                                                                                                                                                                                     sonarjs/no-dead-store
+   186:5   error    Remove the declaration of the unused 'setEdges' variable                                                                                                                                                                                                                                  sonarjs/no-unused-vars
+   186:5   error    Remove this useless assignment to variable "setEdges"                                                                                                                                                                                                                                     sonarjs/no-dead-store
+   187:5   error    Remove the declaration of the unused 'removeNode' variable                                                                                                                                                                                                                                sonarjs/no-unused-vars
+   187:5   error    Remove this useless assignment to variable "removeNode"                                                                                                                                                                                                                                   sonarjs/no-dead-store
+   188:5   error    Remove the declaration of the unused 'duplicateNode' variable                                                                                                                                                                                                                             sonarjs/no-unused-vars
+   188:5   error    Remove this useless assignment to variable "duplicateNode"                                                                                                                                                                                                                                sonarjs/no-dead-store
+   189:5   error    Remove the declaration of the unused 'updateNodeData' variable                                                                                                                                                                                                                            sonarjs/no-unused-vars
+   189:5   error    Remove this useless assignment to variable "updateNodeData"                                                                                                                                                                                                                               sonarjs/no-dead-store
+   202:5   error    Remove this useless assignment to variable "suggestions"                                                                                                                                                                                                                                  sonarjs/no-dead-store
+   283:24  error    React Hook "useMemo" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?                                                                                                 react-hooks/rules-of-hooks
+   284:5   error    Arrow function has too many lines (132). Maximum allowed is 80                                                                                                                                                                                                                            max-lines-per-function
+   420:24  error    React Hook "useMemo" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?                                                                                                 react-hooks/rules-of-hooks
+   421:5   error    Arrow function has too many lines (90). Maximum allowed is 80                                                                                                                                                                                                                             max-lines-per-function
+   519:3   error    React Hook "usePlubotLoader" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?                                                                                         react-hooks/rules-of-hooks
+   529:19  error    React Hook "useState" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?                                                                                                react-hooks/rules-of-hooks
+   537:3   error    React Hook "useEffect" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?                                                                                               react-hooks/rules-of-hooks
+   542:23  error    React Hook "useCallback" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?                                                                                             react-hooks/rules-of-hooks
+   543:35  error    Use `undefined` instead of `null`                                                                                                                                                                                                                                                         unicorn/no-null
+   554:34  error    React Hook "useCallback" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?                                                                                             react-hooks/rules-of-hooks
+   596:34  error    React Hook "useCallback" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?                                                                                             react-hooks/rules-of-hooks
+   606:39  error    `Array#reduce()` is not allowed. Prefer other types of loop for readability                                                                                                                                                                                                               unicorn/no-array-reduce
+   607:46  error    Arrow function has too many parameters (4). Maximum allowed is 3                                                                                                                                                                                                                          max-params
+   649:15  error    Generic Object Injection Sink                                                                                                                                                                                                                                                             security/detect-object-injection
+   650:13  error    Generic Object Injection Sink                                                                                                                                                                                                                                                             security/detect-object-injection
+   651:18  error    Generic Object Injection Sink                                                                                                                                                                                                                                                             security/detect-object-injection
+   652:26  error    Generic Object Injection Sink                                                                                                                                                                                                                                                             security/detect-object-injection
+   677:33  error    React Hook "useCallback" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?                                                                                             react-hooks/rules-of-hooks
+   709:29  error    React Hook "useCallback" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?                                                                                             react-hooks/rules-of-hooks
+   710:6   error    'nodes' is already declared in the upper scope on line 179 column 5                                                                                                                                                                                                                       no-shadow
+   710:13  error    'edges' is already declared in the upper scope on line 180 column 5                                                                                                                                                                                                                       no-shadow
+   732:26  error    React Hook "useCallback" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?                                                                                             react-hooks/rules-of-hooks
+   732:38  error    Async arrow function has a complexity of 12. Maximum allowed is 10                                                                                                                                                                                                                        complexity
+   749:30  error    Prefer `structuredClone(…)` over `JSON.parse(JSON.stringify(…))` to create a deep clone                                                                                                                                                                                                   unicorn/prefer-structured-clone
+   795:14  error    'error' is already declared in the upper scope on line 196 column 5                                                                                                                                                                                                                       no-shadow
+   803:6   error    React Hook useCallback has unnecessary dependencies: 'backupEdgesToLocalStorage' and 'plubotId'. Either exclude them or remove the dependency array. Outer scope values like 'backupEdgesToLocalStorage' aren't valid dependencies because mutating them doesn't re-render the component  react-hooks/exhaustive-deps
+   826:25  error    React Hook "useDebounce" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?                                                                                             react-hooks/rules-of-hooks
+   829:3   error    React Hook "useEffect" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?                                                                                               react-hooks/rules-of-hooks
+   838:6   error    React Hook useEffect has a missing dependency: 'nodes'. Either include it or remove the dependency array                                                                                                                                                                                  react-hooks/exhaustive-deps
+   842:24  error    React Hook "useCallback" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?                                                                                             react-hooks/rules-of-hooks
+   929:3   error    React Hook "useEffect" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?                                                                                               react-hooks/rules-of-hooks
+   929:13  error    Arrow function has a complexity of 13. Maximum allowed is 10                                                                                                                                                                                                                              complexity
+   974:6   error    React Hook useEffect has a missing dependency: 'handleDismissRecovery'. Either include it or remove the dependency array                                                                                                                                                                  react-hooks/exhaustive-deps
+  1059:12  error    Use `undefined` instead of `null`                                                                                                                                                                                                                                                         unicorn/no-null
+  1066:30  error    React Hook "useCallback" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?                                                                                             react-hooks/rules-of-hooks
+  1086:27  error    React Hook "useCallback" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?                                                                                             react-hooks/rules-of-hooks
+  1086:39  error    Arrow function has a complexity of 17. Maximum allowed is 10                                                                                                                                                                                                                              complexity
+  1106:11  error    Prefer `Number.isNaN` over `isNaN`                                                                                                                                                                                                                                                        unicorn/prefer-number-properties
+  1107:11  error    Prefer `Number.isNaN` over `isNaN`                                                                                                                                                                                                                                                        unicorn/prefer-number-properties
+  1120:13  error    Prefer `Number.isNaN` over `isNaN`                                                                                                                                                                                                                                                        unicorn/prefer-number-properties
+  1120:40  error    Prefer `Number.isNaN` over `isNaN`                                                                                                                                                                                                                                                        unicorn/prefer-number-properties
+  1130:30  error    React Hook "useCallback" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?                                                                                             react-hooks/rules-of-hooks
+  1157:26  error    React Hook "useCallback" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?                                                                                             react-hooks/rules-of-hooks
+  1183:26  error    React Hook "useCallback" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?                                                                                             react-hooks/rules-of-hooks
+  1302:12  error    Use `undefined` instead of `null`                                                                                                                                                                                                                                                         unicorn/no-null
+  1317:27  error    Please rename the variable `e`. Suggested names are: `error_`, `event_`. A more descriptive name will do too                                                                                                                                                                              unicorn/prevent-abbreviations
+  1318:27  error    Please rename the variable `e`. Suggested names are: `error_`, `event_`. A more descriptive name will do too                                                                                                                                                                              unicorn/prevent-abbreviations
+  1342:27  error    Use `undefined` instead of `null`                                                                                                                                                                                                                                                         unicorn/no-null
+  1350:29  error    Use `undefined` instead of `null`                                                                                                                                                                                                                                                         unicorn/no-null
+
+/Users/luz/Desktop/Plubot/plubot-frontend/src/components/onboarding/screens/WelcomeSequence.jsx
+  25:13  error  Make sure that using this pseudorandom number generator is safe here  sonarjs/pseudo-random
+  26:17  error  Make sure that using this pseudorandom number generator is safe here  sonarjs/pseudo-random
+  27:18  error  Make sure that using this pseudorandom number generator is safe here  sonarjs/pseudo-random
+  28:28  error  Make sure that using this pseudorandom number generator is safe here  sonarjs/pseudo-random
+  29:35  error  Make sure that using this pseudorandom number generator is safe here  sonarjs/pseudo-random
+  52:25  error  Arrow function has too many lines (257). Maximum allowed is 80        max-lines-per-function
+
+/Users/luz/Desktop/Plubot/plubot-frontend/src/components/onboarding/simulation/ConnectionEditor.jsx
+    5:41  error  'properties' is missing in props validation                                                                  react/prop-types
+    6:11  error  'properties.style.stroke' is missing in props validation                                                     react/prop-types
+    6:19  error  'properties.style.strokeWidth' is missing in props validation                                                react/prop-types
+    6:32  error  'properties.style.strokeDasharray' is missing in props validation                                            react/prop-types
+    6:63  error  'properties.style' is missing in props validation                                                            react/prop-types
+   36:19  error  'properties.animated' is missing in props validation                                                         react/prop-types
+   47:31  error  'text' is missing in props validation                                                                        react/prop-types
+   58:35  error  'preset' is missing in props validation                                                                      react/prop-types
+   58:43  error  'onClick' is missing in props validation                                                                     react/prop-types
+   58:52  error  'isActive' is missing in props validation                                                                    react/prop-types
+   63:33  error  'preset.stroke' is missing in props validation                                                               react/prop-types
+   64:29  error  'preset.strokeDasharray' is missing in props validation                                                      react/prop-types
+   69:21  error  'preset.name' is missing in props validation                                                                 react/prop-types
+   70:36  error  'preset.name' is missing in props validation                                                                 react/prop-types
+   77:24  error  Arrow function has too many lines (150). Maximum allowed is 80                                               max-lines-per-function
+   78:3   error  'connectionProperties' is missing in props validation                                                        react/prop-types
+   79:3   error  'setConnectionProperties' is missing in props validation                                                     react/prop-types
+   80:3   error  'connectionType' is missing in props validation                                                              react/prop-types
+   81:3   error  'suggestLabel' is missing in props validation                                                                react/prop-types
+  117:41  error  'connectionProperties.label' is missing in props validation                                                  react/prop-types
+  118:24  error  Please rename the variable `e`. Suggested names are: `error`, `event_`. A more descriptive name will do too  unicorn/prevent-abbreviations
+  121:34  error  'connectionProperties.label' is missing in props validation                                                  react/prop-types
+  141:39  error  'connectionProperties.style' is missing in props validation                                                  react/prop-types
+  141:45  error  'connectionProperties.style.stroke' is missing in props validation                                           react/prop-types
+  142:22  error  Please rename the variable `e`. Suggested names are: `error`, `event_`. A more descriptive name will do too  unicorn/prevent-abbreviations
+  158:41  error  'connectionProperties.style' is missing in props validation                                                  react/prop-types
+  158:47  error  'connectionProperties.style.strokeWidth' is missing in props validation                                      react/prop-types
+  159:24  error  Please rename the variable `e`. Suggested names are: `error`, `event_`. A more descriptive name will do too  unicorn/prevent-abbreviations
+  167:49  error  'connectionProperties.style' is missing in props validation                                                  react/prop-types
+  167:55  error  'connectionProperties.style.strokeWidth' is missing in props validation                                      react/prop-types
+  170:35  error  'connectionProperties.style' is missing in props validation                                                  react/prop-types
+  170:41  error  'connectionProperties.style.strokeWidth' is missing in props validation                                      react/prop-types
+  182:39  error  'connectionProperties.style' is missing in props validation                                                  react/prop-types
+  182:45  error  'connectionProperties.style.strokeDasharray' is missing in props validation                                  react/prop-types
+  183:22  error  Please rename the variable `e`. Suggested names are: `error`, `event_`. A more descriptive name will do too  unicorn/prevent-abbreviations
+  198:43  error  'connectionProperties.animated' is missing in props validation                                               react/prop-types
+  199:24  error  Please rename the variable `e`. Suggested names are: `error`, `event_`. A more descriptive name will do too  unicorn/prevent-abbreviations
+  200:48  error  'connectionProperties.animated' is missing in props validation                                               react/prop-types
+  220:41  error  'connectionProperties.priority' is missing in props validation                                               react/prop-types
+  221:24  error  Please rename the variable `e`. Suggested names are: `error`, `event_`. A more descriptive name will do too  unicorn/prevent-abbreviations
+  236:26  error  Arrow function has too many lines (240). Maximum allowed is 80                                               max-lines-per-function
+  236:26  error  Arrow function has a complexity of 11. Maximum allowed is 10                                                 complexity
+  237:3   error  'nodes' is missing in props validation                                                                       react/prop-types
+  238:3   error  'selectedConnection' is missing in props validation                                                          react/prop-types
+  239:3   error  'connectionProperties' is missing in props validation                                                        react/prop-types
+  240:3   error  'setConnectionProperties' is missing in props validation                                                     react/prop-types
+  241:3   error  'saveConnectionChanges' is missing in props validation                                                       react/prop-types
+  242:3   error  'deleteConnection' is missing in props validation                                                            react/prop-types
+  243:3   error  'setShowConnectionEditor' is missing in props validation                                                     react/prop-types
+  290:48  error  'connectionProperties.style' is missing in props validation                                                  react/prop-types
+  290:54  error  'connectionProperties.style.stroke' is missing in props validation                                           react/prop-types
+  291:53  error  'connectionProperties.style' is missing in props validation                                                  react/prop-types
+  291:59  error  'connectionProperties.style.strokeWidth' is missing in props validation                                      react/prop-types
+  292:57  error  'connectionProperties.style' is missing in props validation                                                  react/prop-types
+  292:63  error  'connectionProperties.style.strokeDasharray' is missing in props validation                                  react/prop-types
+  294:28  error  'connectionProperties.style' is missing in props validation                                                  react/prop-types
+  298:17  error  'nodes.find' is missing in props validation                                                                  react/prop-types
+  298:64  error  'selectedConnection.source' is missing in props validation                                                   react/prop-types
+  303:17  error  'nodes.find' is missing in props validation                                                                  react/prop-types
+  303:64  error  'selectedConnection.target' is missing in props validation                                                   react/prop-types
+  323:28  error  Please rename the variable `e`. Suggested names are: `error`, `event_`. A more descriptive name will do too  unicorn/prevent-abbreviations
+  431:63  error  'selectedConnection.source' is missing in props validation                                                   react/prop-types
+  438:63  error  'selectedConnection.target' is missing in props validation                                                   react/prop-types
+
+/Users/luz/Desktop/Plubot/plubot-frontend/src/components/onboarding/simulation/SimulationInterface.jsx
+   27:30  error    Async arrow function has a complexity of 14. Maximum allowed is 10                                                                                                                             complexity
+   97:23  error    Found non-literal argument to RegExp Constructor                                                                                                                                               security/detect-non-literal-regexp
+  101:52  error    Generic Object Injection Sink                                                                                                                                                                  security/detect-object-injection
+  124:3   error    Async arrow function has too many parameters (4). Maximum allowed is 3                                                                                                                         max-params
+  185:3   error    Async arrow function has too many parameters (4). Maximum allowed is 3                                                                                                                         max-params
+  254:21  error    Component definition is missing display name                                                                                                                                                   react/display-name
+  254:35  error    'message' is missing in props validation                                                                                                                                                       react/prop-types
+  255:11  error    'message.type' is missing in props validation                                                                                                                                                  react/prop-types
+  255:17  error    'message.content' is missing in props validation                                                                                                                                               react/prop-types
+  255:26  error    'message.timestamp' is missing in props validation                                                                                                                                             react/prop-types
+  255:37  error    'message.isActionStatus' is missing in props validation                                                                                                                                        react/prop-types
+  272:29  error    Arrow function has too many lines (720). Maximum allowed is 80                                                                                                                                 max-lines-per-function
+  272:29  error    Arrow function has a complexity of 17. Maximum allowed is 10                                                                                                                                   complexity
+  273:3   error    'nodes' is missing in props validation                                                                                                                                                         react/prop-types
+  274:3   error    'edges' is missing in props validation                                                                                                                                                         react/prop-types
+  275:3   error    'onClose' is missing in props validation                                                                                                                                                       react/prop-types
+  275:19  error    Unexpected empty arrow function                                                                                                                                                                no-empty-function
+  276:3   error    'analyticsTracker' is missing in props validation                                                                                                                                              react/prop-types
+  276:22  error    Use `undefined` instead of `null`                                                                                                                                                              unicorn/no-null
+  277:3   error    'isUltraMode' is missing in props validation                                                                                                                                                   react/prop-types
+  280:9   error    The 'safeNodes' conditional could make the dependencies of useEffect Hook (at line 376) change on every render. To fix this, wrap the initialization of 'safeNodes' in its own useMemo() Hook  react-hooks/exhaustive-deps
+  280:9   error    The 'safeNodes' conditional could make the dependencies of useMemo Hook (at line 835) change on every render. To fix this, wrap the initialization of 'safeNodes' in its own useMemo() Hook    react-hooks/exhaustive-deps
+  290:54  error    Use `undefined` instead of `null`                                                                                                                                                              unicorn/no-null
+  293:64  error    Use `undefined` instead of `null`                                                                                                                                                              unicorn/no-null
+  317:22  error    Use `undefined` instead of `null`                                                                                                                                                              unicorn/no-null
+  361:9   error    Unexpected console statement                                                                                                                                                                   no-console
+  381:5   error    Async arrow function has too many lines (405). Maximum allowed is 80                                                                                                                           max-lines-per-function
+  381:5   error    Async arrow function has a complexity of 52. Maximum allowed is 10                                                                                                                             complexity
+  381:61  error    Refactor this function to reduce its Cognitive Complexity from 70 to the 15 allowed                                                                                                            sonarjs/cognitive-complexity
+  594:19  error    Use array destructuring                                                                                                                                                                        prefer-destructuring
+  607:17  error    Expected an assignment or function call and instead saw an expression                                                                                                                          no-unused-expressions
+  800:5   error    React Hook useCallback has missing dependencies: 'userMessageForNode' and 'userResponses'. Either include them or remove the dependency array                                                  react-hooks/exhaustive-deps
+  827:22  error    Use `undefined` instead of `null`                                                                                                                                                              unicorn/no-null
+  837:40  error    Please rename the variable `e`. Suggested names are: `error`, `event_`. A more descriptive name will do too                                                                                    unicorn/prevent-abbreviations
+  899:36  error    Return values from promise executor functions cannot be read                                                                                                                                   no-promise-executor-return
+  900:75  error    Use `undefined` instead of `null`                                                                                                                                                              unicorn/no-null
+  907:14  error    Use `undefined` instead of `null`                                                                                                                                                              unicorn/no-null
+  915:20  warning  Do not use Array index in keys                                                                                                                                                                 react/no-array-index-key
+  926:36  error    Please rename the variable `e`. Suggested names are: `error`, `event_`. A more descriptive name will do too                                                                                    unicorn/prevent-abbreviations
+  941:24  error    Please rename the variable `e`. Suggested names are: `error`, `event_`. A more descriptive name will do too                                                                                    unicorn/prevent-abbreviations
+
+/Users/luz/Desktop/Plubot/plubot-frontend/src/flow/nodeRegistry.jsx
+  51:32  error  Arrow function has too many lines (100). Maximum allowed is 80  max-lines-per-function
+
+/Users/luz/Desktop/Plubot/plubot-frontend/src/pages/contact/Contact.jsx
+  184:17  error  Arrow function has too many lines (319). Maximum allowed is 80  max-lines-per-function
+
+/Users/luz/Desktop/Plubot/plubot-frontend/src/pages/faq/FAQ.jsx
+  15:13  error  Arrow function has too many lines (323). Maximum allowed is 80  max-lines-per-function
+
+/Users/luz/Desktop/Plubot/plubot-frontend/src/pages/legal/Seguridad.jsx
+  196:19  error  Arrow function has too many lines (497). Maximum allowed is 80  max-lines-per-function
+
+/Users/luz/Desktop/Plubot/plubot-frontend/src/pages/marketplace/Marketplace.jsx
+  34:21  error  Arrow function has too many lines (267). Maximum allowed is 80  max-lines-per-function
+
+/Users/luz/Desktop/Plubot/plubot-frontend/src/pages/plans/Plans.jsx
+  10:16  error  Function 'Plans' has too many lines (308). Maximum allowed is 80  max-lines-per-function
+
+/Users/luz/Desktop/Plubot/plubot-frontend/src/pages/poderes/Poderes.jsx
+  10:17  error  Arrow function has too many lines (141). Maximum allowed is 80  max-lines-per-function
+
+/Users/luz/Desktop/Plubot/plubot-frontend/src/pages/tuopinion/TuOpinion.jsx
+  245:19  error  Arrow function has too many lines (330). Maximum allowed is 80  max-lines-per-function
+
+/Users/luz/Desktop/Plubot/plubot-frontend/src/services/exportImportService.js
+  246:30  error  Async arrow function has too many lines (101). Maximum allowed is 80  max-lines-per-function
+  246:30  error  Async arrow function has a complexity of 18. Maximum allowed is 10    complexity
+
+/Users/luz/Desktop/Plubot/plubot-frontend/src/services/flowService.js
+  59:17  error  Async method 'loadFlow' has a complexity of 15. Maximum allowed is 10  complexity
+
+/Users/luz/Desktop/Plubot/plubot-frontend/src/services/syncService.js
+   83:20  error  Async arrow function has a complexity of 13. Maximum allowed is 10  complexity
+  151:31  error  Async arrow function has a complexity of 11. Maximum allowed is 10  complexity
+
+/Users/luz/Desktop/Plubot/plubot-frontend/src/stores/selectors.js
+  19:5  error  Arrow function has a complexity of 15. Maximum allowed is 10  complexity
+  47:5  error  Arrow function has a complexity of 18. Maximum allowed is 10  complexity
+
+/Users/luz/Desktop/Plubot/plubot-frontend/src/stores/slices/nodeSlice.js
+  35:32  error  Arrow function has too many lines (333). Maximum allowed is 80  max-lines-per-function
+
+/Users/luz/Desktop/Plubot/plubot-frontend/src/stores/use-auth-store.js
+  30:24  error  Arrow function has too many lines (317). Maximum allowed is 80  max-lines-per-function
+
+/Users/luz/Desktop/Plubot/plubot-frontend/src/stores/use-flow-store.js
+  159:5  error  Arrow function has too many lines (162). Maximum allowed is 80  max-lines-per-function
+
+/Users/luz/Desktop/Plubot/plubot-frontend/src/utils/ai-flow-helpers.js
+  89:41  error  Arrow function has too many lines (90). Maximum allowed is 80  max-lines-per-function
+  89:41  error  Arrow function has a complexity of 12. Maximum allowed is 10   complexity
+
+/Users/luz/Desktop/Plubot/plubot-frontend/src/utils/error-handler.js
+  27:8  error  Function 'captureError' has a complexity of 14. Maximum allowed is 10  complexity
+
+/Users/luz/Desktop/Plubot/plubot-frontend/src/utils/flow-optimizer.js
+  110:31  error  Arrow function has a complexity of 17. Maximum allowed is 10  complexity
+  160:34  error  Arrow function has a complexity of 19. Maximum allowed is 10  complexity
+  313:29  error  Arrow function has a complexity of 15. Maximum allowed is 10  complexity
+
+/Users/luz/Desktop/Plubot/plubot-frontend/src/utils/flow-validation.js
+  495:40  error  Arrow function has too many lines (113). Maximum allowed is 80  max-lines-per-function
+  495:40  error  Arrow function has a complexity of 13. Maximum allowed is 10    complexity
+
+/Users/luz/Desktop/Plubot/plubot-frontend/src/utils/node-config.js
+  350:29  error  Arrow function has a complexity of 12. Maximum allowed is 10  complexity
+
+/Users/luz/Desktop/Plubot/plubot-frontend/src/utils/node-validation.js
+  106:35  error  Arrow function has a complexity of 11. Maximum allowed is 10  complexity
+
+/Users/luz/Desktop/Plubot/plubot-frontend/src/utils/plubot-name-sync.js
+  26:31  error  Async arrow function has a complexity of 11. Maximum allowed is 10  complexity
+
+/Users/luz/Desktop/Plubot/plubot-frontend/src/utils/suggestion-providers.js
+  1:43  error  Arrow function has too many lines (101). Maximum allowed is 80  max-lines-per-function
+
+✖ 751 problems (739 errors, 12 warnings)
+

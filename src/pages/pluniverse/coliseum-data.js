@@ -1,0 +1,113 @@
+export const tabs = [
+  { id: 'ranking', label: 'Ranking Global' },
+  { id: 'plubots', label: 'Plubots Destacados' },
+  { id: 'challenges', label: 'Retos Activos' },
+];
+
+export const rankings = [
+  {
+    rank: 1,
+    user: 'Zentro',
+    score: 1200,
+    avatar: '/api/placeholder/50/50',
+    efficiency: 98,
+    timesSaved: 24,
+    interactions: 542,
+  },
+  {
+    rank: 2,
+    user: 'Nova',
+    score: 950,
+    avatar: '/api/placeholder/50/50',
+    efficiency: 92,
+    timesSaved: 18,
+    interactions: 487,
+  },
+  {
+    rank: 3,
+    user: 'Kryon',
+    score: 800,
+    avatar: '/api/placeholder/50/50',
+    efficiency: 89,
+    timesSaved: 16,
+    interactions: 412,
+  },
+  {
+    rank: 4,
+    user: 'Synthia',
+    score: 750,
+    avatar: '/api/placeholder/50/50',
+    efficiency: 86,
+    timesSaved: 15,
+    interactions: 384,
+  },
+];
+
+export const plubots = [
+  {
+    id: 1,
+    name: 'VentaMaster3000',
+    creator: '@LuisCreador',
+    style: 'Ventas por WhatsApp',
+    sales: 3200,
+    reviews: 4.9,
+    votes: 189,
+    price: 4.99,
+    avatar: '/api/placeholder/60/60',
+    badges: ['Élite', 'Popular'],
+    level: 8,
+  },
+  {
+    id: 2,
+    name: 'AsistenteProAI',
+    creator: '@MariaDigital',
+    style: 'Soporte Técnico',
+    sales: 2850,
+    reviews: 4.8,
+    votes: 156,
+    price: 3.99,
+    avatar: '/api/placeholder/60/60',
+    badges: ['Eficiente', 'Confiable'],
+    level: 7,
+  },
+  {
+    id: 3,
+    name: 'ContentoCreator',
+    creator: '@PabloSocial',
+    style: 'Marketing de Contenidos',
+    sales: 4100,
+    reviews: 4.7,
+    votes: 203,
+    price: 5.99,
+    avatar: '/api/placeholder/60/60',
+    badges: ['Creativo', 'Trending'],
+    level: 9,
+  },
+];
+
+export const challenges = [
+  {
+    id: 1,
+    title: 'Maestro de la Automatización',
+    description: 'Automatiza 50 tareas esta semana',
+    reward: '100 puntos + Medalla Dorada',
+    progress: 72,
+    deadline: '3 días',
+  },
+  {
+    id: 2,
+    title: 'Campeón de la Eficiencia',
+    description: 'Mantén un ratio de eficiencia superior al 90% durante 7 días',
+    reward: "150 puntos + Título 'Eficiencia Suprema'",
+    progress: 45,
+    deadline: '5 días',
+  },
+  {
+    id: 3,
+    title: 'Estratega del Tiempo',
+    description: 'Ahorra 10 horas de trabajo manual',
+    reward: "80 puntos + Desbloqueo tema 'Chronomaster'",
+    progress: 89,
+    deadline: '1 día',
+  },
+];

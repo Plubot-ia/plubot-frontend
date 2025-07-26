@@ -1,0 +1,84 @@
+/* 
+ * OPTIMIZACIONES DE RENDIMIENTO ELITE PARA DRAG & DROP
+ * Versión 2.0 - Solución completa para fluidez de arrastre individual
+ */
+
+/* Clase aplicada al body durante el arrastre para optimizaciones globales */
+.elite-node-dragging {
+  cursor: grabbing !important;
+}
+
+/* CORRECCIÓN: Solo desactivar eventos en elementos específicos, no en todos */
+.elite-node-dragging .react-flow__edge,
+.elite-node-dragging .react-flow__background,
+.elite-node-dragging .ts-background-scene-container {
+  pointer-events: none !important;
+}
+
+/* IMPORTANTE: Preservar eventos en nodos para permitir interacción fluida */
+.elite-node-dragging .react-flow__node {
+  will-change: transform !important;
+  z-index: 10 !important; /* Forzar nodos por encima durante arrastre */
+  pointer-events: auto !important;
+  /* Evitar que se oculten detrás de márgenes */
+  box-shadow: 0 0 0 1px rgba(0, 150, 255, 0.1) !important;
+}
+
+/* El nodo que está siendo arrastrado debe tener máxima visibilidad */
+.elite-node-dragging .react-flow__node.selected {
+  z-index: 100 !important; /* Nodo seleccionado siempre visible */
+  pointer-events: auto !important;
+}
+
+/* Reducir la carga visual durante el arrastre */
+.elite-node-dragging .react-flow__edge {
+  opacity: 0.7;
+  transition: none !important; /* Eliminar transiciones durante el arrastre */
+}
+
+/* Modo ultra para máxima fluidez sacrificando calidad visual */
+.elite-ultra-dragging .react-flow__edge {
+  opacity: 0.3 !important;
+  transition: none !important;
+  animation: none !important;
+}
+
+/* Asegurar que el fondo siempre esté detrás */
+.react-flow__background,
+.background-scene,
+.ts-background-scene-container {
+  z-index: -1 !important;
+  pointer-events: none !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* Optimizaciones para minimizar repaints durante el arrastre */
+.elite-node-dragging .react-flow__renderer {
+  will-change: transform !important;
+  contain: layout style !important;
+  /* Permitir que elementos salgan de los límites */
+  overflow: visible !important;
+}
+
+/* Asegurar que los nodos estén siempre visibles */
+.react-flow__node {
+  z-index: 5;
+  contain: layout style;
+}
+
+/* Prevenir problemas de capas */
+.react-flow__edge {
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* Optimización para el viewport */
+.react-flow__viewport {
+  will-change: transform;
+  transform-origin: 0 0;
+  contain: layout style paint;
+}
