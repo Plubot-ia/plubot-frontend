@@ -30,8 +30,8 @@ const _renderSyncModal = (closeModal, handleSync) => (
   />
 );
 
-const _renderEmbedModal = (closeModal, flowId) => (
-  <EmbedModal onClose={() => closeModal('embedModal')} plubotId={flowId || '1'} plubotName='Mi Plubot' />
+const _renderEmbedModal = (closeModal, plubotId) => (
+  <EmbedModal onClose={() => closeModal('embedModal')} plubotId={plubotId || '1'} plubotName='Mi Plubot' />
 );
 
 const _renderImportExportModal = (closeModal, setByteMessage) => (
@@ -132,11 +132,11 @@ const ModalContainer = () => {
   const { activeModals, closeModal } = useModalContext();
   const { showNotification, setByteMessage } = useByteMessageContext();
 
-  // Obtener los nodos, aristas y flowId del FlowStore
-  const { nodes, edges, flowId } = useFlowStore((state) => ({
+  // Obtener los nodos, aristas y plubotId del FlowStore
+  const { nodes, edges, plubotId } = useFlowStore((state) => ({
     nodes: state.nodes ?? [],
     edges: state.edges ?? [],
-    flowId: state.flowId,
+    plubotId: state.plubotId,
   }));
 
   const activeModalEntry = [...(activeModals?.entries() ?? [])].find(([, isActive]) => isActive);
@@ -169,7 +169,7 @@ const ModalContainer = () => {
           }
 
           case 'embedModal': {
-            return _renderEmbedModal(closeModal, flowId);
+            return _renderEmbedModal(closeModal, plubotId);
           }
 
           case 'importExportModal': {
