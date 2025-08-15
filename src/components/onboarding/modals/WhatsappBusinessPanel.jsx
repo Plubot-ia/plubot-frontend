@@ -28,7 +28,27 @@ const WhatsappBusinessPanel = ({ plubotId }) => {
 
   useEffect(() => {
     checkStatus();
-  }, [checkStatus]);
+    
+    // Escuchar mensajes del callback OAuth
+    const handleMessage = (event) => {
+      // Verificar origen por seguridad
+      if (event.origin !== 'https://plubot.com') return;
+      
+      if (event.data.type === 'whatsapp-oauth-success') {
+        showNotification('WhatsApp Business conectado exitosamente', 'success');
+        checkStatus(); // Actualizar estado
+      } else if (event.data.type === 'whatsapp-oauth-error') {
+        showNotification(event.data.error || 'Error al conectar WhatsApp Business', 'error');
+        setIsConnecting(false);
+      }
+    };
+    
+    window.addEventListener('message', handleMessage);
+    
+    return () => {
+      window.removeEventListener('message', handleMessage);
+    };
+  }, [plubotId, checkStatus]);
 
   // Iniciar proceso de conexión OAuth
   const handleConnect = async () => {

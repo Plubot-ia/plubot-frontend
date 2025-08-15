@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conectando WhatsApp Business...</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .container {
+            text-align: center;
+            padding: 2rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+        }
+        .spinner {
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 3px solid white;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .error {
+            color: #ff6b6b;
+            background: rgba(255, 107, 107, 0.1);
+            padding: 1rem;
+            border-radius: 5px;
+            margin-top: 1rem;
+        }
+        .success {
+            color: #51cf66;
+            background: rgba(81, 207, 102, 0.1);
+            padding: 1rem;
+            border-radius: 5px;
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="spinner" id="spinner"></div>
+        <h2 id="status">Procesando autorización...</h2>
+        <p id="message">Por favor espera mientras conectamos tu cuenta de WhatsApp Business.</p>
+    </div>
+
+    <script>
+        // Obtener parámetros de la URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const code = urlParams.get('code');
+        const state = urlParams.get('state'); // Este es el plubot_id
+        const error = urlParams.get('error');
+        const errorDescription = urlParams.get('error_description');
+
+        async function processCallback() {
+            const statusEl = document.getElementById('status');
+            const messageEl = document.getElementById('message');
+            const spinnerEl = document.getElementById('spinner');
+
+            if (error) {
+                // Hubo un error en la autorización
+                spinnerEl.style.display = 'none';
+                statusEl.textContent = 'Error de autorización';
+                messageEl.innerHTML = `<div class="error">${errorDescription || error}</div>`;
+                
+                // Cerrar ventana después de 3 segundos
+                setTimeout(() => {
+                    if (window.opener) {
+                        window.opener.postMessage({ 
+                            type: 'whatsapp-oauth-error', 
+                            error: error,
+                            description: errorDescription 
+                        }, '*');
+                    }
+                    window.close();
+                }, 3000);
+                return;
+            }
+
+            if (!code || !state) {
+                spinnerEl.style.display = 'none';
+                statusEl.textContent = 'Error';
+                messageEl.innerHTML = '<div class="error">Parámetros faltantes en la respuesta de autorización.</div>';
+                setTimeout(() => window.close(), 3000);
+                return;
+            }
+
+            try {
+                // Enviar el código al backend para intercambiarlo por tokens
+                const response = await fetch(`https://plubot-backend.onrender.com/api/wa/oauth-callback`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        code: code,
+                        plubot_id: parseInt(state)
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    spinnerEl.style.display = 'none';
+                    statusEl.textContent = '¡Conexión exitosa!';
+                    messageEl.innerHTML = '<div class="success">Tu cuenta de WhatsApp Business ha sido conectada correctamente.</div>';
+                    
+                    // Notificar a la ventana padre
+                    if (window.opener) {
+                        window.opener.postMessage({ 
+                            type: 'whatsapp-oauth-success',
+                            plubot_id: state
+                        }, '*');
+                    }
+                    
+                    // Cerrar ventana después de 2 segundos
+                    setTimeout(() => window.close(), 2000);
+                } else {
+                    throw new Error(data.error || 'Error al procesar la autorización');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                spinnerEl.style.display = 'none';
+                statusEl.textContent = 'Error de conexión';
+                messageEl.innerHTML = `<div class="error">${error.message}</div>`;
+                
+                // Notificar error a la ventana padre
+                if (window.opener) {
+                    window.opener.postMessage({ 
+                        type: 'whatsapp-oauth-error',
+                        error: error.message
+                    }, '*');
+                }
+                
+                setTimeout(() => window.close(), 3000);
+            }
+        }
+
+        // Procesar callback cuando la página carga
+        processCallback();
+    </script>
+</body>
+</html>
