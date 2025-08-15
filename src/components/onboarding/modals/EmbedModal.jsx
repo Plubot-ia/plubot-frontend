@@ -13,6 +13,7 @@ import {
   Zap,
   Star,
   Trophy,
+  MessageCircle,
 } from 'lucide-react';
 import PropTypes from 'prop-types';
 import React, { useState, useEffect, useRef } from 'react';
@@ -27,6 +28,7 @@ import useModalContext from '../../../hooks/useModalContext';
 
 import CustomizeSection from './CustomizeSection';
 import WhatsappIntegrationPanel from './WhatsappIntegrationPanel';
+import WhatsappBusinessPanel from './WhatsappBusinessPanel';
 // Si no tienes canvas-confetti, puedes instalarlo con: npm install canvas-confetti
 
 // Custom hook para manejar achievements y gamificación
@@ -513,7 +515,14 @@ const EmbedModal = ({ plubotId, plubotName, onClose, onExport, _flowData }) => {
             onClick={() => setActiveTab('whatsapp')}
           >
             <Share2 size={16} style={{ marginRight: '5px' }} />
-            WhatsApp
+            WhatsApp QR
+          </button>
+          <button
+            className={`embed-tab-button ${activeTab === 'whatsapp-business' ? 'active' : ''}`}
+            onClick={() => setActiveTab('whatsapp-business')}
+          >
+            <MessageCircle size={16} style={{ marginRight: '5px' }} />
+            WhatsApp Business
           </button>
         </div>
 
@@ -611,6 +620,8 @@ const EmbedModal = ({ plubotId, plubotName, onClose, onExport, _flowData }) => {
               {activeTab === 'qr' && <QRSection />}
 
               {activeTab === 'whatsapp' && <WhatsappIntegrationPanel plubotId={plubotId} />}
+              
+              {activeTab === 'whatsapp-business' && <WhatsappBusinessPanel plubotId={plubotId} />}
 
               {activeTab === 'export' && <ExportSection />}
 
