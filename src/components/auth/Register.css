@@ -1,0 +1,751 @@
+/* Global keyframes remain unchanged */
+@keyframes register-pulseLine {
+  0%,
+  100% {
+    opacity: 0.6;
+    width: 60%;
+  }
+  50% {
+    opacity: 1;
+    width: 90%;
+  }
+}
+
+@keyframes register-glowingBorder {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes register-gradientShift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes register-beamMovement1 {
+  0%,
+  100% {
+    transform: rotate(25deg);
+    opacity: 0.3;
+  }
+  50% {
+    transform: rotate(28deg);
+    opacity: 0.5;
+  }
+}
+
+@keyframes register-beamMovement2 {
+  0%,
+  100% {
+    transform: rotate(-15deg);
+    opacity: 0.2;
+  }
+  50% {
+    transform: rotate(-12deg);
+    opacity: 0.4;
+  }
+}
+
+@keyframes register-beamMovement3 {
+  0%,
+  100% {
+    transform: rotate(5deg);
+    opacity: 0.15;
+  }
+  50% {
+    transform: rotate(8deg);
+    opacity: 0.25;
+  }
+}
+
+@keyframes register-particleFloat1 {
+  0% {
+    transform: translate(0, 0) scale(0.5);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.9;
+  }
+  100% {
+    transform: translate(-30px, -40px) scale(0);
+    opacity: 0;
+  }
+}
+
+@keyframes register-particleFloat2 {
+  0% {
+    transform: translate(0, 0) scale(0.7);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: translate(35px, -35px) scale(0);
+    opacity: 0;
+  }
+}
+
+@keyframes register-particleFloat3 {
+  0% {
+    transform: translate(0, 0) scale(0.6);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.9;
+  }
+  100% {
+    transform: translate(-25px, 35px) scale(0);
+    opacity: 0;
+  }
+}
+
+@keyframes register-particleFloat4 {
+  0% {
+    transform: translate(0, 0) scale(0.8);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.7;
+  }
+  100% {
+    transform: translate(30px, 30px) scale(0);
+    opacity: 0;
+  }
+}
+
+@keyframes register-particleFloat5 {
+  0% {
+    transform: translate(0, 0) scale(0.5);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: translate(0, 40px) scale(0);
+    opacity: 0;
+  }
+}
+
+@keyframes register-particleFloat6 {
+  0% {
+    transform: translate(0, 0) scale(0.6);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.9;
+  }
+  100% {
+    transform: translate(-20px, -35px) scale(0);
+    opacity: 0;
+  }
+}
+
+@keyframes register-scanlines {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 0 100px;
+  }
+}
+
+@keyframes register-fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Encapsulated styles */
+.register-register-container {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+  padding-top: 100px;
+  position: relative;
+  z-index: 1;
+  font-family: "Rajdhani", sans-serif;
+  background: radial-gradient(circle at 50% 50%, rgba(0, 10, 30, 1) 0%, rgba(0, 0, 10, 1) 100%);
+  color: white;
+  perspective: 1000px;
+  box-sizing: border-box;
+}
+
+.register-register-container .register-register-card {
+  width: 100%;
+  max-width: 550px;
+  backdrop-filter: blur(15px);
+  background: rgba(0, 0, 0, 0.7);
+  border-radius: 25px;
+  border: 1px solid rgba(0, 224, 255, 0.7);
+  box-shadow:
+    0 0 40px rgba(0, 224, 255, 0.6),
+    0 0 100px rgba(0, 0, 0, 0.8),
+    inset 0 0 20px rgba(0, 224, 255, 0.3);
+  padding: 3rem;
+  position: relative;
+  transform-style: preserve-3d;
+  transform: perspective(1000px) rotateX(0deg);
+  transition:
+    transform 0.5s ease,
+    box-shadow 0.5s ease;
+  overflow: hidden;
+  animation: register-fadeIn 1s ease-out forwards;
+}
+
+.register-register-container .register-register-card:hover {
+  transform: perspective(1000px) rotateX(2deg) translateZ(10px);
+  box-shadow:
+    0 0 50px rgba(0, 224, 255, 0.8),
+    0 0 120px rgba(0, 0, 0, 0.9),
+    inset 0 0 25px rgba(0, 224, 255, 0.5);
+}
+
+.register-register-container .register-card-header {
+  margin-bottom: 2rem;
+  text-align: center;
+  position: relative;
+}
+
+.register-register-container .register-logo {
+  margin-bottom: 1.5rem;
+  position: relative;
+  display: inline-block;
+}
+
+.register-register-container .register-logo img {
+  height: 80px;
+  width: auto;
+  filter: drop-shadow(0 0 8px #00e0ff);
+}
+
+.register-register-container .register-logo::after {
+  content: "";
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  height: 3px;
+  width: 80%;
+  background: linear-gradient(
+    90deg,
+    rgba(0, 224, 255, 0) 0%,
+    rgba(0, 224, 255, 1) 50%,
+    rgba(0, 224, 255, 0) 100%
+  );
+  border-radius: 2px;
+  filter: blur(1px);
+  animation: register-pulseLine 3s infinite;
+}
+
+.register-register-container .register-card-title {
+  font-family: "Orbitron", sans-serif;
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: #00e0ff;
+  text-shadow:
+    0 0 10px rgba(0, 224, 255, 0.6),
+    0 0 20px rgba(0, 224, 255, 0.3);
+  letter-spacing: 1px;
+  margin-bottom: 0.5rem;
+}
+
+.register-register-container .register-card-subtitle {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 1.1rem;
+  letter-spacing: 0.5px;
+}
+
+.register-register-container .register-form-group {
+  margin-bottom: 1.5rem;
+  position: relative;
+}
+
+.register-register-container .register-form-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.9);
+  letter-spacing: 0.5px;
+}
+
+.register-register-container .register-input-wrapper {
+  position: relative;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.register-register-container .register-form-input {
+  width: 100%;
+  padding: 0.8rem 2rem 0.8rem 1rem;
+  border-radius: 8px;
+  background: rgba(0, 10, 30, 0.5);
+  border: 1px solid rgba(0, 224, 255, 0.4);
+  color: white;
+  font-family: "Rajdhani", sans-serif;
+  font-size: 1rem;
+  text-align: left;
+  transition: all 0.3s ease;
+  box-shadow:
+    0 0 5px rgba(0, 224, 255, 0.2),
+    inset 0 0 10px rgba(0, 0, 20, 0.5);
+  box-sizing: border-box;
+}
+
+.register-register-container .register-form-input:focus {
+  outline: none;
+  border-color: rgba(0, 224, 255, 0.8);
+  box-shadow:
+    0 0 15px rgba(0, 224, 255, 0.4),
+    inset 0 0 10px rgba(0, 0, 20, 0.5);
+}
+
+.register-register-container .register-form-input::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+  text-align: left;
+}
+
+.register-register-container .register-toggle-password {
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  transform: translateY(-50%);
+  color: rgba(0, 224, 255, 0.7);
+  cursor: pointer;
+  font-size: 1rem;
+  transition: color 0.3s ease;
+  z-index: 10;
+}
+
+.register-register-container .register-toggle-password:hover {
+  color: rgba(0, 224, 255, 1);
+}
+
+.register-register-container .register-btn {
+  background: linear-gradient(45deg, #00e0ff, #9900ff, #ff00ff);
+  background-size: 200% 200%;
+  animation: register-gradientShift 5s ease infinite;
+  color: white;
+  font-size: 1.2rem;
+  padding: 1rem 2rem;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: "Orbitron", sans-serif;
+  font-weight: 600;
+  letter-spacing: 1px;
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+  margin-top: 1rem;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+  box-shadow:
+    0 0 20px rgba(0, 224, 255, 0.7),
+    0 5px 15px rgba(0, 0, 0, 0.3),
+    inset 0 0 10px rgba(255, 255, 255, 0.2);
+}
+
+.register-register-container .register-btn:hover {
+  transform: translateY(-3px);
+  box-shadow:
+    0 0 30px rgba(0, 224, 255, 0.9),
+    0 8px 25px rgba(0, 0, 0, 0.4),
+    inset 0 0 15px rgba(255, 255, 255, 0.3);
+}
+
+.register-register-container .register-btn:active {
+  transform: translateY(1px);
+}
+
+.register-register-container .register-btn::before {
+  content: "";
+  position: absolute;
+  top: -5px;
+  left: -5px;
+  right: -5px;
+  bottom: -5px;
+  background: linear-gradient(
+    45deg,
+    rgba(0, 224, 255, 0.8),
+    rgba(153, 0, 255, 0.5),
+    rgba(255, 0, 255, 0.8),
+    rgba(0, 224, 255, 0.5)
+  );
+  background-size: 400% 400%;
+  border-radius: 54px;
+  z-index: -1;
+  opacity: 0;
+  filter: blur(10px);
+  animation: register-glowingBorder 10s linear infinite;
+  transition: opacity 0.3s ease;
+}
+
+.register-register-container .register-btn:hover::before {
+  opacity: 1;
+}
+
+.register-register-container .register-form-footer {
+  margin-top: 1rem;
+  text-align: center;
+  font-size: 0.9rem;
+}
+
+.register-register-container .register-form-footer a {
+  color: #00e0ff;
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  position: relative;
+  text-shadow: 0 0 5px rgba(0, 224, 255, 0.3);
+}
+
+.register-register-container .register-form-footer a::after {
+  content: "";
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0%;
+  height: 1px;
+  background: #00e0ff;
+  transition: width 0.3s ease;
+  box-shadow: 0 0 5px #00e0ff;
+}
+
+.register-register-container .register-form-footer a:hover {
+  color: #00e0ff;
+  text-shadow: 0 0 8px rgba(0, 224, 255, 0.6);
+}
+
+.register-register-container .register-form-footer a:hover::after {
+  width: 100%;
+}
+
+.register-register-container .register-cosmic-lights {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.register-register-container .register-light-beam {
+  position: absolute;
+  width: 150vmax;
+  height: 4px;
+  background: linear-gradient(
+    90deg,
+    rgba(0, 224, 255, 0) 0%,
+    rgba(0, 224, 255, 0.5) 50%,
+    rgba(0, 224, 255, 0) 100%
+  );
+  opacity: 0.3;
+  transform-origin: left center;
+  filter: blur(3px);
+  box-shadow: 0 0 15px rgba(0, 224, 255, 0.5);
+}
+
+.register-register-container .register-light-beam-1 {
+  top: 20%;
+  left: -50%;
+  transform: rotate(25deg);
+  animation: register-beamMovement1 15s infinite alternate ease-in-out;
+}
+
+.register-register-container .register-light-beam-2 {
+  top: 65%;
+  left: -50%;
+  transform: rotate(-15deg);
+  animation: register-beamMovement2 18s infinite alternate ease-in-out;
+  opacity: 0.2;
+}
+
+.register-register-container .register-light-beam-3 {
+  top: 40%;
+  left: -50%;
+  transform: rotate(5deg);
+  animation: register-beamMovement3 20s infinite alternate ease-in-out;
+  opacity: 0.15;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 0, 255, 0) 0%,
+    rgba(255, 0, 255, 0.4) 50%,
+    rgba(255, 0, 255, 0) 100%
+  );
+}
+
+.register-register-container .register-particles {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.register-register-container .register-particle {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: linear-gradient(45deg, #00e0ff, #ff00ff);
+  opacity: 0;
+  filter: blur(1px);
+}
+
+.register-register-container .register-particle-1 {
+  top: 10%;
+  left: 10%;
+  animation: register-particleFloat1 3s infinite ease-out;
+}
+
+.register-register-container .register-particle-2 {
+  top: 20%;
+  left: 80%;
+  animation: register-particleFloat2 4s infinite ease-out;
+}
+
+.register-register-container .register-particle-3 {
+  top: 70%;
+  left: 20%;
+  animation: register-particleFloat3 5s infinite ease-out;
+}
+
+.register-register-container .register-particle-4 {
+  top: 60%;
+  left: 90%;
+  animation: register-particleFloat4 3.2s infinite ease-out;
+}
+
+.register-register-container .register-particle-5 {
+  top: 90%;
+  left: 50%;
+  animation: register-particleFloat5 3.8s infinite ease-out;
+}
+
+.register-register-container .register-particle-6 {
+  top: 30%;
+  left: 30%;
+  animation: register-particleFloat6 4.2s infinite ease-out;
+}
+
+.register-register-container .register-register-card::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 224, 255, 0.03) 0px,
+    rgba(0, 224, 255, 0.03) 1px,
+    rgba(0, 0, 0, 0) 1px,
+    rgba(0, 0, 0, 0) 4px
+  );
+  pointer-events: none;
+  z-index: 5;
+  opacity: 0.4;
+  animation: register-scanlines 8s linear infinite;
+}
+
+.register-register-container .register-message {
+  padding: 1rem;
+  margin: 1rem 0;
+  border-radius: 10px;
+  font-weight: 500;
+  text-align: center;
+  opacity: 0;
+  transform: translateY(-20px);
+  transition: all 0.5s ease;
+}
+
+.register-register-container .register-message.register-show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.register-register-container .register-message-error {
+  background: rgba(255, 0, 0, 0.2);
+  border: 1px solid rgba(255, 100, 100, 0.5);
+  color: #ff5555;
+}
+
+.register-register-container .register-message-success {
+  background: rgba(0, 255, 150, 0.2);
+  border: 1px solid rgba(0, 255, 150, 0.5);
+  color: #00ff96;
+}
+
+.register-register-container .register-password-strength {
+  margin-top: 0.5rem;
+  height: 5px;
+  border-radius: 3px;
+  background: #333;
+  overflow: hidden;
+}
+
+.register-register-container .register-strength-meter {
+  height: 100%;
+  width: 0%;
+  transition:
+    width 0.3s ease,
+    background-color 0.3s ease;
+}
+
+.register-register-container .register-strength-text {
+  font-size: 0.8rem;
+  margin-top: 0.3rem;
+  text-align: right;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* Separador para opciones de registro */
+.register-separator {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin: 1.5rem 0;
+}
+
+.register-separator::before,
+.register-separator::after {
+  content: "";
+  flex: 1;
+  border-bottom: 1px solid rgba(0, 224, 255, 0.3);
+}
+
+.register-separator::before {
+  margin-right: 0.5rem;
+}
+
+.register-separator::after {
+  margin-left: 0.5rem;
+}
+
+.register-separator span {
+  color: rgba(0, 224, 255, 0.8);
+  padding: 0 0.5rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+/* Botón de Google */
+.register-register-container .google-auth-button {
+  margin-bottom: 1.5rem;
+  transition: all 0.3s ease;
+  width: 100%;
+  background: linear-gradient(45deg, rgba(0, 224, 255, 0.1), rgba(0, 0, 0, 0.3));
+  border: 1px solid rgba(0, 224, 255, 0.3);
+  border-radius: 8px;
+  box-shadow: 0 0 15px rgba(0, 224, 255, 0.2);
+  color: rgba(255, 255, 255, 0.9);
+  padding: 12px 20px;
+  font-weight: 500;
+  backdrop-filter: blur(5px);
+}
+
+.register-register-container .google-auth-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 25px rgba(0, 224, 255, 0.5);
+  border: 1px solid rgba(0, 224, 255, 0.5);
+}
+
+/* Encapsulated media queries */
+@media (max-width: 768px) {
+  .register-register-container {
+    min-height: 100vh;
+    padding: 1rem;
+    padding-top: 80px;
+  }
+
+  .register-register-container .register-register-card {
+    padding: 2rem;
+    max-width: 90%;
+  }
+
+  .register-register-container .register-card-title {
+    font-size: 1.8rem;
+  }
+
+  .register-register-container .register-logo img {
+    height: 60px;
+  }
+
+  .register-register-container .register-form-input {
+    padding: 0.7rem 2rem 0.7rem 1rem;
+  }
+
+  .register-register-container .register-btn {
+    font-size: 1.1rem;
+    padding: 0.9rem 1.8rem;
+  }
+}
+
+/* Estilos para el separador */
+.register-separator {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin: 1.5rem 0;
+}
+
+.register-separator::before,
+.register-separator::after {
+  content: "";
+  flex: 1;
+  border-bottom: 1px solid rgba(0, 224, 255, 0.3);
+}
+
+.register-separator::before {
+  margin-right: 0.5rem;
+}
+
+.register-separator::after {
+  margin-left: 0.5rem;
+}
+
+.register-separator-text {
+  color: rgba(0, 224, 255, 0.8);
+  padding: 0 0.5rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+/* Ajustes para el botón de Google */
+.register-register-container .google-auth-button {
+  margin-bottom: 1rem;
+  transition: all 0.3s ease;
+}
+
+.register-register-container .google-auth-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 25px rgba(0, 224, 255, 0.5);
+}

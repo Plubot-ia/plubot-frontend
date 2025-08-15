@@ -1,0 +1,649 @@
+.ts-simulation-interface {
+  --ts-bg-primary: rgba(18, 18, 40, 0.7);
+  --ts-border-primary: #00e0ff;
+  --ts-text-primary: #e0e0ff;
+  --ts-accent-primary: #00e0ff;
+  --ts-accent-secondary: #ff00ff;
+  --ts-button-primary: #00ff9d;
+  --ts-dark-bg: #171727;
+  --ts-dark-text: #0a0a14;
+  --ts-border-radius: 8px;
+  --ts-shadow-glow: 0 0 8px var(--ts-accent-primary), 0 0 12px var(--ts-accent-secondary);
+  --ts-transition-speed: 0.3s; /* Ajustar velocidad para la animación de cierre */
+
+  position: fixed;
+  bottom: 1rem;
+  right: 1rem;
+  width: min(90vw, 400px);
+  max-width: 95%;
+  background: var(--ts-bg-primary);
+  backdrop-filter: blur(10px);
+  border-radius: var(--ts-border-radius);
+  border: 1px solid var(--ts-border-primary);
+  z-index: 1003;
+  box-shadow: var(--ts-shadow-glow);
+  font-family: "Inter", system-ui, sans-serif;
+  display: flex;
+  flex-direction: column;
+  height: clamp(50vh, 80vh, 600px);
+  max-height: 90vh;
+  transition:
+    opacity var(--ts-transition-speed) ease,
+    transform var(--ts-transition-speed) ease;
+}
+
+/* --- MODO ULTRA RENDIMIENTO --- */
+/*
+  Apunta a la interfaz de simulación solo cuando la clase 'ultra-mode'
+  está presente en el body. Desactiva el resplandor y las animaciones,
+  pero mantiene un borde estético y estático.
+*/
+body.ultra-mode .ts-simulation-interface {
+  box-shadow: none !important;
+  animation: none !important;
+  transition: none !important;
+}
+
+/* Se asegura de que el hover no reintroduzca el efecto */
+body.ultra-mode .ts-simulation-interface:hover {
+  box-shadow: none !important;
+}
+
+/*
+  NOTA DE REFACTORIZACIÓN (Animación de Cierre):
+  - La animación de cierre se ha simplificado para ser más fluida y natural.
+  - Se ha eliminado la propiedad `scale` que podía causar la percepción de un "cierre en dos etapas".
+  - Ahora, la interfaz se desliza suavemente hacia abajo y se desvanece, creando una transición más limpia.
+*/
+.ts-simulation-interface.ts-closing {
+  opacity: 0;
+  transform: translateY(30px); /* Un deslizamiento hacia abajo más pronunciado y suave */
+}
+
+.ts-simulation-interface.ts-light-mode {
+  --ts-bg-primary: rgba(240, 240, 255, 0.8);
+  --ts-border-primary: #0080ff;
+  --ts-text-primary: #202040;
+  --ts-accent-primary: #0080ff;
+  --ts-accent-secondary: #ff2088;
+  --ts-button-primary: #00c080;
+  --ts-dark-bg: #e8e8f0;
+  --ts-dark-text: #202040;
+}
+
+.ts-simulation-interface:hover {
+  box-shadow:
+    0 0 12px var(--ts-accent-primary),
+    0 0 18px var(--ts-accent-secondary);
+}
+
+.ts-simulation-interface .ts-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: clamp(0.75rem, 2vw, 1rem) clamp(1rem, 3vw, 1.5rem);
+  border-bottom: 1px solid var(--ts-border-primary);
+  background: rgba(0, 0, 0, 0.3);
+  flex-shrink: 0;
+}
+
+.ts-header-actions {
+  display: flex;
+  align-items: center;
+  gap: clamp(0.5rem, 2vw, 1rem);
+}
+
+.ts-simulation-interface .ts-simulation-header h3 {
+  color: var(--ts-accent-primary);
+  margin: 0;
+  font-size: clamp(0.9rem, 3vw, 1rem); /* Tamaño de fuente responsive */
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  flex-grow: 1;
+}
+
+.ts-simulation-interface .ts-header h2-controls {
+  display: flex;
+  gap: 0.5rem;
+}
+
+/*
+  NOTA DE REFACTORIZACIÓN (Botón de Cierre):
+  - Se ha mejorado el estilo del botón de cierre para que sea más intuitivo y estéticamente agradable.
+  - El hover ahora incluye un fondo distintivo, una rotación suave y un ligero aumento de tamaño para un feedback visual claro.
+  - Se ha aumentado la opacidad y se ha añadido una sombra para destacar la acción.
+*/
+.ts-simulation-interface .ts-close-btn,
+.ts-simulation-interface .ts-restart-btn {
+  background: none;
+  border: none;
+  color: var(--ts-text-primary);
+  font-size: clamp(1rem, 3vw, 1.1rem);
+  cursor: pointer;
+  transition: all var(--ts-transition-speed) ease;
+  padding: 0.25rem;
+}
+
+.ts-simulation-interface .ts-close-btn:hover,
+.ts-simulation-interface .ts-restart-btn:hover {
+  color: var(--ts-accent-primary);
+  transform: scale(1.1);
+}
+
+.ts-simulation-interface .ts-simulation-header button {
+  background: transparent;
+  border: none;
+  color: var(--ts-text-primary);
+  cursor: pointer;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all var(--ts-transition-speed) ease;
+  opacity: 0.8;
+}
+
+.ts-simulation-interface .ts-simulation-header button:hover {
+  opacity: 1;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.ts-simulation-interface .ts-close-btn {
+  color: var(--ts-accent-secondary); /* Color distintivo para la acción de cerrar */
+}
+
+.ts-simulation-interface .ts-close-btn:hover {
+  background: rgba(255, 0, 255, 0.2); /* Fondo magenta al pasar el ratón */
+  color: #fff;
+  transform: rotate(90deg) scale(1.1); /* Rotación suave y un ligero aumento de tamaño */
+  box-shadow: 0 0 8px var(--ts-accent-secondary);
+}
+
+.ts-simulation-interface .ts-chat-container {
+  flex-grow: 1; /* Ocupa el espacio disponible */
+  overflow-y: auto; /* Habilita el scroll vertical cuando sea necesario */
+  min-height: 0; /* Clave para que el overflow funcione en un contexto flex */
+  padding: clamp(0.5rem, 2vw, 1rem);
+  scrollbar-width: thin;
+  scrollbar-color: var(--ts-accent-primary) transparent;
+}
+
+.ts-simulation-interface .ts-chat-container::-webkit-scrollbar {
+  width: 4px;
+}
+
+.ts-simulation-interface .ts-chat-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.ts-simulation-interface .ts-chat-container::-webkit-scrollbar-thumb {
+  background-color: var(--ts-accent-primary);
+  border-radius: 20px;
+}
+
+.ts-simulation-interface .ts-conversation-container::-webkit-scrollbar {
+  width: 4px;
+}
+
+.ts-simulation-interface .ts-conversation-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.ts-simulation-interface .ts-conversation-container::-webkit-scrollbar-thumb {
+  background-color: var(--ts-accent-primary);
+  border-radius: 20px;
+}
+
+.ts-simulation-interface .ts-scroll-anchor {
+  height: 1px;
+  margin-top: 8px;
+}
+
+.ts-simulation-interface .ts-message {
+  display: flex;
+  align-items: flex-start;
+  padding: 4px 0;
+  box-sizing: border-box;
+  width: 100%;
+  opacity: 1 !important;
+  transform: none !important;
+  position: relative;
+  margin-bottom: clamp(6px, 2vw, 8px);
+}
+
+.ts-simulation-interface .ts-message.ts-bot {
+  justify-content: flex-start;
+}
+
+.ts-simulation-interface .ts-message.ts-user {
+  justify-content: flex-end;
+}
+
+.ts-simulation-interface .ts-message.ts-system {
+  justify-content: center;
+  margin: clamp(6px, 2vw, 8px) 0;
+}
+
+.ts-simulation-interface .ts-bot-avatar {
+  width: 24px;
+  height: 24px;
+  background: linear-gradient(135deg, var(--ts-accent-primary), var(--ts-accent-secondary));
+  border-radius: 50%;
+  margin-right: 0.5rem;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ts-simulation-interface .ts-message-content {
+  background: var(--ts-dark-bg);
+  padding: clamp(6px, 2vw, 8px) clamp(8px, 2vw, 12px);
+  border-radius: var(--ts-border-radius);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  font-size: clamp(0.75rem, 2.5vw, 0.8rem); /* Fuente responsive */
+  line-height: 1.4;
+  word-break: break-word;
+  max-width: 80%; /* Reducir en pantallas pequeñas */
+  overflow-wrap: break-word;
+  hyphens: auto;
+}
+
+.ts-simulation-interface .ts-message-content p {
+  margin: 0.25em 0;
+}
+
+.ts-simulation-interface .ts-message-content p:first-child {
+  margin-top: 0;
+}
+
+.ts-simulation-interface .ts-message-content p:last-child {
+  margin-bottom: 0;
+}
+
+/* Estilos para el botón de reiniciar simulación */
+.ts-restart-btn {
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--ts-accent-primary);
+  color: var(--ts-text-primary);
+  padding: 8px 16px;
+  border-radius: var(--ts-border-radius);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.8rem;
+  font-weight: 600;
+  margin: 0.5rem auto;
+  display: block;
+  transition:
+    background-color var(--ts-transition-speed) ease,
+    box-shadow var(--ts-transition-speed) ease;
+}
+
+.ts-restart-btn:hover {
+  background-color: rgba(0, 224, 255, 0.2);
+  box-shadow: 0 0 8px var(--ts-accent-primary);
+}
+
+.ts-simulation-interface .ts-message-content pre {
+  overflow-x: auto;
+  background: rgba(0, 0, 0, 0.2);
+  padding: 8px;
+  border-radius: 4px;
+  margin: 4px 0;
+}
+
+.ts-simulation-interface .ts-message-content code {
+  font-family: "Consolas", "Monaco", monospace;
+  font-size: 0.85em;
+  padding: 2px 4px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
+}
+
+.ts-simulation-interface .ts-message-content pre code {
+  padding: 0;
+  background: transparent;
+}
+
+.ts-simulation-interface .ts-message.ts-bot .ts-message-content {
+  border-left: 3px solid var(--ts-accent-primary);
+  color: var(--ts-text-primary);
+}
+
+.ts-simulation-interface .ts-message.ts-user .ts-message-content {
+  background: linear-gradient(135deg, var(--ts-accent-primary), var(--ts-accent-secondary));
+  color: var(--ts-dark-text);
+  border-bottom-right-radius: 0;
+}
+
+.ts-simulation-interface .ts-message.ts-system .ts-message-content {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--ts-text-primary);
+  text-align: center;
+  font-style: italic;
+  max-width: 85%;
+}
+
+.ts-simulation-interface .ts-message-timestamp {
+  font-size: clamp(0.5rem, 2vw, 0.6rem);
+  opacity: 0.7;
+  text-align: right;
+  margin-top: 0.2rem;
+}
+
+.ts-simulation-interface .ts-message.ts-typing .ts-message-content {
+  padding: 8px;
+  min-height: 20px;
+  min-width: 50px;
+}
+
+.ts-simulation-interface .ts-typing-content {
+  background-color: var(--ts-dark-bg) !important;
+  border-left: 3px solid var(--ts-accent-primary);
+}
+
+.ts-simulation-interface .ts-typing-indicator {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: 20px;
+}
+
+.ts-simulation-interface .ts-typing-indicator span {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  background: var(--ts-accent-primary);
+  border-radius: 50%;
+  opacity: 0.7;
+  animation: typingStable 1s infinite ease-in-out both;
+}
+
+.ts-simulation-interface .ts-typing-indicator span:nth-child(1) {
+  animation-delay: 0s;
+}
+.ts-simulation-interface .ts-typing-indicator span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.ts-simulation-interface .ts-typing-indicator span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes typingStable {
+  0%,
+  100% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.ts-simulation-interface .ts-decision-options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: clamp(0.5rem, 2vw, 0.75rem);
+  border-top: 1px solid var(--ts-accent-primary);
+  background: rgba(0, 0, 0, 0.1);
+  flex-shrink: 0;
+}
+
+.ts-simulation-interface .ts-decision-option-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--ts-accent-primary);
+  border-radius: var(--ts-border-radius);
+  padding: clamp(0.4rem, 2vw, 0.5rem);
+  color: var(--ts-text-primary);
+  cursor: pointer;
+  transition:
+    background-color var(--ts-transition-speed) ease,
+    box-shadow var(--ts-transition-speed) ease;
+  text-align: left;
+  font-size: clamp(0.75rem, 2.5vw, 0.8rem);
+  min-height: 44px; /* Área táctil mínima */
+}
+
+.ts-simulation-interface .ts-decision-option-btn:hover {
+  background: rgba(0, 224, 255, 0.2);
+  box-shadow: 0 2px 8px rgba(0, 224, 255, 0.3);
+}
+
+/* --- Contenedor de Opciones de Decisión --- */
+.ts-options-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: clamp(0.5rem, 2vw, 0.75rem);
+  padding: clamp(0.75rem, 2vw, 1rem);
+  border-top: 1px solid var(--ts-border-primary);
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.ts-option-btn {
+  flex-grow: 1;
+  background-color: var(--ts-accent-primary-transparent);
+  border: 1px solid var(--ts-accent-primary);
+  color: var(--ts-accent-primary);
+  padding: clamp(0.6rem, 2vw, 0.8rem);
+  border-radius: var(--ts-border-radius);
+  cursor: pointer;
+  font-size: clamp(0.8rem, 2.5vw, 0.9rem);
+  font-weight: 500;
+  text-align: center;
+  transition: all var(--ts-transition-speed) ease;
+  min-width: 120px; /* Ancho mínimo para evitar botones muy pequeños */
+}
+
+.ts-option-btn:hover {
+  background-color: var(--ts-accent-primary);
+  color: var(--ts-dark-bg);
+  box-shadow: var(--ts-shadow-glow);
+  transform: translateY(-2px);
+}
+
+/* --- Rediseño del Input de Chat --- */
+.ts-user-input-form {
+  padding: clamp(0.5rem, 2vw, 0.75rem);
+  border-top: 1px solid var(--ts-border-primary);
+  background: rgba(0, 0, 0, 0.2);
+  flex-shrink: 0;
+}
+
+.ts-textarea-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background: var(--ts-dark-bg);
+  border-radius: calc(var(--ts-border-radius) * 1.5); /* Bordes más redondeados */
+  border: 1px solid transparent;
+  transition: border-color var(--ts-transition-speed) ease;
+}
+
+.ts-textarea-wrapper:focus-within {
+  border-color: var(--ts-accent-primary);
+  box-shadow: var(--ts-shadow-glow);
+}
+
+.ts-chat-textarea {
+  flex-grow: 1;
+  background: transparent;
+  color: var(--ts-text-primary);
+  border: none;
+  outline: none;
+  padding: clamp(0.6rem, 2vw, 0.75rem);
+  padding-right: 48px; /* Espacio para el botón */
+  font-size: clamp(0.8rem, 2.5vw, 0.9rem);
+  font-family: inherit;
+  resize: none; /* Desactivar resize manual, se manejará con JS */
+  line-height: 1.5;
+  max-height: 120px; /* Límite de altura */
+  overflow-y: auto; /* Scroll si excede el max-height */
+  scrollbar-width: none; /* Ocultar scrollbar en Firefox */
+}
+
+.ts-chat-textarea::-webkit-scrollbar {
+  display: none; /* Ocultar scrollbar en Chrome/Safari */
+}
+
+.ts-chat-textarea::placeholder {
+  color: var(--ts-text-primary);
+  opacity: 0.6;
+}
+
+.ts-send-btn {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: var(--ts-accent-primary);
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--ts-dark-bg);
+  transition: all var(--ts-transition-speed) ease;
+  box-shadow: 0 2px 5px rgba(0, 224, 255, 0.3);
+}
+
+.ts-send-btn:hover:not(:disabled) {
+  background: var(--ts-accent-secondary);
+  transform: translateY(-50%) scale(1.1);
+  box-shadow: 0 4px 10px rgba(255, 0, 255, 0.4);
+}
+
+.ts-send-btn:disabled {
+  background-color: rgba(255, 255, 255, 0.2);
+  cursor: not-allowed;
+  transform: translateY(-50%) scale(1);
+  box-shadow: none;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.ts-send-btn svg {
+  width: 20px;
+  height: 20px;
+  margin-left: 2px; /* Ajuste visual del icono */
+}
+
+.ts-simulation-interface .ts-user-input-container input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.ts-simulation-interface .ts-user-input-container button {
+  background: var(--ts-button-primary);
+  border: none;
+  padding: clamp(0.5rem, 2vw, 0.75rem);
+  border-radius: var(--ts-border-radius);
+  color: var(--ts-dark-text);
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background-color var(--ts-transition-speed) ease,
+    box-shadow var(--ts-transition-speed) ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px; /* Área táctil mínima */
+  min-height: 44px;
+}
+
+.ts-simulation-interface .ts-user-input-container button:hover:not(:disabled) {
+  box-shadow: 0 2px 8px rgba(0, 255, 157, 0.3);
+}
+
+.ts-simulation-interface .ts-user-input-container button:disabled {
+  background: rgba(0, 255, 157, 0.5);
+  cursor: not-allowed;
+}
+
+.ts-simulation-interface .ts-simulation-info {
+  padding: clamp(0.4rem, 2vw, 0.5rem);
+  border-top: 1px solid var(--ts-border-primary);
+  font-size: clamp(0.7rem, 2.5vw, 0.75rem);
+  color: var(--ts-text-primary);
+  background: rgba(0, 0, 0, 0.1);
+  flex-shrink: 0;
+}
+
+.ts-simulation-interface .ts-current-node {
+  display: flex;
+  align-items: center;
+  gap: clamp(0.4rem, 2vw, 0.5rem);
+  margin-bottom: clamp(0.4rem, 2vw, 0.5rem);
+}
+
+.ts-simulation-interface .ts-progress-indicator {
+  height: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.ts-simulation-interface .ts-progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--ts-accent-primary), var(--ts-accent-secondary));
+  transition: width 0.5s ease;
+}
+
+/* Media Queries para pantallas pequeñas */
+@media (max-width: 768px) {
+  .ts-simulation-interface {
+    width: calc(100% - 2rem); /* Ocupar casi todo el ancho */
+    right: 1rem;
+    left: 1rem;
+    bottom: 1rem;
+    height: clamp(40vh, 70vh, 500px); /* Reducir altura */
+    max-height: 85vh;
+    padding-bottom: calc(env(safe-area-inset-bottom) + 2rem); /* Espacio para teclado */
+  }
+
+  .ts-simulation-interface .ts-message-content {
+    max-width: 85%; /* Más espacio para mensajes */
+  }
+}
+
+@media (max-width: 480px) {
+  .ts-simulation-interface {
+    width: calc(100% - 1rem); /* Aún más compacto */
+    right: 0.5rem;
+    left: 0.5rem;
+    bottom: 0.5rem;
+    height: clamp(35vh, 65vh, 450px);
+    max-height: 80vh;
+    font-size: clamp(0.7rem, 2.8vw, 0.75rem); /* Fuente más pequeña */
+  }
+
+  .ts-simulation-interface .ts-simulation-header {
+    padding: 0.5rem;
+  }
+
+  .ts-simulation-interface .ts-simulation-header h3 {
+    font-size: clamp(0.8rem, 3vw, 0.9rem);
+  }
+
+  .ts-simulation-interface .ts-conversation-container {
+    padding: 0.5rem;
+    max-height: 60vh; /* Más espacio para mensajes */
+  }
+
+  .ts-simulation-interface .ts-user-input-container {
+    padding: 0.5rem;
+    gap: 0.3rem;
+  }
+
+  .ts-simulation-interface .ts-decision-options {
+    padding: 0.5rem;
+  }
+
+  .ts-simulation-interface .ts-decision-option-btn {
+    padding: 0.4rem;
+    font-size: clamp(0.7rem, 2.8vw, 0.75rem);
+  }
+}

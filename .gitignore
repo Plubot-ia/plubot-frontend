@@ -1,0 +1,116 @@
+# Logs
+*.log
+*.log.*
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Node.js y dependencias
+node_modules/
+*.local
+
+# Directorios de compilación
+dist/
+dist-ssr/
+build/
+
+# Entorno
+.env
+.env.local
+.env.development
+.env.development.local
+.env.test.local
+.env.production
+.env.production.local
+
+# macOS
+.DS_Store
+.Trash/
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea/
+
+# Vite
+.vite/
+
+# Cobertura de tests
+coverage/
+*.lcov
+.nyc_output
+
+# Cache de herramientas
+.eslintcache
+.stylelintcache
+
+# Yarn v2 (si usas Yarn)
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.yarn/install-state.gz
+.pnp.*
+
+# Vercel
+.vercel/
+
+# Archivos sensibles y temporales
+*.db
+*.pyc
+__pycache__/
+*.bak
+*.backup
+*.temp.jsx
+client_secret_*.json
+GOOGLESHEETSJSON*.json
+backup/
+backup-old-files/
+backup-plubot.sh
+
+# Archivos y carpetas personales
+.CFUserTextEncoding
+.claude.json
+.claude/
+.codeium/
+.cursor/
+.docker/
+.git-credentials
+.gitconfig
+.idlerc/
+.lesshst
+.matplotlib/
+.npm/
+.nvm/
+.psql_history
+.python_history
+.rediscli_history
+.sentry/
+.sqlite_history
+.ssh/
+.userchain
+.viminfo
+.vscode/
+.windsurf/
+.zcompdump
+.zprofile
+.zsh_history
+.zsh_sessions/
+.zshrc
+.zshrc.save
+
+# Archivos y carpetas no relacionados con plubot-frontend
+plubot-backend/
+PAGROK/
+edge-fix.js
+fix_edge_type.js
+dump.rdb
+plubot.py
+plubots6.py
+Plubot-backup-2025-05-09/
+PlubotTW.jpg
+Pluni.png
+20250429_0346_Awakened AI Plubot_remix_01jt04n2mpfqd9565f5bb1yxsa.png
+ChatGPT Image*.png
+static/js/create-claude.js

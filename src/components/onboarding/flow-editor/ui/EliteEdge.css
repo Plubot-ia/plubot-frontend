@@ -1,0 +1,370 @@
+/**
+ * EliteEdge.css
+ * Estilos avanzados para aristas con flujo visual de energía dinámico
+ * Implementa estándares de visualización de datos de 2025
+ * @version 2.0.0
+ * @author Cascade AI
+ */
+
+/* Definición de filtros SVG para efectos visuales avanzados */
+:root {
+  --edge-primary: #ff00ff;
+  --edge-primary-light: #ff40ff;
+  --edge-primary-dark: #cc00cc;
+  --edge-hover: #ff20ff;
+  --edge-selected: #ff60ff;
+  --edge-glow-opacity: 0.4;
+  --edge-particle-opacity: 0.5;
+  --edge-transition-speed: 0.2s;
+}
+
+/* Filtros SVG para efectos visuales avanzados */
+svg:not(:root) {
+  overflow: visible;
+}
+
+/* Filtro para el resplandor de las aristas */
+svg:first-of-type {
+  filter: none;
+}
+
+svg:first-of-type:after {
+  content: "";
+  display: block;
+}
+
+/* Definir filtros SVG en el DOM para efectos visuales */
+svg:first-of-type:after {
+  content: "";
+}
+
+/* Filtros para efectos visuales avanzados */
+filter#elite-edge-glow-filter {
+  filter: url(#elite-edge-glow-filter);
+}
+
+filter#elite-edge-particle-filter {
+  filter: url(#elite-edge-particle-filter);
+}
+
+/* Modo Ultra Rendimiento - Estilos específicos */
+.elite-edge.ultra-mode .elite-edge-flow,
+.elite-edge.ultra-mode .elite-edge-flow-secondary,
+.elite-edge.ultra-mode .elite-edge-glow,
+.elite-edge.ultra-mode .elite-edge-center {
+  display: none !important;
+  opacity: 0 !important;
+  animation: none !important;
+  transition: none !important;
+}
+
+.elite-edge.ultra-mode .elite-edge-path {
+  display: none !important;
+}
+
+.elite-edge.ultra-mode .elite-edge-path-ultra {
+  display: block !important;
+  opacity: 1 !important;
+  stroke: #ff00ff !important; /* Magenta brillante HARDCODEADO */
+  stroke-width: 3px !important;
+  stroke-dasharray: none !important; /* ASEGURAR LÍNEA SÓLIDA */
+  animation: none !important;
+  transition: none !important;
+  filter: none !important;
+}
+
+/* Estilos base para las aristas con interactividad mejorada */
+.elite-edge {
+  cursor: pointer;
+  pointer-events: visibleStroke;
+  transition: opacity var(--edge-transition-speed) ease;
+}
+
+/* Estilo principal para las aristas con gradiente dinámico */
+.elite-edge-path {
+  /* stroke: var(--edge-primary); */ /* Commented out to allow JSX gradient */
+  stroke-opacity: 0.8;
+  stroke-dasharray: none !important; /* Asegurar que la línea sea sólida, con mayor especificidad */
+  transition:
+    stroke-width var(--edge-transition-speed) cubic-bezier(0.4, 0, 0.2, 1),
+    stroke-opacity var(--edge-transition-speed) cubic-bezier(0.4, 0, 0.2, 1),
+    filter var(--edge-transition-speed) cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: stroke-width, stroke-opacity, filter;
+}
+
+/* EliteEdge - Premium edge component with advanced animations */
+
+/* APPLE-LEVEL: CSS animations for smooth visuals without JavaScript renders */
+@keyframes elite-edge-flow {
+  0% {
+    stroke-dashoffset: 0;
+  }
+  100% {
+    stroke-dashoffset: -1000;
+  }
+}
+
+@keyframes elite-edge-pulse {
+  0%, 100% {
+    opacity: 0.7;
+  }
+  50% {
+    opacity: 0.9;
+  }
+}
+
+/* Apply CSS animations to selected edges - no JavaScript needed */
+.elite-edge-selected .elite-edge-flow-path {
+  animation: elite-edge-flow 20s linear infinite;
+}
+
+.elite-edge-selected .elite-edge-glow {
+  animation: elite-edge-pulse 3s ease-in-out infinite;
+}
+
+/* Efecto de resplandor adaptativo para aristas */
+.elite-edge-glow {
+  filter: drop-shadow(0 0 3px rgba(255, 0, 255, var(--edge-glow-opacity)));
+  transition:
+    filter var(--edge-transition-speed) cubic-bezier(0.4, 0, 0.2, 1),
+    stroke-width var(--edge-transition-speed) cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: filter, stroke-width;
+}
+
+/* Línea central para efecto de profundidad y dimensionalidad */
+.elite-edge-center {
+  stroke: white;
+  stroke-opacity: 0.4;
+  transition: stroke-width var(--edge-transition-speed) ease;
+  will-change: stroke-width;
+}
+
+/* Partículas de flujo energético con efectos visuales avanzados */
+.elite-edge-particle {
+  filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.6));
+  transition:
+    r 0.1s ease,
+    opacity 0.1s ease;
+  will-change: cx, cy, r, opacity;
+}
+
+/* Tooltip contextual para información adicional */
+.elite-edge-tooltip {
+  pointer-events: none;
+  overflow: visible;
+  z-index: 1000;
+}
+
+.elite-edge-tooltip-content {
+  background: rgba(20, 20, 30, 0.85);
+  backdrop-filter: blur(8px);
+  border-radius: 6px;
+  box-shadow:
+    0 4px 12px rgba(0, 0, 0, 0.3),
+    0 0 0 1px rgba(255, 0, 255, 0.2);
+  padding: 8px 10px;
+  color: white;
+  font-family: "Inter", "Roboto", sans-serif;
+  font-size: 11px;
+  line-height: 1.4;
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
+  transform-origin: center bottom;
+  animation: tooltipFadeIn 0.2s ease forwards;
+}
+
+@keyframes tooltipFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.elite-edge-tooltip-title {
+  font-weight: 600;
+  margin-bottom: 4px;
+  color: var(--edge-primary-light);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.elite-edge-tooltip-info {
+  font-size: 10px;
+  opacity: 0.9;
+}
+
+/* Etiqueta de arista con tipografía moderna */
+.elite-edge-label {
+  user-select: none;
+  pointer-events: none;
+}
+
+/* Estados interactivos - Seleccionado */
+.elite-edge.selected .elite-edge-path {
+  stroke: var(--edge-selected);
+  stroke-opacity: 0.9;
+}
+
+.elite-edge.selected .elite-edge-glow {
+  filter: drop-shadow(0 0 6px rgba(255, 0, 255, 0.7));
+}
+
+.elite-edge.selected .elite-edge-particle {
+  filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.8));
+}
+
+/* Estados interactivos - Hover */
+.elite-edge.hovered .elite-edge-path {
+  stroke: var(--edge-hover);
+  stroke-opacity: 0.85;
+}
+
+.elite-edge.hovered .elite-edge-glow {
+  filter: drop-shadow(0 0 5px rgba(255, 0, 255, 0.6));
+}
+
+.elite-edge.hovered .elite-edge-particle {
+  filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.7));
+}
+
+/* Estados interactivos - Arrastre */
+/* Crucial para resolver el problema de aristas invisibles y mal posicionadas durante la conexión */
+.elite-edge.dragging {
+  /* Asegurar que la arista completa no tenga desplazamientos incorrectos */
+  transform: none !important;
+  position: relative !important;
+  z-index: 9999 !important;
+  /* pointer-events: none; */ /* Comentado para prueba */
+}
+
+.elite-edge.dragging .elite-edge-path,
+.elite-edge.dragging path {
+  stroke: #ff00cc !important; /* Color vibrante magenta para máxima visibilidad */
+  stroke-width: 4px !important;
+  stroke-opacity: 1 !important;
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  pointer-events: none; /* Permitir interacción a través de la arista */
+}
+
+/* Asegurar que la arista en modo ultra también sea visible durante el arrastre */
+.elite-edge.dragging.ultra-mode .elite-edge-path-ultra {
+  display: block !important;
+  stroke: #ff00cc !important;
+  stroke-width: 4px !important;
+  stroke-opacity: 1 !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* Forzar visibilidad incluso si algún otro estilo la oculta */
+.react-flow__edge.dragging {
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* Optimizaciones para fondos claros y oscuros */
+@media (prefers-color-scheme: light) {
+  .elite-edge-path {
+    stroke-opacity: 0.75; /* Ligeramente más opaco en fondos claros */
+  }
+
+  .elite-edge-glow {
+    filter: drop-shadow(0 0 4px rgba(255, 0, 255, 0.5));
+  }
+
+  .elite-edge-tooltip-content {
+    background: rgba(40, 40, 50, 0.9);
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .elite-edge-path {
+    stroke-opacity: 0.85; /* Ligeramente más brillante en fondos oscuros */
+  }
+
+  .elite-edge-glow {
+    filter: drop-shadow(0 0 4px rgba(255, 0, 255, 0.4));
+  }
+}
+
+/* Optimizaciones para dispositivos móviles */
+@media (max-width: 768px) {
+  .elite-edge-path {
+    stroke-width: 3.5px; /* Ligeramente más grueso para mejor visibilidad en móviles */
+  }
+
+  .elite-edge-tooltip-content {
+    padding: 6px 8px;
+    font-size: 10px;
+  }
+}
+
+/* Optimizaciones para pantallas de alta resolución */
+@media (min-width: 2560px) {
+  .elite-edge-path {
+    stroke-width: 4px; /* Ligeramente más grueso para mejor visibilidad en pantallas grandes */
+  }
+
+  .elite-edge-tooltip-content {
+    font-size: 12px;
+  }
+}
+
+/* Asegurar que las aristas de ReactFlow sean visibles */
+.react-flow__edge {
+  opacity: 1 !important;
+  z-index: 5 !important;
+  visibility: visible !important;
+}
+
+.react-flow__edge-path {
+  opacity: 1 !important;
+  stroke-opacity: 1 !important;
+  fill-opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* Animaciones para el flujo de energía */
+@keyframes flowAnimation {
+  0% {
+    stroke-dashoffset: 0;
+  }
+  100% {
+    stroke-dashoffset: 20;
+  }
+}
+
+@keyframes pulseGlow {
+  0% {
+    filter: drop-shadow(0 0 3px rgba(255, 0, 255, 0.4));
+  }
+  50% {
+    filter: drop-shadow(0 0 5px rgba(255, 0, 255, 0.6));
+  }
+  100% {
+    filter: drop-shadow(0 0 3px rgba(255, 0, 255, 0.4));
+  }
+}
+
+@keyframes particlePulse {
+  0% {
+    r: 1;
+    opacity: 0.3;
+  }
+  50% {
+    r: 1.5;
+    opacity: 0.5;
+  }
+  100% {
+    r: 1;
+    opacity: 0.3;
+  }
+}

@@ -1,0 +1,787 @@
+/* ProfilePlubots.css - Estilos para la sección de plubots con estética cyberpunk mejorada */
+
+/* ==========================================================================
+   Sección Plubots
+   ========================================================================== */
+.plubots-section {
+  position: relative;
+  overflow: hidden;
+  padding: 1.5rem;
+  border-radius: 15px;
+  background: rgba(0, 10, 25, 0.85);
+  box-shadow: 0 0 30px rgba(0, 224, 255, 0.3);
+}
+
+.plubots-section::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle at center, rgba(0, 150, 255, 0.1) 0%, transparent 70%);
+  animation: pulse-glow 8s infinite ease-in-out;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.plubots-section::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, rgba(0, 0, 0, 0) 0%, rgba(0, 40, 70, 0.1) 50%, rgba(0, 0, 0, 0) 100%),
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0, 150, 255, 0.05) 2px,
+      rgba(0, 150, 255, 0.05) 4px
+    );
+  pointer-events: none;
+  z-index: 1;
+}
+
+.plubots-section-title {
+  position: relative;
+  margin-bottom: 2rem;
+  font-size: 1.8rem;
+  text-align: center;
+  color: rgba(0, 224, 255, 1);
+  text-shadow: 0 0 10px rgba(0, 224, 255, 0.8);
+  letter-spacing: 3px;
+}
+
+.plubots-section-title::after {
+  content: "";
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent 0%, rgba(0, 224, 255, 0.8) 50%, transparent 100%);
+}
+
+/* ==========================================================================
+     Cuadrícula Plubots
+     ========================================================================== */
+.plubots-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 2rem;
+  perspective: 1000px;
+  position: relative;
+  z-index: 2;
+}
+
+/* ==========================================================================
+     Tarjeta Plubot
+     ========================================================================== */
+.plubot-card {
+  position: relative;
+  border-radius: 15px;
+  padding: 1.5rem;
+  background: rgba(10, 20, 35, 0.8);
+  border: 1px solid rgba(0, 224, 255, 0.5);
+  overflow: hidden;
+  transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transform-style: preserve-3d;
+  box-shadow:
+    0 7px 20px rgba(0, 0, 0, 0.5),
+    0 0 15px rgba(0, 224, 255, 0.3);
+}
+
+.plubot-card::before {
+  content: "";
+  position: absolute;
+  top: -100%;
+  left: -100%;
+  width: 300%;
+  height: 300%;
+  background:
+    radial-gradient(circle at center, rgba(0, 224, 255, 0.1) 0%, transparent 70%),
+    conic-gradient(from 0deg, transparent, rgba(0, 224, 255, 0.3), transparent);
+  animation: rotate-gradient 8s linear infinite;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  z-index: -1;
+}
+
+.plubot-card::after {
+  content: "";
+  position: absolute;
+  height: 5px;
+  width: 100%;
+  background: linear-gradient(90deg, transparent, rgba(0, 224, 255, 0.8), transparent);
+  top: -100%;
+  left: 0;
+  opacity: 0;
+  animation: scanner 4s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.plubot-card:hover {
+  transform: translateY(-15px) rotateX(5deg);
+  box-shadow:
+    0 15px 30px rgba(0, 0, 0, 0.6),
+    0 0 30px rgba(0, 224, 255, 0.6);
+  border-color: rgba(0, 224, 255, 1);
+}
+
+.plubot-card:hover::before,
+.plubot-card:hover::after {
+  opacity: 1;
+}
+
+.plubot-card.animate-in {
+  animation: card-appear 0.8s cubic-bezier(0.215, 0.61, 0.355, 1) forwards;
+}
+
+.plubot-card-fallback {
+  background: linear-gradient(135deg, rgba(0, 40, 80, 0.8), rgba(0, 20, 40, 0.9));
+  border-color: rgba(0, 224, 255, 0.5);
+}
+
+/* ==========================================================================
+     Ícono Plubot
+     ========================================================================== */
+.plubot-icon-container {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: rgba(0, 20, 40, 0.5);
+  border: 2px solid rgba(0, 224, 255, 0.5);
+  box-shadow: 0 0 20px rgba(0, 150, 255, 0.3);
+  overflow: hidden;
+  transition: all 0.5s ease;
+}
+
+.plubot-icon-container::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, rgba(0, 224, 255, 0.2), transparent 70%);
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.plubot-card:hover .plubot-icon-container {
+  transform: scale(1.1) rotate(10deg);
+  border-color: rgba(0, 224, 255, 1);
+  box-shadow: 0 0 30px rgba(0, 224, 255, 0.7);
+}
+
+.plubot-card:hover .plubot-icon-container::before {
+  opacity: 1;
+  animation: pulse 2s ease infinite;
+}
+
+.plubot-icon {
+  font-size: 2.5rem;
+  z-index: 2;
+  filter: drop-shadow(0 0 8px rgba(0, 224, 255, 0.8));
+  transition: all 0.5s ease;
+}
+
+.plubot-card:hover .plubot-icon {
+  transform: scale(1.2);
+  animation: float 3s ease infinite;
+}
+
+.plubot-icon-container-styles {
+  width: 100px;
+  height: 100px;
+  margin: 0 auto 1.5rem;
+}
+
+.plubot-icon-styles {
+  font-size: 3rem;
+}
+
+/* ==========================================================================
+     Detalles Plubot
+     ========================================================================== */
+.plubot-name {
+  font-size: 1.4rem;
+  text-align: center;
+  margin: 0.8rem 0;
+  color: rgba(0, 224, 255, 1);
+  text-shadow: 0 0 10px rgba(0, 224, 255, 0.5);
+  font-weight: bold;
+  letter-spacing: 1px;
+  transform: translateZ(20px);
+  transition: all 0.3s ease;
+}
+
+.plubot-card:hover .plubot-name {
+  text-shadow: 0 0 15px rgba(0, 224, 255, 0.8);
+  letter-spacing: 2px;
+}
+
+.plubot-detail {
+  font-size: 0.9rem;
+  color: rgba(0, 224, 255, 0.8);
+  margin: 0.5rem 0;
+  text-align: center;
+  transform: translateZ(10px);
+  transition: all 0.3s ease;
+}
+
+/* ==========================================================================
+     Poderes Plubot
+     ========================================================================== */
+.plubot-powers {
+  margin: 1rem 0;
+  padding: 0.7rem;
+  background: rgba(0, 20, 40, 0.4);
+  border-radius: 8px;
+  border-left: 3px solid rgba(0, 224, 255, 0.5);
+  transform: translateZ(5px);
+  transition: all 0.3s ease;
+}
+
+.plubot-card:hover .plubot-powers {
+  background: rgba(0, 30, 60, 0.5);
+  border-left-color: rgba(0, 224, 255, 1);
+  box-shadow: 0 0 15px rgba(0, 224, 255, 0.2);
+}
+
+/* ==========================================================================
+     Acciones Plubot
+     ========================================================================== */
+.plubot-actions {
+  display: flex;
+  gap: 0.7rem;
+  margin-top: 1.5rem;
+  justify-content: center;
+  transform: translateZ(15px);
+}
+
+.plubot-button {
+  background: rgba(0, 30, 60, 0.7);
+  color: rgba(0, 224, 255, 1);
+  border: 1px solid rgba(0, 224, 255, 0.5);
+  border-radius: 5px;
+  padding: 0.5rem 0.8rem;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.plubot-button::before {
+  content: "";
+  position: absolute;
+  top: -100%;
+  left: -100%;
+  width: 300%;
+  height: 300%;
+  background: linear-gradient(45deg, transparent, rgba(0, 224, 255, 0.3), transparent);
+  transform: rotate(45deg);
+  transition: all 0.5s ease;
+}
+
+.plubot-button:hover {
+  background: rgba(0, 50, 80, 0.8);
+  box-shadow: 0 0 15px rgba(0, 224, 255, 0.5);
+  transform: translateY(-3px);
+  border-color: rgba(0, 224, 255, 1);
+}
+
+.plubot-button:hover::before {
+  animation: button-shine 1.5s ease;
+}
+
+.empty-state-button {
+  margin-top: 1rem;
+}
+
+/* ==========================================================================
+     Estado Vacío
+     ========================================================================== */
+/* ==========================================================================
+   Estado Vacío
+   ========================================================================== */
+.empty-state {
+  text-align: center;
+  padding: 2rem;
+  background: rgba(0, 10, 30, 0.5);
+  border-radius: 15px;
+  border: 1px dashed rgba(0, 224, 255, 0.5);
+  position: relative;
+  overflow: hidden;
+}
+
+.empty-state::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at center, rgba(0, 150, 255, 0.1) 0%, transparent 70%),
+    repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 10px,
+      rgba(0, 224, 255, 0.05) 10px,
+      rgba(0, 224, 255, 0.05) 20px
+    );
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.empty-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  animation: float 3s ease infinite;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.empty-icon-image {
+  width: 40px; /* Tamaño más pequeño para el logo */
+  height: 40px;
+  object-fit: contain; /* Mantiene la proporción de la imagen */
+  filter: drop-shadow(0 0 8px rgba(0, 224, 255, 0.8)); /* Mantiene el efecto cyberpunk */
+}
+
+/* ==========================================================================
+     Efectos de Fondo
+     ========================================================================== */
+.plubots-background {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(to right, rgba(0, 30, 60, 0.1) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 30, 60, 0.1) 1px, transparent 1px);
+  background-size: 20px 20px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.data-cube {
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  background: rgba(0, 224, 255, 0.1);
+  border: 1px solid rgba(0, 224, 255, 0.3);
+  box-shadow: 0 0 10px rgba(0, 224, 255, 0.2);
+  transform-style: preserve-3d;
+  animation: float-cube 10s ease-in-out infinite;
+  z-index: 0;
+  opacity: 0.5;
+}
+
+.data-cube:nth-child(odd) {
+  animation-duration: 15s;
+  animation-delay: 2s;
+}
+
+/* ==========================================================================
+     Contenido Modal
+     ========================================================================== */
+.modal-content-styles {
+  background: rgba(10, 20, 35, 0.9);
+  border: 2px solid rgba(0, 224, 255, 0.7);
+  box-shadow: 0 0 30px rgba(0, 224, 255, 0.5);
+  backdrop-filter: blur(10px);
+}
+
+.modal-title-styles {
+  font-size: 2rem;
+  text-align: center;
+  color: rgba(0, 224, 255, 1);
+}
+
+.modal-paragraph-id,
+.modal-paragraph-integrations {
+  text-align: center;
+  margin: 1rem 0;
+  color: rgba(0, 224, 255, 0.8);
+}
+
+.modal-paragraph-integrations {
+  margin: 1.5rem 0;
+}
+
+.modal-integrations-highlight {
+  font-weight: bold;
+  color: rgba(0, 224, 255, 1);
+}
+
+/* ==========================================================================
+     Poderes Modal
+     ========================================================================== */
+.modal-powers-container,
+.modal-flows-container,
+.modal-edges-container {
+  padding: 1rem;
+  background: rgba(0, 30, 60, 0.5);
+  border-radius: 8px;
+  border: 1px solid rgba(0, 224, 255, 0.3);
+  margin: 1rem 0;
+}
+
+.modal-powers-title,
+.modal-flows-title,
+.modal-edges-title {
+  color: rgba(0, 224, 255, 1);
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.modal-powers-list,
+.modal-flows-list,
+.modal-edges-list {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.modal-power-item,
+.modal-flow-item,
+.modal-edge-item {
+  margin: 0.8rem 0;
+  padding: 0.8rem;
+  background: rgba(0, 20, 40, 0.7);
+  border-radius: 6px;
+  border-left: 3px solid rgba(0, 224, 255, 0.7);
+}
+
+.modal-power-icon {
+  font-size: 1.5rem;
+  margin-right: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: rgba(0, 40, 70, 0.8);
+  border-radius: 50%;
+  box-shadow: 0 0 10px rgba(0, 224, 255, 0.3);
+}
+
+.modal-power-name,
+.modal-flow-name {
+  font-weight: bold;
+  color: rgba(0, 224, 255, 1);
+}
+
+.modal-power-description,
+.modal-flow-description,
+.modal-edge-description {
+  font-size: 0.9rem;
+  color: rgba(0, 224, 255, 0.8);
+}
+
+/* ==========================================================================
+     Estados Vacíos Modal
+     ========================================================================== */
+.modal-empty-flows,
+.modal-empty-edges,
+.modal-available-power-container {
+  padding: 1rem;
+  background: rgba(0, 40, 80, 0.3);
+  border-radius: 8px;
+  border: 1px dashed rgba(0, 224, 255, 0.5);
+  text-align: center;
+}
+
+.modal-available-power-bg {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, rgba(0, 224, 255, 0.1), transparent);
+  animation: pulse 3s infinite;
+}
+
+.modal-available-power-text {
+  position: relative;
+  z-index: 1;
+}
+
+.modal-available-power-highlight {
+  color: rgba(0, 224, 255, 1);
+}
+
+.modal-all-powers-container {
+  padding: 1rem;
+  background: rgba(0, 224, 255, 0.1);
+  border-radius: 8px;
+  border: 1px solid rgba(0, 224, 255, 0.3);
+  text-align: center;
+}
+
+.modal-modify-plubot-button {
+  margin-top: 1.5rem;
+  display: block;
+  width: 100%;
+  padding: 0.8rem;
+  font-size: 1rem;
+  border-width: 2px;
+}
+
+/* ==========================================================================
+     Modal Edición
+     ========================================================================== */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(5px);
+  z-index: 999; /* Justo por debajo del header (z-index: 1000) */
+  display: flex;
+  justify-content: center;
+  align-items: flex-start; /* Alineado en la parte superior */
+  padding-top: 90px; /* Espacio para el encabezado (80px altura + 10px extra) */
+  overflow-y: auto; /* Permitir scroll si el contenido es muy alto */
+  box-sizing: border-box; /* Para que el padding se incluya en la altura total */
+}
+
+.edit-modal-content-styles {
+  background: rgba(10, 20, 35, 0.95);
+  border: 2px solid rgba(0, 224, 255, 0.7);
+  box-shadow: 0 0 30px rgba(0, 224, 255, 0.5);
+  backdrop-filter: blur(12px);
+  max-width: 500px;
+  width: 90%;
+  margin: 0 auto 40px auto; /* Eliminado margen superior, mantenido margen inferior */
+  padding: 2.5rem;
+  text-align: center;
+  border-radius: 12px;
+  position: relative;
+  z-index: 1000; /* Al mismo nivel que el header */
+  overflow: visible; /* Asegurar que el contenido no se corte */
+}
+
+.modal-close-styles {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  font-size: 1.2rem;
+  padding: 0.5rem;
+  color: rgba(0, 224, 255, 0.8);
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.modal-close-styles:hover {
+  color: rgba(0, 224, 255, 1);
+}
+
+.edit-modal-title-styles {
+  font-size: 2rem;
+  margin-bottom: 1.5rem;
+  color: rgba(0, 224, 255, 1);
+  text-shadow: 0 0 10px rgba(0, 224, 255, 0.5);
+}
+
+.edit-modal-paragraph {
+  color: rgba(0, 224, 255, 0.8);
+  margin-bottom: 2rem;
+  font-size: 1rem;
+}
+
+.edit-modal-buttons-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.edit-modal-identity-button,
+.edit-modal-flows-button {
+  padding: 0.9rem;
+  font-size: 1.1rem;
+  border-width: 2px;
+  transition:
+    transform 0.2s,
+    background 0.3s ease;
+  background: rgba(0, 30, 60, 0.7);
+  color: rgba(0, 224, 255, 1);
+  border: 1px solid rgba(0, 224, 255, 0.5);
+  border-radius: 5px;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.edit-modal-identity-button:hover,
+.edit-modal-flows-button:hover {
+  background: rgba(0, 50, 80, 0.8);
+  transform: translateY(-3px);
+  border-color: rgba(0, 224, 255, 1);
+  box-shadow: 0 0 15px rgba(0, 224, 255, 0.5);
+}
+
+.edit-modal-flows-button {
+  background: rgba(0, 224, 255, 0.2);
+}
+
+.edit-modal-icon {
+  margin-right: 0.5rem;
+}
+
+/* ==========================================================================
+     Animaciones
+     ========================================================================== */
+@keyframes card-appear {
+  0% {
+    opacity: 0;
+    transform: translateY(50px) scale(0.8);
+  }
+  60% {
+    transform: translateY(-10px) scale(1.05);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes pulse-glow {
+  0%,
+  100% {
+    opacity: 0.5;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.05);
+  }
+}
+
+@keyframes rotate-gradient {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 0.3;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(1.1);
+  }
+}
+
+@keyframes button-shine {
+  0% {
+    left: -100%;
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.8;
+  }
+  100% {
+    left: 100%;
+    opacity: 0;
+  }
+}
+
+@keyframes scanner {
+  0% {
+    top: 0%;
+    opacity: 0.7;
+  }
+  75% {
+    top: 100%;
+    opacity: 0.7;
+  }
+  76%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes float-cube {
+  0%,
+  100% {
+    transform: translateY(0) translateX(0) rotate(0deg);
+  }
+  25% {
+    transform: translateY(-30px) translateX(20px) rotate(90deg);
+  }
+  50% {
+    transform: translateY(0) translateX(40px) rotate(180deg);
+  }
+  75% {
+    transform: translateY(30px) translateX(20px) rotate(270deg);
+  }
+}
+
+/* ==========================================================================
+     Media Queries
+     ========================================================================== */
+@media (max-width: 768px) {
+  .plubots-grid {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .plubot-icon-container {
+    width: 60px;
+    height: 60px;
+  }
+
+  .plubot-icon {
+    font-size: 2rem;
+  }
+
+  .plubot-name {
+    font-size: 1.2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .plubots-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .plubot-actions {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .plubot-button {
+    width: 100%;
+    text-align: center;
+  }
+}
+
+.modal-overlay-immediate {
+  background: rgba(0, 0, 0, 0.7); /* Fondo más claro */
+  width: 100vw !important;
+  height: 100vh !important;
+  transition: background 0.3s ease;
+  will-change: background;
+}

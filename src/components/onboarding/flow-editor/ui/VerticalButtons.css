@@ -1,0 +1,272 @@
+/* Estilos para los botones verticales - Encapsulados para el editor de flujo */
+.flow-editor-container .vertical-buttons-container,
+.flow-editor-wrapper .vertical-buttons-container {
+  position: absolute; /* Cambiado de fixed a absolute para evitar problemas de scroll */
+  top: 80px; /* Posicionado más abajo */
+  right: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 999; /* Reducido para no interferir con otros elementos */
+  pointer-events: auto;
+}
+
+/* Grupo de botones con espaciado especial */
+.flow-editor-container .button-group,
+.flow-editor-wrapper .button-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Espaciado especial entre grupos */
+.flow-editor-container .button-spacer,
+.flow-editor-wrapper .button-spacer {
+  height: 24px; /* Doble espacio entre grupos */
+}
+
+.flow-editor-container .editor-button,
+.flow-editor-wrapper .editor-button {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background-color: rgba(10, 20, 35, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  position: relative;
+  font-size: 1em;
+  transition: all 0.2s ease;
+  overflow: visible;
+  /* Efecto de borde iluminado cyan */
+  border: 1px solid rgba(0, 200, 224, 0.8);
+  box-shadow:
+    0 0 8px rgba(0, 200, 224, 0.5),
+    0 0 4px rgba(0, 200, 224, 0.3) inset;
+}
+
+/* Efecto de fondo sutil para simular la animación de la imagen */
+.flow-editor-container .editor-button::before,
+.flow-editor-wrapper .editor-button::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 4px;
+  background: radial-gradient(circle at center, rgba(255, 255, 255, 0.05) 0%, transparent 70%);
+  opacity: 0.5;
+  z-index: -1;
+}
+
+/* Botón Ultra Rendimiento */
+.flow-editor-container .editor-button.ultra,
+.flow-editor-wrapper .editor-button.ultra {
+  color: #e317e3; /* Color magenta para el botón de ultra rendimiento */
+  border: 1px solid rgba(227, 23, 227, 0.8);
+  box-shadow:
+    0 0 8px rgba(227, 23, 227, 0.5),
+    0 0 4px rgba(227, 23, 227, 0.3) inset;
+  background-color: rgba(10, 5, 15, 0.7);
+}
+
+/* Botones de control */
+.flow-editor-container .editor-button.control,
+.flow-editor-wrapper .editor-button.control {
+  color: #00e6f0; /* Cyan brillante consistente */
+  border: 1px solid rgba(0, 230, 240, 0.8);
+  box-shadow:
+    0 0 8px rgba(0, 230, 240, 0.5),
+    0 0 4px rgba(0, 230, 240, 0.3) inset;
+}
+
+/* Botón de sincronización */
+.flow-editor-container .editor-button.sync,
+.flow-editor-wrapper .editor-button.sync {
+  color: #00e6f0; /* Mismo color que los demu00e1s botones */
+  border: 1px solid rgba(0, 230, 240, 0.8);
+  box-shadow:
+    0 0 8px rgba(0, 230, 240, 0.5),
+    0 0 4px rgba(0, 230, 240, 0.3) inset;
+}
+
+/* Tooltips estilizados */
+.flow-editor-container .editor-button .tooltip,
+.flow-editor-wrapper .editor-button .tooltip {
+  position: absolute;
+  right: 40px;
+  background-color: rgba(10, 20, 35, 0.85);
+  color: white;
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity 0.2s,
+    transform 0.2s;
+  transform: translateX(5px);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+}
+
+.flow-editor-container .editor-button:hover .tooltip,
+.flow-editor-wrapper .editor-button:hover .tooltip {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* Flecha del tooltip */
+.flow-editor-container .editor-button .tooltip::after,
+.flow-editor-wrapper .editor-button .tooltip::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: -5px;
+  margin-top: -5px;
+  border-width: 5px 0 5px 5px;
+  border-style: solid;
+  border-color: transparent transparent transparent rgba(10, 20, 35, 0.85);
+}
+
+/* Animaciones para los botones */
+@keyframes flow-editor-subtle-glow-cyan {
+  0%,
+  100% {
+    box-shadow: 0 0 3px rgba(0, 230, 240, 0.3);
+    border-color: rgba(0, 230, 240, 0.7);
+    transform: translateY(0);
+  }
+  50% {
+    box-shadow:
+      0 0 10px rgba(0, 230, 240, 0.7),
+      0 0 15px rgba(0, 230, 240, 0.4);
+    border-color: rgba(0, 230, 240, 1);
+    transform: translateY(-1px);
+  }
+}
+
+@keyframes flow-editor-subtle-glow-magenta {
+  0%,
+  100% {
+    box-shadow: 0 0 3px rgba(224, 32, 224, 0.3);
+    border-color: rgba(224, 32, 224, 0.7);
+    transform: translateY(0);
+  }
+  50% {
+    box-shadow: 0 0 5px rgba(224, 32, 224, 0.4);
+    border-color: rgba(224, 32, 224, 0.8);
+    transform: translateY(-1px);
+  }
+}
+
+@keyframes flow-editor-subtle-glow-green {
+  0%,
+  100% {
+    box-shadow: 0 0 3px rgba(32, 208, 96, 0.3);
+    border-color: rgba(32, 208, 96, 0.7);
+    transform: translateY(0);
+  }
+  50% {
+    box-shadow: 0 0 5px rgba(32, 208, 96, 0.4);
+    border-color: rgba(32, 208, 96, 0.8);
+    transform: translateY(-1px);
+  }
+}
+
+@keyframes flow-editor-subtle-radial-glow {
+  0%,
+  100% {
+    opacity: 0.3;
+    background: radial-gradient(circle at center, rgba(255, 255, 255, 0.03) 0%, transparent 70%);
+  }
+  50% {
+    opacity: 0.6;
+    background: radial-gradient(circle at center, rgba(255, 255, 255, 0.06) 0%, transparent 70%);
+  }
+}
+
+/* Animación de pulso suave para los botones */
+@keyframes flow-editor-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+/* Sin animaciones en modo Ultra Rendimiento */
+body.ultra-mode .flow-editor-container .editor-button,
+body.ultra-mode .flow-editor-wrapper .editor-button {
+  animation: none !important;
+  transition: none !important;
+}
+
+body.ultra-mode .flow-editor-container .editor-button::before,
+body.ultra-mode .flow-editor-wrapper .editor-button::before {
+  display: none !important;
+}
+
+/* Animaciones muy sutiles para modo normal */
+body:not(.ultra-mode) .flow-editor-container .editor-button.ultra,
+body:not(.ultra-mode) .flow-editor-wrapper .editor-button.ultra {
+  animation:
+    flow-editor-subtle-glow-magenta 5s infinite alternate,
+    flow-editor-pulse 3s infinite ease-in-out;
+}
+
+body:not(.ultra-mode) .flow-editor-container .editor-button.control,
+body:not(.ultra-mode) .flow-editor-wrapper .editor-button.control {
+  animation:
+    flow-editor-subtle-glow-cyan 5s infinite alternate,
+    flow-editor-pulse 3s infinite ease-in-out;
+  animation-delay: 0s, 0.2s; /* Ligero desfase para que no pulsen todos a la vez */
+}
+
+body:not(.ultra-mode) .flow-editor-container .editor-button.sync,
+body:not(.ultra-mode) .flow-editor-wrapper .editor-button.sync {
+  animation:
+    flow-editor-subtle-glow-green 5s infinite alternate,
+    flow-editor-pulse 3s infinite ease-in-out;
+  animation-delay: 0s, 0.4s; /* Ligero desfase para que no pulsen todos a la vez */
+}
+
+body:not(.ultra-mode) .flow-editor-container .editor-button::before,
+body:not(.ultra-mode) .flow-editor-wrapper .editor-button::before {
+  animation: flow-editor-subtle-radial-glow 8s infinite alternate;
+}
+
+/* Efectos hover */
+.flow-editor-container .editor-button:hover,
+.flow-editor-wrapper .editor-button:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.2);
+}
+
+.flow-editor-container .editor-button:active,
+.flow-editor-wrapper .editor-button:active {
+  transform: translateY(1px);
+  filter: brightness(1.3);
+}
+
+/* Botones deshabilitados */
+.flow-editor-container .editor-button:disabled,
+.flow-editor-wrapper .editor-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  animation: none !important;
+}
+
+.flow-editor-container .editor-button:disabled:hover,
+.flow-editor-wrapper .editor-button:disabled:hover {
+  transform: none;
+  filter: none;
+}

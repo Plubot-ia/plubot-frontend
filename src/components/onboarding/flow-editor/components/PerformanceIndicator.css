@@ -1,0 +1,50 @@
+/* Estilos para el indicador de rendimiento */
+.performance-indicator {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  background: rgba(0, 0, 0, 0.7);
+  color: #00e0ff;
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-family: monospace;
+  z-index: 1000;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.performance-indicator-title {
+  font-weight: bold;
+  margin-bottom: 4px;
+  color: #fff;
+  font-size: 14px;
+}
+
+.performance-indicator-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.performance-indicator-label {
+  color: #ccc;
+}
+
+.performance-indicator-value {
+  color: #00e0ff;
+}
+
+.performance-indicator-value.good {
+  color: #00ff00;
+}
+
+.performance-indicator-value.warning {
+  color: #ffcc00;
+}
+
+.performance-indicator-value.bad {
+  color: #ff3333;
+}

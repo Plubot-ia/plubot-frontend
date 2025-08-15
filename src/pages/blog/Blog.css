@@ -1,0 +1,380 @@
+/* Blog.css */
+
+/* Estilo General */
+.blog-posts,
+.blog-post-detail {
+  background: #121212;
+  color: #ffffff;
+  padding: 4rem 2rem;
+  font-family: "Roboto Mono", monospace;
+  position: relative;
+  min-height: 100vh;
+}
+
+/* Contenedor Principal */
+.blog-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+/* Título Principal */
+.blog-title,
+.blog-post-detail h1 {
+  font-family: "Orbitron", sans-serif;
+  font-size: 2.5rem;
+  color: #00e0ff;
+  text-align: center;
+  margin-bottom: 2rem;
+  text-shadow: 0 0 10px rgba(0, 224, 255, 0.6);
+  position: relative;
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+.blog-title::after,
+.blog-post-detail h1::after {
+  content: attr(data-text);
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  color: rgba(0, 224, 255, 0.2);
+  z-index: -1;
+  text-shadow: none;
+}
+
+/* Subtítulo */
+.blog-posts > .blog-container > p {
+  font-size: 1.1rem;
+  color: #b0b0b0;
+  text-align: center;
+  margin-bottom: 3rem;
+  line-height: 1.6;
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Tarjetas de Entradas */
+.blog-post {
+  background: rgba(30, 30, 30, 0.9);
+  border-radius: 12px;
+  border: 1px solid rgba(0, 224, 255, 0.3);
+  padding: 2rem;
+  margin-bottom: 2rem;
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease,
+    border-color 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.blog-post:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 0 20px rgba(0, 224, 255, 0.5);
+  border-color: #ff00ff;
+}
+
+.blog-post h2 {
+  font-family: "Orbitron", sans-serif;
+  font-size: 1.8rem;
+  color: #ff00ff;
+  margin-bottom: 1rem;
+  text-shadow: 0 0 5px rgba(255, 0, 255, 0.5);
+}
+
+.blog-post p {
+  font-size: 1rem;
+  color: #d0d0d0;
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+}
+
+/* Insignia Gamificada */
+.badge {
+  display: inline-block;
+  font-family: "Orbitron", sans-serif;
+  font-size: 0.9rem;
+  color: #00e0ff;
+  background: rgba(0, 224, 255, 0.2);
+  padding: 0.3rem 1rem;
+  border-radius: 20px;
+  margin-bottom: 1rem;
+  text-shadow: 0 0 5px rgba(0, 224, 255, 0.5);
+  animation: badgeUnlock 1s ease-out;
+}
+
+.badge:hover {
+  transform: scale(1.1);
+}
+
+/* Botón Leer Más */
+.read-more {
+  display: inline-block;
+  font-family: "Orbitron", sans-serif;
+  font-size: 1rem;
+  color: #00e0ff;
+  text-decoration: none;
+  padding: 0.5rem 1.5rem;
+  border: 2px solid #00e0ff;
+  border-radius: 25px;
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+.read-more:hover {
+  background-color: #00e0ff;
+  color: #121212;
+  box-shadow: 0 0 10px rgba(0, 224, 255, 0.8);
+}
+
+/* Efecto de Escaneo */
+.blog-post::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(0, 224, 255, 0.2), transparent);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.blog-post:hover::after {
+  opacity: 1;
+  animation: scan-effect 1.5s infinite linear;
+}
+
+/* Página de Detalle */
+.blog-post-detail .blog-container {
+  background: rgba(18, 18, 18, 0.95);
+  padding: 3rem;
+  border-radius: 15px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+  position: relative;
+  z-index: 1;
+}
+
+.blog-post-detail h1 {
+  font-size: 2.2rem;
+  margin-bottom: 1rem;
+}
+
+.blog-post-detail p em {
+  font-size: 1.1rem;
+  color: #b0b0b0;
+  display: block;
+  text-align: center;
+  margin-bottom: 2rem;
+  line-height: 1.6;
+}
+
+.blog-post-detail hr {
+  border: 0;
+  height: 1px;
+  background: linear-gradient(to right, transparent, #00e0ff, transparent);
+  margin: 2rem 0;
+}
+
+/* Contenido del Blog */
+.blog-post-detail h2 {
+  font-family: "Orbitron", sans-serif;
+  font-size: 1.6rem;
+  color: #ff00ff;
+  margin: 2rem 0 1rem;
+  text-shadow: 0 0 5px rgba(255, 0, 255, 0.3);
+}
+
+.blog-post-detail p {
+  font-size: 1rem;
+  color: #d0d0d0;
+  line-height: 1.8;
+  margin-bottom: 1.5rem;
+}
+
+.blog-post-detail strong {
+  color: #00e0ff;
+  font-weight: 700;
+}
+
+.blog-post-detail a {
+  color: #00e0ff;
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.3s ease;
+}
+
+.blog-post-detail a:hover {
+  border-bottom: 1px solid #00e0ff;
+}
+
+/* Estilo para xp-checkpoint */
+.xp-checkpoint {
+  height: 1px;
+  margin: 1rem 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Asegurar visibilidad del contenido renderizado */
+.blog-post-detail .blog-container > div > * {
+  visibility: visible;
+  opacity: 1;
+  position: relative;
+  z-index: 1;
+}
+
+/* Animaciones */
+@keyframes scan-effect {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes pulse-glow {
+  0%,
+  100% {
+    filter: brightness(1);
+  }
+  50% {
+    filter: brightness(1.2);
+  }
+}
+
+@keyframes badgeUnlock {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(100px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOut {
+  to {
+    opacity: 0;
+  }
+}
+
+/* Responsividad */
+@media (max-width: 768px) {
+  .blog-posts,
+  .blog-post-detail {
+    padding: 2rem 1.5rem;
+  }
+
+  .blog-title,
+  .blog-post-detail h1 {
+    font-size: 2rem;
+  }
+
+  .blog-posts > .blog-container > p,
+  .blog-post-detail p em {
+    font-size: 1rem;
+  }
+
+  .blog-post {
+    padding: 1.5rem;
+  }
+
+  .blog-post h2 {
+    font-size: 1.5rem;
+  }
+
+  .blog-post p {
+    font-size: 0.95rem;
+  }
+
+  .badge {
+    font-size: 0.8rem;
+    padding: 0.2rem 0.8rem;
+  }
+
+  .read-more {
+    font-size: 0.9rem;
+    padding: 0.4rem 1.2rem;
+  }
+
+  .blog-post-detail .blog-container {
+    padding: 2rem;
+  }
+
+  .blog-post-detail h2 {
+    font-size: 1.4rem;
+  }
+
+  .blog-post-detail p {
+    font-size: 0.95rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .blog-posts,
+  .blog-post-detail {
+    padding: 1.5rem 1rem;
+  }
+
+  .blog-title,
+  .blog-post-detail h1 {
+    font-size: 1.8rem;
+  }
+
+  .blog-posts > .blog-container > p,
+  .blog-post-detail p em {
+    font-size: 0.9rem;
+  }
+
+  .blog-post {
+    padding: 1rem;
+  }
+
+  .blog-post h2 {
+    font-size: 1.3rem;
+  }
+
+  .blog-post p {
+    font-size: 0.9rem;
+  }
+
+  .badge {
+    font-size: 0.7rem;
+    padding: 0.2rem 0.6rem;
+  }
+
+  .read-more {
+    font-size: 0.85rem;
+    padding: 0.3rem 1rem;
+  }
+
+  .blog-post-detail .blog-container {
+    padding: 1.5rem;
+  }
+
+  .blog-post-detail h2 {
+    font-size: 1.2rem;
+  }
+
+  .blog-post-detail p {
+    font-size: 0.9rem;
+  }
+}

@@ -1,0 +1,208 @@
+/* Estilos generales para modales */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.75);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  backdrop-filter: blur(5px);
+}
+
+.modal-container {
+  background-color: #1a1a2e;
+  border-radius: 8px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+  width: 90%;
+  max-width: 700px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #2a2a5a;
+  animation: modalFadeIn 0.3s ease-out;
+}
+
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid #2a2a5a;
+}
+
+.modal-header h2 {
+  margin: 0;
+  color: #e2e2f0;
+  font-family: "Orbitron", sans-serif;
+  font-size: 1.5rem;
+}
+
+.close-button {
+  background: none;
+  border: none;
+  color: #8080a0;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.close-button:hover {
+  color: #e2e2f0;
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.modal-content {
+  padding: 20px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  padding: 16px 20px;
+  border-top: 1px solid #2a2a5a;
+  gap: 10px;
+}
+
+/* Estilos para botones */
+.primary-button,
+.secondary-button,
+.action-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: none;
+}
+
+.primary-button {
+  background-color: #4a4ae0;
+  color: white;
+}
+
+.primary-button:hover {
+  background-color: #5a5af0;
+}
+
+.secondary-button {
+  background-color: transparent;
+  border: 1px solid #4a4ae0;
+  color: #4a4ae0;
+}
+
+.secondary-button:hover {
+  background-color: rgba(74, 74, 224, 0.1);
+}
+
+.action-button {
+  background: none;
+  color: #8080a0;
+  padding: 6px;
+}
+
+.action-button:hover {
+  color: #e2e2f0;
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.restore-button:hover {
+  color: #4a4ae0;
+}
+
+.delete-button:hover {
+  color: #e04a4a;
+}
+
+/* Estilos específicos para el historial de versiones */
+.version-history-modal {
+  width: 90%;
+  max-width: 800px;
+}
+
+.version-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 16px;
+  gap: 10px;
+}
+
+.versions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: 50vh;
+  overflow-y: auto;
+}
+
+.version-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+  border-radius: 6px;
+  background-color: #222240;
+  border: 1px solid #2a2a5a;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.version-item:hover {
+  background-color: #2a2a50;
+}
+
+.version-item.selected {
+  background-color: #2a2a60;
+  border-color: #4a4ae0;
+}
+
+.version-info {
+  flex: 1;
+}
+
+.version-info h3 {
+  margin: 0 0 4px 0;
+  font-size: 1.1rem;
+  color: #e2e2f0;
+}
+
+.version-info p {
+  margin: 2px 0;
+  font-size: 0.9rem;
+  color: #8080a0;
+}
+
+.version-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.no-versions {
+  text-align: center;
+  color: #8080a0;
+  padding: 20px;
+  font-style: italic;
+}

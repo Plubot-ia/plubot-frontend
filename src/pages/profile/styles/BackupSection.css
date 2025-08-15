@@ -1,0 +1,85 @@
+/* Estilos para la sección de respaldo de datos */
+.backup-section {
+  padding: 20px;
+  background-color: rgba(0, 0, 0, 0.05);
+  border-radius: 12px;
+  margin-bottom: 20px;
+}
+
+.backup-section .section-title {
+  color: var(--primary-color, #4285f4);
+  font-size: 24px;
+  margin-bottom: 15px;
+  font-weight: 600;
+  border-bottom: 2px solid var(--primary-color, #4285f4);
+  padding-bottom: 8px;
+}
+
+.backup-section .section-description {
+  margin-bottom: 25px;
+  font-size: 16px;
+  line-height: 1.5;
+  color: #555;
+}
+
+.backup-info {
+  margin-top: 30px;
+  padding: 20px;
+  background-color: rgba(0, 0, 0, 0.03);
+  border-radius: 8px;
+  border-left: 4px solid var(--primary-color, #4285f4);
+}
+
+.backup-info h3 {
+  margin-top: 0;
+  margin-bottom: 15px;
+  font-size: 18px;
+  color: #333;
+}
+
+.backup-info ul {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.backup-info li {
+  margin-bottom: 12px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #555;
+}
+
+.backup-info strong {
+  color: #333;
+}
+
+/* Estilos para modo oscuro */
+@media (prefers-color-scheme: dark) {
+  .backup-section {
+    background-color: rgba(255, 255, 255, 0.05);
+  }
+
+  .backup-section .section-title {
+    color: var(--primary-color, #4285f4);
+  }
+
+  .backup-section .section-description {
+    color: #bdc1c6;
+  }
+
+  .backup-info {
+    background-color: rgba(255, 255, 255, 0.03);
+  }
+
+  .backup-info h3 {
+    color: #e8eaed;
+  }
+
+  .backup-info li {
+    color: #bdc1c6;
+  }
+
+  .backup-info strong {
+    color: #e8eaed;
+  }
+}

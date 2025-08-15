@@ -1,0 +1,226 @@
+/* Estilos para el botu00f3n de sincronizaciu00f3n */
+.sync-button-container {
+  position: relative;
+}
+
+.sync-control-button {
+  width: 30px; /* Reducido para que coincida con los otros botones */
+  height: 30px; /* Reducido para que coincida con los otros botones */
+  border-radius: 6px; /* Reducido para que coincida con los otros botones */
+  background-color: rgba(10, 20, 35, 0.5);
+  color: #00ff66; /* Verde neu00f3n */
+  border: 1px solid rgba(0, 255, 102, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  box-shadow: 0 0 15px rgba(0, 255, 102, 0.5);
+  animation: pulse-green 2s infinite alternate;
+}
+
+/* Animaciu00f3n de pulso para el botu00f3n de sincronizaciu00f3n */
+@keyframes pulse-green {
+  0% {
+    box-shadow: 0 0 8px rgba(0, 255, 102, 0.4);
+    border-color: rgba(0, 255, 102, 0.6);
+  }
+  100% {
+    box-shadow:
+      0 0 15px rgba(0, 255, 102, 0.7),
+      0 0 20px rgba(0, 255, 102, 0.3);
+    border-color: rgba(0, 255, 102, 0.9);
+  }
+}
+
+/* Tooltip para el botón de sincronización */
+.sync-control-button .button-tooltip {
+  position: absolute;
+  right: 40px;
+  top: 0;
+  background-color: rgba(10, 20, 35, 0.9);
+  color: #00ff66;
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 0.3s,
+    visibility 0.3s;
+  z-index: 1000;
+  border: 1px solid rgba(0, 255, 102, 0.4);
+  box-shadow: 0 0 10px rgba(0, 255, 102, 0.3);
+}
+
+.sync-control-button:hover .button-tooltip {
+  opacity: 1;
+  visibility: visible;
+}
+
+.sync-control-button:hover {
+  background-color: rgba(0, 255, 102, 0.2);
+  transform: translateY(-2px);
+  box-shadow:
+    0 0 10px rgba(0, 255, 102, 0.7),
+    0 0 20px rgba(0, 255, 102, 0.4);
+  color: #ffffff;
+}
+
+.sync-control-button:active {
+  transform: translateY(1px);
+  box-shadow: 0 0 5px rgba(0, 255, 102, 0.5);
+  background-color: rgba(0, 255, 102, 0.3);
+}
+
+/* Animaciu00f3n de pulso sutil para el botu00f3n */
+@keyframes subtle-pulse-green {
+  0% {
+    box-shadow: 0 0 5px rgba(0, 255, 102, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 15px rgba(0, 255, 102, 0.7);
+  }
+  100% {
+    box-shadow: 0 0 5px rgba(0, 255, 102, 0.3);
+  }
+}
+
+/* Animaciu00f3n de giro para el icono */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Estilos para el panel de detalles de sincronizaciu00f3n */
+.sync-details-panel {
+  position: absolute;
+  top: 0;
+  right: 40px; /* Posicionado a la derecha del botu00f3n */
+  width: 280px;
+  background-color: rgba(10, 20, 35, 0.9);
+  border-radius: 8px;
+  box-shadow:
+    0 0 20px rgba(0, 0, 0, 0.5),
+    0 0 30px rgba(0, 224, 255, 0.2);
+  padding: 15px;
+  color: #fff;
+  z-index: 1000;
+  border: 1px solid rgba(0, 224, 255, 0.3);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+/* Estilos para el encabezado del panel */
+.sync-panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  border-bottom: 1px solid rgba(0, 224, 255, 0.3);
+  padding-bottom: 8px;
+}
+
+.sync-panel-header h4 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #00e0ff;
+}
+
+.sync-status {
+  font-size: 12px;
+  padding: 3px 8px;
+  border-radius: 12px;
+  background-color: rgba(0, 224, 255, 0.2);
+}
+
+/* Estilos para los elementos de detalle */
+.sync-detail-item {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  font-size: 12px;
+}
+
+/* Estilos para la secciu00f3n de errores */
+.sync-errors {
+  margin-top: 10px;
+  background-color: rgba(234, 67, 53, 0.1);
+  border-radius: 6px;
+  padding: 8px;
+  border-left: 3px solid #ea4335;
+}
+
+.sync-errors h4 {
+  margin: 0 0 5px 0;
+  font-size: 13px;
+  color: #ea4335;
+}
+
+.sync-errors ul {
+  margin: 0;
+  padding-left: 15px;
+  font-size: 11px;
+}
+
+.sync-errors li {
+  margin-bottom: 4px;
+}
+
+/* Estilos para los controles */
+.sync-controls {
+  margin-top: 12px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.sync-now-btn {
+  background-color: rgba(0, 224, 255, 0.2);
+  color: #00e0ff;
+  border: 1px solid rgba(0, 224, 255, 0.5);
+  border-radius: 4px;
+  padding: 5px 10px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.sync-now-btn:hover {
+  background-color: rgba(0, 224, 255, 0.3);
+  box-shadow: 0 0 10px rgba(0, 224, 255, 0.5);
+}
+
+.sync-now-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Animaciu00f3n de rotaciu00f3n para el icono de sincronizaciu00f3n */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Estilos para diferentes estados */
+.sync-control-button.success .sync-icon {
+  color: #34a853;
+}
+
+.sync-control-button.error .sync-icon {
+  color: #ea4335;
+}
+
+.sync-control-button.syncing .sync-icon {
+  color: #4285f4;
+}

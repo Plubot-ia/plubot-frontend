@@ -1,0 +1,238 @@
+import js from '@eslint/js';
+import globals from 'globals';
+
+import babelParser from '@babel/eslint-parser';
+import react from 'eslint-plugin-react';
+import reactHooks from 'eslint-plugin-react-hooks';
+import reactRefresh from 'eslint-plugin-react-refresh';
+import tsParser from '@typescript-eslint/parser';
+import tsPlugin from '@typescript-eslint/eslint-plugin';
+
+// Create a sanitized version of browser globals
+const sanitizedGlobals = { ...globals.browser };
+delete sanitizedGlobals['AudioWorkletGlobalScope '];
+sanitizedGlobals.AudioWorkletGlobalScope = true;
+
+export default [
+  {
+    // Configuración para archivos de build y configuración
+    files: ['**/*config.js', '**/*config.mjs'],
+    languageOptions: {
+      globals: {
+        ...globals.node,
+      },
+    },
+  },
+  {
+    ignores: [
+      'dist',
+      'build',
+      'node_modules',
+      'coverage',
+      '.nyc_output',
+      '**/*config.js',
+      '**/*config.mjs',
+    ],
+  },
+
+  // === CONFIGURACIÓN PARA ARCHIVOS JS/JSX ===
+  {
+    files: ['src/**/*.{js,mjs,cjs,jsx}'],
+    languageOptions: {
+      globals: sanitizedGlobals,
+      parser: babelParser,
+      parserOptions: {
+        ecmaVersion: 'latest',
+        ecmaFeatures: { jsx: true },
+        sourceType: 'module',
+        requireConfigFile: false,
+        babelOptions: {
+          presets: ['@babel/preset-react'],
+        },
+      },
+    },
+    plugins: {
+      react,
+      'react-hooks': reactHooks,
+      'react-refresh': reactRefresh,
+    },
+    settings: {
+      react: {
+        version: 'detect',
+      },
+    },
+    rules: {
+      // === REGLAS CRÍTICAS DE JAVASCRIPT ===
+      ...js.configs.recommended.rules,
+      
+      // Variables y funciones críticas
+      'no-undef': 'error',
+      'no-unused-vars': 'warn',
+      'no-redeclare': 'error',
+      'prefer-const': 'error',
+      'no-var': 'error',
+      
+      // Errores críticos que rompen la app
+      'no-unreachable': 'error',
+      'no-duplicate-case': 'error',
+      'no-empty': 'error',
+      'no-debugger': 'error',
+      'no-eval': 'error',
+      'eqeqeq': 'error',
+      
+      // === REGLAS CRÍTICAS DE REACT ===
+      ...react.configs.recommended.rules,
+      ...reactHooks.configs.recommended.rules,
+      'react/react-in-jsx-scope': 'off',
+      'react/prop-types': 'off', // Demasiado ruido, se puede activar después
+      'react/jsx-uses-react': 'off',
+      'react/jsx-uses-vars': 'error',
+      'react/no-unknown-property': 'error',
+      'react/no-children-prop': 'error',
+      'react/no-danger': 'error',
+      'react/no-deprecated': 'error',
+      'react/no-direct-mutation-state': 'error',
+      'react/no-typos': 'error',
+      'react/no-unsafe': 'error',
+      'react/require-render-return': 'error',
+      
+      // Hooks críticos
+      'react-hooks/rules-of-hooks': 'error',
+      'react-hooks/exhaustive-deps': 'warn',
+      
+      // React Refresh
+      'react-refresh/only-export-components': [
+        'error',
+        { allowConstantExport: true },
+      ],
+      
+      // === SOLO ERRORES DE SINTAXIS Y LÓGICA CRÍTICA ===
+      'no-async-promise-executor': 'error',
+      'no-promise-executor-return': 'error',
+      'no-unreachable-loop': 'error',
+      'no-use-before-define': 'error',
+      'default-case': 'error',
+      
+      // Desactivar reglas de estilo y menos críticas por ahora
+      'no-console': 'off',
+      'max-len': 'off',
+      'indent': 'off',
+      'quotes': 'off',
+      'semi': 'off',
+      'comma-dangle': 'off',
+      'no-trailing-spaces': 'off',
+      'no-multiple-empty-lines': 'off',
+    },
+  },
+
+  // === CONFIGURACIÓN PARA ARCHIVOS TS/TSX ===
+  {
+    files: ['**/*.{ts,tsx}'],
+    languageOptions: {
+      parser: tsParser,
+      ecmaVersion: 2024,
+      globals: sanitizedGlobals,
+      parserOptions: {
+        ecmaVersion: 'latest',
+        ecmaFeatures: { jsx: true },
+        sourceType: 'module',
+        project: './tsconfig.json',
+      },
+    },
+    plugins: {
+      '@typescript-eslint': tsPlugin,
+      react,
+      'react-hooks': reactHooks,
+      'react-refresh': reactRefresh,
+    },
+    settings: {
+      react: {
+        version: 'detect',
+      },
+    },
+    rules: {
+      // === REGLAS CRÍTICAS DE TYPESCRIPT ===
+      ...tsPlugin.configs.recommended.rules,
+      
+      // Desactivar reglas JS que maneja TS
+      'no-unused-vars': 'off',
+      'no-undef': 'off',
+      'no-redeclare': 'off',
+      'no-use-before-define': 'off',
+      
+      // Activar versiones TypeScript críticas
+      '@typescript-eslint/no-unused-vars': 'warn',
+      '@typescript-eslint/no-redeclare': 'error',
+      '@typescript-eslint/no-use-before-define': 'error',
+      
+      // Solo errores críticos de TS
+      '@typescript-eslint/no-explicit-any': 'off', // Muy ruidoso al inicio
+      '@typescript-eslint/no-non-null-assertion': 'off', // Se puede activar después
+      '@typescript-eslint/prefer-as-const': 'error',
+      '@typescript-eslint/no-duplicate-enum-values': 'error',
+      '@typescript-eslint/no-require-imports': 'error',
+      
+      // === REGLAS CRÍTICAS DE REACT (igual que JS) ===
+      ...react.configs.recommended.rules,
+      ...reactHooks.configs.recommended.rules,
+      'react/react-in-jsx-scope': 'off',
+      'react/prop-types': 'off',
+      'react/jsx-uses-react': 'off',
+      'react/jsx-uses-vars': 'error',
+      'react/no-unknown-property': 'error',
+      'react/no-children-prop': 'error',
+      'react/no-danger': 'error',
+      'react/no-deprecated': 'error',
+      'react/no-direct-mutation-state': 'error',
+      'react/no-typos': 'error',
+      'react/no-unsafe': 'error',
+      'react/require-render-return': 'error',
+      
+      // Hooks críticos
+      'react-hooks/rules-of-hooks': 'error',
+      'react-hooks/exhaustive-deps': 'warn',
+      
+      // React Refresh
+      'react-refresh/only-export-components': [
+        'error',
+        { allowConstantExport: true },
+      ],
+      
+      // Desactivar reglas de estilo
+      'no-console': 'off',
+      'max-len': 'off',
+      'indent': 'off',
+      'quotes': 'off',
+      'semi': 'off',
+      'comma-dangle': 'off',
+      'no-trailing-spaces': 'off',
+      'no-multiple-empty-lines': 'off',
+    },
+  },
+  
+  // === CONFIGURACIÓN PARA TESTS ===
+  {
+    files: ['**/*.{test,spec}.{js,jsx,ts,tsx}', '**/__tests__/**/*.{js,jsx,ts,tsx}'],
+    languageOptions: {
+      globals: {
+        ...globals.browser,
+        ...globals.jest,
+        ...globals.vitest,
+      },
+    },
+    rules: {
+      'no-console': 'off',
+      'react/display-name': 'off',
+      '@typescript-eslint/no-explicit-any': 'off',
+      '@typescript-eslint/no-non-null-assertion': 'off',
+    },
+  },
+  
+  // === CONFIGURACIÓN PARA LOGGER ===
+  {
+    files: ['src/utils/logger.js'],
+    rules: {
+      'no-console': 'off',
+    },
+  },
+];

@@ -1,0 +1,378 @@
+/* Estilos para el componente FlowMain - Totalmente encapsulados */
+
+.flow-editor-wrapper.flow-editor-container {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  flex: 1;
+  display: flex;
+  overflow: visible !important; /* CORRECCIÓN CRÍTICA: Cambiar de hidden a visible para permitir que los nodos se vean completamente */
+  will-change: transform;
+  backface-visibility: hidden;
+  /* Evitar que los contenedores limiten visualmente los nodos */
+  clip-path: none !important;
+  clip: auto !important;
+}
+
+/* Ocultar controles nativos de ReactFlow */
+.flow-editor-container .react-flow__controls,
+.flow-editor-wrapper .react-flow__controls {
+  display: none !important;
+}
+
+/* Estilos para el panel del mini mapa */
+.flow-editor-container .custom-minimap-panel,
+.flow-editor-wrapper .custom-minimap-panel {
+  margin: 0;
+  padding: 0;
+}
+
+/* Estilos para el contenedor del MiniMap */
+.flow-minimap-container {
+  position: absolute;
+  z-index: 1000;
+  pointer-events: auto;
+}
+
+.flow-minimap-container.bottom-left {
+  bottom: 20px;
+  left: 20px;
+}
+
+/* Asegurar que el MiniMap está por encima de otros elementos */
+.custom-minimap,
+.ts-custom-minimap-container {
+  z-index: 1000 !important;
+  pointer-events: auto !important;
+}
+
+/* Eliminar cualquier duplicación del MiniMap en la parte superior */
+.react-flow__attribution,
+.react-flow__minimap {
+  display: none !important;
+}
+
+/* Estilos para el panel de controles de zoom */
+.flow-editor-container .react-flow__panel.react-flow__panel-bottom-right,
+.flow-editor-wrapper .react-flow__panel.react-flow__panel-bottom-right {
+  margin-right: 10px;
+  margin-bottom: 10px;
+}
+
+/* Asegurar que el fondo se muestre correctamente */
+.flow-editor-container .react-flow__background,
+.flow-editor-wrapper .react-flow__background {
+  z-index: 0;
+}
+
+/* SOLUCIÓN OPTIMIZADA: Estilos para nodos que preservan la estética original */
+.flow-editor-container .react-flow__node,
+.flow-editor-wrapper .react-flow__node {
+  /* Eliminar background general para respetar estilos nativos */
+  background: transparent !important;
+  /* Eliminar sombras que interfieren con la estética original */
+  box-shadow: none !important;
+  /* Mantener z-index para correcta superposición */
+  z-index: 5;
+  /* Optimizaciones de rendimiento */
+  transform: translate3d(0, 0, 0);
+  will-change: transform;
+  /* Eliminar borde por defecto que causa el rectángulo */
+  border: none !important;
+  /* Eliminar padding adicional que afecta el tamaño */
+  padding: 0 !important;
+  /* Restringir las dimensiones para prevenir el estiramiento horizontal excesivo */
+  width: max-content !important; /* Usar max-content para que se ajuste al contenido natural */
+  height: max-content !important; /* Valor natural para la altura */
+  /* Capa de compatibilidad para nodos que no definan sus propios estilos */
+  overflow: visible !important;
+}
+
+/* Preservar estilos para high-performance-node sin interferir con los originales */
+.flow-editor-container .react-flow__node.high-performance-node > *,
+.flow-editor-wrapper .react-flow__node.high-performance-node > * {
+  /* Preservar estilos de contenido interno */
+  pointer-events: auto;
+}
+
+/* Estilos para los nodos seleccionados - preservando estética original */
+.flow-editor-container .react-flow__node.selected,
+.flow-editor-wrapper .react-flow__node.selected {
+  /* Indicador visual de selección optimizado */
+  outline: 2px solid #00e0ff !important;
+  outline-offset: 2px;
+  /* Evitar box-shadow que afecta rendimiento */
+  box-shadow: none !important;
+  /* Prioridad correcta en z-index */
+  z-index: 10;
+  /* Mantener transparencia para respetar estilos originales */
+  background: transparent !important;
+}
+
+/* Estilos para el efecto de arrastre */
+.flow-editor-container .react-flow__pane.drag-over,
+.flow-editor-wrapper .react-flow__pane.drag-over {
+  background-color: rgba(0, 224, 255, 0.05);
+  cursor: grab;
+}
+
+/* Estilo normal para el modo de arrastre - sin optimizaciones excesivas */
+.flow-editor-container .react-flow__node-drag-active,
+.flow-editor-wrapper .react-flow__node-drag-active {
+  cursor: grabbing !important;
+  z-index: 200 !important; /* Valor moderado que no interfiere con otros elementos */
+  /* Solo las optimizaciones más esenciales */
+  will-change: transform;
+}
+
+/* Optimizaciones para mejorar rendimiento */
+.flow-editor-container .react-flow__edge,
+.flow-editor-wrapper .react-flow__edge {
+  pointer-events: stroke;
+  will-change: filter;
+  backface-visibility: hidden;
+}
+
+/* Prevención de rectángulos enormes */
+.flow-editor-container .react-flow__handle,
+.flow-editor-wrapper .react-flow__handle {
+  z-index: 15;
+  /* background: transparent; */ /* Comentado para permitir colores de handle específicos del nodo */
+}
+
+/* Mejoras de rendimiento global */
+.flow-editor-container .react-flow__viewport,
+.flow-editor-wrapper .react-flow__viewport {
+  will-change: transform;
+  /* ELIMINADO: transform: translate3d(0, 0, 0); - Esta regla estaba forzando todos los nodos a la esquina */
+  backface-visibility: hidden;
+}
+.flow-editor-container .react-flow__node,
+.flow-editor-wrapper .react-flow__node {
+  transition: transform 0.2s ease; /* Transiciu00f3n por defecto */
+}
+
+.flow-editor-container.dragging-mode .react-flow__node,
+.flow-editor-wrapper.dragging-mode .react-flow__node {
+  transition: none !important;
+}
+
+.flow-editor-container.dragging-mode .react-flow__edge,
+.flow-editor-wrapper.dragging-mode .react-flow__edge {
+  opacity: 0.5;
+  transition: none !important;
+}
+
+/* Estilos para el indicador de rendimiento */
+.flow-editor-container .performance-indicator,
+.flow-editor-wrapper .performance-indicator {
+  position: absolute;
+  bottom: 15px;
+  right: 15px;
+  background-color: rgba(0, 0, 0, 0.8);
+  padding: 7px 12px;
+  border-radius: 4px;
+  color: #00e0ff;
+  font-size: 12px;
+  z-index: 100;
+  transition: all 0.3s ease;
+  font-family: "Courier New", monospace;
+  box-shadow: 0 0 5px rgba(0, 224, 255, 0.3);
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  max-width: 320px;
+  backdrop-filter: blur(4px);
+}
+
+.flow-editor-container .performance-indicator .perf-metric,
+.flow-editor-wrapper .performance-indicator .perf-metric {
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.flow-editor-container .performance-indicator .perf-metric strong,
+.flow-editor-wrapper .performance-indicator .perf-metric strong {
+  font-weight: bold;
+  color: #fff;
+}
+
+.flow-editor-container .performance-indicator .lod-stats,
+.flow-editor-wrapper .performance-indicator .lod-stats {
+  display: flex;
+  gap: 2px;
+  align-items: center;
+}
+
+.flow-editor-container .performance-indicator .high-detail,
+.flow-editor-wrapper .performance-indicator .high-detail {
+  color: #4caf50;
+}
+
+.flow-editor-container .performance-indicator .med-detail,
+.flow-editor-wrapper .performance-indicator .med-detail {
+  color: #ffc107;
+}
+
+.flow-editor-container .performance-indicator .low-detail,
+.flow-editor-wrapper .performance-indicator .low-detail {
+  color: #f44336;
+}
+
+.flow-editor-container .performance-indicator .perf-warning,
+.flow-editor-wrapper .performance-indicator .perf-warning {
+  color: #ff9800;
+  font-style: italic;
+}
+
+.flow-editor-container .performance-indicator.warning,
+.flow-editor-wrapper .performance-indicator.warning {
+  background-color: rgba(255, 193, 7, 0.2);
+  color: #ffc107;
+  box-shadow: 0 0 5px rgba(255, 193, 7, 0.5);
+}
+
+.flow-editor-container .performance-indicator.critical,
+.flow-editor-wrapper .performance-indicator.critical {
+  background-color: rgba(244, 67, 54, 0.2);
+  color: #f44336;
+  box-shadow: 0 0 10px rgba(244, 67, 54, 0.5);
+  animation: pulse 1.5s infinite;
+}
+
+/* Optimizaciones para grandes cantidades de nodos */
+.flow-editor-container .react-flow__node[data-detail-level="low"],
+.flow-editor-wrapper .react-flow__node[data-detail-level="low"] {
+  opacity: 0.7;
+  transition: none !important;
+}
+
+.flow-editor-container .react-flow__node[data-detail-level="low"] .node-content,
+.flow-editor-wrapper .react-flow__node[data-detail-level="low"] .node-content {
+  filter: blur(1px);
+}
+
+.flow-editor-container .react-flow__node[data-detail-level="medium"],
+.flow-editor-wrapper .react-flow__node[data-detail-level="medium"] {
+  opacity: 0.85;
+  transition: opacity 0.1s ease-out;
+}
+
+/* Estilos para el sistema adaptativo de rendimiento */
+.flow-editor-container.optimization-low .react-flow__node:not(:hover),
+.flow-editor-wrapper.optimization-low .react-flow__node:not(:hover) {
+  transition-duration: 0.25s !important;
+}
+
+.flow-editor-container.optimization-medium .react-flow__node:not(:hover):not(.selected),
+.flow-editor-wrapper.optimization-medium .react-flow__node:not(:hover):not(.selected) {
+  transition: none !important;
+}
+
+.flow-editor-container.optimization-medium .react-flow__edge,
+.flow-editor-wrapper.optimization-medium .react-flow__edge {
+  transition: stroke 0.2s ease-out !important;
+}
+
+.flow-editor-container.optimization-high .react-flow__node:not(:hover):not(.selected),
+.flow-editor-wrapper.optimization-high .react-flow__node:not(:hover):not(.selected) {
+  transition: none !important;
+  animation: none !important;
+}
+
+.flow-editor-container.optimization-high .react-flow__edge,
+.flow-editor-wrapper.optimization-high .react-flow__edge {
+  transition: none !important;
+  animation: none !important;
+}
+
+.flow-editor-container.disable-animations *,
+.flow-editor-wrapper.disable-animations * {
+  animation-duration: 0s !important;
+  transition-duration: 0s !important;
+}
+
+/* Indicador de nivel de optimizaciu00f3n */
+.flow-editor-container .optimization-indicator,
+.flow-editor-wrapper .optimization-indicator {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background-color: rgba(0, 0, 0, 0.7);
+  color: #4caf50;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  z-index: 100;
+  pointer-events: none;
+  font-family: "Courier New", monospace;
+}
+
+.flow-editor-container .optimization-indicator.medium,
+.flow-editor-wrapper .optimization-indicator.medium {
+  color: #ffc107;
+}
+
+.flow-editor-container .optimization-indicator.high,
+.flow-editor-wrapper .optimization-indicator.high {
+  color: #f44336;
+}
+
+.flow-editor-container .optimization-indicator.ultra,
+.flow-editor-wrapper .optimization-indicator.ultra {
+  color: #ff00ff;
+  text-shadow: 0 0 5px rgba(255, 0, 255, 0.5);
+}
+
+/* Optimizaciones para el modo de arrastre */
+.flow-editor-container.dragging-mode .react-flow__node,
+.flow-editor-wrapper.dragging-mode .react-flow__node {
+  transition: none !important;
+  will-change: transform;
+}
+
+.flow-editor-container.dragging-mode .react-flow__edge,
+.flow-editor-wrapper.dragging-mode .react-flow__edge {
+  opacity: 0.5;
+  transition: none !important;
+}
+
+/* Animaciu00f3n de pulso encapsulada */
+@keyframes pulse {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+/* Optimizaciones para dispositivos de alto rendimiento */
+@media (min-width: 1200px) {
+  .flow-editor-container .react-flow__renderer,
+  .flow-editor-wrapper .react-flow__renderer {
+    contain: layout;
+  }
+
+  .flow-editor-container .react-flow__node,
+  .flow-editor-wrapper .react-flow__node {
+    contain: layout;
+    will-change: transform;
+  }
+}
+
+/* Optimizaciones para dispositivos de bajo rendimiento */
+@media (max-width: 768px) {
+  .flow-editor-container .react-flow__edge,
+  .flow-editor-wrapper .react-flow__edge {
+    stroke-width: 1px !important;
+  }
+
+  .flow-editor-container .react-flow__node,
+  .flow-editor-wrapper .react-flow__node {
+    transform: translate3d(0, 0, 0);
+  }
+}

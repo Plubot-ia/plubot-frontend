@@ -1,0 +1,75 @@
+/**
+ * ultra-mode-fixes.css - SOLUCIÓN COMPLETA
+ * Elimina barras de desplazamiento en el editor de flujos
+ * Funciona tanto en modo normal como en modo ultra
+ */
+
+/* REGLA 1: Aplicar overflow:hidden al contenedor principal del editor en AMBOS modos */
+.flow-editor-container,
+.flow-editor-wrapper {
+  overflow: hidden !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* REGLA 2: Configurar ReactFlow correctamente para ambos modos */
+.flow-editor-container .react-flow,
+.flow-editor-container .react-flow__renderer,
+.flow-editor-container .react-flow__container,
+.flow-editor-container .react-flow__viewport,
+.flow-editor-container .react-flow__pane,
+.flow-editor-container .react-flow__nodes,
+.flow-editor-container .react-flow__edges,
+.flow-editor-container .react-flow__edge-labels,
+.flow-editor-container .react-flow__controls,
+.flow-editor-container .flow-container {
+  overflow: visible !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* REGLA 3: Desactivar TODAS las barras de desplazamiento dentro del editor */
+.flow-editor-container * {
+  scrollbar-width: none !important; /* Firefox */
+  -ms-overflow-style: none !important; /* IE/Edge */
+}
+
+/* REGLA 4: Ocultar scrollbars en Chrome/Safari/Opera */
+.flow-editor-container *::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  background: transparent !important;
+}
+
+/* REGLA 5: Configuración adicional para modo ultra */
+body.ultra-mode .flow-editor-container .react-flow-wrapper,
+.flow-editor-container .react-flow-wrapper {
+  width: 100% !important;
+  height: 100% !important;
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+/* REGLA 6: Configuraciones especiales para componentes del editor */
+.flow-editor-container .epic-header,
+.flow-editor-container .node-palette,
+.flow-editor-container .editor-sidebar,
+.flow-editor-container .editor-controls-container,
+.flow-editor-container .editor-controls {
+  max-width: 100% !important;
+  overflow: visible !important;
+}
+
+/* REGLA 7: Configurar body y html solo para el editor */
+body:has(.flow-editor-container) {
+  overflow: hidden !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  height: 100vh !important;
+  width: 100vw !important;
+}

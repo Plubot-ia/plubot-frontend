@@ -1,0 +1,94 @@
+/**
+ * fix-transform-override.css
+ * 
+ * Este archivo corrige los problemas de estilo que causan que los nodos
+ * se apilen en la esquina superior izquierda del pane.
+ * 
+ * Problema: El "transform: none" aplicado a .react-flow__pane y .react-flow__viewport
+ * anula completamente el sistema de transformación de React Flow.
+ */
+
+/* IMPORTANTE: NO forzar transform para .react-flow__viewport */
+.react-flow__pane,
+.react-flow__container,
+.react-flow__edges {
+  /* Permitir que ReactFlow maneje las transformaciones */
+  /* NO anular transform del viewport, ReactFlow lo necesita */
+  pointer-events: all !important;
+}
+
+/* Asegurar que el pane ocupe todo el espacio disponible */
+.react-flow__pane {
+  width: 100% !important;
+  height: 100% !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  z-index: 0 !important;
+}
+
+/* Permitir que el viewport realice transformaciones */
+.react-flow__viewport {
+  transform-origin: 0 0 !important;
+  z-index: 2 !important;
+  pointer-events: none !important;
+  /* Quitar las propiedades que están interfiriendo */
+  animation: none !important;
+  transition: none !important;
+  backdrop-filter: none !important;
+  box-shadow: none !important;
+}
+
+/* Permitir que los nodos tengan su propio sistema de transformación */
+.react-flow__node {
+  /* NO anular el transform de ReactFlow - esto causa el problema de apilamiento */
+  /* transform: none !important; */
+  /* transform: translate(var(--x, 0px), var(--y, 0px)) !important; */
+
+  /* En lugar de eso, asegurar que sean visibles e interactivos */
+  position: absolute !important;
+  z-index: 3 !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: block !important;
+  pointer-events: all !important;
+}
+
+/* Asegurarse de que los handles sean visibles e interactivos */
+.react-flow__handle {
+  visibility: visible !important;
+  pointer-events: all !important;
+  opacity: 1 !important;
+}
+
+/* Arreglar las aristas para que se muestren correctamente */
+.react-flow__edge {
+  pointer-events: stroke !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+.react-flow__edge-path {
+  /* Forzar la visibilidad de los paths de las aristas */
+  visibility: visible !important;
+  stroke: #00e0ff !important;
+  stroke-width: 2px !important;
+}
+
+/* Permitir que los controles de ReactFlow funcionen */
+.react-flow__controls {
+  z-index: 5 !important;
+}
+
+/* Asegurar que la interacción de arrastre funcione */
+.react-flow__selectionpane {
+  z-index: 5 !important;
+}
+
+/* ELIMINADO: Esta regla estaba causando que los nodos se apilaran en la esquina superior izquierda
+body:not(.ultra-performance-disabled) .react-flow__pane,
+body:not(.ultra-performance-disabled) .react-flow__viewport {
+  will-change: transform !important;
+  transform: translate3d(0, 0, 0) !important;
+}
+*/

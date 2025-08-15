@@ -1,0 +1,490 @@
+/* ==========================================================================
+   Poderes Page (Scoped)
+   ========================================================================== */
+.poderes-page {
+  background:
+    radial-gradient(circle at center, rgba(10, 14, 47, 0.9) 0%, rgba(0, 0, 0, 0.85) 100%),
+    url("/src/assets/img/background-poderes.jpg") no-repeat center center fixed;
+  background-size: cover;
+  background-blend-mode: overlay;
+  color: white;
+  padding: 4rem 2rem;
+  font-family: "Orbitron", sans-serif;
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+  animation: pulse-bg 10s infinite ease-in-out;
+}
+
+@keyframes pulse-bg {
+  0%,
+  100% {
+    background-blend-mode: overlay;
+  }
+  50% {
+    background-blend-mode: screen;
+  }
+}
+
+.poderes-page .particles-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  pointer-events: none;
+  animation: particle-glow 5s infinite alternate;
+}
+
+@keyframes particle-glow {
+  0% {
+    opacity: 0.7;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.poderes-page .poderes-hero {
+  text-align: center;
+  margin-bottom: 4.5rem;
+  position: relative;
+  z-index: 1;
+}
+
+.poderes-page .poderes-hero h1 {
+  font-size: 3.5rem;
+  color: #00f7ff;
+  text-shadow:
+    0 0 20px rgba(0, 224, 255, 0.9),
+    0 0 40px rgba(0, 224, 255, 0.5);
+  margin-bottom: 1.5rem;
+  letter-spacing: 2px;
+  animation: neon-flicker 3s infinite;
+}
+
+@keyframes neon-flicker {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.95;
+  }
+}
+
+.poderes-page .poderes-hero p {
+  font-family: "Inter", sans-serif;
+  font-size: 1.3rem;
+  color: #e0e0e0;
+  max-width: 750px;
+  margin: 0 auto 2.5rem;
+  line-height: 1.6;
+  text-shadow: 0 0 8px rgba(0, 224, 255, 0.4);
+}
+
+.poderes-page .hero-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+.poderes-page .poderes-about {
+  text-align: center;
+  margin-bottom: 5rem;
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
+  position: relative;
+}
+
+.poderes-page .poderes-about::before {
+  content: "";
+  position: absolute;
+  top: -20px;
+  left: 50%;
+  width: 100px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #00f7ff, transparent);
+  transform: translateX(-50%);
+}
+
+.poderes-page .poderes-about h2 {
+  font-size: 2.5rem;
+  color: #00e0ff;
+  text-shadow: 0 0 15px rgba(0, 224, 255, 0.9);
+  margin-bottom: 1.5rem;
+  letter-spacing: 1px;
+}
+
+.poderes-page .poderes-about p {
+  font-family: "Inter", sans-serif;
+  font-size: 1.15rem;
+  color: #d0d0d0;
+  line-height: 1.7;
+}
+
+.poderes-page .poderes-progress {
+  text-align: center;
+  margin-bottom: 4rem;
+}
+
+.poderes-page .poderes-progress h2 {
+  font-size: 2.2rem;
+  color: #00e0ff;
+  text-shadow: 0 0 12px rgba(0, 224, 255, 0.9);
+  margin-bottom: 1.5rem;
+}
+
+.poderes-page .progress-bar-container {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  width: 85%;
+  max-width: 600px;
+  height: 25px;
+  margin: 0 auto;
+  position: relative;
+  box-shadow: 0 0 15px rgba(0, 224, 255, 0.4);
+  overflow: hidden;
+}
+
+.poderes-page .progress-bar {
+  background: linear-gradient(90deg, #00f7ff, #007bff);
+  height: 100%;
+  border-radius: 12px;
+  box-shadow: 0 0 20px rgba(0, 224, 255, 0.7);
+  animation: progress-pulse 2s infinite;
+}
+
+@keyframes progress-pulse {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 200% 50%;
+  }
+}
+
+.poderes-page .progress-text {
+  position: absolute;
+  top: 50%;
+  right: 15px;
+  transform: translateY(-50%);
+  color: #fff;
+  font-family: "Inter", sans-serif;
+  font-size: 1rem;
+  text-shadow: 0 0 8px rgba(0, 224, 255, 0.9);
+}
+
+.poderes-page .poderes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2.5rem;
+  max-width: 1300px;
+  margin: 0 auto 4rem;
+}
+
+.poderes-page .power-card {
+  background: linear-gradient(135deg, rgba(10, 14, 47, 0.9), rgba(20, 24, 67, 0.9));
+  border: 2px solid #00e0ff;
+  border-radius: 15px;
+  padding: 2rem;
+  text-align: center;
+  cursor: pointer;
+  transition:
+    transform 0.4s ease,
+    box-shadow 0.4s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.poderes-page .power-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at center, rgba(0, 224, 255, 0.2), transparent);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.poderes-page .power-card:hover::before {
+  opacity: 1;
+}
+
+.poderes-page .power-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 0 25px rgba(0, 224, 255, 0.8);
+}
+
+.poderes-page .power-icon {
+  font-size: 3rem;
+  margin-bottom: 1.5rem;
+  color: #00f7ff;
+  filter: drop-shadow(0 0 10px rgba(0, 224, 255, 0.7));
+}
+
+.poderes-page .power-card h3 {
+  font-size: 1.6rem;
+  color: #00e0ff;
+  margin-bottom: 0.75rem;
+  text-shadow: 0 0 10px rgba(0, 224, 255, 0.9);
+}
+
+.poderes-page .power-card p {
+  font-family: "Inter", sans-serif;
+  font-size: 1rem;
+  color: #d0d0d0;
+  line-height: 1.5;
+}
+
+.poderes-page .poderes-cta {
+  text-align: center;
+  margin: 4rem 0;
+  position: relative;
+}
+
+.poderes-page .poderes-cta::after {
+  content: "";
+  position: absolute;
+  bottom: -20px;
+  left: 50%;
+  width: 150px;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, #00f7ff, transparent);
+  transform: translateX(-50%);
+}
+
+.poderes-page .poderes-cta h2 {
+  font-size: 2.5rem;
+  color: #00e0ff;
+  text-shadow: 0 0 15px rgba(0, 224, 255, 0.9);
+  margin-bottom: 1rem;
+}
+
+.poderes-page .poderes-cta p {
+  font-family: "Inter", sans-serif;
+  font-size: 1.2rem;
+  color: #d0d0d0;
+  margin-bottom: 2rem;
+}
+
+.poderes-page .hero-button,
+.poderes-page .modal-button {
+  display: inline-block;
+  padding: 1rem 2.5rem;
+  border-radius: 30px;
+  background: linear-gradient(90deg, #00f7ff, #007bff);
+  color: #000;
+  font-family: "Inter", sans-serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  text-decoration: none;
+  box-shadow: 0 0 15px rgba(0, 224, 255, 0.7);
+  transition: all 0.4s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.poderes-page .hero-button::before,
+.poderes-page .modal-button::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transition: left 0.4s ease;
+}
+
+.poderes-page .hero-button:hover::before,
+.poderes-page .modal-button:hover::before {
+  left: 100%;
+}
+
+.poderes-page .hero-button:hover,
+.poderes-page .modal-button:hover {
+  background: linear-gradient(90deg, #007bff, #00aaff);
+  box-shadow: 0 0 25px rgba(0, 224, 255, 1);
+  transform: scale(1.1);
+}
+
+.poderes-page .hero-button.secondary {
+  background: transparent;
+  border: 2px solid #00f7ff;
+  color: #00f7ff;
+}
+
+.poderes-page .hero-button.secondary:hover {
+  background: #00f7ff;
+  color: #000;
+  box-shadow: 0 0 25px rgba(0, 224, 255, 1);
+}
+
+.poderes-page .power-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fade-in 0.3s ease;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.poderes-page .power-modal {
+  background: linear-gradient(135deg, rgba(17, 17, 17, 0.97), rgba(10, 14, 47, 0.97));
+  border: 3px solid #00e0ff;
+  border-radius: 20px;
+  padding: 2.5rem;
+  max-width: 500px;
+  width: 95%;
+  box-shadow: 0 0 30px rgba(0, 224, 255, 0.6);
+  text-align: center;
+  position: relative;
+  transform: scale(0.8);
+  animation: modal-pop 0.4s ease forwards;
+}
+
+@keyframes modal-pop {
+  to {
+    transform: scale(1);
+  }
+}
+
+.poderes-page .modal-icon {
+  font-size: 3.5rem;
+  margin-bottom: 1.5rem;
+  color: #00f7ff;
+  filter: drop-shadow(0 0 12px rgba(0, 224, 255, 0.8));
+}
+
+.poderes-page .power-modal h2 {
+  font-size: 2rem;
+  color: #00e0ff;
+  margin-bottom: 1.2rem;
+  text-shadow: 0 0 10px rgba(0, 224, 255, 0.9);
+}
+
+.poderes-page .power-modal p {
+  font-family: "Inter", sans-serif;
+  font-size: 1.1rem;
+  color: #d0d0d0;
+  margin-bottom: 2rem;
+  line-height: 1.6;
+}
+
+.poderes-page .close-modal-btn {
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  background: transparent;
+  border: none;
+  font-size: 1.8rem;
+  color: #00f7ff;
+  cursor: pointer;
+  transition: all 0.4s ease;
+}
+
+.poderes-page .close-modal-btn:hover {
+  transform: rotate(180deg);
+  color: #fff;
+  text-shadow: 0 0 10px rgba(0, 224, 255, 0.9);
+}
+
+/* ==========================================================================
+   Media Queries (Scoped)
+   ========================================================================== */
+@media (max-width: 768px) {
+  .poderes-page .poderes-hero h1 {
+    font-size: 2.8rem;
+  }
+
+  .poderes-page .poderes-hero p {
+    font-size: 1.1rem;
+  }
+
+  .poderes-page .poderes-about h2 {
+    font-size: 2rem;
+  }
+
+  .poderes-page .poderes-about p {
+    font-size: 1rem;
+  }
+
+  .poderes-page .poderes-progress h2 {
+    font-size: 1.8rem;
+  }
+
+  .poderes-page .progress-bar-container {
+    width: 95%;
+    height: 20px;
+  }
+
+  .poderes-page .poderes-grid {
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 2rem;
+  }
+
+  .poderes-page .power-card h3 {
+    font-size: 1.4rem;
+  }
+
+  .poderes-page .power-card p {
+    font-size: 0.95rem;
+  }
+
+  .poderes-page .poderes-cta h2 {
+    font-size: 2rem;
+  }
+
+  .poderes-page .hero-buttons {
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .poderes-page {
+    padding: 3rem 1.5rem;
+  }
+
+  .poderes-page .poderes-hero h1 {
+    font-size: 2.2rem;
+  }
+
+  .poderes-page .poderes-about h2 {
+    font-size: 1.6rem;
+  }
+
+  .poderes-page .poderes-about p {
+    font-size: 0.95rem;
+  }
+
+  .poderes-page .power-modal {
+    padding: 2rem;
+  }
+
+  .poderes-page .power-modal h2 {
+    font-size: 1.7rem;
+  }
+}

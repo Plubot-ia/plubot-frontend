@@ -1,0 +1,322 @@
+/**
+ * Estilos para el componente BackupManager
+ * Diseñado para coincidir con la estética cyberpunk del resto de la aplicación
+ */
+
+/* Botón para abrir el gestor de copias de seguridad */
+.backup-manager-trigger {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background-color: rgba(0, 195, 255, 0.08);
+  transition: all 0.2s ease;
+}
+
+.backup-manager-trigger:hover {
+  background-color: rgba(0, 195, 255, 0.15);
+  transform: translateY(-1px);
+  box-shadow: 0 0 8px rgba(0, 195, 255, 0.3);
+}
+
+/* Overlay del diálogo */
+.backup-manager-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(5px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  animation: fadeIn 0.2s ease-out;
+}
+
+/* Diálogo principal */
+.backup-manager-dialog {
+  width: 90%;
+  max-width: 500px;
+  background: linear-gradient(135deg, rgba(8, 10, 15, 0.98) 0%, rgba(20, 22, 28, 0.98) 100%);
+  border: 1px solid rgba(0, 195, 255, 0.3);
+  border-radius: 8px;
+  box-shadow:
+    0 4px 20px rgba(0, 0, 0, 0.5),
+    0 0 15px rgba(0, 195, 255, 0.2);
+  overflow: hidden;
+  animation: slideUp 0.3s ease-out;
+}
+
+/* Encabezado del diálogo */
+.backup-manager-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+}
+
+.backup-manager-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.backup-manager-title h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+  font-family: "Orbitron", sans-serif;
+}
+
+.backup-manager-title svg {
+  color: rgba(0, 195, 255, 0.8);
+}
+
+.backup-manager-close-btn {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5px;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+
+.backup-manager-close-btn:hover {
+  color: rgba(255, 255, 255, 0.9);
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Divisor */
+.backup-manager-divider {
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(0, 195, 255, 0.4) 20%,
+    rgba(128, 255, 219, 0.4) 50%,
+    rgba(0, 195, 255, 0.4) 80%,
+    transparent 100%
+  );
+  margin: 0;
+}
+
+/* Contenido del diálogo */
+.backup-manager-content {
+  padding: 20px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+/* Estados de carga y error */
+.backup-manager-loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 30px 0;
+}
+
+.backup-manager-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(0, 195, 255, 0.1);
+  border-top: 3px solid rgba(0, 195, 255, 0.8);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.backup-manager-spinner-small {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-top: 2px solid rgba(255, 255, 255, 0.8);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-right: 8px;
+}
+
+.backup-manager-error {
+  display: flex;
+  align-items: center;
+  padding: 15px;
+  background-color: rgba(244, 67, 54, 0.1);
+  border: 1px solid rgba(244, 67, 54, 0.3);
+  border-radius: 6px;
+  margin-bottom: 15px;
+}
+
+.backup-manager-error svg {
+  color: rgba(244, 67, 54, 0.8);
+  margin-right: 10px;
+  flex-shrink: 0;
+}
+
+.backup-manager-error p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.9rem;
+}
+
+.backup-manager-empty {
+  text-align: center;
+  padding: 30px 0;
+  color: rgba(255, 255, 255, 0.5);
+  font-style: italic;
+}
+
+/* Lista de copias de seguridad */
+.backup-manager-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.backup-manager-item {
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  padding: 12px 15px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background-color: rgba(255, 255, 255, 0.03);
+}
+
+.backup-manager-item:hover {
+  background-color: rgba(0, 195, 255, 0.05);
+  border-color: rgba(0, 195, 255, 0.2);
+}
+
+.backup-manager-item.selected {
+  background-color: rgba(0, 195, 255, 0.1);
+  border-color: rgba(0, 195, 255, 0.4);
+  box-shadow: 0 0 8px rgba(0, 195, 255, 0.2);
+}
+
+.backup-manager-item-content h4 {
+  margin: 0 0 5px 0;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.backup-manager-item-date {
+  margin: 0 0 3px 0;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.backup-manager-item-meta {
+  margin: 0;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* Acciones del diálogo */
+.backup-manager-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 16px 20px;
+}
+
+.backup-manager-cancel-btn {
+  background-color: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.8);
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+}
+
+.backup-manager-cancel-btn:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.backup-manager-restore-btn {
+  display: flex;
+  align-items: center;
+  background: linear-gradient(135deg, rgba(0, 195, 255, 0.8) 0%, rgba(0, 153, 255, 0.8) 100%);
+  border: none;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+  font-weight: 500;
+}
+
+.backup-manager-restore-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, rgba(0, 195, 255, 0.9) 0%, rgba(0, 153, 255, 0.9) 100%);
+  box-shadow: 0 0 10px rgba(0, 195, 255, 0.4);
+  transform: translateY(-1px);
+}
+
+.backup-manager-restore-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.backup-manager-restore-btn svg {
+  margin-right: 8px;
+}
+
+/* Animaciones */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Estilos para scrollbar personalizado */
+.backup-manager-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.backup-manager-content::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 3px;
+}
+
+.backup-manager-content::-webkit-scrollbar-thumb {
+  background: rgba(0, 195, 255, 0.3);
+  border-radius: 3px;
+}
+
+.backup-manager-content::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 195, 255, 0.5);
+}

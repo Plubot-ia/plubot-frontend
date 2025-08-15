@@ -1,0 +1,685 @@
+.sanctuary-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2.5rem;
+  background: linear-gradient(180deg, #0a0a23 0%, #1e1e3f 100%);
+  color: white;
+  position: relative;
+  overflow: hidden;
+  font-family: "Rajdhani", "Orbitron", sans-serif;
+}
+
+/* Cyberpunk lines and energy */
+.energy-lines {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.line {
+  position: absolute;
+  background: linear-gradient(
+    90deg,
+    rgba(59, 130, 246, 0) 0%,
+    #3b82f6 50%,
+    rgba(59, 130, 246, 0) 100%
+  );
+  height: 1px;
+  width: 100%;
+  animation: flowLine 15s linear infinite;
+}
+
+.line-1 {
+  top: 20%;
+  animation-delay: 0s;
+}
+
+.line-2 {
+  top: 50%;
+  animation-delay: 5s;
+}
+
+.line-3 {
+  top: 80%;
+  animation-delay: 10s;
+}
+
+@keyframes flowLine {
+  0% {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+
+/* Glitch effect */
+.glitch {
+  animation: glitch 0.2s ease-in-out forwards;
+}
+
+@keyframes glitch {
+  0% {
+    transform: translate(0);
+  }
+  20% {
+    transform: translate(-5px, 5px);
+  }
+  40% {
+    transform: translate(-5px, -5px);
+  }
+  60% {
+    transform: translate(5px, 5px);
+  }
+  80% {
+    transform: translate(5px, -5px);
+  }
+  100% {
+    transform: translate(0);
+  }
+}
+
+/* Section Styles */
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+  width: 100%;
+  position: relative;
+}
+
+.cyber-line {
+  height: 2px;
+  background: linear-gradient(90deg, rgba(96, 165, 250, 0) 0%, #60a5fa 100%);
+  width: 5rem;
+  margin: 0 1rem;
+}
+
+.cyber-line.left {
+  background: linear-gradient(90deg, rgba(96, 165, 250, 0) 0%, #60a5fa 100%);
+}
+
+.cyber-line.right {
+  background: linear-gradient(90deg, #60a5fa 0%, rgba(96, 165, 250, 0) 100%);
+}
+
+.section-title {
+  font-size: 3rem;
+  font-weight: bold;
+  color: #60a5fa;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  margin: 0;
+  text-shadow:
+    0 0 10px rgba(96, 165, 250, 0.7),
+    0 0 20px rgba(96, 165, 250, 0.5);
+}
+
+.section-subtitle {
+  font-size: 2rem;
+  font-weight: 600;
+  color: #93c5fd;
+  margin-bottom: 1.5rem;
+  text-align: center;
+  position: relative;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.section-subtitle::after {
+  content: "";
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60%;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    rgba(93, 197, 253, 0) 0%,
+    #93c5fd 50%,
+    rgba(93, 197, 253, 0) 100%
+  );
+}
+
+.sanctuary-description {
+  text-align: center;
+  color: #a5b4fc;
+  font-size: 1.2rem;
+  max-width: 40rem;
+  margin: 0 auto 2rem;
+  font-style: italic;
+  width: 100%;
+}
+
+/* Monument - Núcleo del Fundador */
+.monument-section {
+  text-align: center;
+  margin-bottom: 4rem;
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  padding: 2rem 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.monument {
+  width: 16rem;
+  height: 16rem;
+  margin: 0 auto;
+  background: rgba(37, 99, 235, 0.3);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  border: 1px solid #3b82f6;
+  box-shadow:
+    0 0 2rem rgba(59, 130, 246, 0.6),
+    inset 0 0 1rem rgba(59, 130, 246, 0.4);
+  overflow: hidden;
+  z-index: 2;
+}
+
+.core-energy {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle, rgba(59, 130, 246, 0.7) 0%, rgba(59, 130, 246, 0) 70%);
+  animation: pulse 4s infinite;
+}
+
+.monument-content {
+  z-index: 2;
+  text-align: center;
+  padding: 1rem;
+  background: rgba(17, 24, 39, 0.7);
+  border-radius: 0.5rem;
+  border: 1px solid #3b82f6;
+  max-width: 80%;
+}
+
+.monument-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #93c5fd;
+}
+
+.monument-message {
+  font-size: 1rem;
+  font-style: italic;
+  color: #e5e7eb;
+  line-height: 1.5;
+}
+
+.pulse-rings {
+  position: absolute;
+  width: 16rem;
+  height: 16rem;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1;
+}
+
+.ring {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  border: 2px solid #3b82f6;
+  opacity: 0;
+}
+
+.ring-1 {
+  width: 100%;
+  height: 100%;
+  animation: ringPulse 4s infinite;
+}
+
+.ring-2 {
+  width: 100%;
+  height: 100%;
+  animation: ringPulse 4s infinite 1.3s;
+}
+
+.ring-3 {
+  width: 100%;
+  height: 100%;
+  animation: ringPulse 4s infinite 2.6s;
+}
+
+@keyframes ringPulse {
+  0% {
+    width: 100%;
+    height: 100%;
+    opacity: 0.7;
+  }
+  100% {
+    width: 200%;
+    height: 200%;
+    opacity: 0;
+  }
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 0.5;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+  100% {
+    opacity: 0.5;
+    transform: scale(1);
+  }
+}
+
+/* History Section */
+.history-section {
+  width: 100%;
+  max-width: 64rem;
+  margin-bottom: 3rem;
+  padding: 1.5rem;
+  background: rgba(23, 23, 45, 0.7);
+  border-radius: 0.5rem;
+  border: 1px solid #2563eb;
+  position: relative;
+  overflow: hidden;
+}
+
+.history-content {
+  position: relative;
+  z-index: 1;
+  line-height: 1.8;
+}
+
+.history-content p {
+  margin-bottom: 1rem;
+}
+
+.highlight {
+  color: #60a5fa;
+  font-weight: bold;
+  position: relative;
+}
+
+.highlight::after {
+  content: "";
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background: #60a5fa;
+}
+
+/* Diary Section */
+.diary-section {
+  width: 100%;
+  max-width: 64rem;
+  margin-bottom: 3rem;
+}
+
+.diary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+  gap: 1.5rem;
+}
+
+.diary-entry {
+  background: rgba(17, 24, 39, 0.7);
+  backdrop-filter: blur(10px);
+  padding: 1.5rem;
+  border-radius: 0.5rem;
+  transition:
+    transform 0.3s,
+    box-shadow 0.3s;
+  position: relative;
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  overflow: hidden;
+}
+
+.diary-entry:hover {
+  transform: translateY(-0.3125rem);
+  box-shadow: 0 0.5rem 1rem rgba(59, 130, 246, 0.2);
+  border-color: #3b82f6;
+}
+
+.entry-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+  border-bottom: 1px solid rgba(59, 130, 246, 0.3);
+  padding-bottom: 0.5rem;
+}
+
+.entry-date {
+  font-size: 0.875rem;
+  color: #60a5fa;
+}
+
+.entry-indicator {
+  width: 0.5rem;
+  height: 0.5rem;
+  background: #60a5fa;
+  border-radius: 50%;
+  box-shadow: 0 0 0.5rem #60a5fa;
+  animation: blink 2s infinite;
+}
+
+@keyframes blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.3;
+  }
+}
+
+.entry-text {
+  font-size: 1.125rem;
+  color: #e5e7eb;
+  position: relative;
+  z-index: 1;
+}
+
+.entry-glow {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 50%;
+  background: linear-gradient(0deg, rgba(59, 130, 246, 0.1) 0%, rgba(59, 130, 246, 0) 100%);
+  pointer-events: none;
+}
+
+/* Legacy Section */
+.legacy-section {
+  width: 100%;
+  max-width: 64rem;
+  margin-bottom: 3rem;
+}
+
+.legacy-content {
+  background: rgba(31, 41, 55, 0.8);
+  padding: 2rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 0 1.25rem rgba(59, 130, 246, 0.3);
+  border: 1px solid #2563eb;
+  position: relative;
+  overflow: hidden;
+}
+
+.legacy-content::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, #3b82f6, #60a5fa, #93c5fd, #60a5fa, #3b82f6);
+  animation: gradient 3s linear infinite;
+  background-size: 200% 100%;
+}
+
+@keyframes gradient {
+  0% {
+    background-position: 0% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.legacy-intro {
+  margin-bottom: 1.5rem;
+  color: #93c5fd;
+  font-size: 1.125rem;
+}
+
+.legacy-textarea {
+  width: 100%;
+  padding: 1rem;
+  background: rgba(17, 24, 39, 0.9);
+  color: white;
+  border-radius: 0.5rem;
+  margin-bottom: 1.5rem;
+  resize: vertical;
+  border: 1px solid #3b82f6;
+  box-shadow: 0 0 0.5rem rgba(59, 130, 246, 0.3);
+  min-height: 8rem;
+  font-family: "Courier New", monospace;
+}
+
+.legacy-textarea:focus {
+  outline: none;
+  border-color: #60a5fa;
+  box-shadow: 0 0 0.75rem rgba(96, 165, 250, 0.5);
+}
+
+.legacy-button {
+  background: #2563eb;
+  color: white;
+  padding: 0.75rem 2rem;
+  border-radius: 0.5rem;
+  border: none;
+  font-weight: bold;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition:
+    background 0.3s,
+    transform 0.3s;
+}
+
+.legacy-button:hover {
+  background: #3b82f6;
+  transform: translateY(-2px);
+}
+
+.button-text {
+  position: relative;
+  z-index: 1;
+}
+
+.button-glow {
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  animation: buttonGlow 3s infinite;
+}
+
+@keyframes buttonGlow {
+  0% {
+    left: -100%;
+  }
+  50%,
+  100% {
+    left: 100%;
+  }
+}
+
+/* Community Section */
+.community-section {
+  width: 100%;
+  max-width: 64rem;
+  margin-bottom: 3rem;
+}
+
+.community-intro {
+  text-align: center;
+  margin-bottom: 2rem;
+  color: #a5b4fc;
+  font-size: 1.125rem;
+}
+
+.community-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+  gap: 1.5rem;
+}
+
+.community-member {
+  background: rgba(17, 24, 39, 0.7);
+  backdrop-filter: blur(10px);
+  padding: 1.5rem;
+  border-radius: 0.5rem;
+  text-align: center;
+  transition:
+    transform 0.3s,
+    box-shadow 0.3s;
+  position: relative;
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  overflow: hidden;
+}
+
+.community-member:hover {
+  transform: translateY(-0.3125rem);
+  box-shadow: 0 0.5rem 1rem rgba(59, 130, 246, 0.2);
+  border-color: #3b82f6;
+}
+
+.member-avatar {
+  width: 5rem;
+  height: 5rem;
+  border-radius: 50%;
+  margin: 0 auto 1rem;
+  background: linear-gradient(135deg, #60a5fa, #3b82f6);
+  position: relative;
+  overflow: hidden;
+}
+
+.member-avatar::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" fill="none" /><path d="M50,30 L50,70 M30,50 L70,50" stroke="white" stroke-width="2"/></svg>')
+    center/cover;
+}
+
+.member-name {
+  font-size: 1.25rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+  color: #e5e7eb;
+}
+
+.member-achievement {
+  font-size: 0.875rem;
+  color: #93c5fd;
+  margin-bottom: 1rem;
+}
+
+.member-level {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  background: rgba(96, 165, 250, 0.2);
+  border: 1px solid #3b82f6;
+  border-radius: 1rem;
+  font-size: 0.75rem;
+  color: #93c5fd;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* Access Portal */
+.access-portal {
+  position: relative;
+  margin-top: 2rem;
+  width: 10rem;
+  height: 10rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.portal-ring {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  border: 2px solid #3b82f6;
+  animation: rotateRing 10s linear infinite;
+}
+
+.portal-ring::before,
+.portal-ring::after {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  border: 1px dashed #3b82f6;
+  animation: rotateRing 15s linear infinite reverse;
+}
+
+.portal-ring::after {
+  width: 80%;
+  height: 80%;
+  top: 10%;
+  left: 10%;
+  animation: rotateRing 7s linear infinite;
+}
+
+.portal-text {
+  color: #60a5fa;
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-weight: bold;
+  text-shadow: 0 0 5px #60a5fa;
+  animation: pulseText 2s infinite;
+}
+
+@keyframes rotateRing {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes pulseText {
+  0%,
+  100% {
+    opacity: 0.7;
+  }
+  50% {
+    opacity: 1;
+  }
+}

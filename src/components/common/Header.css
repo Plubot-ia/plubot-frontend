@@ -1,0 +1,781 @@
+/* ==========================================================================
+   Fuentes e Importaciones
+   ========================================================================== */
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Roboto+Mono:wght@400;500&family=Orbitron:wght@400;700;900&display=swap");
+
+/* ==========================================================================
+      Header y Navegación
+      ========================================================================== */
+.header {
+  background: transparent;
+  padding: 0.8rem 0;
+  border-bottom: 2px solid rgba(0, 224, 255, 0.3);
+  box-shadow: 0 4px 20px rgba(0, 224, 255, 0.2);
+  position: fixed;
+  width: 100%; /* Ajustado para ocupar todo el ancho */
+  top: 0;
+  height: 80px;
+  z-index: 1000; /* Aumentado para estar por encima de otros elementos */
+  overflow: visible;
+  transition:
+    background 0.3s ease-in-out,
+    box-shadow 0.3s ease-in-out;
+  box-sizing: border-box;
+}
+
+.header.scrolled {
+  background: #0a1128;
+  backdrop-filter: blur(5px);
+  box-shadow: 0 4px 30px rgba(0, 224, 255, 0.4);
+  transition:
+    background 0.3s ease-in-out,
+    box-shadow 0.3s ease-in-out;
+}
+
+.header .navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 100%;
+  margin: 0;
+  padding: 0 1.5rem;
+  position: relative;
+}
+
+.header .logo {
+  display: flex;
+  align-items: center;
+  gap: 0.1rem;
+  line-height: 1;
+  margin-right: 1rem;
+  position: relative;
+}
+
+.header .logo-text {
+  font-family: "Orbitron", Arial, sans-serif;
+  font-size: 1.5rem;
+  font-weight: 900;
+  color: #ffffff;
+  text-transform: capitalize;
+  letter-spacing: 2px;
+  text-shadow: 0 0 10px rgba(0, 224, 255, 0.7);
+  transition:
+    color 0.4s ease,
+    text-shadow 0.4s ease,
+    transform 0.4s ease;
+  position: relative;
+  line-height: 1;
+}
+
+.header .logo-text::after {
+  content: "";
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #00e0ff, #00ff88);
+  transition: width 0.4s ease;
+}
+
+.header .logo:hover .logo-text {
+  color: #ffca28;
+  text-shadow: 0 0 20px rgba(255, 202, 40, 0.8);
+  transform: scale(1.05);
+}
+
+.header .logo:hover .logo-text::after {
+  width: 100%;
+}
+
+.header .logo-image {
+  width: 59px;
+  height: 59px;
+  min-width: 59px;
+  min-height: 59px;
+  object-fit: contain;
+  margin-left: -1rem;
+  z-index: 1;
+  position: relative;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.header .logo-image.loaded {
+  opacity: 1;
+  animation:
+    header-pulseGlow 3s ease-in-out infinite,
+    header-slightRotate 10s linear infinite;
+  filter: drop-shadow(0 0 20px #00f0ff);
+  transition:
+    transform 0.4s ease,
+    filter 0.4s ease,
+    opacity 0.3s ease;
+}
+
+.header .logo-image::after {
+  content: "";
+  position: absolute;
+  top: -10%;
+  left: -10%;
+  width: 120%;
+  height: 120%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(0, 224, 255, 0.4) 0%, transparent 70%);
+  animation: header-auraScan 4s ease-in-out infinite;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.header .nav-links {
+  display: flex;
+  list-style: none;
+  gap: 1.5rem;
+  margin: 0;
+  padding: 0 0.5rem 0 0;
+  align-items: center;
+  transition:
+    max-height 0.4s ease,
+    opacity 0.3s ease;
+}
+
+.header .nav-links li a {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: #00e0ff;
+  font-family: "Inter", sans-serif;
+  font-weight: 400;
+  font-size: 1rem;
+  text-transform: capitalize;
+  letter-spacing: 1.5px;
+  position: relative;
+  padding: 0.3rem 0;
+  line-height: 1.2;
+  white-space: nowrap;
+  text-shadow: 0 0 10px rgba(0, 224, 255, 0.7);
+  text-decoration: none;
+}
+
+.header .nav-links li a.active {
+  text-decoration: none;
+}
+
+.header .nav-links li a .nav-icon {
+  font-size: 1rem;
+  font-weight: 400;
+  text-shadow: 0 0 10px rgba(0, 224, 255, 0.7);
+}
+
+.header .nav-links li a::after {
+  content: "";
+  position: absolute;
+  width: 0;
+  height: 2px;
+  bottom: -4px;
+  left: 0;
+  background: linear-gradient(90deg, #00e0ff, #00ff88);
+  box-shadow: 0 0 8px rgba(0, 224, 255, 0.8);
+  transition: width 0.4s ease;
+}
+
+.header .nav-links li a:hover {
+  color: #ffffff;
+  text-shadow:
+    0 0 15px #00e0ff,
+    0 0 25px #00e0ff;
+}
+
+.header .nav-links li a:hover::after {
+  width: 100%;
+}
+
+.header .auth-section {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  transition: all 0.3s ease;
+}
+
+.header .auth-button {
+  padding: 0.5rem 1.2rem;
+  border: 2px solid #00e0ff;
+  border-radius: 20px;
+  color: #00e0ff;
+  font-family: "Inter", sans-serif;
+  font-weight: 400;
+  font-size: 0.75rem;
+  text-transform: capitalize;
+  letter-spacing: 1.5px;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  position: relative;
+  overflow: hidden;
+  text-align: center;
+  white-space: nowrap;
+  min-width: 160px;
+  text-shadow: 0 0 10px rgba(0, 224, 255, 0.7);
+  text-decoration: none;
+  z-index: 1;
+}
+
+.header .auth-button:before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -150%;
+  width: 150%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(0, 224, 255, 0.3), transparent);
+  border-radius: 20px;
+  transition: left 0.5s ease;
+  z-index: -1;
+}
+
+.header .auth-button.glowing {
+  background: linear-gradient(45deg, #00e0ff, #00ff88);
+  color: #000;
+  box-shadow: 0 0 15px rgba(0, 224, 255, 0.8);
+}
+
+.header .auth-button:hover {
+  background: linear-gradient(45deg, #00e0ff, #00ff88);
+  color: #000;
+  box-shadow: 0 0 25px rgba(0, 224, 255, 1);
+  transform: translateY(-3px) scale(1.03);
+  letter-spacing: 2px;
+  border-color: #fff;
+  text-shadow: 0 0 8px rgba(0, 0, 0, 0.5);
+}
+
+.header .auth-button:hover:before {
+  left: 150%;
+}
+
+.header .auth-button[data-tooltip]::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  top: -30px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #1a1a1a;
+  color: #00e0ff;
+  padding: 0.3rem 0.6rem;
+  border-radius: 5px;
+  font-size: 0.7rem;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.header .auth-button:hover[data-tooltip]::after {
+  opacity: 1;
+}
+
+.header .user-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #ffffff;
+  font-family: "Inter", sans-serif;
+  font-size: 0.7rem;
+}
+
+.header .user-level,
+.header .plu-coins {
+  background: #1a1a1a;
+  padding: 0.15rem 0.4rem;
+  border-radius: 12px;
+  box-shadow: 0 0 8px rgba(0, 224, 255, 0.5);
+  display: flex;
+  align-items: center;
+  gap: 0.15rem;
+  position: relative;
+  transition: box-shadow 0.3s ease;
+}
+
+.header .user-level:hover,
+.header .plu-coins:hover {
+  box-shadow: 0 0 15px rgba(0, 224, 255, 0.8);
+}
+
+.header .menu-toggle {
+  display: none;
+  background: none;
+  border: none;
+  color: #00e0ff;
+  font-size: 1.4rem;
+  cursor: pointer;
+  transition:
+    color 0.3s ease,
+    transform 0.3s ease;
+  padding: 0.5rem;
+  min-width: 44px;
+  min-height: 44px;
+}
+
+.header .menu-toggle:hover {
+  color: #ffca28;
+  transform: scale(1.1);
+}
+
+/* ==========================================================================
+      Estilos para el perfil
+      ========================================================================== */
+.header .user-profile {
+  position: relative;
+}
+
+.header .profile-icon {
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(45deg, #00e0ff, #00ff88);
+  color: #0a0e2f;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "Inter", sans-serif;
+  font-size: 1.2rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 10px rgba(0, 224, 255, 0.5);
+}
+
+.header .profile-icon:hover {
+  background: linear-gradient(45deg, #ffca28, #ffb300);
+  box-shadow: 0 0 15px rgba(255, 202, 40, 0.8);
+  transform: scale(1.05);
+}
+
+.header .profile-dropdown {
+  position: absolute;
+  top: 50px;
+  right: 0;
+  background: rgba(10, 17, 40, 0.95);
+  backdrop-filter: blur(5px);
+  border: 1px solid rgba(0, 224, 255, 0.3);
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 224, 255, 0.2);
+  padding: 15px;
+  z-index: 99;
+  width: 220px;
+  color: #fff;
+  font-family: "Inter", sans-serif;
+  animation: header-fadeIn 0.3s ease-in-out;
+}
+
+.header .profile-info p {
+  margin: 2px 0;
+  font-size: 0.9rem;
+  color: #ccc;
+}
+
+.profile-email {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 180px; /* Ajusta este valor según el ancho de tu contenedor */
+  margin: 5px 0;
+  font-size: 0.9rem;
+  color: #ffffff;
+  text-shadow: 0 0 5px rgba(0, 224, 255, 0.3);
+}
+
+.header .profile-stats p {
+  margin: 5px 0;
+  font-size: 0.9rem;
+  color: #00e0ff;
+  text-shadow: 0 0 5px rgba(0, 224, 255, 0.3);
+}
+
+.header .profile-link {
+  display: block;
+  margin: 10px 0;
+  color: #00e0ff;
+  font-size: 0.9rem;
+  text-decoration: none;
+  transition:
+    color 0.3s ease,
+    text-shadow 0.3s ease;
+}
+
+.header .profile-link:hover {
+  color: #ffca28;
+  text-shadow: 0 0 10px rgba(255, 202, 40, 0.8);
+}
+
+.header .logout-btn {
+  background: linear-gradient(45deg, #f26666, #ff4040);
+  color: #fff;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+  width: 100%;
+  text-align: center;
+  font-family: "Inter", sans-serif;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 8px rgba(242, 102, 102, 0.5);
+}
+
+.header .logout-btn:hover {
+  background: linear-gradient(45deg, #ffca28, #ffb300);
+  box-shadow: 0 0 15px rgba(255, 202, 40, 0.8);
+}
+
+/* ==========================================================================
+      Espaciado más ajustado para textos compuestos
+      ========================================================================== */
+.header .nav-links li a.tight-text {
+  letter-spacing: 0.5px;
+  word-spacing: -2px;
+}
+
+/* ==========================================================================
+      Nav Icon
+      ========================================================================== */
+.header .nav-icon {
+  margin-right: 6px;
+  vertical-align: middle;
+  color: #00f0ff;
+  transition:
+    transform 0.2s ease,
+    filter 0.2s ease;
+}
+
+.header .nav-icon:hover {
+  transform: scale(1.2);
+  filter: drop-shadow(0 0 5px #00f0ff);
+}
+
+/* ==========================================================================
+      Media Queries Responsivas
+      ========================================================================== */
+@media (max-width: 1366px) {
+  .header .navbar {
+    padding: 0 1.2rem;
+  }
+  .header .logo-text {
+    font-size: 1.3rem;
+  }
+  .header .logo {
+    gap: 0.1rem;
+  }
+  .header .logo-image {
+    width: 52px;
+    height: 52px;
+    min-width: 52px;
+    min-height: 52px;
+    margin-left: -0.8rem;
+  }
+  .header .nav-links {
+    gap: 1.5rem;
+  }
+  .header .nav-links li a {
+    font-size: 0.9rem;
+  }
+  .header .nav-links li a .nav-icon {
+    font-size: 0.9rem;
+  }
+  .header .auth-section {
+    gap: 0.8rem;
+  }
+  .header .auth-button {
+    padding: 0.4rem 1rem;
+    min-width: 140px;
+  }
+}
+
+@media (max-width: 1024px) {
+  .header .navbar {
+    padding: 0 1rem;
+  }
+  .header .logo-text {
+    font-size: 1.2rem;
+  }
+  .header .logo {
+    gap: 0.1rem;
+  }
+  .header .logo-image {
+    width: 47px;
+    height: 47px;
+    min-width: 47px;
+    min-height: 47px;
+    margin-left: -0.6rem;
+  }
+  .header .nav-links {
+    gap: 1.2rem;
+  }
+  .header .nav-links li a {
+    font-size: 0.85rem;
+  }
+  .header .nav-links li a .nav-icon {
+    font-size: 0.85rem;
+  }
+  .header .auth-section {
+    gap: 0.6rem;
+  }
+  .header .auth-button {
+    padding: 0.4rem 0.8rem;
+    min-width: 130px;
+  }
+}
+
+@media (max-width: 768px) {
+  .header {
+    height: 70px;
+  }
+
+  .header .navbar {
+    justify-content: space-between;
+    padding: 0 1rem;
+    max-width: 100%;
+  }
+
+  .header .nav-links {
+    display: none;
+    flex-direction: column;
+    width: 100%;
+    position: absolute;
+    top: 70px;
+    left: 0;
+    background: rgba(10, 17, 40, 0.95);
+    padding: 1rem;
+    border-bottom: 2px solid rgba(0, 224, 255, 0.3);
+    box-shadow: 0 4px 20px rgba(0, 224, 255, 0.2);
+    gap: 1rem;
+    z-index: 99;
+  }
+
+  .header .nav-links.active {
+    display: flex;
+  }
+
+  .header .auth-section {
+    display: none;
+  }
+
+  .header .auth-section.active {
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    margin-top: 0.8rem;
+  }
+
+  .header .nav-links li a {
+    font-size: 1rem;
+    padding: 0.5rem 0;
+    margin-right: 1rem;
+    text-align: center;
+    justify-content: center;
+    display: flex;
+    width: 100%;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .header .nav-links li {
+    width: 100%;
+  }
+
+  .header .nav-links li a .nav-icon {
+    font-size: 1rem;
+  }
+
+  .header .auth-button {
+    width: 100%;
+    text-align: center;
+    padding: 0.6rem;
+    font-size: 0.8rem;
+    min-width: 0;
+  }
+
+  .header .user-info {
+    flex-direction: column;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  .header .logo {
+    gap: 0.1rem;
+  }
+
+  .header .logo-image {
+    width: 42px;
+    height: 42px;
+    min-width: 42px;
+    min-height: 42px;
+    margin-left: -0.5rem;
+  }
+
+  .header .menu-toggle {
+    display: block;
+  }
+
+  .header .auth-section.active .user-profile {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+  }
+
+  .header .profile-dropdown {
+    position: static;
+    width: 100%;
+    margin-top: 10px;
+    background: rgba(10, 17, 40, 0.95);
+    border: 1px solid rgba(0, 224, 255, 0.3);
+    box-shadow: 0 4px 20px rgba(0, 224, 255, 0.2);
+  }
+}
+
+@media (max-width: 480px) {
+  .header {
+    height: 60px;
+  }
+
+  .header .navbar {
+    padding: 0 0.8rem;
+  }
+
+  .header .logo-text {
+    font-size: 1rem;
+  }
+
+  .header .logo {
+    gap: 0rem;
+  }
+
+  .header .logo-image {
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+    min-height: 36px;
+    margin-left: -0.4rem;
+  }
+
+  .header .nav-links {
+    top: 60px;
+  }
+
+  .header .nav-links li a {
+    font-size: 0.85rem;
+  }
+
+  .header .nav-links li a .nav-icon {
+    font-size: 0.85rem;
+  }
+
+  .header .auth-button {
+    padding: 0.4rem;
+    font-size: 0.75rem;
+  }
+
+  .header .menu-toggle {
+    font-size: 1.2rem;
+  }
+}
+
+@media (max-width: 360px) {
+  .header {
+    height: 50px;
+  }
+
+  .header .navbar {
+    padding: 0 0.6rem;
+  }
+
+  .header .logo-text {
+    font-size: 0.9rem;
+  }
+
+  .header .logo-image {
+    width: 32px;
+    height: 32px;
+    min-width: 32px;
+    min-height: 32px;
+    margin-left: -0.3rem;
+  }
+
+  .header .nav-links {
+    top: 50px;
+    padding: 0.8rem;
+  }
+
+  .header .nav-links li a {
+    font-size: 0.8rem;
+  }
+
+  .header .menu-toggle {
+    font-size: 1.1rem;
+    min-width: 40px;
+    min-height: 40px;
+  }
+}
+
+/* ==========================================================================
+      Media Query para monitores grandes
+      ========================================================================== */
+@media (min-width: 1920px) {
+  .header .auth-button {
+    min-width: 180px;
+    font-size: 0.85rem;
+    padding: 0.6rem 1.4rem;
+  }
+  .header .auth-button:before {
+    width: 200%;
+    left: -200%;
+  }
+  .header .auth-button:hover:before {
+    left: 200%;
+  }
+}
+
+/* ==========================================================================
+      Animaciones
+      ========================================================================== */
+@keyframes header-fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes header-pulseGlow {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 8px #00f0ff) brightness(1);
+    transform: scale(1);
+  }
+  50% {
+    filter: drop-shadow(0 0 16px #00ff88) brightness(1.2);
+    transform: scale(1.05);
+  }
+}
+
+@keyframes header-slightRotate {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(1deg);
+  }
+}
+
+@keyframes header-auraScan {
+  0% {
+    opacity: 0.4;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.1);
+  }
+  100% {
+    opacity: 0.4;
+    transform: scale(1);
+  }
+}

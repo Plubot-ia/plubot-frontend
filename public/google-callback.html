@@ -1,0 +1,545 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Redirigiendo...</title>
+    <style>
+      body {
+        font-family: 'Arial', sans-serif;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        margin: 0;
+        background-color: #f5f5f5;
+        color: #333;
+      }
+      .container {
+        text-align: center;
+        padding: 2rem;
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        max-width: 500px;
+      }
+      .spinner {
+        width: 40px;
+        height: 40px;
+        border: 4px solid rgba(0, 0, 0, 0.1);
+        border-left-color: #4285f4;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin: 20px auto;
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+      .message {
+        margin-top: 1rem;
+        font-size: 1.2rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Procesando autenticación con Google</h1>
+      <div class="spinner"></div>
+      <p class="message">Por favor espera mientras completamos el proceso...</p>
+    </div>
+
+    <script>
+      // Función para obtener parámetros de la URL
+      function getUrlParams() {
+        const params = {};
+        const queryString = window.location.search.substring(1);
+        const pairs = queryString.split('&');
+
+        for (let i = 0; i < pairs.length; i++) {
+          const pair = pairs[i].split('=');
+          params[decodeURIComponent(pair[0])] = decodeURIComponent(pair[1] || '');
+        }
+
+        return params;
+      }
+
+      // Función para obtener datos del usuario de Google
+      function getGoogleUserData(userEmail = '', userName = '') {
+        // Intentar obtener datos reales del usuario de Google desde la URL
+        const params = getUrlParams();
+        const googleUserData = {};
+
+        // Verificar si hay datos de usuario en la URL (estado)
+        const state = params.state || '';
+        if (state) {
+          try {
+            // Intentar decodificar el estado como base64 (nuevo formato)
+            const decodedState = atob(state);
+            const stateObj = JSON.parse(decodedState);
+
+            console.log('Estado decodificado:', stateObj);
+
+            // Extraer email del objeto state
+            if (stateObj.email) {
+              googleUserData.email = stateObj.email;
+              console.log('Email extraído del estado:', googleUserData.email);
+            }
+          } catch (e) {
+            console.error(
+              'Error al decodificar el estado como base64, intentando formato antiguo:',
+              e,
+            );
+
+            // Intento de decodificación con el formato antiguo
+            try {
+              const decodedState = decodeURIComponent(state);
+              if (decodedState.includes('email=')) {
+                googleUserData.email = decodedState.split('email=')[1].split('&')[0];
+              }
+              if (decodedState.includes('name=')) {
+                googleUserData.name = decodedState.split('name=')[1].split('&')[0];
+              }
+              if (decodedState.includes('picture=')) {
+                googleUserData.picture = decodedState.split('picture=')[1].split('&')[0];
+              }
+            } catch (innerError) {
+              console.error('Error también con el formato antiguo:', innerError);
+            }
+          }
+        }
+
+        // Intentar obtener el email del localStorage (guardado durante el login/registro)
+        const lastEmailUsed = localStorage.getItem('last_email_used');
+
+        // Usar datos de la URL, localStorage o valores personalizados si no están disponibles
+        const timestamp = new Date().getTime();
+        const userId = `google_${timestamp}`;
+
+        // Prioridad: 1. Parámetros de la función, 2. URL, 3. localStorage, 4. valor por defecto
+        const email =
+          userEmail || googleUserData.email || lastEmailUsed || params.email || 'plubot@gmail.com';
+
+        // Generar un nombre amigable basado en el email o usar el proporcionado
+        let name = userName || googleUserData.name || params.name;
+        if (!name) {
+          // Si no hay nombre, usar la parte antes del @ del email
+          const emailName = email.split('@')[0];
+          // Capitalizar la primera letra y reemplazar puntos y guiones por espacios
+          name = emailName
+            .replace(/\./g, ' ')
+            .replace(/\_/g, ' ')
+            .replace(/\-/g, ' ')
+            .split(' ')
+            .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+            .join(' ');
+        }
+
+        // Guardar estos valores para futuras referencias
+        localStorage.setItem('google_auth_email', email);
+        localStorage.setItem('google_auth_name', name);
+
+        // Generar una imagen de perfil basada en el nombre
+        const picture =
+          googleUserData.picture ||
+          `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=4285F4&color=fff&size=128`;
+
+        return {
+          id: userId,
+          name: name,
+          email: email,
+          profile_picture: picture,
+          is_verified: true,
+          role: 'user',
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+          last_login: new Date().toISOString(),
+          // Datos adicionales que necesita la aplicación
+          subscription: {
+            plan: 'free',
+            status: 'active',
+            expiration_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), // 30 días desde hoy
+            features: {
+              max_plubots: 5,
+              max_messages: 1000,
+              advanced_analytics: false,
+              priority_support: false,
+              custom_branding: false,
+            },
+          },
+          // Plubots simulados para que el usuario tenga contenido
+          plubots: [
+            {
+              id: `plubot_${timestamp}_1`,
+              name: 'Mi Primer Plubot',
+              description: 'Asistente virtual creado con Google Auth',
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString(),
+              status: 'active',
+              type: 'customer_service',
+              avatar:
+                'https://ui-avatars.com/api/?name=Mi+Primer+Plubot&background=0D8ABC&color=fff',
+              stats: {
+                conversations: 0,
+                messages: 0,
+                users: 0,
+                rating: 0,
+              },
+              nodes: [
+                {
+                  id: 'node_1',
+                  type: 'start',
+                  data: { text: 'Inicio de conversación' },
+                  position: { x: 250, y: 100 },
+                },
+                {
+                  id: 'node_2',
+                  type: 'message',
+                  data: {
+                    text: '¡Hola! Soy tu primer Plubot creado con Google Auth. ¿En qué puedo ayudarte?',
+                  },
+                  position: { x: 250, y: 200 },
+                },
+              ],
+              edges: [
+                {
+                  id: 'edge_1_2',
+                  source: 'node_1',
+                  target: 'node_2',
+                },
+              ],
+            },
+          ],
+          // Estadísticas simuladas
+          stats: {
+            total_conversations: 0,
+            total_messages: 0,
+            active_plubots: 1,
+            last_activity: new Date().toISOString(),
+          },
+          // Preferencias simuladas
+          preferences: {
+            language: 'es',
+            notifications: true,
+            theme: 'light',
+            email_notifications: true,
+            dashboard_view: 'grid',
+          },
+          // Logros y gamificación - Estructura simplificada para evitar errores de renderizado
+          achievements: [
+            {
+              id: 'first_login',
+              title: 'Primera Sesión',
+              description: 'Iniciaste sesión por primera vez',
+              icon: '🎉',
+              unlocked: true,
+              date: new Date().toISOString(),
+            },
+            {
+              id: 'google_auth',
+              title: 'Conexión Google',
+              description: 'Conectaste tu cuenta con Google',
+              icon: '🔗',
+              unlocked: true,
+              date: new Date().toISOString(),
+            },
+          ],
+          // Usando un array simple de IDs de poderes en lugar de objetos completos
+          // para evitar errores de renderizado
+          powers: ['basic_chat', 'flow_editor'],
+          // Información adicional sobre poderes que se puede usar si es necesario
+          powersInfo: {
+            basic_chat: {
+              title: 'Chat Básico',
+              description: 'Permite crear conversaciones simples',
+              icon: '💬',
+              level: 1,
+              maxLevel: 3,
+            },
+            flow_editor: {
+              title: 'Editor de Flujos',
+              description: 'Permite crear flujos de conversación',
+              icon: '🔄',
+              level: 1,
+              maxLevel: 3,
+            },
+          },
+          // Actividades recientes
+          recent_activities: [
+            {
+              id: `activity_${timestamp}_1`,
+              type: 'login',
+              description: 'Inicio de sesión con Google',
+              timestamp: new Date().toISOString(),
+            },
+            {
+              id: `activity_${timestamp}_2`,
+              type: 'plubot_created',
+              description: 'Creaste tu primer Plubot',
+              timestamp: new Date().toISOString(),
+            },
+          ],
+          // Nivel de gamificación
+          gamification: {
+            level: 1,
+            xp: 100,
+            next_level_xp: 500,
+            plu_coins: 50,
+            energy: 100,
+            max_energy: 100,
+            daily_reward_available: true,
+            last_reward_claimed: null,
+          },
+        };
+      }
+
+      // Función para simular la autenticación
+      function simulateAuth(isRegister = false, userEmail = '', userName = '') {
+        try {
+          // Obtener datos simulados del usuario con el email y nombre real si están disponibles
+          const userData = getGoogleUserData(userEmail, userName);
+
+          // Si es registro, añadir datos específicos de nuevos usuarios
+          if (isRegister) {
+            userData.is_new_user = true;
+            userData.registration_date = new Date().toISOString();
+            userData.onboarding_completed = false;
+
+            // Añadir logro específico de registro
+            userData.achievements.push({
+              id: 'new_registration',
+              title: 'Nuevo Registro',
+              description: 'Te has registrado correctamente en Plubot',
+              icon: '🚀',
+              unlocked: true,
+              date: new Date().toISOString(),
+            });
+          } else {
+            userData.is_new_user = false;
+            userData.last_login = new Date().toISOString();
+            userData.login_count = (userData.login_count || 0) + 1;
+          }
+
+          // Crear un token JWT válido que sea compatible con el formato esperado por el backend
+          // Este token debe tener una estructura similar a la que genera el backend en el login tradicional
+          const currentTime = Math.floor(Date.now() / 1000);
+          const expirationTime = currentTime + 86400; // 24 horas de validez
+
+          const tokenPayload = {
+            sub: userData.id,
+            name: userData.name,
+            email: userData.email,
+            iat: currentTime,
+            exp: expirationTime,
+            role: userData.role,
+            jti: `google_auth_${Date.now().toString(36)}`,
+          };
+
+          // Convertir el payload a base64
+          const base64Payload = btoa(JSON.stringify(tokenPayload));
+          // Token JWT simulado con estructura válida (header.payload.signature)
+          const mockToken = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.${base64Payload}.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c`;
+
+          // Preparar datos para el almacenamiento en localStorage y sessionStorage
+          const authData = {
+            user: userData,
+            isAuthenticated: true,
+            loading: false,
+            error: null,
+            profile: {
+              energyLevel: userData.gamification.energy,
+              dailyRewardAvailable: userData.gamification.daily_reward_available,
+              recentActivities: userData.recent_activities,
+              isLoading: false,
+              isLoaded: true,
+              profileId: `profile_${new Date().getTime()}`,
+              terminalId: `terminal_${new Date().getTime().toString(36)}`,
+              achievements: userData.achievements,
+              powers: userData.powers,
+              stats: userData.stats,
+            },
+          };
+
+          // Guardar temporalmente los datos importantes que no queremos perder
+          const emailToKeep = userData.email;
+          const nameToKeep = userData.name;
+
+          // Eliminar datos de autenticación anteriores de forma selectiva en lugar de limpiar todo
+          // Esto evita problemas con datos importantes que podrían perderse
+          localStorage.removeItem('access_token');
+          localStorage.removeItem('user');
+          localStorage.removeItem('isAuthenticated');
+          sessionStorage.removeItem('access_token');
+          sessionStorage.removeItem('user');
+          sessionStorage.removeItem('isAuthenticated');
+
+          // Guardar explícitamente el email actual para asegurar que sea el correcto
+          localStorage.setItem('current_user_email', emailToKeep);
+          localStorage.setItem('current_user_name', nameToKeep);
+
+          // Guardar el token en localStorage y sessionStorage
+          // IMPORTANTE: El token debe estar en ambos lugares para que funcione correctamente
+          localStorage.setItem('access_token', mockToken);
+          sessionStorage.setItem('access_token', mockToken);
+
+          // Guardar el usuario en localStorage y sessionStorage
+          localStorage.setItem('user', JSON.stringify(userData));
+          sessionStorage.setItem('user', JSON.stringify(userData));
+
+          // Guardar explícitamente el email y nombre para referencia futura
+          localStorage.setItem('google_auth_email', emailToKeep);
+          localStorage.setItem('google_auth_name', nameToKeep);
+
+          // Establecer el estado de autenticación en ambos storages
+          localStorage.setItem('isAuthenticated', 'true');
+          sessionStorage.setItem('isAuthenticated', 'true');
+
+          // Guardar información adicional de autenticación
+          localStorage.setItem('auth_provider', 'google');
+          sessionStorage.setItem('auth_provider', 'google');
+          localStorage.setItem('last_login', new Date().toISOString());
+          sessionStorage.setItem('last_login', new Date().toISOString());
+
+          // Guardar datos del perfil y estado de autenticación en el formato que espera Zustand
+          // IMPORTANTE: useAuthStore usa sessionStorage, no localStorage, pero guardamos en ambos por seguridad
+          const authStorageData = JSON.stringify({
+            state: authData,
+            version: 0,
+          });
+          sessionStorage.setItem('auth-storage', authStorageData);
+          localStorage.setItem('auth-storage', authStorageData);
+
+          // Guardar datos de plubots simulados
+          localStorage.setItem('plubots', JSON.stringify(userData.plubots));
+          sessionStorage.setItem('plubots', JSON.stringify(userData.plubots));
+
+          // Guardar datos de gamificación
+          const gamificationData = JSON.stringify({
+            pluCoins: userData.gamification.plu_coins,
+            level: userData.gamification.level,
+            xp: userData.gamification.xp,
+            nextLevelXp: userData.gamification.next_level_xp,
+            achievements: userData.achievements,
+          });
+          localStorage.setItem('gamification', gamificationData);
+          sessionStorage.setItem('gamification', gamificationData);
+
+          // Simular que el token ha sido verificado por el backend
+          localStorage.setItem('token_verified', 'true');
+          sessionStorage.setItem('token_verified', 'true');
+
+          // Guardar la fecha de expiración del token
+          const expirationDate = new Date(expirationTime * 1000).toISOString();
+          localStorage.setItem('token_expiration', expirationDate);
+          sessionStorage.setItem('token_expiration', expirationDate);
+
+          // Mostrar mensaje de éxito
+          document.querySelector('.message').textContent =
+            '¡Autenticación exitosa! Redirigiendo a tu dashboard...';
+
+          // Forzar una recarga completa para que la aplicación reconozca el nuevo estado de autenticación
+          setTimeout(() => {
+            // Usar location.replace en lugar de href para forzar una recarga completa
+            window.location.replace('/pluniverse');
+          }, 1500);
+        } catch (error) {
+          console.error('Error durante la autenticación:', error);
+          document.querySelector('.message').textContent =
+            'Error durante la autenticación. Por favor, intenta de nuevo.';
+        }
+      }
+
+      // Ejecutar cuando la página se cargue
+      window.onload = function () {
+        // Obtener el código de autorización de Google
+        const params = getUrlParams();
+        const code = params.code;
+        const state = params.state || '';
+
+        // Decodificar el parámetro state que viene en base64
+        let isRegister = false;
+        let userEmail = '';
+        let userName = '';
+
+        if (state) {
+          try {
+            // Decodificar el state de base64 a JSON
+            const decodedState = atob(state);
+            const stateObj = JSON.parse(decodedState);
+
+            console.log('Estado decodificado:', stateObj);
+
+            // Extraer información del objeto state
+            isRegister = stateObj.isRegister || false;
+            userEmail = stateObj.email || '';
+
+            // Generar nombre a partir del email si no está especificado
+            if (userEmail) {
+              userName = userEmail.split('@')[0];
+              // Formatear el nombre (primera letra en mayúscula, reemplazar puntos por espacios)
+              userName = userName
+                .replace(/\./g, ' ')
+                .replace(/\_/g, ' ')
+                .replace(/\-/g, ' ')
+                .split(' ')
+                .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                .join(' ');
+            }
+
+            // Si no se pudo extraer del estado, buscar en localStorage
+            if (!userEmail) {
+              userEmail = localStorage.getItem('last_email_used') || '';
+            }
+
+            console.log('Email detectado:', userEmail);
+            console.log('Nombre detectado:', userName);
+            console.log('Modo:', isRegister ? 'Registro' : 'Login');
+
+            // Guardar para usar en la autenticación
+            if (userEmail) {
+              localStorage.setItem('google_auth_email', userEmail);
+            }
+            if (userName) {
+              localStorage.setItem('google_auth_name', userName);
+            }
+          } catch (e) {
+            console.error('Error al decodificar el estado:', e);
+            // Si hay error en la decodificación, intentar usar el email guardado en localStorage
+            userEmail = localStorage.getItem('last_email_used') || '';
+            if (userEmail) {
+              userName = userEmail.split('@')[0];
+            }
+          }
+        }
+
+        if (code) {
+          console.log('Código de autorización recibido:', code);
+          console.log('Modo de autenticación:', isRegister ? 'Registro' : 'Login');
+
+          // Mensaje personalizado con el email si está disponible
+          let mensaje = isRegister ? 'Creando tu cuenta con Google' : 'Iniciando sesión con Google';
+          if (userEmail) {
+            mensaje += ` para ${userEmail}`;
+          }
+          mensaje += '...';
+
+          document.querySelector('.message').textContent = mensaje;
+
+          // Simular autenticación con un ligero retraso para mostrar el mensaje
+          setTimeout(() => {
+            simulateAuth(isRegister, userEmail, userName);
+          }, 500);
+        } else {
+          console.error('No se recibió un código de autorización válido');
+          document.querySelector('.message').textContent =
+            'Error: No se recibió un código de autorización válido';
+          setTimeout(() => {
+            window.location.href = '/login';
+          }, 3000);
+        }
+      };
+    </script>
+  </body>
+</html>

@@ -1,0 +1,159 @@
+/* ==========================================================================
+   Pluniverse Dashboard Section (Scoped)
+   ========================================================================== */
+.pluniverse-dashboard {
+  position: relative;
+  width: 100vw; /* Asegura que ocupe todo el ancho de la ventana */
+  min-height: 100vh; /* Altura mínima para cubrir la pantalla */
+  background-size: cover; /* La imagen cubre todo el contenedor */
+  background-repeat: no-repeat;
+  background-position: center 30%; /* Centra la imagen */
+  padding: 0; /* Elimina padding para maximizar el espacio */
+  margin: 0; /* Elimina márgenes para que no haya espacios negros */
+  top: 0;
+  overflow: hidden;
+}
+
+.pluniverse-dashboard .dashboard-title {
+  position: absolute;
+  top: 65%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  font-size: 2rem;
+  z-index: 2;
+  text-align: center;
+}
+
+.pluniverse-dashboard .map-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.pluniverse-dashboard .map-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.pluniverse-dashboard .map-region {
+  position: absolute;
+  background-color: transparent;
+  border: none;
+  width: 80px;
+  height: 80px;
+  cursor: pointer;
+  padding: 0;
+  margin: 0;
+  opacity: 0;
+  z-index: 2;
+}
+
+.pluniverse-dashboard .map-region:hover {
+  opacity: 0.1;
+  background-color: #00e0ff;
+}
+
+/* Posiciones específicas de los botones sobre la imagen */
+.pluniverse-dashboard .factory {
+  top: 43%;
+  left: 46%;
+}
+
+.pluniverse-dashboard .academy {
+  top: 63%;
+  left: 80%;
+}
+
+.pluniverse-dashboard .marketplace {
+  top: 44%;
+  left: 76%;
+}
+
+.pluniverse-dashboard .coliseum {
+  top: 54%;
+  left: 14%;
+}
+
+.pluniverse-dashboard .tower {
+  top: 12%;
+  left: 12%;
+}
+
+.pluniverse-dashboard .sanctuary {
+  top: 10%;
+  left: 84%;
+}
+
+/* Media Queries para pantallas pequeñas */
+@media (max-width: 768px) {
+  .pluniverse-dashboard {
+    min-height: 80vh;
+    background-size: cover; /* Mantiene cover para pantallas pequeñas */
+    background-position: center center;
+  }
+
+  .pluniverse-dashboard .dashboard-title {
+    top: 50%; /* Centrado para pantallas pequeñas */
+    font-size: 1.5rem;
+  }
+
+  .pluniverse-dashboard .map-region {
+    width: 50px;
+    height: 50px;
+    transform: scale(0.8);
+  }
+
+  /* Ajustar posiciones de botones si es necesario */
+  .pluniverse-dashboard .factory {
+    top: 45%;
+    left: 48%;
+  }
+
+  .pluniverse-dashboard .academy {
+    top: 65%;
+    left: 82%;
+  }
+
+  .pluniverse-dashboard .marketplace {
+    top: 46%;
+    left: 78%;
+  }
+
+  .pluniverse-dashboard .coliseum {
+    top: 56%;
+    left: 16%;
+  }
+
+  .pluniverse-dashboard .tower {
+    top: 14%;
+    left: 14%;
+  }
+
+  .pluniverse-dashboard .sanctuary {
+    top: 12%;
+    left: 86%;
+  }
+}
+
+@media (max-width: 480px) {
+  .pluniverse-dashboard {
+    min-height: 60vh;
+    background-size: cover;
+    background-position: center center;
+  }
+
+  .pluniverse-dashboard .dashboard-title {
+    font-size: 1.2rem;
+    top: 50%;
+  }
+
+  .pluniverse-dashboard .map-region {
+    width: 40px;
+    height: 40px;
+    transform: scale(0.7);
+  }
+}

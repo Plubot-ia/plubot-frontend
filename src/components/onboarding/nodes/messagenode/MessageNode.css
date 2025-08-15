@@ -1,0 +1,2543 @@
+/**
+ * @file MessageNode.css
+ * @description Estilos de élite mundial para el componente MessageNode del editor de flujos PLUBOT
+ * Implementa diseño premium, accesibilidad WCAG 2.1, optimización de rendimiento y características avanzadas
+ * @version 3.1.0
+ * @author PLUBOT Team & Cascade AI
+ */
+
+/* ======================================================
+   VARIABLES CSS Y CONFIGURACIÓN
+   ====================================================== */
+
+:root {
+  /* HANDLE VARIABLES - IDENTICAL TO STARTNODE */
+  --handle-default-size: 15px;
+  --handle-ultra-size: 15px;
+  
+  /* Paleta de colores premium - Azul vibrante como acento principal compartido */
+  --node-shared-accent: 37, 99, 235; /* Azul vibrante (igual que StartNode) */
+  --node-shared-accent-rgb: var(--node-shared-accent);
+  --node-shared-accent-hex: #2563eb; /* Equivalente hexadecimal */
+
+  --message-node-primary: rgb(var(--node-shared-accent-rgb));
+  --message-node-primary-hover: rgb(29, 78, 216); /* Azul más oscuro para hover */
+  --message-node-primary-rgb: var(--node-shared-accent-rgb);
+  --message-node-focus-ring: rgba(var(--node-shared-accent-rgb), 0.4);
+
+  /* Fondos y gradientes premium - Suavizados y modernizados */
+  /* Se mantiene la diferenciación por tipo de mensaje para UX */
+  --message-node-bg-user-color-rgb: 219, 234, 254; /* Azul muy claro */
+  --message-node-bg-user: linear-gradient(
+    145deg,
+    rgba(var(--message-node-bg-user-color-rgb), 0.8),
+    rgba(var(--message-node-bg-user-color-rgb), 1)
+  );
+
+  --message-node-bg-bot-color-rgb: 209, 213, 219; /* Gris azulado claro */
+  --message-node-bg-bot: linear-gradient(
+    145deg,
+    rgba(var(--message-node-bg-bot-color-rgb), 0.8),
+    rgba(var(--message-node-bg-bot-color-rgb), 1)
+  );
+
+  --message-node-bg-system-color-rgb: 224, 231, 255; /* Índigo muy claro */
+  --message-node-bg-system: linear-gradient(
+    145deg,
+    rgba(var(--message-node-bg-system-color-rgb), 0.8),
+    rgba(var(--message-node-bg-system-color-rgb), 1)
+  );
+
+  --message-node-bg-error-color-rgb: 254, 226, 226; /* Rojo muy claro */
+  --message-node-bg-error: linear-gradient(
+    145deg,
+    rgba(var(--message-node-bg-error-color-rgb), 0.8),
+    rgba(var(--message-node-bg-error-color-rgb), 1)
+  );
+
+  --message-node-bg-warning-color-rgb: 254, 243, 199; /* Amarillo muy claro */
+  --message-node-bg-warning: linear-gradient(
+    145deg,
+    rgba(var(--message-node-bg-warning-color-rgb), 0.8),
+    rgba(var(--message-node-bg-warning-color-rgb), 1)
+  );
+
+  --message-node-bg-info-color-rgb: 224, 242, 254; /* Celeste muy claro */
+  --message-node-bg-info: linear-gradient(
+    145deg,
+    rgba(var(--message-node-bg-info-color-rgb), 0.8),
+    rgba(var(--message-node-bg-info-color-rgb), 1)
+  );
+
+  --message-node-bg-question-color-rgb: 243, 232, 255; /* Púrpura muy claro */
+  --message-node-bg-question: linear-gradient(
+    145deg,
+    rgba(var(--message-node-bg-question-color-rgb), 0.8),
+    rgba(var(--message-node-bg-question-color-rgb), 1)
+  );
+
+  /* Fondo por defecto (si no es un tipo específico) */
+  --message-node-bg-default-color-rgb: 239, 246, 255; /* Azul extremadamente claro, casi blanco */
+  --message-node-bg: linear-gradient(
+    145deg,
+    rgba(var(--message-node-bg-default-color-rgb), 0.8),
+    rgba(var(--message-node-bg-default-color-rgb), 1)
+  );
+
+  /* Bordes y contornos - Alineados con StartNode pero más sutiles */
+  --message-node-border-color: rgba(var(--node-shared-accent-rgb), 0.3);
+  --message-node-border-selected-color: var(--node-shared-accent-hex);
+  --message-node-border-hover-color: rgba(var(--node-shared-accent-rgb), 0.5);
+  --message-node-border-width: 1px; /* Más sutil que StartNode */
+  --message-node-border-radius: 12px; /* Igual que StartNode */
+
+  /* Colores de texto - con contraste WCAG 2.1 */
+  --message-node-text-primary: #1e293b; /* Azul pizarra oscuro */
+  --message-node-text-secondary: #3b82f6; /* Azul (igual a --node-shared-accent-hex) */
+  --message-node-text-muted: #64748b; /* Gris pizarra */
+  --message-node-text-on-dark-bg: #f8fafc; /* Blanco para fondos oscuros (si se implementa tema oscuro) */
+
+  /* Estados y feedback */
+  --message-node-error-text: #b91c1c; /* Rojo oscuro para texto de error */
+  --message-node-warning-text: #b45309; /* Ámbar oscuro para texto de advertencia */
+  --message-node-info-text: #075985; /* Cian oscuro para texto de info */
+
+  /* Efectos y sombras - Sutiles y modernos, como StartNode */
+  --message-node-shadow-base: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --message-node-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+  --message-node-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+  --message-node-shadow-selected-ring: 0 0 0 2px var(--message-node-border-selected-color);
+
+  /* Dimensiones y espaciado */
+  --message-node-padding: 0.75rem; /* Ligeramente menos que StartNode - This is for internal elements if they use it, base node has 0 */
+  --message-node-header-padding: 0.65rem 0.85rem; /* Increased */
+  --message-node-content-padding: 0.85rem; /* Increased */
+  --message-node-footer-padding: 0.5rem 0.75rem;
+  --message-node-gap: 0.5rem;
+  --message-node-min-width: 230px; /* Slightly Increased */
+  --message-node-min-height: 100px; /* Increased */
+  --message-node-max-width: 360px; /* Slightly Increased */
+
+  /* Tipografía */
+  --message-node-font-family: var(
+    --font-primary,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    Oxygen,
+    Ubuntu,
+    Cantarell,
+    "Open Sans",
+    "Helvetica Neue",
+    sans-serif
+  );
+  --message-node-font-size: 0.875rem; /* 14px */
+  --message-node-font-size-small: 0.75rem; /* 12px */
+  --message-node-font-size-title: 0.875rem; /* Título igual que texto base, pero más peso */
+  --message-node-line-height: 1.5;
+  --message-node-font-weight-normal: 400;
+  --message-node-font-weight-medium: 500;
+  --message-node-font-weight-semibold: 600;
+
+  /* Transiciones y animaciones */
+  --message-node-transition-duration: 0.2s;
+  --message-node-transition-timing: ease-in-out;
+  --message-node-transition: all var(--message-node-transition-duration)
+    var(--message-node-transition-timing);
+
+  /* Variables para modo ultra rendimiento */
+  --message-node-ultra-bg: #f8fafc;
+  --message-node-ultra-border-color: #e2e8f0;
+  --message-node-ultra-border-selected-color: var(--node-shared-accent-hex);
+  --message-node-ultra-text-color: #334155;
+  --message-node-ultra-padding: 0.5rem;
+  --message-node-ultra-border-width: 1px;
+  --message-node-ultra-border-radius: 8px;
+
+  /* Accesibilidad */
+  --message-node-focus-outline: 2px solid var(--message-node-focus-ring);
+  --message-node-focus-outline-offset: 1px;
+}
+
+/* Soporte para modo oscuro (Placeholder - se refinarán si se implementa tema oscuro) */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --message-node-bg-user-color-rgb: 30, 58, 138; /* Azul oscuro */
+    --message-node-bg-bot-color-rgb: 55, 65, 81; /* Gris oscuro */
+    --message-node-bg-system-color-rgb: 59, 7, 100; /* Púrpura oscuro */
+    --message-node-bg-error-color-rgb: 127, 29, 29; /* Rojo oscuro */
+    --message-node-bg-warning-color-rgb: 120, 53, 15; /* Naranja oscuro */
+    --message-node-bg-info-color-rgb: 12, 74, 110; /* Cian oscuro */
+    --message-node-bg-question-color-rgb: 88, 28, 135; /* Violeta oscuro */
+    --message-node-bg-default-color-rgb: 23, 37, 84; /* Azul muy oscuro */
+
+    --message-node-border-color: rgba(var(--node-shared-accent-rgb), 0.5);
+    --message-node-text-primary: #e2e8f0; /* Gris claro */
+    --message-node-text-secondary: #93c5fd; /* Azul claro */
+    --message-node-text-muted: #94a3b8; /* Gris azulado */
+
+    --message-node-error-text: #fca5a5; /* Rojo claro para texto de error */
+    --message-node-warning-text: #fdba74; /* Naranja claro para texto de advertencia */
+    --message-node-info-text: #67e8f9; /* Cian claro para texto de info */
+
+    --message-node-ultra-bg: #1e293b; /* Azul pizarra oscuro */
+    --message-node-ultra-border-color: #334155;
+    --message-node-ultra-text-color: #cbd5e1;
+  }
+}
+
+/* ======================================================
+   COMPONENTE BASE
+   ====================================================== */
+
+/*
+ * Se establece box-sizing: border-box de forma universal dentro del nodo.
+ * Esto asegura que el padding y los bordes se incluyan en el cálculo del ancho y alto total,
+ * previniendo desbordamientos y problemas de layout. Es una corrección fundamental.
+ */
+.message-node,
+.message-node *,
+.message-node *::before,
+.message-node *::after {
+  box-sizing: border-box;
+}
+
+.message-node {
+  background: var(--message-node-bg); /* Usará el gradiente por defecto */
+  border: var(--message-node-border-width) solid var(--message-node-border-color);
+  border-radius: var(--message-node-border-radius);
+  color: var(--message-node-text-primary);
+  box-shadow: var(--message-node-shadow-md);
+
+  /* Se eliminan las propiedades de flexbox y min-height para permitir un cálculo de altura natural. */
+  /* La altura ahora se basa únicamente en el contenido, lo que resuelve los conflictos de layout. */
+  padding: 0; /* El padding se manejará en header/content/footer */
+  width: clamp(var(--message-node-min-width), 100%, var(--message-node-max-width));
+  position: relative; /* Para posicionar elementos internos como handles */
+  transition: var(--message-node-transition);
+  font-family: var(--message-node-font-family);
+  font-size: var(--message-node-font-size);
+  line-height: var(--message-node-line-height);
+}
+
+.message-node:hover {
+  border-color: var(--message-node-border-hover-color);
+  box-shadow: var(--message-node-shadow-lg);
+}
+
+.message-node.selected {
+  border-color: var(--message-node-border-selected-color);
+  box-shadow: var(--message-node-shadow-selected-ring), var(--message-node-shadow-lg);
+}
+
+.message-node:focus-visible {
+  outline: var(--message-node-focus-outline);
+  outline-offset: var(--message-node-focus-outline-offset);
+}
+
+/* Aplicar fondo específico según el tipo de mensaje */
+.message-node[data-message-type="user"] {
+  background: var(--message-node-bg-user);
+}
+.message-node[data-message-type="bot"] {
+  background: var(--message-node-bg-bot);
+}
+.message-node[data-message-type="system"] {
+  background: var(--message-node-bg-system);
+}
+.message-node[data-message-type="error"] {
+  background: var(--message-node-bg-error);
+}
+.message-node[data-message-type="warning"] {
+  background: var(--message-node-bg-warning);
+}
+.message-node[data-message-type="info"] {
+  background: var(--message-node-bg-info);
+}
+.message-node[data-message-type="question"] {
+  background: var(--message-node-bg-question);
+}
+
+/* ======================================================
+   ESTADOS DEL NODO
+   ====================================================== */
+
+/* Hover - Interacción suave */
+.message-node:hover:not(.message-node--ultra-performance) {
+  /* transform: translateY(-2px); */ /* Evita salto del nodo en hover */
+  box-shadow: var(--message-node-shadow-lg);
+  border-color: var(--message-node-border-hover-color);
+}
+
+/* Seleccionado - Destacado con borde y sombra */
+.message-node--selected:not(.message-node--ultra-performance) {
+  border-color: var(--message-node-border-selected-color);
+  box-shadow: var(--message-node-shadow-selected-ring), var(--message-node-shadow-lg);
+  z-index: 2;
+  animation: selectedPulse 2s infinite;
+}
+
+/* Editando - Modo de edición con estilo premium */
+.message-node--editing:not(.message-node--ultra-performance) {
+  border-color: rgba(var(--message-node-primary-rgb), 0.8);
+  box-shadow:
+    0 0 0 2px rgba(var(--message-node-primary-rgb), 0.3),
+    var(--message-node-shadow);
+  z-index: 3;
+}
+
+/* Error - Indicación visual clara de error */
+.message-node--has-error:not(.message-node--ultra-performance) {
+  border-color: var(--message-node-error-text);
+  box-shadow:
+    0 0 0 2px rgba(239, 68, 68, 0.3),
+    var(--message-node-shadow);
+  animation: errorPulse 2s infinite;
+}
+
+/* Dirty - Cambios no guardados */
+.message-node--dirty:not(.message-node--ultra-performance)::after {
+  content: "";
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  width: 10px;
+  height: 10px;
+  background-color: var(--message-node-primary);
+  border-radius: 50%;
+  border: 2px solid #fff;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);
+}
+
+/* ======================================================
+   MODO ULTRA RENDIMIENTO
+   ====================================================== */
+
+/**
+ * Modo Ultra Rendimiento
+ * Optimizado para flujos complejos con cientos de nodos
+ */
+.message-node--ultra-performance {
+  /* Diseño minimalista y eficiente pero estéticamente agradable */
+  background: none;
+  background-color: var(--message-node-ultra-bg);
+  border: var(--message-node-ultra-border-width) solid var(--message-node-ultra-border-color);
+  border-radius: var(--message-node-ultra-border-radius);
+  color: var(--message-node-ultra-text-color);
+
+  /* Dimensiones optimizadas pero con suficiente espacio */
+  padding: 8px;
+  min-height: auto;
+  min-width: 180px;
+  max-width: 240px;
+
+  /* Optimizaciones críticas de rendimiento */
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  transition: none;
+  animation: none;
+  transform: none;
+  will-change: auto;
+
+  /* Optimizaciones de contenido */
+  contain: content;
+  content-visibility: auto;
+}
+
+/* Estado seleccionado en modo ultra rendimiento */
+.message-node--ultra-performance.message-node--selected {
+  border-color: var(--message-node-ultra-border-selected-color);
+  border-width: 2px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+  animation: none;
+}
+
+/* Icono en modo ultra rendimiento */
+.message-node__icon--ultra {
+  background: none;
+  border: none;
+  box-shadow: none;
+  padding: 2px;
+  margin-right: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* SVG en modo ultra rendimiento */
+.message-node__icon-svg--ultra {
+  color: var(--message-node-ultra-text-color);
+  opacity: 0.9;
+  transition: none;
+  animation: none;
+  transform: none;
+}
+
+/* Contenido en modo ultra rendimiento */
+.message-node__ultra-content {
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  /* Se elimina height: 100% para evitar dependencias circulares de tamaño. */
+  background-color: transparent;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  transition: none;
+  animation: none;
+}
+
+/* Cabecera en modo ultra rendimiento */
+.message-node__ultra-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+  border-bottom: 1px solid rgba(var(--message-node-primary-rgb), 0.2);
+  padding-bottom: 6px;
+}
+
+/* Título en modo ultra rendimiento */
+.message-node__ultra-title {
+  font-weight: 600;
+  font-size: 13px;
+  margin-left: 6px;
+  color: var(--message-node-ultra-text-color);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: calc(100% - 30px); /* Reservar espacio para tooltip icon */
+  flex-grow: 1;
+}
+
+/* Mensaje en modo ultra rendimiento */
+.message-node__ultra-message {
+  font-size: 12px;
+  opacity: 0.95;
+  word-break: break-word;
+  max-width: 220px;
+  color: var(--message-node-ultra-text-color);
+  line-height: 1.5;
+  background-color: rgba(var(--message-node-primary-rgb), 0.05);
+  padding: 6px 8px;
+  border-radius: 4px;
+  border-left: 2px solid rgba(var(--message-node-primary-rgb), 0.3);
+}
+
+/* Mensaje vacío en modo ultra rendimiento */
+.message-node__ultra-message--empty {
+  opacity: 0.7;
+  font-style: italic;
+  background-color: rgba(var(--message-node-primary-rgb), 0.02);
+  border-left-color: rgba(var(--message-node-primary-rgb), 0.15);
+}
+
+/* Texto de mensaje vacío */
+.message-node__ultra-empty {
+  color: var(--message-node-ultra-text-color);
+  opacity: 0.7;
+}
+
+/* Estado hover en modo ultra rendimiento */
+.message-node--ultra-performance:hover {
+  transform: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12);
+  border-color: rgba(var(--message-node-primary-rgb), 0.5);
+}
+
+/* Conectores en modo ultra rendimiento */
+.message-node .message-node__handle--ultra {
+  width: var(--handle-default-size) !important;
+  height: var(--handle-default-size) !important;
+  background-color: var(--handle-default-bg-color) !important;
+  border: var(--handle-default-border-width) solid var(--handle-default-border-color) !important;
+  border-radius: 50% !important; /* Circular like normal mode */
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important; /* Default shadow */
+  opacity: 1 !important;
+  transition: none !important; /* No animations/transitions */
+  z-index: 10 !important; /* Asegurar que los handles estén por encima */
+  cursor: pointer !important;
+}
+
+.message-node .message-node__handle--target.message-node__handle--ultra {
+  top: var(--handle-default-offset) !important;
+}
+
+.message-node .message-node__handle--source.message-node__handle--ultra {
+  bottom: var(--handle-default-offset) !important;
+}
+
+.message-node--ultra-performance .message-node__handle:hover,
+.message-node--ultra-performance .message-node__handle:focus {
+  transform: translateX(-50%);
+  animation: none;
+  box-shadow: none;
+}
+
+/* ======================================================
+   HANDLE STYLING (Puntos de conexión)
+   ====================================================== */
+
+.message-node .message-node__handle:not(.message-node__handle--ultra) {
+  width: var(--handle-default-size) !important;
+  height: var(--handle-default-size) !important;
+  background-color: var(--handle-default-bg-color) !important;
+  border: var(--handle-default-border-width) solid var(--handle-default-border-color) !important;
+  border-radius: 50% !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  cursor: pointer !important;
+  z-index: 10 !important;
+  transition:
+    background-color var(--message-node-transition-duration) var(--message-node-transition-timing),
+    filter var(--message-node-transition-duration) var(--message-node-transition-timing),
+    transform var(--message-node-transition-duration) var(--message-node-transition-timing),
+    box-shadow var(--message-node-transition-duration) var(--message-node-transition-timing);
+}
+
+.message-node .message-node__handle--target:not(.message-node__handle--ultra) {
+  top: var(--handle-default-offset) !important;
+}
+
+.message-node .message-node__handle--source:not(.message-node__handle--ultra) {
+  bottom: var(--handle-default-offset) !important;
+}
+
+.message-node .message-node__handle:not(.message-node__handle--ultra):hover {
+  background-color: var(--handle-default-bg-color) !important;
+  filter: brightness(120%);
+  /* transform: scale(1.1); /* Optional: keep a slight scale if desired */
+  /* box-shadow: none; /* Or a very subtle one if needed */
+}
+
+/* Specific positioning to make handles sit slightly outside the node bounds */
+/* Adjust these values if the node's border-width changes or a different protrusion is desired */
+.message-node .react-flow__handle-top {
+  top: -7px; /* (10px handle + 2px border*2)/2 = 7px to be flush, so -7px makes it sit on the edge */
+}
+.message-node .react-flow__handle-bottom {
+  bottom: -7px;
+}
+.message-node .react-flow__handle-left {
+  left: -7px;
+}
+.message-node .react-flow__handle-right {
+  right: -7px;
+}
+
+/* Ultra Performance Mode - Simplified Handles */
+.message-node--ultra-performance .react-flow__handle {
+  width: 8px;
+  height: 8px;
+  background-color: var(--message-node-ultra-accent, var(--message-node-primary));
+  border: 1px solid var(--message-node-ultra-border, var(--message-node-border-color));
+  box-shadow: none;
+  transform: none;
+  transition: none;
+}
+
+.message-node--ultra-performance .react-flow__handle:hover {
+  /* Maintain exact same appearance for static behavior */
+  background-color: var(
+    --message-node-ultra-accent-hover,
+    var(--message-node-primary-hover)
+  ); /* Slight change on hover if desired */
+  transform: none; /* Ensure no scaling */
+  box-shadow: none;
+}
+
+/* Adjust positioning for ultra mode if handle size/border changes significantly */
+.message-node--ultra-performance .react-flow__handle-top {
+  top: -5px;
+} /* (8px + 1px*2)/2 = 5px */
+.message-node--ultra-performance .react-flow__handle-bottom {
+  bottom: -5px;
+}
+.message-node--ultra-performance .react-flow__handle-left {
+  left: -5px;
+}
+.message-node--ultra-performance .react-flow__handle-right {
+  right: -5px;
+}
+
+/* ======================================================
+   CABECERA DEL NODO
+   ====================================================== */
+
+.message-node__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--message-node-header-padding, 0.65rem 0.85rem);
+  /* Optional: Add a subtle bottom border to delineate header if needed */
+  /* border-bottom: 1px solid rgba(var(--message-node-primary-rgb), 0.1); */
+  /* Background is inherited from .message-node based on type, which is good */
+  border-top-left-radius: var(--message-node-border-radius);
+  border-top-right-radius: var(--message-node-border-radius);
+  position: relative; /* For potential absolute positioned elements like saving indicator */
+}
+
+.message-node__title-container {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem; /* Increased gap for better spacing between icon and title */
+  flex-grow: 1; /* Allow title container to take available space */
+  overflow: hidden; /* Prevent long titles from breaking layout */
+}
+
+.message-node__icon {
+  /* Styles for the wrapper div if MessageNodeIcon is wrapped */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--message-node-primary); /* Icon color based on primary accent */
+}
+
+.message-node__icon svg {
+  width: 18px; /* Consistent icon size */
+  height: 18px;
+  stroke-width: 2; /* Adjust stroke for Lucide icons if needed */
+}
+
+.message-node__title {
+  font-size: var(--message-node-font-size-title, 0.875rem);
+  font-weight: var(--message-node-font-weight-semibold, 600);
+  color: var(--message-node-text-primary);
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.3; /* Ensure title vertical alignment is good */
+  max-width: calc(100% - 30px); /* RESERVAR MENOS ESPACIO PARA TOOLTIP ICON */
+  flex-grow: 1; /* PERMITIR QUE EL TÍTULO CREZCA */
+}
+
+.message-node__title-input {
+  font-size: var(--message-node-font-size-title, 0.875rem);
+  font-weight: var(--message-node-font-weight-semibold, 600);
+  color: var(--message-node-text-primary);
+  background-color: rgba(255, 255, 255, 0.8);
+  border: 1px solid var(--message-node-primary);
+  border-radius: calc(var(--message-node-border-radius) / 2);
+  padding: 0.2rem 0.4rem;
+  margin: 0; /* Replaces h2, so no extra margin */
+  width: 100%; /* Take available space */
+  box-sizing: border-box;
+}
+
+.message-node__title-input:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--message-node-focus-ring);
+}
+
+.message-node__header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0; /* Prevent actions from shrinking */
+}
+
+.message-node__timestamp-icon {
+  color: var(--message-node-text-muted);
+  width: 14px;
+  height: 14px;
+}
+
+/* Saving Indicator (if not already styled elsewhere) */
+.message-node__saving-indicator {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: var(--message-node-font-size-small);
+  color: var(--message-node-text-secondary);
+  /* Example: using a spinner */
+}
+
+.message-node__saving-indicator svg {
+  /* If using an SVG spinner */
+  animation: spin 1s linear infinite;
+  width: 14px;
+  height: 14px;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* ======================================================
+   CONTENIDO PRINCIPAL (Editor y Preview)
+   ====================================================== */
+
+.message-node__content {
+  padding: var(--message-node-content-padding, 0.85rem);
+  /* The content area itself doesn't need a specific background if the main node has it */
+  /* It will contain either the editor or the preview */
+  /* flex-grow and min-height removed to allow natural content height */
+  display: flex; /* To manage active editor/preview display */
+  flex-direction: column; /* Stack editor/preview */
+}
+
+/* Editor Area */
+.message-node__editor {
+  display: flex;
+  flex-direction: column;
+  gap: var(--message-node-gap, 0.5rem);
+  padding: var(--message-node-content-padding);
+  width: 100%; /* Asegurar que ocupe el ancho completo del contenedor */
+  box-sizing: border-box; /* Incluir padding en el cálculo del ancho */
+  min-height: 150px; /* Altura mínima para acomodar el contenido del editor */
+  overflow: visible; /* Permitir que los tooltips se desborden si es necesario */
+}
+
+/* Textarea dentro del editor */
+.message-node__textarea {
+  width: 100%;
+  min-height: 80px; /* Minimum height for about 4 lines */
+  padding: 0.5rem;
+  border: 1px solid var(--message-node-border-color, #cbd5e1);
+  border-radius: var(--message-node-border-radius, 8px);
+  font-family: var(--message-node-font-family, sans-serif);
+  font-size: var(--message-node-font-size, 0.875rem);
+  line-height: var(--message-node-line-height, 1.5);
+  color: #333333; /* Color de texto oscuro */
+  background-color: var(--input-bg-color, #fff); /* Assuming a variable for input backgrounds */
+  box-sizing: border-box; /* Crucial for width: 100% and padding */
+  resize: vertical; /* Allow user to resize vertically */
+  transition: border-color var(--message-node-transition-duration)
+    var(--message-node-transition-timing);
+}
+
+.message-node__textarea:focus {
+  outline: none;
+  border-color: var(--message-node-primary, #3b82f6);
+  box-shadow: 0 0 0 2px var(--message-node-focus-ring);
+}
+
+/* Contenedor para los botones de acción del editor */
+.message-node__editor-actions {
+  display: flex;
+  justify-content: flex-end; /* Alinea botones a la derecha */
+  gap: 0.5rem; /* Espacio entre botones */
+  width: 100%;
+  margin-top: 0.5rem; /* Espacio arriba de los botones */
+}
+
+/* Botones dentro del editor (Guardar, Cancelar) */
+.message-node__editor-button {
+  padding: 0.4rem 0.8rem;
+  border: 1px solid transparent;
+  border-radius: var(--message-node-border-radius, 8px);
+  font-size: var(--message-node-font-size-small, 0.75rem);
+  font-weight: var(--message-node-font-weight-medium, 500);
+  cursor: pointer;
+  transition:
+    background-color var(--message-node-transition-duration) var(--message-node-transition-timing),
+    color var(--message-node-transition-duration) var(--message-node-transition-timing),
+    border-color var(--message-node-transition-duration) var(--message-node-transition-timing);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.message-node__editor-button--save {
+  background-color: var(--message-node-primary, #3b82f6);
+  color: #ffffff;
+}
+
+.message-node__editor-button--save:hover {
+  background-color: var(--message-node-primary-hover, #2563eb);
+}
+
+.message-node__editor-button--cancel {
+  background-color: transparent;
+  color: var(--message-node-text-muted, #64748b);
+  border: 1px solid var(--message-node-border-color, #cbd5e1);
+}
+
+.message-node__editor-button--cancel:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+  border-color: var(--message-node-text-muted, #64748b);
+  color: var(--message-node-text-primary, #1e293b);
+}
+
+/* Preview Display Area */
+.message-node__preview-display {
+  padding: var(--message-node-content-padding);
+  min-height: 60px; /* Altura mínima para el área de vista previa */
+  overflow-y: auto; /* Permitir scroll si el contenido del preview es largo */
+}
+
+/* Estilización de scrollbar */
+.message-node__message::-webkit-scrollbar {
+  width: 4px;
+}
+
+.message-node__message::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.message-node__message::-webkit-scrollbar-thumb {
+  background-color: rgba(var(--message-node-primary-rgb), 0.3);
+  border-radius: 10px;
+}
+
+.message-node__message::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(var(--message-node-primary-rgb), 0.5);
+}
+
+/* Mensaje en modo vista previa */
+.message-node__preview {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  transition: var(--message-node-transition);
+}
+
+/* Mensaje truncado con indicador de expansión */
+.message-node__preview--truncated::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 24px;
+  background: linear-gradient(to bottom, transparent, var(--message-node-bg-default-color-rgb));
+  pointer-events: none;
+}
+
+/* Botón de expansión */
+.message-node__expand-button {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  background-color: rgba(var(--message-node-primary-rgb), 0.1);
+  color: var(--message-node-text-primary);
+  border: none;
+  border-radius: 4px;
+  padding: 2px 8px;
+  font-size: var(--message-node-font-size-small);
+  cursor: pointer;
+  transition: var(--message-node-transition-fast);
+  z-index: 2;
+}
+
+.message-node__expand-button:hover {
+  background-color: rgba(var(--message-node-primary-rgb), 0.2);
+}
+
+.message-node__expand-button:focus-visible {
+  outline: var(--message-node-focus-outline);
+  outline-offset: var(--message-node-focus-outline-offset);
+}
+
+/* ======================================================
+   ÁREA DE EDICIÓN
+   ====================================================== */
+
+.message-node__edit-area {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+/* Contador de caracteres */
+.message-node__character-count {
+  align-self: flex-end;
+  font-size: var(--message-node-font-size-small);
+  color: var(--message-node-text-muted);
+}
+
+.message-node__character-count--warning {
+  color: var(--message-node-warning-text);
+}
+
+.message-node__character-count--error {
+  color: var(--message-node-error-text);
+}
+
+/* ======================================================
+   BOTONES Y ACCIONES
+   ====================================================== */
+
+.message-node__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  width: 100%;
+  margin-top: 0.5rem;
+}
+
+.message-node__button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 6px;
+  border: none;
+  font-size: var(--message-node-font-size-small);
+  font-weight: var(--message-node-font-weight-medium);
+  cursor: pointer;
+  transition: var(--message-node-transition-fast);
+  position: relative;
+  overflow: hidden;
+  background-color: rgba(var(--message-node-primary-rgb), 0.1);
+  color: var(--message-node-text-primary);
+}
+
+/* Efecto de onda al hacer clic */
+.message-node__button::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 5px;
+  height: 5px;
+  background: rgba(255, 255, 255, 0.5);
+  opacity: 0;
+  border-radius: 100%;
+  transform: scale(1, 1) translate(-50%, -50%);
+  transform-origin: 50% 50%;
+}
+
+.message-node__button:active::after {
+  animation: ripple 0.6s ease-out;
+}
+
+/* Microinteracciones de botones */
+.message-node__button:hover {
+  background-color: rgba(var(--message-node-primary-rgb), 0.2);
+  transform: translateY(-1px);
+}
+
+.message-node__button:active {
+  transform: translateY(0);
+}
+
+/* Accesibilidad de botones */
+.message-node__button:focus {
+  outline: none;
+}
+
+.message-node__button:focus-visible {
+  outline: var(--message-node-focus-outline);
+  outline-offset: var(--message-node-focus-outline-offset);
+}
+
+/* Botón primario */
+.message-node__button--primary {
+  background-color: var(--message-node-primary);
+  color: #ffffff;
+}
+
+.message-node__button--primary:hover {
+  background-color: var(--message-node-primary-hover);
+  box-shadow: 0 2px 5px rgba(var(--message-node-primary-rgb), 0.4);
+}
+
+/* Botón secundario */
+.message-node__button--secondary {
+  background-color: transparent;
+  border: 1px solid rgba(var(--message-node-primary-rgb), 0.5);
+  color: var(--message-node-text-secondary);
+}
+
+.message-node__button--secondary:hover {
+  border-color: rgba(var(--message-node-primary-rgb), 0.8);
+  background-color: rgba(var(--message-node-primary-rgb), 0.05);
+}
+
+/* Botón de peligro */
+.message-node__button--danger {
+  background-color: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+}
+
+.message-node__button--danger:hover {
+  background-color: rgba(239, 68, 68, 0.2);
+}
+
+/* Botón de peligro primario */
+.message-node__button--danger-primary {
+  background-color: #ef4444;
+  color: #ffffff;
+}
+
+.message-node__button--danger-primary:hover {
+  background-color: #dc2626;
+}
+
+/* Botón de icono */
+.message-node__icon-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  border: none;
+  background-color: transparent;
+  color: var(--message-node-text-secondary);
+  cursor: pointer;
+  transition: var(--message-node-transition-fast);
+}
+
+.message-node__icon-button:hover {
+  background-color: rgba(var(--message-node-primary-rgb), 0.1);
+  color: var(--message-node-text-primary);
+}
+
+.message-node__icon-button:focus-visible {
+  outline: var(--message-node-focus-outline);
+  outline-offset: var(--message-node-focus-outline-offset);
+}
+
+/* Botón de icono activo */
+.message-node__icon-button--active {
+  background-color: rgba(var(--message-node-primary-rgb), 0.1);
+  color: var(--message-node-primary);
+}
+
+/* ======================================================
+   MANIJAS DE CONEXIÓN (HANDLES)
+   ====================================================== */
+
+.message-node__handle {
+  /* IDENTICAL to StartNode handle size and style */
+  width: var(--handle-default-size) !important;
+  height: var(--handle-default-size) !important;
+  background-color: #3b82f6 !important;
+  border: 2px solid white !important;
+  border-radius: 50% !important;
+  transition: var(--message-node-transition-fast);
+  position: absolute;
+  z-index: 1000 !important;
+  cursor: pointer !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+}
+
+.message-node__handle:hover,
+.message-node__handle:focus {
+  /* Match StartNode hover style */
+  background-color: #3b82f6 !important;
+  filter: brightness(120%);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.3) !important;
+  outline: none;
+}
+
+/* Conector de entrada */
+.message-node__handle--target {
+  top: -8px !important; /* Standard offset matching StartNode */
+  left: 50% !important;
+  transform: translateX(-50%) !important; /* Precise centering */
+  z-index: 1001 !important;
+}
+
+.message-node__handle--target:hover,
+.message-node__handle--target:focus {
+  animation: energyPulse 1.5s infinite ease-in-out;
+}
+
+/* Conector de salida */
+.message-node__handle--source {
+  bottom: -8px !important; /* Standard offset matching StartNode */
+  left: 50% !important;
+  transform: translateX(-50%) !important; /* Precise centering */
+  z-index: 1001 !important;
+}
+
+.message-node__handle--source:hover,
+.message-node__handle--source:focus {
+  animation: energyPulse 1.5s infinite ease-in-out;
+}
+
+/* Conectores en modo ultra rendimiento */
+.message-node--ultra-performance .message-node__handle {
+  width: 8px;
+  height: 8px;
+  border-width: 1px;
+  box-shadow: none;
+  transition: none;
+}
+
+.message-node--ultra-performance .message-node__handle:hover,
+.message-node--ultra-performance .message-node__handle:focus {
+  transform: translateX(-50%);
+  animation: none;
+  box-shadow: none;
+}
+
+/* Handles de React Flow en modo ultra rendimiento: Estáticos y con apariencia de modo normal */
+/* Handles de React Flow en modo ultra rendimiento: Estáticos y con apariencia de modo normal */
+.message-node--ultra-performance
+  .react-flow__handle.message-node__handle.message-node__handle--ultra {
+  width: 10px !important;
+  height: 10px !important;
+  background-color: #f8fafc !important; /* Hardcoded desired background */
+  border: 1px solid #2563eb !important; /* Hardcoded desired border */
+  border-radius: 50% !important; /* Desired circular shape */
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.05),
+    0 1px 2px rgba(0, 0, 0, 0.1) !important; /* Desired shadow */
+  transition: none !important;
+  animation: none !important;
+  cursor: pointer !important;
+  transform: none !important;
+  z-index: 120 !important; /* Desired z-index */
+}
+
+/* Specific positioning for top (target) handle */
+.message-node--ultra-performance
+  .react-flow__handle-top.message-node__handle.message-node__handle--ultra {
+  top: -10px !important; /* Desired position */
+}
+
+/* Specific positioning for bottom (source) handle */
+.message-node--ultra-performance
+  .react-flow__handle-bottom.message-node__handle.message-node__handle--ultra {
+  bottom: -10px !important; /* Desired position */
+}
+
+.message-node--ultra-performance
+  .react-flow__handle.message-node__handle.message-node__handle--ultra:hover {
+  /* Maintain exact same appearance for static behavior */
+  background-color: #f8fafc !important;
+  border: 1px solid #2563eb !important;
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.05),
+    0 1px 2px rgba(0, 0, 0, 0.1) !important;
+  transform: none !important;
+}
+
+/* ======================================================
+   SECCIÓN DE VARIABLES
+   ====================================================== */
+
+.message-node__variables {
+  width: 100%;
+  margin-top: 0.5rem;
+  border-top: 1px solid rgba(var(--message-node-primary-rgb), 0.1);
+  padding-top: 0.5rem;
+  box-sizing: border-box; /* Asegurar que padding/border no expandan más allá del 100% */
+}
+
+.message-node__variables-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.message-node__variables-title {
+  font-size: var(--message-node-font-size-small);
+  font-weight: var(--message-node-font-weight-semibold);
+  color: var(--message-node-text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.message-node__variables-actions {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.message-node__variables-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  width: 100%;
+  /* max-height: 120px; */ /* Comentado para mostrar todas las variables */
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(var(--message-node-primary-rgb), 0.3) transparent;
+}
+
+.message-node__variables-list::-webkit-scrollbar {
+  width: 4px;
+}
+
+.message-node__variables-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.message-node__variables-list::-webkit-scrollbar-thumb {
+  background-color: rgba(var(--message-node-primary-rgb), 0.3);
+  border-radius: 10px;
+}
+
+/* Elemento de variable */
+.message-node__variable {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.35rem 0.5rem;
+  border-radius: 6px;
+  background-color: rgba(var(--message-node-primary-rgb), 0.05);
+  transition: var(--message-node-transition-fast);
+  position: relative;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.message-node__variable-name,
+.message-node__variable-value {
+  padding: 0.2rem 0.4rem;
+  border: 1px solid var(--message-node-border-color, #cbd5e1);
+  border-radius: calc(var(--message-node-border-radius) / 2);
+  font-size: var(--message-node-font-size-small);
+  font-weight: var(--message-node-font-weight-medium);
+  color: #333; /* Color de texto oscuro */
+  background-color: rgba(255, 255, 255, 0.8);
+  box-sizing: border-box;
+  flex-grow: 1;
+  min-width: 50px;
+}
+
+.message-node__variable-name::placeholder,
+.message-node__variable-value::placeholder {
+  color: #777; /* Color de placeholder legible */
+  opacity: 1; /* Asegurar que sea visible en Firefox */
+}
+
+.message-node__variable-name:focus,
+.message-node__variable-value:focus {
+  border-color: var(--message-node-primary, #3b82f6);
+  box-shadow: 0 0 0 2px var(--message-node-focus-ring);
+  outline: none;
+}
+
+.message-node__variable:hover {
+  background-color: rgba(var(--message-node-primary-rgb), 0.1);
+}
+
+.message-node__variable--dragging {
+  opacity: 0.5;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.message-node__variable--drop-target {
+  background-color: rgba(var(--message-node-primary-rgb), 0.2);
+  box-shadow: 0 0 0 2px rgba(var(--message-node-primary-rgb), 0.3);
+}
+
+.message-node__variable-actions {
+  display: flex;
+  gap: 0.25rem;
+  opacity: 0.7;
+  transition: var(--message-node-transition-fast);
+}
+
+.message-node__variable:hover .message-node__variable-actions {
+  opacity: 1;
+}
+
+.message-node__variable-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  background-color: transparent;
+  color: var(--message-node-text-secondary);
+  border: none;
+  cursor: pointer;
+  transition: var(--message-node-transition-fast);
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.message-node__variable-button:hover {
+  background-color: rgba(var(--message-node-primary-rgb), 0.1);
+  color: var(--message-node-text-primary);
+}
+
+.message-node__variable-button:focus-visible {
+  outline: var(--message-node-focus-outline);
+  outline-offset: var(--message-node-focus-outline-offset);
+}
+
+.message-node__variable-input {
+  padding: 0.2rem 0.4rem;
+  border: 1px solid var(--message-node-border-color, #cbd5e1);
+  border-radius: calc(var(--message-node-border-radius) / 2);
+  font-size: var(--message-node-font-size-small);
+  font-weight: var(--message-node-font-weight-medium);
+  color: #333333; /* Color de texto más oscuro */
+  background-color: rgba(255, 255, 255, 0.8);
+  box-sizing: border-box;
+}
+
+/* Área de arrastrar y soltar */
+.message-node__dropzone {
+  width: 100%;
+  min-height: 60px;
+  border: 2px dashed rgba(var(--message-node-primary-rgb), 0.3);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem;
+  transition: var(--message-node-transition-fast);
+  background-color: rgba(var(--message-node-primary-rgb), 0.03);
+}
+
+.message-node__dropzone:hover,
+.message-node__dropzone--active {
+  border-color: rgba(var(--message-node-primary-rgb), 0.5);
+  background-color: rgba(var(--message-node-primary-rgb), 0.05);
+}
+
+.message-node__dropzone-text {
+  font-size: var(--message-node-font-size-small);
+  color: var(--message-node-text-muted);
+}
+
+/* ======================================================
+   SUGERENCIAS DE IA
+   ====================================================== */
+
+.message-node__ai-suggestions {
+  width: 100%;
+  margin-top: 0.5rem;
+  border-top: 1px solid rgba(var(--message-node-primary-rgb), 0.1);
+  padding-top: 0.5rem;
+}
+
+.message-node__ai-suggestions-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.message-node__ai-suggestions-title {
+  font-size: var(--message-node-font-size-small);
+  font-weight: var(--message-node-font-weight-semibold);
+  color: var(--message-node-text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.message-node__ai-suggestions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.message-node__ai-suggestion {
+  padding: 0.5rem;
+  border-radius: 6px;
+  background-color: rgba(var(--message-node-primary-rgb), 0.05);
+  border: 1px solid rgba(var(--message-node-primary-rgb), 0.1);
+  transition: var(--message-node-transition-fast);
+  cursor: pointer;
+}
+
+.message-node__ai-suggestion:hover {
+  background-color: rgba(var(--message-node-primary-rgb), 0.1);
+  border-color: rgba(var(--message-node-primary-rgb), 0.2);
+}
+
+.message-node__ai-suggestion-text {
+  font-size: var(--message-node-font-size-small);
+  color: var(--message-node-text-primary);
+  line-height: 1.4;
+}
+
+.message-node__ai-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  font-size: var(--message-node-font-size-small);
+  color: var(--message-node-text-muted);
+}
+
+.message-node__ai-loading-dots {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.message-node__ai-loading-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: var(--message-node-text-muted);
+  animation: loadingDot 1.4s infinite ease-in-out;
+}
+
+.message-node__ai-loading-dot:nth-child(1) {
+  animation-delay: 0s;
+}
+
+.message-node__ai-loading-dot:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.message-node__ai-loading-dot:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+/* ======================================================
+   FOOTER DEL NODO
+   ====================================================== */
+
+.message-node__footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  margin-top: 0.5rem;
+  font-size: var(--message-node-font-size-small);
+  color: var(--message-node-text-muted);
+}
+
+.message-node__metadata {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.message-node__timestamp {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.7rem;
+}
+
+.message-node__word-count {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.7rem;
+}
+
+.message-node__status {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.message-node__status-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--message-node-success);
+}
+
+.message-node__status-indicator--error {
+  background-color: var(--message-node-error-text);
+}
+
+.message-node__status-indicator--warning {
+  background-color: var(--message-node-warning-text);
+}
+
+.message-node__status-indicator--info {
+  background-color: var(--message-node-info-text);
+}
+
+.message-node__status-text {
+  font-size: 0.7rem;
+}
+
+/* ======================================================
+   TOOLTIPS
+   ====================================================== */
+
+.message-node__tooltip {
+  position: absolute;
+  background-color: #333333; /* Fondo oscuro y sólido */
+  color: #ffffff; /* Texto blanco */
+  text-align: center;
+  border-radius: 6px;
+  padding: 8px 12px;
+  z-index: 1001; /* Asegurar que esté por encima de otros elementos del nodo */
+  bottom: 125%; /* Posicionar encima del elemento ancla (ajustar según sea necesario) */
+  left: 50%;
+  transform: translateX(-50%);
+  opacity: 0;
+  transition:
+    opacity 0.2s ease-in-out,
+    visibility 0.2s ease-in-out;
+  font-size: 0.8rem;
+  line-height: 1.4;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.message-node__tooltip--visible {
+  opacity: 1; /* Totalmente opaco al hacer hover/focus */
+  visibility: visible;
+}
+
+/* Opcional: Flecha para el tooltip */
+.message-node__tooltip::before {
+  content: "";
+  position: absolute;
+  width: 0;
+  height: 0;
+  border: 6px solid transparent;
+}
+
+.message-node__tooltip--top::before {
+  bottom: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-top-color: #333333; /* Color de la flecha igual al fondo */
+}
+
+.message-node__tooltip--bottom::before {
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-bottom-color: #333333; /* Color de la flecha igual al fondo */
+}
+
+.message-node__tooltip--left::before {
+  right: -12px;
+  top: 50%;
+  transform: translateY(-50%);
+  border-left-color: #333333; /* Color de la flecha igual al fondo */
+}
+
+.message-node__tooltip--right::before {
+  left: -12px;
+  top: 50%;
+  transform: translateY(-50%);
+  border-right-color: #333333; /* Color de la flecha igual al fondo */
+}
+
+/* Desactivar tooltips en modo ultra rendimiento */
+.message-node--ultra-performance .message-node__tooltip {
+  display: none;
+}
+
+/* ======================================================
+   MENÚ CONTEXTUAL
+   ====================================================== */
+
+.message-node__context-menu {
+  position: absolute;
+  background-color: #ffffff;
+  color: #334155;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  min-width: 180px;
+  z-index: 1000;
+  overflow: hidden;
+  animation: menuAppear 0.2s ease-out;
+}
+
+@media (prefers-color-scheme: dark) {
+  .message-node__context-menu {
+    background-color: #1e293b;
+    color: #f1f5f9;
+  }
+}
+
+.message-node__context-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  transition: var(--message-node-transition-fast);
+  font-size: var(--message-node-font-size);
+}
+
+.message-node__context-menu-item:hover {
+  background-color: rgba(var(--message-node-primary-rgb), 0.1);
+}
+
+.message-node__context-menu-item--danger {
+  color: var(--message-node-error-text);
+}
+
+.message-node__context-menu-item--danger:hover {
+  background-color: rgba(239, 68, 68, 0.1);
+}
+
+.message-node__context-menu-separator {
+  height: 1px;
+  background-color: rgba(0, 0, 0, 0.1);
+  margin: 0.25rem 0;
+}
+
+@media (prefers-color-scheme: dark) {
+  .message-node__context-menu-separator {
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+}
+
+/* ======================================================
+   AUTOCOMPLETADO DE VARIABLES
+   ====================================================== */
+
+.message-node__autocomplete {
+  position: absolute;
+  background-color: #ffffff;
+  color: #334155;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  min-width: 180px;
+  max-width: 300px;
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 1000;
+  animation: menuAppear 0.2s ease-out;
+}
+
+@media (prefers-color-scheme: dark) {
+  .message-node__autocomplete {
+    background-color: #1e293b;
+    color: #f1f5f9;
+  }
+}
+
+.message-node__autocomplete-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  transition: var(--message-node-transition-fast);
+  font-size: var(--message-node-font-size);
+}
+
+.message-node__autocomplete-item:hover,
+.message-node__autocomplete-item--selected {
+  background-color: rgba(var(--message-node-primary-rgb), 0.1);
+}
+
+.message-node__autocomplete-highlight {
+  color: var(--message-node-primary);
+  font-weight: var(--message-node-font-weight-semibold);
+}
+
+.message-node__autocomplete-description {
+  font-size: var(--message-node-font-size-small);
+  color: var(--message-node-text-muted);
+  margin-top: 0.25rem;
+}
+
+/* ======================================================
+   TIPOS DE NODOS DE MENSAJE
+   ====================================================== */
+
+/* Nodo de mensaje de usuario */
+.message-node--user {
+  background: var(--message-node-bg-user);
+  border-color: #3b82f6; /* Azul */
+}
+
+/* Nodo de mensaje de bot */
+.message-node--bot {
+  background: var(--message-node-bg-bot);
+  border-color: #8b5cf6; /* Violeta */
+}
+
+/* Nodo de mensaje de sistema */
+.message-node--system {
+  background: var(--message-node-bg-system);
+  border-color: #6366f1; /* Índigo */
+}
+
+/* Nodo de mensaje de error */
+.message-node--error {
+  background: var(--message-node-bg-error);
+  border-color: #ef4444; /* Rojo */
+}
+
+/* Nodo de mensaje de advertencia */
+.message-node--warning {
+  background: var(--message-node-bg-warning);
+  border-color: #f59e0b; /* Amarillo */
+}
+
+/* Nodo de mensaje de información */
+.message-node--info {
+  background: var(--message-node-bg-info);
+  border-color: #0ea5e9; /* Azul cielo */
+}
+
+/* Nodo de mensaje de pregunta */
+.message-node--question {
+  background: var(--message-node-bg-question);
+  border-color: #a855f7; /* Púrpura */
+}
+
+/* ==========================================================================
+   DESACTIVACIÓN ULTRA-PERFORMANCE HANDLES (ESPECIFICIDAD AUMENTADA)
+   ========================================================================== */
+
+/*
+  Asumimos que el nodo tiene ambas clases: .message-node y .message-node--ultra-performance
+  O que .message-node--ultra-performance es un contenedor de .message-node.
+  Para máxima especificidad, combinamos clases del nodo con las del handle.
+*/
+
+/* Regla base para handles en modo ultra: sin animación, transición, transformación ni sombra */
+.message-node.message-node--ultra-performance .react-flow__handle,
+.message-node.message-node--ultra-performance .message-node__handle {
+  animation: none !important;
+  transition: none !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* Override específico para :hover y :focus en .react-flow__handle.react-flow__handle */
+.message-node.message-node--ultra-performance .react-flow__handle.react-flow__handle:hover,
+.message-node.message-node--ultra-performance .react-flow__handle.react-flow__handle:focus {
+  transform: none !important; /* Anula el scale(1.25) */
+  box-shadow: none !important;
+  animation: none !important;
+  transition: none !important;
+  /* Si el background cambia, también resetearlo si es necesario */
+  /* background-color: var(--desired-ultra-handle-bg, #ccc) !important; */
+}
+
+/* Override específico para :hover y :focus en .message-node__handle */
+.message-node.message-node--ultra-performance .message-node__handle:hover,
+.message-node.message-node--ultra-performance .message-node__handle:focus {
+  transform: none !important; /* Anula el scale(1.2) */
+  box-shadow: none !important;
+  animation: none !important;
+  transition: none !important;
+}
+
+/* Override específico para la animación 'handlePulse' en .message-node__handle--target */
+.message-node.message-node--ultra-performance .message-node__handle--target:hover,
+.message-node.message-node--ultra-performance .message-node__handle--target:focus {
+  animation-name: none !important; /* Anula 'handlePulse' */
+  transform: none !important; /* Por si acaso también tiene transform */
+  box-shadow: none !important;
+  transition: none !important;
+}
+
+/* Si la clase .message-node__handle--ultra se usa específicamente en modo ultra */
+.message-node.message-node--ultra-performance .message-node__handle--ultra:hover,
+.message-node.message-node--ultra-performance .message-node__handle--ultra:focus {
+  transform: none !important;
+  box-shadow: none !important;
+  animation: none !important;
+  transition: none !important;
+}
+
+/* Alternativa usando body.ultra-mode si .message-node--ultra-performance no está en .message-node */
+body.ultra-mode .message-node .react-flow__handle.react-flow__handle:hover,
+body.ultra-mode .message-node .react-flow__handle.react-flow__handle:focus,
+body.ultra-mode .message-node .message-node__handle:hover,
+body.ultra-mode .message-node .message-node__handle:focus,
+body.ultra-mode .message-node .message-node__handle--target:hover,
+body.ultra-mode .message-node .message-node__handle--target:focus {
+  background-color: var(--handle-default-bg-color) !important; /* Fondo consistente */
+  filter: brightness(120%) !important; /* Brillo consistente en hover */
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important; /* Sombra consistente */
+  transform: translateX(-50%) !important; /* Asegurar/restaurar centrado */
+  animation: none !important; /* Mantener animaciones desactivadas */
+  transition: none !important; /* Mantener transiciones desactivadas */
+}
+
+/* ======================================================
+   MODO ULTRA RENDIMIENTO ESPECÍFICO POR TIPO
+   ====================================================== */
+
+.message-node--ultra-performance.message-node--user {
+  background: none;
+  background-color: rgba(59, 130, 246, 0.1);
+  border-color: #3b82f6;
+}
+
+.message-node--ultra-performance.message-node--bot {
+  background: none;
+  background-color: rgba(139, 92, 246, 0.1);
+  border-color: #8b5cf6;
+}
+
+.message-node--ultra-performance.message-node--system {
+  background: none;
+  background-color: rgba(99, 102, 241, 0.1);
+  border-color: #6366f1;
+}
+
+.message-node--ultra-performance.message-node--error {
+  background: none;
+  background-color: rgba(239, 68, 68, 0.1);
+  border-color: #ef4444;
+}
+
+.message-node--ultra-performance.message-node--warning {
+  background: none;
+  background-color: rgba(245, 158, 11, 0.1);
+  border-color: #f59e0b;
+}
+
+.message-node--ultra-performance.message-node--info {
+  background: none;
+  background-color: rgba(14, 165, 233, 0.1);
+  border-color: #0ea5e9;
+}
+
+.message-node--ultra-performance.message-node--question {
+  background: none;
+  background-color: rgba(168, 85, 247, 0.1);
+  border-color: #a855f7;
+}
+
+/* ======================================================
+   ANIMACIONES
+   ====================================================== */
+
+/* Animación de aparición del nodo */
+@keyframes nodeAppear {
+  0% {
+    opacity: 0;
+    transform: translateY(10px) scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Animación de pulso para nodos seleccionados */
+@keyframes selectedPulse {
+  0% {
+    box-shadow:
+      0 0 0 0 rgba(var(--message-node-primary-rgb), 0.4),
+      0 0 0 2px rgba(var(--message-node-primary-rgb), 0.5);
+  }
+  70% {
+    box-shadow:
+      0 0 0 10px rgba(var(--message-node-primary-rgb), 0),
+      0 0 0 2px rgba(var(--message-node-primary-rgb), 0.5);
+  }
+  100% {
+    box-shadow:
+      0 0 0 0 rgba(var(--message-node-primary-rgb), 0),
+      0 0 0 2px rgba(var(--message-node-primary-rgb), 0.5);
+  }
+}
+
+/* Animación de pulso para nodos con error */
+@keyframes errorPulse {
+  0% {
+    box-shadow:
+      0 0 0 0 rgba(239, 68, 68, 0.4),
+      0 0 0 2px rgba(239, 68, 68, 0.5);
+  }
+  70% {
+    box-shadow:
+      0 0 0 10px rgba(239, 68, 68, 0),
+      0 0 0 2px rgba(239, 68, 68, 0.5);
+  }
+  100% {
+    box-shadow:
+      0 0 0 0 rgba(239, 68, 68, 0),
+      0 0 0 2px rgba(239, 68, 68, 0.5);
+  }
+}
+
+/* Animación de pulso para conectores */
+@keyframes handlePulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(var(--message-node-primary-rgb), 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 5px rgba(var(--message-node-primary-rgb), 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(var(--message-node-primary-rgb), 0);
+  }
+}
+
+/* Animación de pulso para iconos */
+@keyframes iconPulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Animación de onda para botones */
+@keyframes ripple {
+  0% {
+    transform: scale(0, 0);
+    opacity: 0.5;
+  }
+  20% {
+    transform: scale(25, 25);
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(40, 40);
+  }
+}
+
+/* Animación de aparición del menú */
+@keyframes menuAppear {
+  0% {
+    opacity: 0;
+    transform: translateY(5px) scale(0.98);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Animación para puntos de carga */
+@keyframes loadingDot {
+  0%,
+  80%,
+  100% {
+    transform: scale(0.6);
+    opacity: 0.6;
+  }
+  40% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* ======================================================
+   SOPORTE PARA DISPOSITIVOS MÓVILES
+   ====================================================== */
+
+@media (max-width: 768px) {
+  .message-node {
+    width: 100%;
+    max-width: 280px;
+    padding: 0.75rem;
+  }
+
+  .message-node__title {
+    font-size: 0.875rem;
+  }
+
+  .message-node__icon {
+    width: 20px;
+    height: 20px;
+  }
+
+  .message-node__actions {
+    flex-wrap: wrap;
+  }
+
+  .message-node__button {
+    padding: 0.3rem 0.6rem;
+    font-size: 0.7rem;
+  }
+}
+
+/* ======================================================
+   ACCESIBILIDAD
+   ====================================================== */
+
+/* Clase para elementos visibles solo para lectores de pantalla */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Mejora de contraste para texto */
+.high-contrast .message-node {
+  --message-node-text: #000000;
+  --message-node-text-secondary: #0047ab;
+  --message-node-text-muted: #505050;
+  border-width: 3px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .high-contrast .message-node {
+    --message-node-text: #ffffff;
+    --message-node-text-secondary: #6cb4ee;
+    --message-node-text-muted: #aaaaaa;
+  }
+}
+
+/* Soporte para navegación por teclado */
+.message-node *:focus-visible {
+  outline: var(--message-node-focus-outline);
+  outline-offset: var(--message-node-focus-outline-offset);
+  z-index: 2;
+}
+
+/* Soporte para tamaño de texto aumentado */
+.large-text .message-node {
+  --message-node-font-size: 1rem;
+  --message-node-font-size-small: 0.875rem;
+  --message-node-font-size-title: 1.125rem;
+  line-height: 1.6;
+}
+
+/* Soporte para reducción de movimiento */
+@media (prefers-reduced-motion: reduce) {
+  .message-node,
+  .message-node * {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+/* ======================================================
+   UTILIDADES
+   ====================================================== */
+
+/* Clase para ocultar elementos */
+.message-node__hidden {
+  display: none !important;
+}
+
+/* Clase para elementos visualmente ocultos pero accesibles */
+.message-node__visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Clase para texto truncado */
+.message-node__truncate {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Clase para texto con ajuste de línea */
+.message-node__wrap {
+  white-space: normal;
+  word-break: break-word;
+}
+
+/* Clase para elementos flexibles */
+.message-node__flex {
+  display: flex;
+  align-items: center;
+}
+
+/* Clase para espaciado entre elementos */
+.message-node__gap {
+  gap: var(--message-node-gap);
+}
+
+/* Clase para elementos centrados */
+.message-node__center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Clase para elementos con ancho completo */
+.message-node__full-width {
+  width: 100%;
+}
+
+/* Clase para elementos con altura completa */
+.message-node__full-height {
+  height: 100%;
+}
+
+/* Clase para elementos con posición relativa */
+.message-node__relative {
+  position: relative;
+}
+
+/* Clase para elementos con posición absoluta */
+.message-node__absolute {
+  position: absolute;
+}
+
+/* Clase para elementos con z-index alto */
+.message-node__z-top {
+  z-index: 10;
+}
+
+/* Clase para elementos con bordes redondeados */
+.message-node__rounded {
+  border-radius: var(--message-node-border-radius);
+}
+
+/* Clase para elementos con sombra */
+.message-node__shadow {
+  box-shadow: var(--message-node-shadow);
+}
+
+/* Clase para elementos con transición */
+.message-node__transition {
+  transition: var(--message-node-transition);
+}
+
+/* Clase para elementos con animación */
+.message-node__animate {
+  animation: nodeAppear var(--message-node-animation-duration) cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* Clase para elementos con cursor pointer */
+.message-node__clickable {
+  cursor: pointer;
+}
+
+/* Clase para elementos con cursor move */
+.message-node__draggable {
+  cursor: move;
+}
+
+/* Clase para elementos con cursor text */
+.message-node__editable {
+  cursor: text;
+}
+
+/* Clase para elementos con cursor not-allowed */
+.message-node__disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* Clase para elementos con cursor help */
+.message-node__help {
+  cursor: help;
+}
+
+/* Clase para elementos con cursor wait */
+.message-node__loading {
+  cursor: wait;
+}
+
+/* Clase para elementos con cursor grab */
+.message-node__grabbable {
+  cursor: grab;
+}
+
+/* Clase para elementos con cursor grabbing */
+.message-node__grabbing {
+  cursor: grabbing;
+}
+
+/* ======================================================
+   ESTILOS ESPECÍFICOS DEL EDITOR DE VARIABLES (VariableEditor.jsx)
+   ====================================================== */
+
+.message-node__variables-editor {
+  /* Estilos para el contenedor principal del editor de variables si son necesarios */
+  /* Por ejemplo, asegurar que ocupe el ancho completo si está dentro de otro contenedor */
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.message-node__variable-add {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  width: 100%;
+  padding: 0.5rem 0; /* Ajustar padding según sea necesario */
+  box-sizing: border-box;
+}
+
+.message-node__variable-add .message-node__variable-input {
+  flex-grow: 1; /* Permitir que los inputs crezcan */
+  /* box-sizing: border-box; ya está aplicado en la regla general .message-node__variable-input */
+}
+
+/* Estilos base para los botones dentro del editor de variables */
+.message-node__variable-button {
+  padding: 0.35rem 0.75rem;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  font-size: var(--message-node-font-size-small, 0.75rem);
+  font-weight: var(--message-node-font-weight-medium, 500);
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease-in-out,
+    border-color 0.2s ease-in-out;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+  box-sizing: border-box; /* CRUCIAL */
+  transition:
+    background-color 0.2s ease-in-out,
+    border-color 0.2s ease-in-out;
+}
+
+.message-node__variable-button:hover {
+  filter: brightness(90%);
+}
+
+.message-node__variable-button:focus-visible {
+  outline: var(
+    --message-node-focus-outline
+  ); /* Cambiado de 2px solid var(--message-node-primary) */
+  outline-offset: var(
+    --message-node-focus-outline-offset
+  ); /* Asegurando consistencia, aunque 1px es el valor de la variable */
+  background-color: rgba(var(--message-node-primary-rgb), 0.1);
+}
+
+.message-node__variable-button:active {
+  filter: brightness(80%);
+  transform: scale(0.95);
+}
+
+.message-node__variable-button--save,
+.message-node__variable-button--add {
+  background-color: var(--message-node-primary, #3b82f6);
+  color: #ffffff;
+}
+
+.message-node__variable-button--save:hover,
+.message-node__variable-button--add:hover {
+  background-color: var(--message-node-primary-hover, #2563eb);
+}
+
+/* Botón de Cancelar (generalmente secundario o de texto) */
+.message-node__variable-button--cancel {
+  background-color: transparent;
+  color: var(--message-node-text-secondary, #475569);
+  border: 1px solid var(--message-node-border-color, #cbd5e1);
+}
+
+.message-node__variable-button--cancel:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+  border-color: var(--message-node-text-secondary, #475569);
+  color: var(--message-node-text-primary, #1e293b);
+}
+
+/* Ajustes para el layout de edición de una variable existente */
+.message-node__variable-edit {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.message-node__variable-edit .message-node__variable-input {
+  flex-grow: 1;
+}
+
+.message-node__variable-edit .message-node__variable-actions {
+  display: flex;
+  gap: 0.25rem;
+  flex-shrink: 0; /* Evitar que los botones se encojan */
+}
+
+/* Styles for the help icon next to the 'Variables' title */
+.message-node__help-icon {
+  color: var(--message-node-text-tertiary, #94a3b8);
+  transition: color 0.2s ease-in-out;
+  margin-left: 4px; /* Space between title and icon */
+  cursor: help; /* Indicates it's a help element */
+}
+
+.message-node__help-icon:hover {
+  color: var(--message-node-primary, #3b82f6);
+}
+
+/* Estilos minimalistas para el formulario de agregar variables */
+.message-node__variable-form--modern {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem;
+  background: rgba(var(--message-node-primary-rgb), 0.03);
+  border: 1px solid rgba(var(--message-node-primary-rgb), 0.1);
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  margin-top: 0.5rem;
+  width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.message-node__variable-form--modern:hover {
+  background: rgba(var(--message-node-primary-rgb), 0.05);
+  border-color: rgba(var(--message-node-primary-rgb), 0.15);
+}
+
+/* Grupo de inputs horizontales minimalistas */
+.message-node__input-group {
+  display: flex;
+  gap: 0.4rem;
+  flex: 1;
+  min-width: 0;
+}
+
+/* Inputs minimalistas que mantienen proporción horizontal */
+.message-node__variable-input--modern {
+  flex: 1;
+  padding: 0.35rem 0.5rem;
+  border: 1px solid rgba(var(--message-node-primary-rgb), 0.2);
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.9);
+  font-size: 0.75rem;
+  transition: all 0.2s ease;
+  outline: none;
+  min-width: 0;
+  max-width: none;
+}
+
+.message-node__variable-input--modern:focus {
+  border-color: var(--message-node-primary);
+  background: rgba(255, 255, 255, 1);
+  box-shadow: 0 0 0 2px rgba(var(--message-node-primary-rgb), 0.1);
+}
+
+.message-node__variable-input--modern::placeholder {
+  color: var(--message-node-text-muted);
+  opacity: 0.6;
+  font-size: 0.7rem;
+}
+
+/* Botón minimalista de guardar - compacto y horizontal */
+.message-node__variable-btn--modern {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  padding: 0.35rem 0.6rem;
+  background: var(--message-node-primary);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  flex-shrink: 0;
+  min-width: fit-content;
+}
+
+/* Botón de solo ícono - más compacto */
+.message-node__variable-btn--icon-only {
+  padding: 0.4rem;
+  min-width: auto;
+  width: auto;
+  aspect-ratio: 1;
+}
+
+.message-node__variable-btn--modern:hover:not(:disabled) {
+  background: var(--message-node-primary-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(var(--message-node-primary-rgb), 0.2);
+}
+
+.message-node__variable-btn--modern:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.message-node__variable-btn--modern:disabled {
+  background: var(--message-node-text-muted);
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.message-node__btn-text {
+  font-weight: 500;
+  font-size: 0.75rem;
+}
+
+/* Estilos para funcionalidad de drag & drop de variables */
+.message-node__variable-info--draggable {
+  cursor: grab !important;
+  transition: all 0.2s ease;
+  position: relative;
+  user-select: none;
+}
+
+.message-node__variable-info--draggable * {
+  cursor: grab !important;
+  user-select: none;
+}
+
+.message-node__variable-info--draggable:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(var(--message-node-primary-rgb), 0.15);
+  background: rgba(var(--message-node-primary-rgb), 0.05);
+  cursor: grab !important;
+}
+
+.message-node__variable-info--draggable:active {
+  cursor: grabbing !important;
+}
+
+.message-node__variable-info--draggable:active * {
+  cursor: grabbing !important;
+}
+
+.message-node__variable--dragging {
+  opacity: 0.6;
+  transform: rotate(2deg) scale(0.95);
+  z-index: 1000;
+}
+
+/* Indicador visual para drag & drop */
+.message-node__variable-info--draggable::after {
+  content: '🖱️ Arrastra aquí o Ctrl+Click';
+  position: absolute;
+  top: -28px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.9);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+  z-index: 1001;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.message-node__variable-info--draggable:hover::after {
+  opacity: 1;
+}
+
+/* Estilos para el textarea cuando se arrastra una variable sobre él */
+.message-node__textarea--drag-over {
+  border-color: var(--message-node-primary) !important;
+  background: rgba(var(--message-node-primary-rgb), 0.05) !important;
+  box-shadow: 0 0 0 2px rgba(var(--message-node-primary-rgb), 0.2) !important;
+}
+
+/* Animación sutil para indicar que las variables son interactivas */
+@keyframes variable-pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(var(--message-node-primary-rgb), 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 3px rgba(var(--message-node-primary-rgb), 0.1);
+  }
+}
+
+.message-node__variable-info--draggable:focus-visible {
+  animation: variable-pulse 1.5s ease-in-out;
+}
+
+/* Estilos para el sistema de drag & drop premium */
+.message-node__premium-drag-preview {
+  position: fixed;
+  z-index: 10000;
+  pointer-events: none;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 8px;
+  padding: 8px 12px;
+  color: white;
+  font-size: 0.8rem;
+  font-weight: 500;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(10px);
+  transform: rotate(-2deg) scale(1.05);
+  transition: transform 0.1s ease;
+  min-width: 120px;
+}
+
+.drag-preview-variable {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.drag-preview-name {
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.drag-preview-arrow {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.7rem;
+}
+
+.drag-preview-value {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.75rem;
+}
+
+/* Animación para el elemento original durante el drag */
+.message-node__variable-info--dragging {
+  opacity: 0.3 !important;
+  transform: scale(0.95) !important;
+  transition: all 0.2s ease !important;
+}
+
+/* Deshabilitar drag del nodo cuando se arrastra una variable */
+.react-flow__node-dragging-disabled {
+  pointer-events: none !important;
+}
+
+.react-flow__node-dragging-disabled .message-node__variable-info--draggable {
+  pointer-events: all !important;
+  z-index: 9999 !important;
+  position: relative;
+}
+
+/* Animación para el indicador de inserción */
+@keyframes insertion-pulse {
+  0% { 
+    opacity: 1;
+    transform: scaleY(1);
+    box-shadow: 0 0 8px rgba(102, 126, 234, 0.6);
+  }
+  50% { 
+    opacity: 0.7;
+    transform: scaleY(1.1);
+    box-shadow: 0 0 12px rgba(102, 126, 234, 0.8);
+  }
+  100% { 
+    opacity: 1;
+    transform: scaleY(1);
+    box-shadow: 0 0 8px rgba(102, 126, 234, 0.6);
+  }
+}
+
+/* Estilos para el indicador de inserción */
+.insertion-indicator {
+  position: absolute;
+  width: 2px;
+  height: 20px;
+  background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+  border-radius: 1px;
+  box-shadow: 0 0 8px rgba(102, 126, 234, 0.6);
+  z-index: 1000;
+  animation: insertion-pulse 1s ease-in-out infinite;
+  pointer-events: none;
+  transition: all 0.1s ease;
+}

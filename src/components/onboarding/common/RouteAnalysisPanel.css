@@ -1,0 +1,53 @@
+.ts-route-analysis-panel {
+  position: absolute;
+  top: 4rem;
+  right: 1rem;
+  background: rgba(18, 18, 40, 0.7);
+  backdrop-filter: blur(10px);
+  padding: 1rem;
+  border-radius: 8px;
+  border: 1px solid #00e0ff;
+  z-index: 1002;
+  box-shadow:
+    0 0 8px #00e0ff,
+    0 0 12px #ff00ff;
+  width: 300px;
+}
+
+.ts-route-analysis-panel .ts-panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.ts-route-analysis-panel .ts-panel-header h3 {
+  color: #00e0ff;
+  margin: 0;
+  font-size: 1rem;
+}
+
+.ts-route-analysis-panel .ts-panel-header button {
+  background: transparent;
+  border: none;
+  color: #e0e0ff;
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+
+.ts-route-analysis-panel .ts-panel-header button:hover {
+  color: #ff2e5b;
+}
+
+.ts-route-analysis-panel .ts-analysis-results {
+  color: #e0e0ff;
+  font-size: 0.9rem;
+}
+
+.ts-route-analysis-panel .ts-analysis-results p {
+  margin: 0.3rem 0;
+}
+
+.ts-route-analysis-panel .ts-analysis-results strong {
+  color: #00e0ff;
+}

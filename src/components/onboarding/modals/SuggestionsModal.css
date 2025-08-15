@@ -1,0 +1,121 @@
+.ts-suggestions-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(18, 18, 40, 0.3);
+  backdrop-filter: blur(10px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1003;
+}
+
+.ts-suggestions-modal {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(18, 18, 40, 0.85);
+  backdrop-filter: blur(10px);
+  padding: 2rem;
+  border-radius: 8px;
+  border: 1px solid #00e0ff;
+  box-shadow:
+    0 0 8px #00e0ff,
+    0 0 12px #ff00ff;
+  width: 500px;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.ts-suggestions-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.ts-suggestions-modal-header h3 {
+  color: #00e0ff;
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.ts-close-button {
+  background: none;
+  border: none;
+  color: #00e0ff;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.ts-close-button:hover {
+  color: #ffb700;
+}
+
+.ts-suggestions-modal-content {
+  margin: 1rem 0;
+}
+
+.ts-suggestion-item {
+  background: #171727;
+  padding: 1rem;
+  border-radius: 8px;
+  border: 2px solid #ffb700;
+  margin-bottom: 1rem;
+  transition: all 0.3s ease;
+}
+
+.ts-suggestion-item:hover {
+  background: #ffb700;
+  color: #0a0a14;
+  box-shadow:
+    0 0 8px #00e0ff,
+    0 0 12px #ff00ff;
+}
+
+.ts-suggestion-item p {
+  color: #e0e0ff;
+  margin: 0 0 0.5rem 0;
+  font-size: 0.9rem;
+}
+
+.ts-apply-suggestion-btn {
+  background: #171727;
+  color: #00e0ff;
+  border: 2px solid #00e0ff;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.ts-apply-suggestion-btn:hover {
+  background: #00e0ff;
+  color: #0a0a14;
+  box-shadow: 0 0 8px #00e0ff;
+}
+
+.ts-suggestions-modal-footer {
+  text-align: right;
+  margin-top: 1rem;
+}
+
+.ts-close-modal-btn {
+  background: #171727;
+  color: #00e0ff;
+  border: 2px solid #00e0ff;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.ts-close-modal-btn:hover {
+  background: #00e0ff;
+  color: #0a0a14;
+  box-shadow: 0 0 8px #00e0ff;
+}

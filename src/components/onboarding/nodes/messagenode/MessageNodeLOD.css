@@ -1,0 +1,177 @@
+/* ======================================================
+   LOD (LEVEL OF DETAIL) STYLES
+   ====================================================== */
+
+/*
+ * NOTA: El modo "ultra-performance" en MessageNode.css ha sido reemplazado por este sistema LOD.
+ * Las clases .message-node--ultra-performance se consideran obsoletas y se eliminarán en el futuro.
+ */
+
+/* Vista Compacta (LOD 1) */
+.message-node--compact {
+  display: flex;
+  align-items: center;
+  padding: 0.5rem; /* 8px */
+  gap: 0.5rem; /* 8px */
+  width: 180px; /* Ancho fijo para consistencia */
+  height: 52px; /* Altura fija */
+  contain: content;
+  overflow: hidden; /* Evita que los hijos se desborden */
+}
+
+/* La vista compacta debe heredar el color de fondo del nodo base */
+.message-node--compact[data-message-type="user"] {
+  background: var(--message-node-bg-user);
+}
+.message-node--compact[data-message-type="bot"] {
+  background: var(--message-node-bg-bot);
+}
+.message-node--compact[data-message-type="system"] {
+  background: var(--message-node-bg-system);
+}
+.message-node--compact[data-message-type="error"] {
+  background: var(--message-node-bg-error);
+}
+.message-node--compact[data-message-type="warning"] {
+  background: var(--message-node-bg-warning);
+}
+.message-node--compact[data-message-type="info"] {
+  background: var(--message-node-bg-info);
+}
+.message-node--compact[data-message-type="question"] {
+  background: var(--message-node-bg-question);
+}
+
+.message-node__compact-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  overflow: hidden;
+  flex-grow: 1;
+  color: var(--message-node-text-primary);
+}
+
+.message-node__compact-title {
+  font-size: var(--message-node-font-size-small); /* 12px */
+  font-weight: var(--message-node-font-weight-semibold);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.message-node__compact-preview {
+  font-size: 0.6875rem; /* 11px */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--message-node-text-muted);
+}
+
+/* El icono en modo compacto reutiliza estilos base pero con tamaño ajustado */
+.message-node--compact .message-node__icon {
+  padding: 4px;
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+}
+
+.message-node--compact .message-node__icon-svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* Vista Mini (LOD 2) */
+.message-node--mini {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  contain: content;
+}
+
+/* La vista mini también debe heredar el color de fondo */
+.message-node--mini[data-message-type="user"] {
+  background: var(--message-node-bg-user);
+}
+.message-node--mini[data-message-type="bot"] {
+  background: var(--message-node-bg-bot);
+}
+.message-node--mini[data-message-type="system"] {
+  background: var(--message-node-bg-system);
+}
+.message-node--mini[data-message-type="error"] {
+  background: var(--message-node-bg-error);
+}
+.message-node--mini[data-message-type="warning"] {
+  background: var(--message-node-bg-warning);
+}
+.message-node--mini[data-message-type="info"] {
+  background: var(--message-node-bg-info);
+}
+.message-node--mini[data-message-type="question"] {
+  background: var(--message-node-bg-question);
+}
+
+/* El icono en modo mini es el único elemento visible */
+.message-node--mini .message-node__icon {
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit; /* Hereda el borde redondeado del nodo */
+  background: none;
+  box-shadow: none;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.message-node--mini .message-node__icon-svg {
+  width: 22px; /* Ligeramente más grande para llenar el espacio */
+  height: 22px;
+  color: var(--message-node-text-secondary); /* Usa color de acento para visibilidad */
+}
+
+/* Ocultar elementos no necesarios en vistas LOD */
+.message-node--compact .message-node__header,
+.message-node--compact .message-node__content,
+.message-node--compact .message-node__footer,
+.message-node--mini .message-node__header,
+.message-node--mini .message-node__content,
+.message-node--mini .message-node__footer,
+.message-node--mini .message-node__compact-content {
+  display: none !important; /* Usar !important para asegurar que se sobreescriba */
+}
+
+/* Posicionamiento de Handles en todos los LODs */
+/* Aseguramos que los handles sean visibles y funcionales */
+.message-node--compact .react-flow__handle,
+.message-node--mini .react-flow__handle {
+  width: 10px !important;
+  height: 10px !important;
+  background-color: var(--message-node-border-hover-color) !important;
+  border: 1px solid white !important;
+  z-index: 20; /* Por encima de todo */
+}
+
+.message-node--compact .react-flow__handle-top,
+.message-node--mini .react-flow__handle-top {
+  top: -5px !important;
+}
+
+.message-node--compact .react-flow__handle-bottom,
+.message-node--mini .react-flow__handle-bottom {
+  bottom: -5px !important;
+}
+
+.message-node--compact .react-flow__handle-left,
+.message-node--mini .react-flow__handle-left {
+  left: -5px !important;
+}
+
+.message-node--compact .react-flow__handle-right,
+.message-node--mini .react-flow__handle-right {
+  right: -5px !important;
+}

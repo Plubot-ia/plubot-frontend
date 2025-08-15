@@ -1,0 +1,1838 @@
+/* DecisionNode.css - Versión Elite 5.0 */
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
+
+:root {
+  --node-decision-primary-start: #4f46e5;
+  --node-decision-primary-end: #2563eb;
+  --node-decision-primary-accent-rgb: 99, 102, 241;
+  --node-decision-primary-accent-color: rgba(var(--node-decision-primary-accent-rgb), 1);
+  --node-decision-text-color: #ffffff;
+  --node-decision-text-secondary-color: #e0e7ff;
+  --node-decision-bg-gradient: linear-gradient(
+    145deg,
+    var(--node-decision-primary-start),
+    var(--node-decision-primary-end)
+  );
+  --node-decision-border-color: rgba(255, 255, 255, 0.2);
+  --node-decision-border-color-hover: rgba(255, 255, 255, 0.4);
+  --node-decision-inner-bg: rgba(255, 255, 255, 0.05);
+  --node-decision-shadow-base: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
+  --node-decision-shadow-hover:
+    0 10px 15px -3px rgba(0, 0, 0, 0.15), 0 4px 6px -2px rgba(0, 0, 0, 0.1);
+  --node-decision-shadow-selected:
+    0 0 0 3px rgba(var(--node-decision-primary-accent-rgb), 0.5),
+    0 10px 20px rgba(var(--node-decision-primary-accent-rgb), 0.2);
+  --node-decision-font-family:
+    "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --node-decision-font-size: 14px;
+  --node-decision-font-size-small: 12px;
+  --node-decision-font-weight-normal: 400;
+  --node-decision-font-weight-medium: 500;
+  --node-decision-font-weight-semibold: 600;
+  --node-decision-border-radius: 12px;
+  --node-decision-padding: 20px;
+  --node-decision-gap: 12px;
+  --node-decision-input-radius: 8px;
+  --node-decision-button-radius: 6px;
+  --node-decision-transition-duration: 0.2s;
+  --node-decision-transition-timing: ease-in-out;
+  --node-decision-input-bg: #ffffff; /* Fondo blanco opaco para inputs */
+  --node-decision-input-text-color: #333333; /* Texto oscuro para contraste en input claro */
+  --node-decision-input-placeholder-color: #aaaaaa;
+  --node-decision-input-border-color: #d1d5db; /* Borde gris claro para input */
+  --node-decision-input-bg-focus: #ffffff; /* Mantener fondo blanco en focus */
+  --node-decision-input-border-focus-color: var(
+    --node-decision-primary-start,
+    #4f46e5
+  ); /* Borde de acento en focus */
+  --node-decision-ultra-bg: #ebf4ff;
+  --node-decision-ultra-border-color: #bee3f8;
+  --node-decision-ultra-text-color: #2c5282;
+  --node-decision-ultra-padding: 16px;
+  --node-decision-ultra-border-width: 1px;
+  --node-decision-true-rgb: 34, 197, 94;
+  --node-decision-false-rgb: 239, 68, 68;
+  --node-decision-default-rgb: var(--node-decision-primary-accent-rgb);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --node-decision-primary-start: #3730a3;
+    --node-decision-primary-end: #1d4ed8;
+    --node-decision-primary-accent-rgb: 79, 70, 229;
+    --node-decision-text-color: #f3f4f6;
+    --node-decision-text-secondary-color: #9ca3af;
+    --node-decision-border-color: rgba(255, 255, 255, 0.15);
+    --node-decision-border-color-hover: rgba(255, 255, 255, 0.3);
+    --node-decision-inner-bg: rgba(0, 0, 0, 0.1);
+    --node-decision-shadow-base: 0 4px 6px rgba(0, 0, 0, 0.2), 0 1px 3px rgba(0, 0, 0, 0.15);
+    --node-decision-shadow-hover:
+      0 10px 15px -3px rgba(0, 0, 0, 0.25), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
+    --node-decision-ultra-bg: #1e293b;
+    --node-decision-ultra-border-color: #334155;
+    --node-decision-ultra-text-color: #94a3b8;
+    --node-decision-bg-hover-overlay-dark: rgba(
+      255,
+      255,
+      255,
+      0.08
+    ); /* Nueva variable para overlay en hover oscuro */
+    /* Variables de input para modo oscuro */
+    --node-decision-input-bg: #ffffff; /* Fondo blanco para input en modo oscuro */
+    --node-decision-input-text-color: #222222; /* Texto oscuro para contraste con fondo blanco en modo oscuro */
+    --node-decision-input-placeholder-color: #757575; /* Placeholder gris medio en modo oscuro */
+    /* --node-decision-input-border-color: rgba(255, 255, 255, 0.2); Ya se define en :root y se hereda, o se puede sobreescribir si es necesario */
+    --node-decision-input-bg-focus: #ffffff; /* Mantener fondo blanco en focus en modo oscuro */
+    --node-decision-input-border-focus-color: var(
+      --node-decision-primary-accent-color-dark,
+      var(--node-decision-primary-accent-color)
+    );
+  }
+
+  /* Estilo de hover específico para modo oscuro */
+  .decision-node:hover {
+    /* Usar filter para aclarar también en modo oscuro, o ajustar el overlay si se prefiere */
+    filter: brightness(120%);
+    /* background: linear-gradient(var(--node-decision-bg-hover-overlay-dark), var(--node-decision-bg-hover-overlay-dark)), 
+                var(--node-decision-bg-gradient); */
+    /* Las propiedades transform, box-shadow y border-color se heredan o se definen aquí si es necesario */
+  }
+}
+
+.decision-node {
+  position: absolute !important; /* Asegurar que React Flow lo maneje correctamente */
+  background: var(--node-decision-bg-gradient);
+  border: 1px solid var(--node-decision-border-color);
+  border-radius: var(--node-decision-border-radius);
+  padding: var(--node-decision-padding);
+  box-shadow: var(--node-decision-shadow-base);
+  min-width: 250px;
+  min-height: 150px;
+  position: relative;
+  font-family: var(--node-decision-font-family);
+  font-size: var(--node-decision-font-size);
+  color: var(--node-decision-text-color);
+  transition: all var(--node-decision-transition-duration) var(--node-decision-transition-timing);
+  overflow: visible;
+  display: flex;
+  flex-direction: column;
+  gap: var(--node-decision-gap);
+  will-change: transform, box-shadow, opacity;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  backface-visibility: hidden;
+}
+
+@keyframes decisionNodeAppear {
+  0% {
+    opacity: 0;
+    transform: translateY(10px) scale(0.98);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+.decision-node {
+  animation: decisionNodeAppear 0.3s var(--node-decision-transition-timing) forwards;
+}
+
+.decision-node:hover {
+  transform: translateY(-2px) scale(1.01);
+  box-shadow: var(--node-decision-shadow-hover);
+  border-color: var(--node-decision-border-color-hover);
+  filter: brightness(110%); /* Aclarar el nodo en hover */
+}
+
+.decision-node.selected,
+.decision-node[data-selected="true"] {
+  box-shadow: var(--node-decision-shadow-selected);
+  transform: translateY(-1px) scale(1.005);
+  z-index: 10;
+}
+
+.decision-node.editing,
+.decision-node[data-editing="true"] {
+  box-shadow: var(--node-decision-shadow-selected);
+  z-index: 20;
+}
+
+.decision-node.ultra-performance {
+  background: var(--node-decision-ultra-bg);
+  border: var(--node-decision-ultra-border-width) solid var(--node-decision-ultra-border-color);
+  color: var(--node-decision-ultra-text-color);
+  box-shadow: none;
+  padding: var(--node-decision-ultra-padding);
+  animation: none !important;
+  transition: none !important;
+}
+
+.decision-node .react-flow__handle,
+.decision-node__handle {
+  cursor: pointer !important;
+}
+
+.decision-node.ultra-performance .react-flow__handle {
+  cursor: pointer !important;
+  background-color: var(--node-decision-ultra-text-color) !important;
+  border-color: var(--node-decision-ultra-bg) !important;
+  box-shadow: none !important;
+}
+
+.nodrag {
+  user-select: text !important;
+  -webkit-user-select: text !important;
+  -moz-user-select: text !important;
+  -ms-user-select: text !important;
+  cursor: text !important;
+}
+.react-flow__node-decision .nodrag::selection {
+  background-color: rgba(var(--node-decision-primary-accent-rgb), 0.3);
+  color: var(--node-decision-text-color);
+}
+.decision-node.ultra-performance .nodrag::selection {
+  background-color: rgba(var(--node-decision-ultra-text-color), 0.3);
+  color: var(--node-decision-ultra-bg);
+}
+
+.decision-node__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: var(--node-decision-gap);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: var(--node-decision-gap);
+}
+.decision-node.ultra-performance .decision-node__header {
+  border-bottom-color: rgba(var(--node-decision-ultra-text-color), 0.2);
+}
+
+.decision-node__title {
+  font-weight: var(--node-decision-font-weight-semibold);
+  font-size: calc(var(--node-decision-font-size) + 2px);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.decision-node__title svg {
+  width: 18px;
+  height: 18px;
+  color: var(--node-decision-primary-accent-color);
+}
+.decision-node.ultra-performance .decision-node__title svg {
+  color: var(--node-decision-ultra-text-color);
+}
+
+.decision-node__content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--node-decision-gap);
+}
+
+.decision-node__question-wrapper {
+  position: relative;
+  margin-top: 8px; /* Añadir espacio encima del textarea */
+  width: 100% !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+/* --- Formulario de nueva condición (Layout Fix) --- */
+.decision-node__condition-form {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  width: 100%;
+}
+
+.decision-node__condition-form .decision-node__condition-input {
+  flex-grow: 1; /* Permite que el input ocupe el espacio sobrante */
+  min-width: 0; /* Evita que el input se desborde en contenedores flex */
+}
+
+.decision-node__condition-form-actions {
+  display: flex;
+  flex-shrink: 0; /* Evita que los botones se encojan */
+  gap: 4px;
+}
+
+/* --- Formulario de nueva condición (Layout Fix) --- */
+.decision-node__condition-form {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  width: 100%;
+}
+
+.decision-node__condition-form .decision-node__condition-input {
+  flex-grow: 1; /* Permite que el input ocupe el espacio sobrante */
+  min-width: 0; /* Evita que el input se desborde en contenedores flex */
+}
+
+.decision-node__condition-form-actions {
+  display: flex;
+  flex-shrink: 0; /* Evita que los botones se encojan */
+  gap: 4px;
+}
+
+.decision-node__question-input,
+.decision-node__condition-input {
+  background-color: var(--node-decision-input-bg);
+  color: var(--node-decision-input-text-color);
+  border: 1px solid var(--node-decision-input-border-color);
+  border-radius: var(--node-decision-input-radius);
+  padding: 10px;
+  font-family: var(--node-decision-font-family);
+  font-size: var(--node-decision-font-size);
+  transition:
+    border-color var(--node-decision-transition-duration) var(--node-decision-transition-timing),
+    background-color var(--node-decision-transition-duration) var(--node-decision-transition-timing);
+  width: 100%;
+}
+.decision-node__question-input::placeholder,
+.decision-node__condition-input::placeholder {
+  color: var(--node-decision-input-placeholder-color);
+  opacity: 1; /* Firefox */
+}
+
+.decision-node__question-input:focus,
+.decision-node__condition-input:focus {
+  outline: none;
+  background-color: var(--node-decision-input-bg-focus);
+  border-color: var(--node-decision-input-border-focus-color);
+  box-shadow: 0 0 0 2px rgba(var(--node-decision-primary-accent-rgb, 60, 80, 220), 0.2); /* Usar fallback si la variable no está definida */
+}
+.decision-node.ultra-performance .decision-node__question-input {
+  background-color: #fff; /* Simplified */
+}
+.decision-node.ultra-performance .decision-node__condition-input {
+  background-color: #fff; /* Simplified */
+}
+.decision-node.ultra-performance .decision-node__question-input:focus,
+.decision-node.ultra-performance .decision-node__condition-input:focus {
+  border-color: var(--node-decision-ultra-text-color);
+}
+
+/* Estilo para resaltar variables {{variable}} */
+.variable-highlight {
+  background-color: rgba(var(--node-decision-primary-accent-rgb), 0.15);
+  color: var(
+    --node-decision-text-color
+  ); /* Asegurar contraste, podría ser un color de acento también */
+  padding: 1px 3px;
+  border-radius: 4px;
+  font-weight: var(--node-decision-font-weight-medium);
+  font-size: 0.95em; /* Ligeramente más pequeño para encajar bien */
+}
+
+.decision-node__conditions-list {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--node-decision-gap) / 2);
+  padding-bottom: 20px; /* Añadir espacio debajo de los botones de condición para los handles */
+}
+.decision-node__condition-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  background-color: transparent;
+  border-radius: var(--node-decision-input-radius);
+  transition: background-color var(--node-decision-transition-duration)
+    var(--node-decision-transition-timing);
+}
+.decision-node__condition-item:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+}
+.decision-node.ultra-performance .decision-node__condition-item:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.decision-node__button {
+  padding: 8px 12px; /* Simplified */
+}
+.decision-node__button:hover {
+  background-color: #3730a3;
+  transform: translateY(-1px);
+}
+.decision-node__button:active {
+  transform: translateY(0);
+}
+.decision-node__button--secondary {
+  background-color: var(--node-decision-inner-bg);
+  border: 1px solid var(--node-decision-border-color);
+  color: var(--node-decision-text-secondary-color);
+}
+.decision-node__button--secondary:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-color: var(--node-decision-border-color-hover);
+}
+.decision-node.ultra-performance .decision-node__button {
+  background-color: var(--node-decision-ultra-text-color);
+  color: var(--node-decision-ultra-bg);
+}
+.decision-node.ultra-performance .decision-node__button:hover {
+  background-color: #1a365d;
+}
+.decision-node.ultra-performance .decision-node__button--secondary {
+  background-color: transparent;
+  border: 1px solid var(--node-decision-ultra-text-color);
+  color: var(--node-decision-ultra-text-color);
+}
+
+.decision-node__edit-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  width: 100%;
+  margin-top: 12px;
+}
+
+/*
+  ============================================================================
+  Estilos Definitivos para Botones de Acción (Primario y Secundario)
+  ============================================================================
+  NOTA: Se utilizan `!important` de forma estratégica para resolver un conflicto
+  persistente de especificidad que impedía la correcta visualización de los
+  botones. Esto asegura que los estilos definidos aquí tengan la máxima
+  prioridad y se apliquen consistentemente.
+*/
+
+/* Botón Primario (Guardar) - Estilo azul, prominente y con gradiente */
+.decision-node__button.decision-node__button--primary {
+  background-image: linear-gradient(rgb(37, 99, 235), rgb(30, 64, 175)) !important;
+  border: 1px solid rgb(30, 58, 138) !important;
+  box-shadow: rgba(30, 64, 175, 0.4) 0px 2px 4px 0px !important;
+  background-color: transparent !important; /* Forza la visualización del gradiente */
+  color: white !important;
+}
+
+.decision-node__button.decision-node__button--primary:hover {
+  filter: brightness(115%);
+}
+
+/* Botón Secundario (Cancelar) - Estilo sutil y sin relleno */
+.decision-node__button.decision-node__button--secondary {
+  background-color: transparent !important;
+  background-image: none !important;
+  color: var(--node-decision-text-secondary-color) !important;
+  border: 1px solid var(--node-decision-border-color) !important;
+  box-shadow: none !important;
+}
+
+.decision-node__button.decision-node__button--secondary:hover {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  border-color: var(--node-decision-border-color-hover) !important;
+}
+
+/* --- Target Handle (Entrada) --- */
+.decision-node
+  .decision-node__handle--target:not(
+    .decision-node--ultra-performance .decision-node__handle--target,
+    .decision-node__handle--ultra
+  ) {
+  width: var(--handle-default-size) !important;
+  height: var(--handle-default-size) !important;
+  background-color: var(--handle-default-bg-color) !important;
+  border: var(--handle-default-border-width) solid var(--handle-default-border-color) !important;
+  border-radius: 50% !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  top: var(--handle-default-offset) !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  cursor: pointer !important;
+  z-index: 10 !important;
+  transition:
+    background-color var(--node-decision-transition-duration) var(--node-decision-transition-timing),
+    filter var(--node-decision-transition-duration) var(--node-decision-transition-timing),
+    transform var(--node-decision-transition-duration) var(--node-decision-transition-timing),
+    box-shadow var(--node-decision-transition-duration) var(--node-decision-transition-timing);
+}
+
+.decision-node
+  .decision-node__handle--target:not(
+    .decision-node--ultra-performance .decision-node__handle--target,
+    .decision-node__handle--ultra
+  ):hover {
+  background-color: var(--handle-default-bg-color) !important;
+  filter: brightness(120%);
+  /* transform: scale(1.1) translateX(-50%); */ /* Ajustar si se quiere mantener el scale */
+}
+
+/* Modo Ultra Rendimiento para Handle de Entrada */
+.decision-node--ultra-performance .decision-node__handle--target,
+.decision-node .decision-node__handle--target.decision-node__handle--ultra {
+  width: var(--handle-ultra-size) !important;
+  height: var(--handle-ultra-size) !important;
+  background-color: var(--handle-ultra-bg-color) !important;
+  border: var(--handle-ultra-border-width) solid var(--handle-ultra-border-color) !important;
+  border-radius: 3px !important;
+  box-shadow: none !important;
+  top: var(--handle-ultra-offset) !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  opacity: 1 !important;
+  transition: none !important;
+  z-index: 10 !important;
+  cursor: pointer !important;
+}
+
+.decision-node--ultra-performance .decision-node__handle--target:hover,
+.decision-node .decision-node__handle--target.decision-node__handle--ultra:hover {
+  transform: translateX(-50%) !important; /* Asegurar que no haya scale en hover */
+  filter: none !important;
+}
+.decision-node .react-flow__handle.connecting {
+  background-color: #10b981;
+  box-shadow: 0 0 10px #10b981;
+}
+/* La regla anterior para .react-flow__handle[data-handlepos="top"].nodrag ha sido eliminada 
+   ya que el posicionamiento ahora está integrado en las reglas específicas para 
+   .decision-node__handle--target y su versión ultra. */
+/* === Standardized Source Handle Styles === */
+/* --- Source Handles (Salida) --- */
+/* Posición de los handles al borde del nodo */
+:root {
+  --handle-bottom-offset: -7.5px; /* Ajustado para centrar handles de 15px en el borde */
+}
+
+/* Contenedor de los handles de salida */
+.decision-node__handles-container {
+  /* Estilos base por si acaso, aunque principalmente se controlan por JSX */
+  position: absolute !important;
+  width: 100%;
+  left: 0;
+  right: 0;
+  height: 0;
+  overflow: visible;
+  bottom: -1px !important; /* Ajuste fino para eliminar gap visual */
+  z-index: 50;
+  transform: none !important;
+  transform-origin: center center !important;
+  transition: none !important;
+}
+
+/* DecisionNode Source Handles - Ahora controlados por estilos inline */
+div.react-flow__node-decision.selectable
+  .decision-node__handles-container
+  > .react-flow__handle.react-flow__handle-bottom.decision-node__handle:not(
+    .decision-node__handle--ultra
+  ) {
+  /* Estilos mínimos de respaldo */
+  position: absolute !important;
+  z-index: 50 !important;
+  transform: translateX(-50%) !important;
+  transform-origin: center center !important;
+  top: auto !important;
+  bottom: -7.5px !important;
+  transition: none !important;
+}
+
+/* Static position for 1st source handle */
+div.react-flow__node-decision.selectable
+  .decision-node__handles-container
+  > .react-flow__handle.react-flow__handle-bottom.decision-node__handle.decision-node__handle--source:not(
+    .decision-node__handle--ultra
+  ):nth-of-type(1) {
+  left: 35% !important;
+  /* Inherits bottom, transform, etc., from the base rule */
+}
+
+/* Intentamos sobreescribir los estilos que React Flow pueda aplicar durante el drag. */
+/* Regla para .decision-node__source-handles-wrapper en estado dragging eliminada para enfocar en los handles individuales. */
+
+/* BASE: Regla para TODOS los handles de salida durante el arrastre */
+div.react-flow__node-decision.dragging
+  .decision-node__handles-container
+  > .react-flow__handle.react-flow__handle-bottom.decision-node__handle.decision-node__handle--source:not(
+    .decision-node__handle--ultra
+  ) {
+  /* Todos los estilos se aplican directamente en el JSX */
+  z-index: 999 !important; /* Mantener z-index más alto durante el drag */
+  /* Anular cualquier transformación que React Flow pueda aplicar */
+  transform: translateX(-50%) !important;
+  /* Anular cualquier posición top que React Flow pueda aplicar */
+  top: auto !important;
+  bottom: -7.5px !important;
+  /* Anular cualquier transición que React Flow pueda aplicar */
+  transition: none !important;
+  position: absolute !important;
+  transform-origin: center center !important;
+}
+
+/* ESPECÍFICO: Regla para segundo handle y siguientes que reciben desplazamiento adicional de React Flow */
+/* REGLAS ESPECIALES PARA EL SEGUNDO HANDLE (ROSADO) */
+/* Forzar posicionamiento correcto para todos los handles */
+div.react-flow__node-decision
+  .decision-node__handles-container
+  > .react-flow__handle.react-flow__handle-bottom.decision-node__handle.decision-node__handle--source {
+  /* Anular cualquier transformación que React Flow pueda aplicar */
+  transform: translateX(-50%) !important;
+  /* Anular cualquier posición top que React Flow pueda aplicar */
+  top: auto !important;
+  /* Anular cualquier transición que React Flow pueda aplicar */
+  transition: none !important;
+  /* Asegurar que bottom sea respetado */
+  bottom: -7.5px !important;
+}
+
+/* REGLAS ESPECIALES PARA CUANDO SE ARRASTRA - REGLA PARA EL PRIMER HANDLE */
+
+/* Regla específica para el primer handle (azul) durante el arrastre */
+div.react-flow__node-decision.dragging
+  .decision-node__handles-container
+  > .react-flow__handle.react-flow__handle-bottom.decision-node__handle.decision-node__handle--source:nth-of-type(
+    1
+  ) {
+  /* Asegurar que el primer handle permanezca visible y con estilos correctos */
+  position: absolute !important;
+  /* background-color es manejado por DecisionNodeHandles.jsx */
+  z-index: 1000 !important;
+  width: var(--handle-default-size) !important;
+  height: var(--handle-default-size) !important;
+  bottom: -7.5px !important;
+  top: auto !important;
+  border: 2px solid #ffffff !important; /* Alineado con MessageNode */
+  box-shadow:
+    0 1px 3px 0 rgba(0, 0, 0, 0.2),
+    0 1px 1px 0 rgba(0, 0, 0, 0.14),
+    0 2px 1px -1px rgba(0, 0, 0, 0.12) !important; /* Actualizado para coincidir con MessageNode y anular mega-drag-fix */
+  border-radius: 50% !important;
+  opacity: 1 !important;
+  left: 35% !important;
+  transform: translateX(-50%) !important;
+  transform-origin: center center !important;
+  transition: none !important;
+}
+
+/* Modo Ultra Rendimiento para Handles de Salida */
+.decision-node .decision-node__handle--source.decision-node__handle--ultra {
+  position: absolute !important;
+  width: var(--handle-ultra-size) !important;
+  height: var(--handle-ultra-size) !important;
+  /* background-color es manejado por el estilo inline en DecisionNodeHandles.jsx */
+  border: none !important; /* Eliminar borde real */
+  border-radius: 50% !important; /* Asegurar que sea un círculo */
+  background-clip: padding-box !important; /* Evitar que el fondo se extienda debajo del box-shadow */
+  /* Simular borde con box-shadow: borde blanco exterior */
+  box-shadow: 0 0 0 var(--handle-ultra-border-width) var(--handle-default-border-color) !important;
+  bottom: var(--handle-ultra-offset) !important;
+  cursor: pointer !important;
+  z-index: 10 !important;
+  transition: none !important;
+  opacity: 1 !important;
+}
+
+.decision-node .decision-node__handle--source.decision-node__handle--ultra:hover {
+  filter: none !important;
+  box-shadow: none !important;
+}
+/* === End of Standardized Source Handle Styles === */
+/* Las propiedades flotantes que estaban aquí (bottom, top, transform, z-index, pointer-events) han sido eliminadas para corregir error de sintaxis. */
+/* Los estilos base de los handles se definen en otros lugares. */
+/* La llave extra que estaba aquí ha sido eliminada. */
+
+/* Ajuste específico para el SEGUNDO handle de salida (rojo/false) */
+/* Asume que el handle "true" es el primero en el DOM y "false" el segundo. */
+/* Se cambia decision-node__source-handles-wrapper a decision-node__handles-container */
+div.decision-node
+  div.decision-node__handles-container
+  > div.react-flow__handle.decision-node__handle--source:nth-of-type(2) {
+  /* Mueve el segundo handle más arriba para evitar solapamiento */
+  /* Nota: El posicionamiento vertical (bottom/top) ya está definido en los estilos inline del Handle y en las reglas generales. */
+  /* Este selector podría necesitar ajustes si la lógica de :nth-of-type se ve afectada por otros elementos dentro de __handles-container */
+  transform: translateX(-50%) translateY(-50%) !important; /* Compensación horizontal */
+}
+
+/* Si solo hay un handle, asegurar que mantenga la posición base. */
+/* :only-child es más robusto que depender de la no aplicación de :nth-of-type(2). */
+/* Se cambia decision-node__source-handles-wrapper a decision-node__handles-container */
+.decision-node
+  div.decision-node__handles-container
+  > .react-flow__handle.decision-node__handle--source:only-child {
+  transform: translateX(-50%) !important;
+}
+
+/* Estilos para el handle de condición verdadera (verde) */
+/* Handles para condiciones TRUE */
+.decision-node .react-flow__handle[data-handleid="true"] {
+  background-color: rgb(var(--node-decision-true-rgb)) !important;
+  border-color: rgb(var(--node-decision-true-rgb)) !important;
+  box-shadow: 0 0 0 2px rgba(var(--node-decision-true-rgb), 0.3) !important;
+}
+
+/* Estilos para el input de añadir/editar condición global */
+
+/* Estilo para el input inline dentro de ConditionItem */
+.decision-node__condition-input--inline {
+  flex-grow: 1;
+  background-color: rgba(255, 255, 255, 0.9);
+  color: var(--node-decision-input-text-color, #222222);
+  border: 1px solid var(--node-decision-input-border-focus-color, #4f46e5);
+  border-radius: var(--node-decision-input-radius, 6px);
+  padding: 4px 8px;
+  font-size: inherit; /* Usar el tamaño de fuente del contexto */
+  font-family: inherit;
+  box-shadow: 0 0 0 2px rgba(var(--node-decision-primary-accent-rgb, 60, 80, 220), 0.1);
+  margin-right: 8px; /* Espacio antes de los botones de acción */
+  min-width: 0; /* Permite que el input se encoja adecuadamente */
+}
+
+.decision-node__condition-input--inline:focus {
+  outline: none;
+  border-color: var(--node-decision-input-border-focus-color, #4f46e5);
+  box-shadow: 0 0 0 3px rgba(var(--node-decision-primary-accent-rgb, 60, 80, 220), 0.25);
+}
+
+/* Estilos para el handle de condición falsa (rojo) */
+.decision-node .react-flow__handle[data-handleid="false"] {
+  background-color: rgb(var(--node-decision-false-rgb)) !important;
+  border-color: rgb(var(--node-decision-false-rgb)) !important;
+  box-shadow: 0 0 0 2px rgba(var(--node-decision-false-rgb), 0.3) !important;
+}
+
+.decision-node-loading {
+  padding: var(--node-decision-padding);
+  color: var(--node-decision-text-secondary-color);
+  text-align: center;
+  font-family: var(--node-decision-font-family);
+}
+
+/* Estado hover - microinteracción elegante */
+.decision-node:hover {
+  transform: translateY(-3px) scale(1.01);
+  /* Gradiente mucho más claro y vibrante para el hover */
+  background: linear-gradient(145deg, #a7a1f8, #d8bbf8); /* Tonos pastel de violeta/lavanda */
+  box-shadow:
+    0 8px 22px rgba(124, 58, 237, 0.15),
+    0 4px 10px rgba(124, 58, 237, 0.1);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+/* Estado de edición - modo profesional */
+.decision-node.editing,
+.decision-node--editing {
+  box-shadow: var(--node-decision-shadow-selected); /* Similar a selected para destacar */
+  z-index: 20;
+  box-shadow:
+    0 12px 36px rgba(var(--node-decision-accent), 0.15),
+    0 0 0 3px rgba(var(--node-decision-accent), 0.3);
+  z-index: 20;
+  transform: translateY(-3px) scale(1.02);
+}
+
+.decision-node--editing::before {
+  opacity: 1;
+  background: linear-gradient(
+    to right bottom,
+    rgba(var(--node-decision-accent), 0.6),
+    rgba(var(--node-decision-accent), 0.2)
+  );
+}
+
+/* Modo Ultra Rendimiento - optimizado pero elegante */
+.decision-node.ultra-performance,
+.decision-node--ultra {
+  background: var(--node-decision-ultra-bg);
+  border: var(--node-decision-ultra-border-width) solid var(--node-decision-ultra-border-color);
+  color: var(--node-decision-ultra-text-color);
+  box-shadow: none;
+  padding: var(--node-decision-ultra-padding);
+  animation: none !important; /* Desactivar animaciones */
+  transition: none !important; /* Desactivar transiciones */
+}
+
+.decision-node.ultra-performance .react-flow__handle,
+.decision-node--ultra .react-flow__handle {
+  background-color: var(--node-decision-ultra-text-color) !important;
+  border-color: var(--node-decision-ultra-bg) !important;
+  box-shadow: none !important;
+}
+
+/* Estilo para textareas con nodrag */
+.nodrag {
+  user-select: text; /* Permite seleccionar texto */
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+  /* La propiedad 'resize' para textareas se maneja mejor directamente en el elemento o su clase específica */
+}
+
+.decision-node--ultra {
+  background: var(--node-decision-ultra-blue-bg);
+  border: var(--node-decision-ultra-blue-border-width) solid
+    var(--node-decision-ultra-blue-border-color);
+  color: var(--node-decision-ultra-blue-text-color);
+  box-shadow: var(--node-decision-ultra-blue-shadow);
+  padding: var(--node-decision-ultra-padding);
+  transition: var(--node-decision-ultra-transition); /* Should be 'none' */
+  animation: var(--node-decision-ultra-animation); /* Should be 'none' */
+  backdrop-filter: none;
+  gap: 0.5rem;
+  /* Optimizaciones para rendimiento */
+  will-change: auto;
+  transform: none;
+  filter: none;
+}
+
+.decision-node--ultra:hover {
+  transform: none;
+  box-shadow: var(--node-decision-ultra-blue-shadow); /* Ensure hover doesn't change ultra style */
+}
+
+.decision-node__max-conditions-warning {
+  background-color: var(--warning-bg-color, #fff3cd);
+  color: var(--warning-text-color, #664d03);
+  padding: 8px 12px;
+  border: 1px solid var(--warning-border-color, #ffc107);
+  border-radius: var(--border-radius-medium, 6px);
+  margin-top: 10px;
+  margin-bottom: 10px;
+  text-align: center;
+  font-size: 0.85rem;
+  position: relative; /* Para asegurar que esté dentro del flujo del nodo */
+  z-index: 10; /* Para que aparezca sobre otros elementos del contenido si es necesario */
+}
+
+/* Cabecera del nodo - diseño premium */
+.decision-node__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 0.75rem;
+  margin-bottom: var(--node-decision-gap);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  position: relative;
+}
+
+/* Efecto de línea de separación con gradiente */
+.decision-node__header::after {
+  content: "";
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(
+    to right,
+    transparent,
+    rgba(var(--node-decision-accent), 0.3),
+    transparent
+  );
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.decision-node:hover .decision-node__header::after,
+.decision-node--selected .decision-node__header::after,
+.decision-node--editing .decision-node__header::after {
+  opacity: 1;
+}
+
+.decision-node__title {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+  letter-spacing: -0.01em;
+  color: var(--text-secondary);
+  transition: color 0.2s ease;
+}
+
+.decision-node--selected .decision-node__title,
+.decision-node--editing .decision-node__title {
+  color: rgba(var(--node-decision-accent), 0.9);
+}
+
+/* Icono del nodo - diseño premium con efecto de profundidad */
+.decision-node__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: linear-gradient(
+    135deg,
+    rgba(var(--node-decision-accent), 0.15),
+    rgba(var(--node-decision-accent), 0.05)
+  );
+  color: rgba(var(--node-decision-accent), 0.9);
+  transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+  box-shadow: 0 2px 6px rgba(var(--node-decision-accent), 0.1);
+  position: relative;
+}
+
+/* Efecto de brillo en el icono */
+.decision-node__icon::after {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 0%, transparent 70%);
+  opacity: 0;
+  transition:
+    opacity 0.5s ease,
+    transform 0.5s ease;
+  transform: scale(0.5);
+  pointer-events: none;
+}
+
+.decision-node:hover .decision-node__icon::after {
+  opacity: 0.8;
+  transform: scale(1);
+}
+
+/* Animación para el icono */
+.decision-node__icon-svg {
+  animation: iconPulse 3s infinite alternate cubic-bezier(0.455, 0.03, 0.515, 0.955);
+}
+
+@keyframes iconPulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale(1.15);
+    opacity: 1;
+  }
+}
+
+/* Icono en modo ultra rendimiento */
+.decision-node__icon--ultra {
+  width: 22px;
+  height: 22px;
+  background: rgba(var(--node-decision-accent), 0.1);
+  box-shadow: none;
+  transition: none;
+}
+
+.decision-node__icon--ultra .decision-node__icon-svg {
+  animation: none;
+}
+
+/* Metadatos del nodo - diseño elegante */
+.decision-node__metadata {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 11px;
+  color: var(--text-tertiary);
+  transition: opacity 0.3s ease;
+}
+
+.decision-node:not(:hover) .decision-node__metadata {
+  opacity: 0.7;
+}
+
+/* Fecha del nodo */
+.decision-node__date {
+  white-space: nowrap;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  background: rgba(var(--node-decision-accent), 0.08);
+  padding: 2px 6px;
+  border-radius: 4px;
+  transition: background 0.2s ease;
+}
+
+.decision-node:hover .decision-node__date {
+  background: rgba(var(--node-decision-accent), 0.15);
+}
+
+/* Avatar del propietario */
+.decision-node__owner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: linear-gradient(
+    135deg,
+    rgba(var(--node-decision-accent), 0.2),
+    rgba(var(--node-decision-accent), 0.4)
+  );
+  color: white;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.decision-node:hover .decision-node__owner {
+  transform: scale(1.1);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
+}
+
+/* Contenido principal */
+.decision-node__content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 1;
+  align-items: stretch !important; /* Forzar que los hijos ocupen el ancho */
+}
+
+/* Estilos para la pregunta */
+.decision-node__question-wrapper {
+  position: relative;
+}
+
+.decision-node__question {
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.5;
+  padding: 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  background-color: rgba(255, 255, 255, 0.3);
+  min-height: 36px;
+  word-break: break-word;
+  text-align: left !important; /* Forzar alineación de texto a la izquierda */
+  width: 100%; /* Asegurar que ocupe el ancho disponible */
+}
+
+.decision-node__question:hover {
+  background-color: rgba(255, 255, 255, 0.5);
+}
+
+.decision-node--ultra .decision-node__question {
+  background-color: rgba(255, 255, 255, 0.2);
+  transition: var(--transition-none);
+}
+
+.decision-node--ultra .decision-node__question:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Wrapper para el componente de opciones, asegurar alineación a la izquierda */
+.decision-node__options-wrapper {
+  display: flex; /* Usar flex para controlar alineación del hijo */
+  justify-content: flex-start; /* Alinear el componente DecisionNodeOptions a la izquierda */
+  width: 100%; /* Asegurar que el wrapper ocupe el ancho completo */
+}
+
+.decision-node__question-input {
+  min-height: 60px;
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid var(--decision-border-normal);
+  background-color: white; /* Usar var(--node-decision-input-bg) si se quiere consistencia */
+  font-family:
+    "Inter",
+    system-ui,
+    -apple-system,
+    sans-serif;
+  color: var(--node-decision-input-text-color);
+  font-size: 14px;
+  line-height: 1.5;
+  resize: vertical;
+  box-shadow: var(--node-decision-shadow-input);
+  box-sizing: border-box !important;
+  width: 100% !important;
+}
+
+.decision-node__question-input:focus {
+  border-color: var(
+    --node-decision-input-border-focus-color,
+    #d97706
+  ); /* Usar variable con fallback */
+  box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.3); /* Considerar variable para esto también si existe */
+  outline: none; /* Buena práctica para estados de foco personalizados */
+}
+
+.decision-node__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.decision-node__button {
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  transition: background-color 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.decision-node__button--cancel {
+  background-color: #e5e7eb;
+  color: #4b5563;
+}
+
+.decision-node__button--cancel:hover {
+  background-color: #d1d5db;
+}
+
+.decision-node__button--save {
+  background-color: var(--decision-border-normal);
+  color: white;
+}
+
+.decision-node__button--save:hover {
+  background-color: #d97706;
+}
+
+.decision-node__button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Estilos para los conectores de salida (source) */
+
+/* Estilos base para todos los handles del DecisionNode (si no existen ya) */
+/* Si .decision-node__handle ya tiene estilos base, estos se pueden omitir o fusionar */
+.decision-node__handle {
+  width: 12px; /* Coincide con MessageNode */
+  height: 12px; /* Coincide con MessageNode */
+  border-radius: 50%;
+  position: absolute;
+  z-index: 10;
+  cursor: pointer;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+  /* El background y border se definirán en las variantes --target y --source */
+}
+
+/* Ajuste específico para handles source en DecisionNode */
+.decision-node__handle--source {
+  /* Forzar posición para eliminar gap con aristas */
+  margin-top: -1px !important;
+}
+
+.decision-node__handle:hover,
+.decision-node__handle:focus {
+  transform: scale(1.2);
+  outline: none;
+  /* El box-shadow específico se definirá en las variantes */
+}
+
+/* Estilos específicos para el conector de entrada (target) del DecisionNode */
+.decision-node__handle--target {
+  background-color: var(
+    --node-decision-accent,
+    #8b5cf6
+  ); /* Usar variable de acento o un morado default */
+  border: 2px solid #ffffff; /* Borde blanco como MessageNode */
+  top: -6px; /* Posición como MessageNode target handle */
+  left: 50%;
+  transform: translateX(-50%);
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.1),
+    0 2px 4px rgba(0, 0, 0, 0.1); /* Sombra inicial como MessageNode */
+}
+
+.decision-node__handle--target:hover,
+.decision-node__handle--target:focus {
+  /* Usar --node-decision-accent-rgb si existe, sino generar uno a partir de --node-decision-accent */
+  box-shadow: 0 0 0 3px rgba(var(--node-decision-accent-rgb, 139, 92, 246), 0.4); /* Sombra de hover/focus */
+}
+
+/* Estilos para los conectores de salida (source) */
+.decision-node__conditions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.decision-node__conditions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.decision-node__condition {
+  padding: 6px 8px;
+  background-color: rgba(255, 255, 255, 0.6);
+  border-radius: 6px;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  transition: background-color 0.2s ease;
+  cursor: pointer;
+  position: relative;
+  border: 1px solid transparent;
+}
+
+.decision-node__condition:hover {
+  background-color: rgba(255, 255, 255, 0.8);
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+.decision-node__condition--true {
+  border-left: 3px solid var(--condition-true-color);
+}
+
+.decision-node__condition--false {
+  border-left: 3px solid var(--condition-false-color);
+}
+
+.decision-node__condition--default {
+  border-left: 3px solid var(--condition-default-color);
+}
+
+.decision-node__condition--active {
+  background-color: rgba(255, 255, 255, 0.9);
+  border-color: rgba(0, 0, 0, 0.2);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.decision-node__condition--ultra {
+  background-color: rgba(255, 255, 255, 0.4);
+  padding: 4px 6px;
+  transition: var(--transition-none);
+  border-width: 0 0 0 2px;
+}
+
+.decision-node__condition--ultra:hover {
+  background-color: rgba(255, 255, 255, 0.4);
+}
+
+.decision-node__condition-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 6px;
+  color: rgba(0, 0, 0, 0.5);
+}
+
+.decision-node__condition-icon--true {
+  color: var(--condition-true-color);
+}
+
+.decision-node__condition-icon--false {
+  color: var(--condition-false-color);
+}
+
+.decision-node__condition-text {
+  color: var(--node-decision-input-text-color, #333333); /* Texto oscuro para contraste */
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.decision-node__condition-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.decision-node__condition:hover .decision-node__condition-actions {
+  opacity: 1;
+}
+
+/* Barra de acciones para botones Guardar/Cancelar */
+.decision-node__actions-toolbar {
+  display: flex;
+  justify-content: space-between; /* O 'flex-end' si solo quieres alinearlos a la derecha con espacio */
+  align-items: center;
+  gap: var(--node-decision-gap, 10px);
+  margin-top: calc(var(--node-decision-gap, 10px) * 1.5); /* Espacio arriba de los botones */
+  padding: 0 var(--node-decision-padding-sm, 8px); /* Alinear con el padding general si es necesario */
+}
+
+.decision-node__condition-button {
+  width: 22px;
+  height: 22px;
+  border-radius: 4px;
+  border: none;
+  background-color: rgba(0, 0, 0, 0.05);
+  color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.decision-node__condition-button:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+.decision-node__condition-button--edit:hover {
+  background-color: var(--condition-default-color);
+  color: white;
+}
+
+.decision-node__condition-button--delete:hover {
+  background-color: var(--condition-false-color);
+  color: white;
+}
+
+.decision-node__condition-button--confirm {
+  background-color: var(--condition-false-color);
+  color: white;
+}
+
+.decision-node__condition-button--move {
+  position: relative;
+}
+
+.decision-node__condition-move-buttons {
+  position: absolute;
+  display: none;
+  flex-direction: column;
+  top: -30px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: white;
+  border-radius: 4px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  z-index: 10;
+}
+
+.decision-node__condition-button--move:hover .decision-node__condition-move-buttons {
+  display: flex;
+}
+
+.decision-node__condition-move-button {
+  width: 24px;
+  height: 24px;
+  border: none;
+  background-color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.decision-node__condition-move-button:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.decision-node__condition-move-button:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.decision-node__add-condition-container {
+  margin-top: 4px;
+}
+
+.decision-node__add-condition {
+  padding: 6px 8px;
+  background-color: rgba(255, 255, 255, 0.5);
+  border: 1px dashed var(--decision-border-normal);
+  border-radius: 6px;
+  color: var(--decision-text-normal);
+  font-size: 13px;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: var(--node-decision-transition);
+  width: 100%;
+}
+
+.decision-node__add-condition:hover {
+  background-color: rgba(var(--node-decision-accent), 0.25);
+  border-color: rgba(var(--node-decision-accent), 0.4);
+  color: var(--node-decision-accent-color);
+  transform: scale(1.04);
+  box-shadow: 0 2px 8px rgba(var(--node-decision-accent), 0.2);
+}
+
+/* Contenido principal - diseño premium */
+.decision-node__content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--node-decision-gap);
+  flex: 1;
+}
+
+/* Contenedor de la pregunta con efecto de profundidad */
+.decision-node__question-container {
+  position: relative;
+  transition: transform 0.3s ease;
+}
+
+.decision-node--editing .decision-node__question-container {
+  transform: scale(1.02);
+}
+
+/* Pregunta del nodo - estilo premium con fondo azul claro */
+.decision-node__question {
+  width: 100%;
+  padding: 0.875rem 1.125rem;
+  border-radius: var(--node-decision-input-radius);
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(59, 130, 246, 0.5);
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  font-weight: 500;
+  color: #1f2937; /* Color oscuro para el texto */
+  transition: var(--node-decision-transition);
+  resize: none;
+  overflow: hidden;
+  box-shadow: 0 2px 6px rgba(59, 130, 246, 0.1);
+}
+
+/* Estado de focus mejorado */
+.decision-node__question:focus {
+  outline: none;
+  border-color: rgba(var(--node-decision-accent), 0.5);
+  box-shadow:
+    0 0 0 3px rgba(var(--node-decision-accent), 0.15),
+    0 2px 8px rgba(0, 0, 0, 0.05);
+  background: white;
+}
+
+/* Estilo de placeholder mejorado */
+.decision-node__question::placeholder {
+  color: var(--text-tertiary);
+  opacity: 0.8;
+  font-style: italic;
+}
+
+/* Visualización de la pregunta con estilo premium */
+.decision-node__question-display {
+  width: 100%;
+  padding: 0.875rem 1.125rem;
+  border-radius: var(--node-decision-input-radius);
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(59, 130, 246, 0.5);
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  font-weight: 500;
+  color: #1f2937; /* Color oscuro para asegurar visibilidad */
+  cursor: pointer;
+  transition: var(--node-decision-transition);
+  box-shadow: 0 2px 6px rgba(59, 130, 246, 0.1);
+}
+
+/* Efecto hover mejorado */
+.decision-node__question-display:hover {
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.85));
+  border-color: rgba(var(--node-decision-accent), 0.3);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.04);
+  transform: translateY(-1px);
+}
+
+/* Botón de editar pregunta - diseño premium */
+.decision-node__edit-question {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  background: rgba(var(--node-decision-accent), 0.08);
+  color: rgba(var(--node-decision-accent), 0.7);
+  opacity: 0;
+  transition: all 0.2s cubic-bezier(0.25, 1, 0.5, 1);
+  backdrop-filter: blur(2px);
+  transform: scale(0.9);
+}
+
+/* Animación de aparición del botón de editar */
+.decision-node__question-container:hover .decision-node__edit-question {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* Efecto hover mejorado para el botón de editar */
+.decision-node__edit-question:hover {
+  background: rgba(var(--node-decision-accent), 0.15);
+  color: rgba(var(--node-decision-accent), 1);
+  box-shadow: 0 2px 8px rgba(var(--node-decision-accent), 0.2);
+  transform: scale(1.05);
+}
+
+/* Editor de condición - diseño premium */
+.decision-node__condition-edit {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  width: 100%;
+  position: relative;
+  padding: 0.25rem;
+  border-radius: var(--node-decision-condition-border-radius);
+  transition: background-color 0.2s ease;
+}
+
+.decision-node__condition-edit:hover {
+  background-color: rgba(var(--node-decision-accent), 0.03);
+}
+
+/* Input de condición con estilo premium */
+.decision-node__condition-input {
+  flex: 1;
+  padding: 0.625rem 0.875rem;
+  border: 1px solid rgba(209, 213, 219, 0.7);
+  border-radius: 20px;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  background: rgba(255, 255, 255, 0.9);
+  transition: var(--node-decision-transition);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+}
+
+/* Estado focus mejorado */
+.decision-node__condition-input:focus {
+  outline: none;
+  border-color: rgba(var(--node-decision-accent), 0.5);
+  box-shadow:
+    0 0 0 2px rgba(var(--node-decision-accent), 0.12),
+    0 2px 4px rgba(0, 0, 0, 0.04);
+  background: white;
+}
+
+/* Estilos específicos para condiciones true/false */
+.decision-node__condition-input--true {
+  border-color: rgba(var(--node-decision-true), 0.3);
+  background: rgba(var(--node-decision-true), 0.05);
+}
+
+.decision-node__condition-input--true:focus {
+  border-color: rgba(var(--node-decision-true), 0.5);
+  box-shadow:
+    0 0 0 2px rgba(var(--node-decision-true), 0.12),
+    0 2px 4px rgba(0, 0, 0, 0.04);
+}
+
+.decision-node__condition-input--false {
+  border-color: rgba(var(--node-decision-false), 0.3);
+  background: rgba(var(--node-decision-false), 0.05);
+}
+
+.decision-node__condition-input--false:focus {
+  border-color: rgba(var(--node-decision-false), 0.5);
+  box-shadow:
+    0 0 0 2px rgba(var(--node-decision-false), 0.12),
+    0 2px 4px rgba(0, 0, 0, 0.04);
+}
+
+/* Acciones de edición de condición */
+.decision-node__condition-edit-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  opacity: 0.7;
+  transition: opacity 0.2s ease;
+}
+
+.decision-node__condition-edit:hover .decision-node__condition-edit-actions {
+  opacity: 1;
+}
+
+/* Botones de acción - diseño premium */
+.decision-node__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.625rem;
+  margin-top: 0.75rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.03);
+}
+
+/* Botón base con diseño premium */
+.decision-node__button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.875rem;
+  border-radius: var(--node-decision-button-radius);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.25, 1, 0.5, 1);
+  border: none;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  will-change: transform, box-shadow;
+}
+
+/* Efecto de onda al hacer clic */
+.decision-node__button::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 5px;
+  height: 5px;
+  background: rgba(255, 255, 255, 0.5);
+  opacity: 0;
+  border-radius: 100%;
+  transform: scale(1, 1) translate(-50%, -50%);
+  transform-origin: 50% 50%;
+}
+
+.decision-node__button:active::after {
+  animation: ripple 0.4s ease-out;
+}
+
+@keyframes ripple {
+  0% {
+    transform: scale(0, 0);
+    opacity: 0.5;
+  }
+  100% {
+    transform: scale(30, 30);
+    opacity: 0;
+  }
+}
+
+/* Botón de cancelar - mismo color que guardar */
+.decision-node__button--cancel {
+  background: linear-gradient(to bottom, #1e40af, #1e3a8a);
+  color: white;
+  border: 1px solid #1e3a8a;
+  box-shadow: 0 1px 3px rgba(30, 64, 175, 0.3);
+}
+
+.decision-node__button--cancel:hover {
+  background: linear-gradient(to bottom, #2563eb, #1e40af);
+  color: white;
+  border-color: #1e3a8a;
+  box-shadow: 0 2px 4px rgba(30, 64, 175, 0.4);
+  transform: translateY(-1px);
+}
+
+.decision-node__button--cancel:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 2px rgba(30, 64, 175, 0.3);
+}
+
+/* Botón de guardar */
+.decision-node__button--save {
+  background: linear-gradient(
+    to bottom,
+    rgba(var(--node-decision-accent), 1),
+    rgba(var(--node-decision-accent), 0.9)
+  );
+  color: white;
+  box-shadow: 0 1px 3px rgba(var(--node-decision-accent), 0.3);
+}
+
+.decision-node__button--save:hover {
+  background: linear-gradient(
+    to bottom,
+    rgba(var(--node-decision-accent), 1),
+    rgba(var(--node-decision-accent), 0.85)
+  );
+  box-shadow: 0 3px 6px rgba(var(--node-decision-accent), 0.4);
+  transform: translateY(-1px);
+}
+
+.decision-node__button--save:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 3px rgba(var(--node-decision-accent), 0.3);
+}
+
+/* Las reglas CSS antiguas para .decision-node__handle, .decision-node__handle--target, 
+   .decision-node__handle--source (comentado), .decision-node__handle--true, 
+   .decision-node__handle--false, .decision-node__handle--active, y .decision-node__handle--ultra 
+   (y sus hovers/animaciones asociadas) han sido eliminadas para evitar conflictos con los 
+   nuevos estilos estandarizados de handles. */
+
+.decision-node__handle-wrapper {
+  position: relative;
+  width: 100%;
+  height: 20px; /* Altura reducida aún más */
+  margin-top: 0.1rem; /* Margen superior mínimo */
+  margin-bottom: 0.1rem; /* Margen inferior mínimo */
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding-bottom: 0; /* Sin padding inferior */
+}
+
+.decision-node__handle-label {
+  position: absolute;
+  bottom: -25px;
+  transform: translateX(-50%);
+  font-size: 10px;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  text-align: center;
+  max-width: 80px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  z-index: 10; /* Asegurar que las etiquetas estén por encima de otros elementos */
+}
+
+/* Accesibilidad */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+.decision-node:focus {
+  outline: 2px solid #4ea0ff;
+  outline-offset: 2px;
+}
+
+.decision-node:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* Animaciones para conectores */
+@keyframes connectorPulse {
+  0% {
+    box-shadow: 0 0 4px rgba(var(--connector-color), 0.4);
+  }
+  50% {
+    box-shadow: 0 0 12px rgba(var(--connector-color), 0.6);
+  }
+  100% {
+    box-shadow: 0 0 4px rgba(var(--connector-color), 0.4);
+  }
+}
+
+@keyframes connectorPulseTrue {
+  0% {
+    box-shadow: 0 0 4px rgba(16, 185, 129, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 12px rgba(16, 185, 129, 0.6);
+  }
+  100% {
+    box-shadow: 0 0 4px rgba(16, 185, 129, 0.4);
+  }
+}
+
+@keyframes connectorPulseFalse {
+  0% {
+    box-shadow: 0 0 4px rgba(239, 68, 68, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 12px rgba(239, 68, 68, 0.6);
+  }
+  100% {
+    box-shadow: 0 0 4px rgba(239, 68, 68, 0.4);
+  }
+}
+
+@keyframes conditionAppear {
+  0% {
+    opacity: 0;
+    transform: translateY(4px) scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes nodeConnected {
+  0% {
+    box-shadow: 0 0 0 2px rgba(var(--node-decision-accent), 0.2);
+  }
+  50% {
+    box-shadow: 0 0 0 4px rgba(var(--node-decision-accent), 0.4);
+  }
+  100% {
+    box-shadow: 0 0 0 2px rgba(var(--node-decision-accent), 0.2);
+  }
+}
+
+/* Soporte para modo oscuro */
+@media (prefers-color-scheme: dark) {
+  .decision-node {
+    --node-decision-border: rgba(255, 255, 255, 0.1);
+    --text-primary: rgba(255, 255, 255, 0.9);
+    --text-secondary: rgba(255, 255, 255, 0.6);
+  }
+}
+
+/* Optimizaciones para pantallas táctiles */
+@media (hover: none) {
+  .decision-node__condition-actions {
+    opacity: 1;
+  }
+
+  .decision-node:hover {
+    transform: none;
+  }
+}
+
+/* Optimizaciones para pantallas pequeñas */
+@media (max-width: 768px) {
+  .decision-node {
+    width: 200px;
+    padding: 0.75rem;
+  }
+
+  .decision-node__question {
+    font-size: 0.875rem;
+  }
+
+  .decision-node__condition {
+    padding: 0.375rem 0.625rem;
+  }
+}
+
+/* Optimizaciones para pantallas de alta densidad */
+@media (min-resolution: 2dppx) {
+  .decision-node {
+    border-width: 0.5px;
+  }
+
+  .decision-node__handle {
+    border-width: 1.5px;
+  }
+}
+
+/* Soporte para navegadores que no soportan grid */
+@supports not (display: grid) {
+  .decision-node__conditions {
+    display: block;
+  }
+
+  .decision-node__condition {
+    margin-bottom: 0.5rem;
+  }
+}
+
+/* Soporte para navegadores que no soportan variables CSS */
+@supports not (--custom: property) {
+  .decision-node {
+    background-color: #ffffff;
+    border: 1px solid #e5e5e5;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.06);
+  }
+
+  .decision-node__condition {
+    background-color: rgba(59, 130, 246, 0.1);
+  }
+
+  .decision-node__handle--true {
+    background-color: #10b981;
+  }
+
+  .decision-node__handle--false {
+    background-color: #ef4444;
+  }
+}

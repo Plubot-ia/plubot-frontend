@@ -1,0 +1,2141 @@
+/* ProfileMain.css - Estilos principales para la página de perfil con estética cyberpunk */
+
+/* ==========================================================================
+   Variables
+   ========================================================================== */
+:root {
+  --primary-glow: rgb(0, 224, 255);
+  --primary-dark: rgb(0, 120, 170);
+  --secondary-glow: rgb(255, 0, 255);
+  --tertiary-glow: rgb(255, 215, 0);
+  --dark-bg: rgb(2, 13, 36);
+  --darker-bg: rgb(1, 6, 20);
+  --border-glow: rgba(0, 224, 255, 0.7);
+  --terminal-font: "Rajdhani", monospace, sans-serif;
+  --display-font: "Orbitron", sans-serif;
+  --accent-color: rgb(255, 43, 116);
+  --accent-glow: rgba(255, 43, 116, 0.7);
+  --hologram-blue: rgba(0, 224, 255, 0.15);
+}
+
+/* ==========================================================================
+     Base Container
+     ========================================================================== */
+.profile-container {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+  padding-top: 100px;
+  position: relative;
+  z-index: 1;
+  font-family: var(--terminal-font);
+  background:
+    radial-gradient(circle at 25% 25%, rgba(0, 224, 255, 0.05) 0%, transparent 50%),
+    radial-gradient(circle at 75% 75%, rgba(255, 0, 255, 0.05) 0%, transparent 50%),
+    radial-gradient(circle at 50% 50%, var(--dark-bg) 0%, var(--darker-bg) 100%);
+  color: white;
+  perspective: 1500px;
+  box-sizing: border-box;
+  overflow: hidden;
+  /* Optimización: Mejorar el rendimiento del scroll */
+  overscroll-behavior: none;
+}
+
+/* ==========================================================================
+     Profile Card
+     ========================================================================== */
+.profile-card {
+  width: 100%;
+  max-width: 1200px;
+  backdrop-filter: blur(20px);
+  background: rgba(0, 0, 0, 0.65);
+  border-radius: 25px;
+  border: 1px solid var(--border-glow);
+  box-shadow:
+    0 0 40px rgba(0, 224, 255, 0.6),
+    0 0 100px rgba(0, 0, 0, 0.8),
+    inset 0 0 20px rgba(0, 224, 255, 0.3);
+  padding: 3rem;
+  position: relative;
+  transform-style: preserve-3d;
+  transition:
+    transform 0.5s cubic-bezier(0.23, 1, 0.32, 1),
+    box-shadow 0.5s ease;
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(20px) scale(0.98);
+}
+
+.profile-card-loaded {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  animation: profile-fadeIn 1.2s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+}
+
+.profile-card:hover {
+  box-shadow:
+    0 0 50px rgba(0, 224, 255, 0.8),
+    0 0 120px rgba(0, 0, 0, 0.9),
+    inset 0 0 25px rgba(0, 224, 255, 0.5);
+  transform: translateY(-5px) scale(1.005);
+}
+
+.card-glare {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 5;
+  opacity: 0.7;
+  mix-blend-mode: overlay;
+}
+
+/* ==========================================================================
+     Profile Tabs
+     ========================================================================== */
+.profile-tabs {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  border-bottom: 1px solid rgba(0, 224, 255, 0.3);
+  position: relative;
+}
+
+.profile-tab {
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(0, 224, 255, 0.3);
+  border-bottom: none;
+  border-radius: 8px 8px 0 0;
+  padding: 0.75rem 1.5rem;
+  font-family: var(--terminal-font);
+  font-size: 0.9rem;
+  color: rgba(0, 224, 255, 0.7);
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.profile-tab.active {
+  background: rgba(0, 224, 255, 0.2);
+  color: var(--primary-glow);
+  border-color: var(--primary-glow);
+  box-shadow: 0 0 15px rgba(0, 224, 255, 0.5);
+}
+
+.profile-tab:hover {
+  background: rgba(0, 224, 255, 0.15);
+  color: var(--primary-glow);
+  transform: translateY(-2px);
+}
+
+.profile-tab::after {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0));
+  transform: rotate(45deg);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.profile-tab:hover::after {
+  opacity: 1;
+  animation: buttonGlow 1.5s infinite;
+}
+
+/* ==========================================================================
+     Profile Grid
+     ========================================================================== */
+.profile-grid {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 2rem;
+  overflow: hidden;
+}
+
+/* ==========================================================================
+     Profile Sections
+     ========================================================================== */
+.profile-section {
+  background: rgba(0, 20, 40, 0.5);
+  border-radius: 12px;
+  border: 1px solid rgba(0, 224, 255, 0.3);
+  padding: 1.5rem;
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(12px);
+  transition: all 0.3s ease;
+  transform: translateZ(0);
+  opacity: 0;
+  animation: section-appear 0.8s ease-out forwards;
+}
+
+.profile-section:nth-child(1) {
+  animation-delay: 0.1s;
+}
+.profile-section:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.profile-section:nth-child(3) {
+  animation-delay: 0.3s;
+}
+.profile-section:nth-child(4) {
+  animation-delay: 0.4s;
+}
+.profile-section:nth-child(5) {
+  animation-delay: 0.5s;
+}
+.profile-section:nth-child(6) {
+  animation-delay: 0.6s;
+}
+
+.profile-section:hover {
+  border-color: rgba(0, 224, 255, 0.6);
+  box-shadow: 0 0 20px rgba(0, 224, 255, 0.3);
+  transform: translateZ(10px);
+}
+
+.profile-section-title {
+  color: var(--primary-glow);
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  position: relative;
+  text-shadow: 0 0 10px rgba(0, 224, 255, 0.5);
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  cursor: pointer;
+}
+
+.profile-section-title::after {
+  content: "";
+  position: absolute;
+  bottom: -5px;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--primary-glow), transparent);
+  animation: title-line-pulse 3s infinite;
+}
+
+.section-toggle {
+  font-size: 1rem;
+  color: var(--primary-glow);
+  transition: transform 0.3s ease;
+}
+
+.collapsible:hover .section-toggle {
+  transform: rotate(90deg);
+}
+
+.collapsible-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.5s ease-out;
+}
+
+.collapsible-content.expanded {
+  max-height: 1000px;
+}
+
+/* ==========================================================================
+     Profile Avatar
+     ========================================================================== */
+.profile-avatar-container {
+  position: relative;
+  width: 150px;
+  height: 150px;
+  margin: 0 auto 2rem;
+  pointer-events: auto;
+  transform-style: preserve-3d;
+  perspective: 800px;
+}
+
+.profile-avatar {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: linear-gradient(45deg, var(--primary-dark), var(--primary-glow));
+  padding: 4px;
+  position: relative;
+  cursor: pointer;
+  z-index: 10;
+  pointer-events: auto;
+  transition: all 0.3s ease;
+  transform-style: preserve-3d;
+  animation: avatar-float 4s ease-in-out infinite;
+}
+
+.profile-avatar:hover {
+  transform: scale(1.05) translateZ(10px);
+  box-shadow: 0 0 20px rgba(0, 224, 255, 0.7);
+}
+
+.profile-avatar-inner {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: #121212;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem;
+  font-weight: bold;
+  color: var(--primary-glow);
+  text-shadow: 0 0 15px rgba(0, 224, 255, 0.7);
+  position: relative;
+  overflow: hidden;
+}
+
+.profile-avatar-inner::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    rgba(0, 224, 255, 0.1),
+    rgba(0, 224, 255, 0.1) 1px,
+    transparent 1px,
+    transparent 4px
+  );
+  animation: hologram-scan 8s linear infinite;
+  opacity: 0.3;
+  transform: rotate(30deg);
+}
+
+.profile-avatar-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  color: var(--primary-glow);
+  opacity: 0;
+  transition:
+    opacity 0.3s ease,
+    transform 0.3s ease;
+  z-index: 11;
+  pointer-events: none;
+  transform: scale(0.8);
+}
+
+.profile-avatar-container:hover .profile-avatar-overlay {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.profile-avatar-ring {
+  position: absolute;
+  border-radius: 50%;
+  border: 2px dashed rgba(0, 224, 255, 0.5);
+  top: -10px;
+  left: -10px;
+  right: -10px;
+  bottom: -10px;
+  animation: rotate 20s linear infinite;
+  z-index: 5;
+  pointer-events: none;
+}
+
+.profile-avatar-ring:nth-child(2) {
+  border: 3px solid rgba(255, 0, 255, 0.3);
+  top: -20px;
+  left: -20px;
+  right: -20px;
+  bottom: -20px;
+  animation: rotate-reverse 30s linear infinite;
+}
+
+.profile-avatar-ring:nth-child(3) {
+  border: 1px solid rgba(255, 215, 0, 0.4);
+  top: -30px;
+  left: -30px;
+  right: -30px;
+  bottom: -30px;
+  animation: rotate 40s linear infinite;
+}
+
+.profile-avatar-image-styles {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  /* Optimización: Carga progresiva de imágenes */
+  transition: opacity 0.3s ease;
+  opacity: 1;
+}
+
+.profile-avatar-image-styles.loaded {
+  opacity: 1;
+}
+
+/* Soporte para formatos modernos de imágenes */
+.profile-avatar-container picture {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* Placeholder para imágenes mientras cargan */
+.profile-avatar-placeholder {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: linear-gradient(45deg, rgba(0, 20, 40, 0.5), rgba(0, 60, 100, 0.5));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+/* Clase para imágenes con lazy loading */
+.lazy-image {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* ==========================================================================
+     Profile Level Badge
+     ========================================================================== */
+.profile-level-badge {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(0, 150, 255, 0.8), rgba(0, 224, 255, 0.8));
+  border: 2px solid rgba(0, 255, 255, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 1.5rem;
+  color: white;
+  box-shadow: 0 0 15px rgba(0, 224, 255, 0.8);
+  z-index: 8;
+  pointer-events: none;
+  animation: badge-pulse 2s infinite alternate;
+}
+
+/* ==========================================================================
+     Profile Card Title and Status
+     ========================================================================== */
+.profile-card-title {
+  text-align: center;
+  width: 100%;
+  margin: 1rem 0;
+  font-size: 1.8rem;
+  font-family: var(--display-font);
+  letter-spacing: 1px;
+}
+
+.profile-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.profile-status {
+  margin-top: 0.5rem;
+  display: flex;
+  justify-content: center;
+}
+
+.status-pill {
+  display: flex;
+  align-items: center;
+  background: rgba(0, 224, 255, 0.2);
+  border: 1px solid var(--primary-glow);
+  border-radius: 20px;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.75rem;
+  color: var(--primary-glow);
+  text-shadow: 0 0 5px rgba(0, 224, 255, 0.5);
+}
+
+.status-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #0f0;
+  margin-right: 0.5rem;
+  animation: blink 2s infinite;
+  box-shadow: 0 0 8px rgba(0, 255, 0, 0.7);
+}
+
+.profile-id {
+  font-size: 0.875rem;
+  color: rgba(0, 224, 255, 0.7);
+  text-align: center;
+  margin-bottom: 1rem;
+  letter-spacing: 2px;
+}
+
+/* ==========================================================================
+     Holographic Card
+     ========================================================================== */
+.holographic-card {
+  background: rgba(0, 0, 0, 0.7);
+  border: 1px solid rgba(0, 224, 255, 0.5);
+  border-radius: 12px;
+  padding: 1rem;
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+}
+
+.holographic-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    45deg,
+    rgba(0, 224, 255, 0.1) 0%,
+    transparent 50%,
+    rgba(255, 0, 255, 0.1) 100%
+  );
+  opacity: 0.3;
+  pointer-events: none;
+  animation: hologram-flicker 5s infinite;
+}
+
+/* ==========================================================================
+     Profile Buttons
+     ========================================================================== */
+.profile-buttons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+.cyber-button {
+  background: rgba(0, 100, 200, 0.2);
+  color: var(--primary-glow);
+  border: 1px solid rgba(0, 224, 255, 0.5);
+  border-radius: 4px;
+  padding: 0.5rem 1.5rem;
+  font-family: var(--terminal-font);
+  font-size: 0.875rem;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  position: relative;
+  overflow: hidden;
+  text-transform: uppercase;
+  box-shadow: 0 0 5px rgba(0, 224, 255, 0.3);
+  margin-top: 0.5rem;
+}
+
+.cyber-button:hover {
+  background: rgba(0, 150, 255, 0.3);
+  box-shadow: 0 0 15px rgba(0, 224, 255, 0.5);
+  transform: translateY(-2px);
+}
+
+.cyber-button::after {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0));
+  transform: rotate(45deg);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.cyber-button:hover::after {
+  opacity: 1;
+  animation: buttonGlow 1.5s infinite;
+}
+
+.cyber-button.small {
+  padding: 0.25rem 0.75rem;
+  font-size: 0.75rem;
+}
+
+.reward-button.pulse {
+  animation: pulse 1.5s infinite;
+}
+
+/* ==========================================================================
+     Coin and Energy Displays
+     ========================================================================== */
+.coin-display {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  justify-content: center;
+}
+
+.coin-icon {
+  font-size: 1.5rem;
+}
+
+.coin-amount {
+  font-size: 1rem;
+  color: var(--primary-glow);
+  text-shadow: 0 0 5px rgba(0, 224, 255, 0.5);
+}
+
+.energy-container {
+  margin-top: 1.5rem;
+}
+
+.energy-bar {
+  background: rgba(0, 0, 0, 0.4);
+}
+
+.energy-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--tertiary-glow), var(--primary-glow));
+  transition: width 0.5s ease;
+  width: var(--energy-width, 0%);
+}
+
+/* ==========================================================================
+     Progress Bar
+     ========================================================================== */
+.progress-bar {
+  height: 10px;
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 5px;
+  overflow: hidden;
+  margin-top: 0.5rem;
+}
+
+.progress-fill {
+  height: 100%;
+  transition: width 0.5s ease;
+  width: var(--progress-width, 0%);
+}
+
+.progress-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.9rem;
+  color: rgba(0, 224, 255, 0.7);
+  margin-bottom: 0.25rem;
+}
+
+.value {
+  color: var(--primary-glow);
+  text-shadow: 0 0 5px rgba(0, 224, 255, 0.5);
+}
+
+/* ==========================================================================
+     Profile Stats
+     ========================================================================== */
+.profile-stats {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 1.5rem;
+}
+
+.stat-item {
+  text-align: center;
+}
+
+.stat-icon {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.stat-value {
+  font-size: 1.25rem;
+  color: var(--primary-glow);
+  text-shadow: 0 0 5px rgba(0, 224, 255, 0.5);
+}
+
+.stat-label {
+  font-size: 0.75rem;
+  color: rgba(0, 224, 255, 0.7);
+}
+
+/* ==========================================================================
+     Membership Status
+     ========================================================================== */
+.membership-status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+}
+
+.membership-badge {
+  background: rgba(0, 224, 255, 0.2);
+  border: 1px solid var(--primary-glow);
+  border-radius: 20px;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.75rem;
+  color: var(--primary-glow);
+  text-shadow: 0 0 5px rgba(0, 224, 255, 0.5);
+}
+
+.membership-badge.premium {
+  background: linear-gradient(45deg, var(--primary-glow), var(--secondary-glow));
+}
+
+.membership-details {
+  font-size: 0.75rem;
+  color: rgba(0, 224, 255, 0.7);
+}
+
+.separator {
+  margin: 0 0.5rem;
+}
+
+/* ==========================================================================
+     Modal
+     ========================================================================== */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 10, 0.8);
+  backdrop-filter: blur(5px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 3000;
+  overflow: auto;
+  padding: 1rem;
+  box-sizing: border-box;
+}
+
+.modal-content {
+  background: rgba(0, 0, 0, 0.7);
+  border: 1px solid var(--border-glow);
+  border-radius: 15px;
+  padding: 2rem;
+  max-width: 90vw;
+  max-height: 90vh;
+  width: 500px;
+  box-shadow: 0 0 30px rgba(0, 224, 255, 0.5);
+  font-family: var(--terminal-font);
+  color: var(--primary-glow);
+  position: relative;
+  animation: profile-fadeIn 0.5s ease-out;
+  overflow-y: auto;
+  box-sizing: border-box;
+  margin: auto;
+}
+
+.modal-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: none;
+  border: none;
+  color: var(--primary-glow);
+  font-size: 1.5rem;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.modal-close:hover {
+  color: var(--secondary-glow);
+}
+
+.modal-title {
+  font-family: var(--display-font);
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  text-shadow: 0 0 10px rgba(0, 224, 255, 0.6);
+}
+
+.modal-power-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+/* ==========================================================================
+     Notifications
+     ========================================================================== */
+.notification {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  padding: 1rem 2rem;
+  border-radius: 8px;
+  font-family: var(--terminal-font);
+  font-size: 1rem;
+  z-index: 2000;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 0 15px rgba(0, 224, 255, 0.5);
+  animation: fadeInOut 3s ease-in-out;
+  text-align: center;
+  min-width: 300px;
+}
+
+.notification-success {
+  background: rgba(0, 224, 255, 0.2);
+  border: 1px solid var(--primary-glow);
+  color: var(--primary-glow);
+  text-shadow: 0 0 5px rgba(0, 224, 255, 0.5);
+}
+
+.notification-error {
+  background: rgba(255, 0, 0, 0.2);
+  border: 1px solid rgb(255, 0, 0);
+  color: rgb(255, 0, 0);
+  text-shadow: 0 0 5px rgba(255, 0, 0, 0.5);
+}
+
+.notification-info {
+  background: rgba(255, 215, 0, 0.2);
+  border: 1px solid var(--tertiary-glow);
+  color: var(--tertiary-glow);
+  text-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
+}
+
+/* ==========================================================================
+     Achievement Notification
+     ========================================================================== */
+.achievement-unlocked {
+  position: fixed;
+  top: 20%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.9);
+  border: 1px solid var(--primary-glow);
+  border-radius: 12px;
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  box-shadow: 0 0 20px rgba(0, 224, 255, 0.5);
+  z-index: 2000;
+  animation:
+    achievement-appear 0.5s ease-out,
+    achievement-fadeOut 0.5s ease-out 4.5s forwards;
+  min-width: 300px;
+}
+
+.achievement-icon {
+  font-size: 2rem;
+}
+
+.achievement-content {
+  color: var(--primary-glow);
+  text-shadow: 0 0 5px rgba(0, 224, 255, 0.5);
+}
+
+.achievement-content h3 {
+  font-size: 1.25rem;
+  margin-bottom: 0.5rem;
+}
+
+.achievement-content h4 {
+  font-size: 1rem;
+  margin-bottom: 0.25rem;
+}
+
+.achievement-content p {
+  font-size: 0.875rem;
+  color: rgba(0, 224, 255, 0.8);
+}
+
+/* ==========================================================================
+     Login Prompt
+     ========================================================================== */
+.login-prompt {
+  text-align: center;
+  padding: 2rem;
+  background: rgba(0, 0, 0, 0.7);
+  border: 1px solid var(--border-glow);
+  border-radius: 15px;
+  box-shadow: 0 0 30px rgba(0, 224, 255, 0.5);
+  max-width: 400px;
+  width: 90%;
+}
+
+.login-prompt-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.login-button {
+  margin-top: 1rem;
+}
+
+.terminal-lines {
+  margin-top: 1.5rem;
+  text-align: left;
+  font-family: monospace;
+  font-size: 0.875rem;
+  color: rgba(0, 224, 255, 0.7);
+}
+
+.terminal-line {
+  margin-bottom: 0.5rem;
+}
+
+.terminal-cursor::after {
+  content: "_";
+  animation: blink 1s infinite;
+}
+
+/* ==========================================================================
+     Cosmic Background Effects
+     ========================================================================== */
+.cosmic-lights {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.light-beam {
+  position: absolute;
+  width: 150vw;
+  height: 4px;
+  background: linear-gradient(
+    90deg,
+    rgba(0, 224, 255, 0) 0%,
+    rgba(0, 224, 255, 0.5) 50%,
+    rgba(0, 224, 255, 0) 100%
+  );
+  opacity: 0.3;
+  transform-origin: left center;
+  filter: blur(3px);
+  box-shadow: 0 0 15px rgba(0, 224, 255, 0.5);
+}
+
+.light-beam-1 {
+  top: 20%;
+  left: -50%;
+  transform: rotate(25deg);
+  animation: beamMovement1 15s infinite alternate ease-in-out;
+}
+
+.light-beam-2 {
+  top: 65%;
+  left: -50%;
+  transform: rotate(-15deg);
+  animation: beamMovement2 18s infinite alternate ease-in-out;
+  opacity: 0.2;
+}
+
+.light-beam-3 {
+  top: 40%;
+  left: -50%;
+  transform: rotate(5deg);
+  animation: beamMovement3 20s infinite alternate ease-in-out;
+  opacity: 0.15;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 0, 255, 0) 0%,
+    rgba(255, 0, 255, 0.4) 50%,
+    rgba(255, 0, 255, 0) 100%
+  );
+}
+
+.light-beam-4 {
+  top: 80%;
+  left: -50%;
+  transform: rotate(-8deg);
+  animation: beamMovement4 25s infinite alternate ease-in-out;
+  opacity: 0.1;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 215, 0, 0) 0%,
+    rgba(255, 215, 0, 0.4) 50%,
+    rgba(255, 215, 0, 0) 100%
+  );
+  height: 2px;
+}
+
+.light-beam-5 {
+  top: 10%;
+  left: -50%;
+  transform: rotate(15deg);
+  animation: beamMovement5 22s infinite alternate ease-in-out;
+  opacity: 0.12;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 43, 116, 0) 0%,
+    rgba(255, 43, 116, 0.4) 50%,
+    rgba(255, 43, 116, 0) 100%
+  );
+  height: 3px;
+}
+
+/* ==========================================================================
+     Particles
+     ========================================================================== */
+.particles {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+  transform-style: preserve-3d;
+  perspective: 1000px;
+}
+
+.particle {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: linear-gradient(45deg, var(--primary-glow), var(--secondary-glow));
+  opacity: 0;
+  filter: blur(1px);
+  box-shadow: 0 0 10px rgba(0, 224, 255, 0.3);
+}
+
+.particle-1 {
+  top: 10%;
+  left: 10%;
+  animation: particleFloat1 3s infinite ease-out;
+}
+.particle-2 {
+  top: 20%;
+  left: 80%;
+  animation: particleFloat2 4s infinite ease-out;
+}
+.particle-3 {
+  top: 70%;
+  left: 20%;
+  animation: particleFloat3 5s infinite ease-out;
+}
+.particle-4 {
+  top: 60%;
+  left: 90%;
+  animation: particleFloat4 3.2s infinite ease-out;
+}
+.particle-5 {
+  top: 90%;
+  left: 50%;
+  animation: particleFloat5 3.8s infinite ease-out;
+}
+.particle-6 {
+  top: 30%;
+  left: 30%;
+  animation: particleFloat6 4.2s infinite ease-out;
+}
+.particle-7 {
+  top: 40%;
+  left: 70%;
+  animation: particleFloat7 4.8s infinite ease-out;
+}
+.particle-8 {
+  top: 85%;
+  left: 25%;
+  animation: particleFloat8 5.5s infinite ease-out;
+}
+.particle-9 {
+  top: 15%;
+  left: 60%;
+  animation: particleFloat9 3.5s infinite ease-out;
+}
+.particle-10 {
+  top: 50%;
+  left: 40%;
+  animation: particleFloat10 4.5s infinite ease-out;
+}
+.particle-11 {
+  top: 25%;
+  left: 15%;
+  animation: particleFloat11 4s infinite ease-out;
+}
+.particle-12 {
+  top: 75%;
+  left: 85%;
+  animation: particleFloat12 3.7s infinite ease-out;
+}
+
+/* ==========================================================================
+     Grid Lines
+     ========================================================================== */
+.grid-lines {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.horizontal-line,
+.vertical-line {
+  position: absolute;
+  background: rgba(0, 224, 255, 0.1);
+  transition: all 1s ease;
+}
+
+.horizontal-line {
+  height: 1px;
+  width: 100%;
+  transform: scaleX(0);
+  animation: line-appear 1.5s forwards;
+}
+
+.vertical-line {
+  width: 1px;
+  height: 100%;
+  transform: scaleY(0);
+  animation: line-appear 1.5s forwards;
+}
+
+/* ==========================================================================
+     Mouse Glow
+     ========================================================================== */
+.mouse-glow {
+  position: absolute;
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--primary-glow) 0%, transparent 70%);
+  opacity: 0.15;
+  filter: blur(40px);
+  transition: all 0.2s ease-out;
+  pointer-events: none;
+  mix-blend-mode: screen;
+}
+
+/* ==========================================================================
+     Text Effects
+     ========================================================================== */
+.text-glow {
+  color: var(--primary-glow);
+  text-shadow: 0 0 5px rgba(0, 224, 255, 0.5);
+}
+
+.text-glow-intense {
+  text-shadow:
+    0 0 10px rgba(0, 224, 255, 0.8),
+    0 0 20px rgba(0, 224, 255, 0.5);
+}
+
+/* ==========================================================================
+     Terminal Footer
+     ========================================================================== */
+.terminal-footer {
+  display: flex;
+  justify-content: space-between;
+  padding: 1rem;
+  background: rgba(0, 0, 0, 0.5);
+  border-top: 1px solid rgba(0, 224, 255, 0.3);
+  font-family: monospace;
+  font-size: 0.75rem;
+  color: rgba(0, 224, 255, 0.7);
+  margin-top: 2rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.terminal-footer::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background:
+    linear-gradient(90deg, transparent 50%, rgba(0, 224, 255, 0.05) 50%),
+    linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5));
+  background-size:
+    4px 100%,
+    100% 100%;
+  animation: terminal-bg 60s linear infinite;
+  z-index: -1;
+}
+
+/* ==========================================================================
+     Utility Classes
+     ========================================================================== */
+.file-input-hidden {
+  display: none;
+}
+
+.profile-avatar-ring-zindex {
+  z-index: 5;
+}
+
+.profile-level-badge-zindex {
+  z-index: 8;
+}
+
+/* ==========================================================================
+     Animations
+     ========================================================================== */
+@keyframes profile-fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes section-appear {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.05);
+  }
+}
+
+@keyframes blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.3;
+  }
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes rotate-reverse {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(-360deg);
+  }
+}
+
+@keyframes hologram-scan {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 0 100px;
+  }
+}
+
+@keyframes hologram-flicker {
+  0%,
+  100% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@keyframes badge-pulse {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 15px rgba(0, 224, 255, 0.8);
+  }
+  100% {
+    transform: scale(1.05);
+    box-shadow: 0 0 20px rgba(0, 224, 255, 1);
+  }
+}
+
+@keyframes buttonGlow {
+  0% {
+    transform: rotate(45deg) translateY(100%) translateX(0);
+  }
+  100% {
+    transform: rotate(45deg) translateY(-100%) translateX(0);
+  }
+}
+
+@keyframes beamMovement1 {
+  0%,
+  100% {
+    transform: rotate(25deg);
+    opacity: 0.3;
+  }
+  50% {
+    transform: rotate(28deg);
+    opacity: 0.5;
+  }
+}
+
+@keyframes beamMovement2 {
+  0%,
+  100% {
+    transform: rotate(-15deg);
+    opacity: 0.2;
+  }
+  50% {
+    transform: rotate(-12deg);
+    opacity: 0.4;
+  }
+}
+
+@keyframes beamMovement3 {
+  0%,
+  100% {
+    transform: rotate(5deg);
+    opacity: 0.15;
+  }
+  50% {
+    transform: rotate(8deg);
+    opacity: 0.25;
+  }
+}
+
+@keyframes beamMovement4 {
+  0%,
+  100% {
+    transform: rotate(-8deg);
+    opacity: 0.1;
+  }
+  50% {
+    transform: rotate(-5deg);
+    opacity: 0.2;
+  }
+}
+
+@keyframes beamMovement5 {
+  0%,
+  100% {
+    transform: rotate(15deg);
+    opacity: 0.12;
+  }
+  50% {
+    transform: rotate(18deg);
+    opacity: 0.22;
+  }
+}
+
+@keyframes particleFloat1 {
+  0% {
+    transform: translate(0, 0) scale(0.5);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.9;
+  }
+  100% {
+    transform: translate(-30px, -40px) scale(0);
+    opacity: 0;
+  }
+}
+
+@keyframes particleFloat2 {
+  0% {
+    transform: translate(0, 0) scale(0.7);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: translate(35px, -35px) scale(0);
+    opacity: 0;
+  }
+}
+
+@keyframes particleFloat3 {
+  0% {
+    transform: translate(0, 0) scale(0.6);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.9;
+  }
+  100% {
+    transform: translate(-25px, 35px) scale(0);
+    opacity: 0;
+  }
+}
+
+@keyframes particleFloat4 {
+  0% {
+    transform: translate(0, 0) scale(0.8);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.7;
+  }
+  100% {
+    transform: translate(30px, 30px) scale(0);
+    opacity: 0;
+  }
+}
+
+@keyframes particleFloat5 {
+  0% {
+    transform: translate(0, 0) scale(0.5);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: translate(0, 40px) scale(0);
+    opacity: 0;
+  }
+}
+
+@keyframes particleFloat6 {
+  0% {
+    transform: translate(0, 0) scale(0.6);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.9;
+  }
+  100% {
+    transform: translate(-20px, -35px) scale(0);
+    opacity: 0;
+  }
+}
+
+@keyframes particleFloat7 {
+  0% {
+    transform: translate(0, 0) scale(0.7);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: translate(25px, 30px) scale(0);
+    opacity: 0;
+  }
+}
+
+@keyframes particleFloat8 {
+  0% {
+    transform: translate(0, 0) scale(0.5);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.9;
+  }
+  100% {
+    transform: translate(-30px, 35px) scale(0);
+    opacity: 0;
+  }
+}
+
+@keyframes particleFloat9 {
+  0% {
+    transform: translate(0, 0) scale(0.6);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.7;
+  }
+  100% {
+    transform: translate(20px, -30px) scale(0);
+    opacity: 0;
+  }
+}
+
+@keyframes particleFloat10 {
+  0% {
+    transform: translate(0, 0) scale(0.8);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: translate(-25px, -25px) scale(0);
+    opacity: 0;
+  }
+}
+
+@keyframes particleFloat11 {
+  0% {
+    transform: translate(0, 0) scale(0.6);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.9;
+  }
+  100% {
+    transform: translate(30px, -20px) scale(0);
+    opacity: 0;
+  }
+}
+
+@keyframes particleFloat12 {
+  0% {
+    transform: translate(0, 0) scale(0.7);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: translate(-20px, 30px) scale(0);
+    opacity: 0;
+  }
+}
+
+@keyframes fadeInOut {
+  0% {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  10% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  90% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+}
+
+@keyframes achievement-appear {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+@keyframes achievement-fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes terminal-bg {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 400px 0;
+  }
+}
+
+@keyframes avatar-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes title-line-pulse {
+  0% {
+    transform: scaleX(0.8);
+    opacity: 0.5;
+  }
+  50% {
+    transform: scaleX(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scaleX(0.8);
+    opacity: 0.5;
+  }
+}
+
+@keyframes line-appear {
+  from {
+    transform: scale(0);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+/* ==========================================================================
+     Media Queries
+     ========================================================================== */
+@media (max-width: 480px) {
+  .profile-container {
+    padding: 1rem;
+    padding-top: 60px;
+    align-items: flex-start;
+  }
+
+  .profile-card {
+    padding: 1rem;
+    max-width: 100%;
+    border-radius: 15px;
+  }
+
+  .profile-card-title {
+    font-size: 1.5rem;
+  }
+
+  .profile-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .profile-avatar-container {
+    width: 100px;
+    height: 100px;
+    margin: 0 auto 1rem;
+  }
+
+  .profile-level-badge {
+    width: 40px;
+    height: 40px;
+    font-size: 1.2rem;
+  }
+
+  .notification,
+  .achievement-unlocked {
+    top: 10%;
+    width: 90%;
+    min-width: 0;
+    padding: 0.75rem 1rem;
+    font-size: 0.875rem;
+  }
+
+  .profile-tabs {
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .profile-tab {
+    width: 100%;
+    text-align: center;
+    padding: 0.5rem 1rem;
+    font-size: 0.8rem;
+  }
+
+  .modal-overlay {
+    padding: 0.5rem;
+  }
+
+  .modal-content {
+    padding: 1rem;
+    width: 90%;
+    max-width: 90vw;
+    max-height: 80vh;
+    font-size: 0.9rem;
+    margin: 0 auto;
+  }
+
+  .modal-title {
+    font-size: 1.2rem;
+  }
+
+  .modal-close {
+    font-size: 1.2rem;
+    top: 0.5rem;
+    right: 0.5rem;
+  }
+}
+
+@media (min-width: 481px) and (max-width: 768px) {
+  .profile-container {
+    padding: 1.5rem;
+    padding-top: 80px;
+    align-items: flex-start;
+  }
+
+  .profile-card {
+    padding: 1.5rem;
+    max-width: 95%;
+    border-radius: 20px;
+  }
+
+  .profile-card-title {
+    font-size: 1.8rem;
+  }
+
+  .profile-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .profile-avatar-container {
+    width: 120px;
+    height: 120px;
+  }
+
+  .profile-level-badge {
+    width: 45px;
+    height: 45px;
+    font-size: 1.3rem;
+  }
+
+  .notification,
+  .achievement-unlocked {
+    top: 15%;
+    width: 80%;
+    padding: 0.75rem 1.5rem;
+  }
+
+  .profile-tabs {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.75rem;
+  }
+
+  .profile-tab {
+    padding: 0.6rem 1.2rem;
+    font-size: 0.85rem;
+  }
+
+  .modal-content {
+    padding: 1.5rem;
+    width: 85%;
+    max-width: 90vw;
+    max-height: 85vh;
+    font-size: 0.95rem;
+    margin: 0 auto;
+  }
+
+  .modal-title {
+    font-size: 1.3rem;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1200px) {
+  .profile-container {
+    padding: 2rem;
+    padding-top: 90px;
+  }
+
+  .profile-card {
+    max-width: 90%;
+    padding: 2rem;
+  }
+
+  .profile-grid {
+    grid-template-columns: 1fr 1.5fr;
+    gap: 1.75rem;
+  }
+
+  .profile-avatar-container {
+    width: 130px;
+    height: 130px;
+  }
+
+  .modal-content {
+    padding: 2rem;
+    width: 70%;
+    max-width: 600px;
+    max-height: 85vh;
+    margin: 0 auto;
+  }
+}
+
+@media (min-width: 1201px) {
+  .profile-container {
+    padding: 3rem;
+    padding-top: 100px;
+  }
+
+  .profile-card {
+    max-width: 1200px;
+    padding: 3rem;
+  }
+
+  .profile-grid {
+    grid-template-columns: 1fr 2fr;
+    gap: 2.5rem;
+  }
+
+  .profile-avatar-container {
+    width: 160px;
+    height: 160px;
+  }
+
+  .profile-level-badge {
+    width: 55px;
+    height: 55px;
+    font-size: 1.6rem;
+  }
+
+  .modal-content {
+    width: 500px;
+    max-width: 90vw;
+    max-height: 90vh;
+    margin: 0 auto;
+  }
+}
+
+/* Solución global para eliminar barras de desplazamiento adicionales */
+html,
+body {
+  overflow-y: auto;
+  overflow-x: hidden;
+  height: 100%;
+}
+
+body {
+  position: relative;
+}
+
+.profile-container {
+  overflow: hidden;
+}
+
+.profile-card {
+  overflow: hidden;
+}
+
+.profile-main {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  width: 100%;
+  animation: section-appear 0.8s ease-out forwards;
+  overflow: hidden;
+}
+
+.profile-grid {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 2rem;
+  overflow: hidden;
+}
+
+.profile-column {
+  overflow: hidden;
+}
+
+.profile-section {
+  background: rgba(0, 20, 40, 0.5);
+  border-radius: 12px;
+  border: 1px solid rgba(0, 224, 255, 0.3);
+  padding: 1.5rem;
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(12px);
+  transition: all 0.3s ease;
+  transform: translateZ(0);
+  opacity: 0;
+  animation: section-appear 0.8s ease-out forwards;
+}
+
+/* Estilos para la sección de estadísticas */
+.profile-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  margin-top: 1rem;
+}
+
+.stat-card {
+  background: rgba(0, 20, 40, 0.5);
+  border-radius: 12px;
+  border: 1px solid rgba(0, 224, 255, 0.3);
+  padding: 1.5rem;
+  text-align: center;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-card:hover {
+  border-color: rgba(0, 224, 255, 0.6);
+  box-shadow: 0 0 20px rgba(0, 224, 255, 0.3);
+  transform: translateY(-5px);
+}
+
+.stat-value {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--primary-glow);
+  margin-bottom: 0.5rem;
+  text-shadow: 0 0 10px rgba(0, 224, 255, 0.5);
+}
+
+.stat-label {
+  font-size: 1rem;
+  color: #fff;
+  margin-bottom: 1rem;
+}
+
+.stat-action-button {
+  background: rgba(0, 40, 80, 0.6);
+  border: 1px solid var(--primary-glow);
+  border-radius: 4px;
+  color: #fff;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: var(--terminal-font);
+}
+
+.stat-action-button:hover {
+  background: rgba(0, 224, 255, 0.2);
+  box-shadow: 0 0 15px rgba(0, 224, 255, 0.3);
+}
+
+/* Estilos para la sección de sistema */
+.system-status {
+  background: rgba(0, 20, 40, 0.5);
+  border-radius: 12px;
+  border: 1px solid rgba(0, 224, 255, 0.3);
+  padding: 1.5rem;
+  position: relative;
+}
+
+.system-id {
+  font-family: var(--display-font);
+  color: var(--primary-glow);
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+  letter-spacing: 1px;
+}
+
+.energy-container {
+  margin-top: 0.5rem;
+}
+
+.energy-label {
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+}
+
+.energy-bar {
+  height: 8px;
+  background: rgba(0, 40, 80, 0.6);
+  border-radius: 4px;
+  overflow: hidden;
+  position: relative;
+}
+
+.energy-level {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary-dark), var(--primary-glow));
+  border-radius: 4px;
+  transition: width 1s ease-out;
+}
+
+.energy-percentage {
+  font-size: 0.8rem;
+  color: var(--primary-glow);
+  text-align: right;
+  margin-top: 0.25rem;
+}
+
+/* Estilos para las secciones colapsables */
+.collapsible-section {
+  background: rgba(0, 20, 40, 0.5);
+  border-radius: 12px;
+  border: 1px solid rgba(0, 224, 255, 0.3);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.collapsible-section:hover {
+  border-color: rgba(0, 224, 255, 0.6);
+  box-shadow: 0 0 20px rgba(0, 224, 255, 0.3);
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  margin-bottom: 0.5rem;
+}
+
+.section-header h3 {
+  color: var(--primary-glow);
+  font-size: 1.25rem;
+  margin: 0;
+  text-shadow: 0 0 10px rgba(0, 224, 255, 0.5);
+}
+
+.section-toggle {
+  color: var(--primary-glow);
+  transition: transform 0.3s ease;
+}
+
+.section-content {
+  margin-top: 1rem;
+  overflow: hidden;
+  transition: all 0.5s ease-out;
+}
+
+/* Estilos para la sección de actividades */
+.activities-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.activity-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem;
+  background: rgba(0, 40, 80, 0.4);
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.activity-item.animate-in {
+  animation: activity-appear 0.5s forwards;
+}
+
+.activity-icon {
+  font-size: 1.5rem;
+  min-width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 60, 120, 0.5);
+  border-radius: 50%;
+}
+
+.activity-details {
+  flex: 1;
+}
+
+.activity-text {
+  margin: 0 0 0.25rem 0;
+}
+
+.activity-time {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0;
+}
+
+/* Estilos para la recompensa diaria */
+.daily-reward {
+  margin-top: 0.5rem;
+  opacity: 0.5;
+  transition: all 0.3s ease;
+}
+
+.daily-reward.available {
+  opacity: 1;
+}
+
+.daily-reward.pulsating .collect-reward-button {
+  animation: pulse 2s infinite;
+}
+
+.collect-reward-button {
+  width: 100%;
+  background: rgba(0, 40, 80, 0.6);
+  border: 1px solid var(--primary-glow);
+  border-radius: 4px;
+  color: #fff;
+  padding: 0.5rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: var(--terminal-font);
+}
+
+.collect-reward-button:hover:not(:disabled) {
+  background: rgba(0, 224, 255, 0.2);
+  box-shadow: 0 0 15px rgba(0, 224, 255, 0.3);
+}
+
+.collect-reward-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+/* Animaciones */
+@keyframes activity-appear {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(0, 224, 255, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(0, 224, 255, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(0, 224, 255, 0);
+  }
+}
+
+/* Media queries para responsividad */
+@media (max-width: 768px) {
+  .profile-stats {
+    grid-template-columns: 1fr;
+  }
+}

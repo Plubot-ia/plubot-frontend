@@ -1,0 +1,232 @@
+/* src/components/onboarding/nodes/ainode/AiNode.module.css */
+.aiNode {
+  background-color: #2c3e50; /* Azul grisáceo oscuro para mejor contraste */
+  color: #ecf0f1; /* Texto claro para contraste */
+  /* background: #0d0c0f; -- REMOVED to prioritize background-color */
+  border: 3px solid transparent; /* Borde base transparente para el efecto de brillo */
+  border-radius: 12px;
+  /* color: #e0e0e0; -- REMOVED, #ecf0f1 is the primary text color */
+  min-width: 300px;
+  max-width: 450px;
+  font-family:
+    "Inter",
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    "Helvetica Neue",
+    Arial,
+    sans-serif;
+  box-shadow: 0 0 20px rgba(255, 215, 0, 0.3); /* Sombra dorada sutil base */
+  position: relative; /* Para el pseudo-elemento del borde */
+  padding: 0; /* El padding se manejará en las secciones internas */
+}
+
+/* Borde dorado brillante (estático para modo ultra, base para animación) */
+.aiNode::before {
+  content: "";
+  position: absolute;
+  top: -3px;
+  left: -3px;
+  right: -3px;
+  bottom: -3px; /* Ajustar al tamaño del borde */
+  border-radius: 12px; /* Mismo que el nodo */
+  border: 3px solid #ffd700; /* Dorado brillante */
+  z-index: -1; /* Detrás del contenido del nodo */
+  pointer-events: none; /* No interferir con el mouse */
+}
+
+/* Estilos para modo normal (con animación de resplandor) */
+.aiNodeNormalMode::before {
+  animation: pulseGoldBorder 3s infinite ease-in-out;
+}
+
+/* Estilos para modo ultra (sin animación) */
+.aiNodeUltraMode::before {
+  animation: none;
+  box-shadow: 0 0 15px 3px rgba(255, 215, 0, 0.7); /* Un resplandor estático más pronunciado */
+}
+
+@keyframes pulseGoldBorder {
+  0% {
+    box-shadow: 0 0 8px 0px rgba(255, 215, 0, 0.6);
+  }
+  50% {
+    box-shadow: 0 0 18px 5px rgba(255, 215, 0, 0.8);
+  }
+  100% {
+    box-shadow: 0 0 8px 0px rgba(255, 215, 0, 0.6);
+  }
+}
+
+.nodeHeader h3 {
+  font-size: 1.1em;
+  color: gold;
+  text-shadow: 0 0 5px rgba(255, 215, 0, 0.7);
+  background-color: rgba(0, 0, 0, 0.2); /* Capa oscura semitransparente para cabecera */
+  padding: 10px 15px;
+  border-top-left-radius: 9px; /* Ligeramente menor que el nodo para encajar */
+  border-top-right-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(255, 215, 0, 0.3); /* Línea dorada sutil */
+}
+
+.nodeSection textarea,
+.nodeSection input[type="text"],
+.nodeSection input[type="number"],
+.nodeSection select {
+  background-color: #1f2a38; /* Fondo oscuro para campos */
+  color: #e0e0e0; /* Texto claro en campos */
+  border: 1px solid #4a5568; /* Borde sutil gris */
+  border-radius: 4px;
+  padding: 8px 10px;
+  margin-top: 4px;
+  font-family: inherit;
+  width: calc(100% - 20px); /* Ajustar para padding */
+  box-sizing: border-box;
+}
+
+.nodeSection textarea:focus,
+.nodeSection input[type="text"]:focus,
+.nodeSection input[type="number"]:focus,
+.nodeSection select:focus {
+  border-color: gold; /* Borde dorado en foco */
+  outline: none;
+  box-shadow: 0 0 5px rgba(255, 215, 0, 0.5); /* Sombra dorada sutil */
+}
+
+.promptTextarea {
+  min-height: 80px; /* Altura mínima inicial */
+  resize: vertical; /* Permitir redimensionamiento vertical manual por ahora */
+  overflow-y: auto; /* Scroll si el contenido excede */
+}
+
+.contentWrapper {
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px; /* Espacio entre secciones */
+}
+
+.section {
+  background-color: rgba(255, 255, 255, 0.03); /* Fondo muy sutil para secciones */
+  border-radius: 6px;
+  padding: 12px;
+  border: 1px solid rgba(255, 215, 0, 0.1); /* Borde dorado muy tenue */
+}
+
+.sectionTitle {
+  font-size: 0.9em;
+  font-weight: 500;
+  color: #ffd700; /* Dorado */
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+}
+
+.sectionTitle svg {
+  margin-right: 6px;
+  width: 16px;
+  height: 16px;
+}
+
+.parameterGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 10px;
+}
+
+.parameterItem label {
+  display: block;
+  font-size: 0.85em;
+  color: #b0b0b0; /* Gris claro para etiquetas */
+  margin-bottom: 4px;
+}
+
+.responseSection {
+  margin-top: 10px;
+  padding: 10px;
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+  border: 1px dashed rgba(255, 215, 0, 0.3);
+}
+
+.responsePreview {
+  font-size: 0.9em;
+  color: #c0c0c0;
+  max-height: 100px;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.statusIndicator {
+  padding: 8px;
+  border-radius: 4px;
+  font-size: 0.85em;
+  text-align: center;
+  margin-top: 10px;
+}
+.statusLoading {
+  background-color: rgba(255, 215, 0, 0.2); /* Dorado translúcido */
+  color: #ffd700;
+  border: 1px solid rgba(255, 215, 0, 0.5);
+}
+.statusError {
+  background-color: rgba(255, 60, 60, 0.2); /* Rojo translúcido */
+  color: #ff8080;
+  border: 1px solid rgba(255, 60, 60, 0.5);
+}
+.statusSuccess {
+  background-color: rgba(60, 255, 120, 0.2); /* Verde translúcido */
+  color: #80ffa0;
+  border: 1px solid rgba(60, 255, 120, 0.5);
+}
+
+.button {
+  background: linear-gradient(145deg, #ffd700, #f0c000); /* Dorado */
+  color: #1a1a1a; /* Texto oscuro para contraste */
+  border: none;
+  padding: 10px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: 600;
+  text-align: center;
+  transition:
+    transform 0.1s,
+    box-shadow 0.2s;
+  margin-top: 10px;
+}
+.button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(255, 215, 0, 0.4);
+}
+.button:active {
+  transform: translateY(0px);
+  box-shadow: 0 2px 5px rgba(255, 215, 0, 0.3);
+}
+
+/* Estilos para los Handles de React Flow */
+.handle {
+  width: 14px;
+  height: 14px;
+  background: #ffd700; /* Dorado */
+  border: 2px solid #0d0c0f; /* Mismo fondo que el nodo para efecto "incrustado" */
+  border-radius: 50%;
+}
+
+.handleTarget {
+  /* Estilos específicos si el handle de entrada es diferente */
+}
+
+.handleSource {
+  /* Estilos específicos si el handle de salida es diferente */
+}
+
+.selected {
+  /* Podrías añadir un efecto de selección más pronunciado si lo deseas */
+  /* Por ejemplo, intensificar la sombra del borde o el brillo */
+}

@@ -1,0 +1,161 @@
+.ts-custom-minimap-container {
+  position: absolute;
+  bottom: 1rem;
+  left: 1rem;
+  z-index: 1002;
+  transition: all 0.35s cubic-bezier(0.25, 0.1, 0.25, 1);
+  cursor: pointer;
+  user-select: none;
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+}
+
+.ts-custom-minimap-container.collapsed {
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  background: rgba(18, 18, 40, 0.8);
+  border: 2px solid var(--primary-color);
+  box-shadow:
+    0 0 8px var(--primary-color),
+    0 0 12px var(--secondary-color);
+  animation: ts-neonPulse 3s infinite;
+  overflow: hidden;
+}
+
+.ts-custom-minimap-container.expanded {
+  width: 180px;
+  height: 180px;
+  border-radius: 12px;
+  background: rgba(18, 18, 40, 0.85);
+  border: 2px solid var(--primary-color);
+  box-shadow:
+    0 0 12px var(--primary-color),
+    0 0 18px var(--secondary-color);
+  overflow: hidden;
+}
+
+.ts-custom-minimap-container.dragging {
+  cursor: grabbing;
+  box-shadow:
+    0 0 15px var(--primary-color),
+    0 0 25px var(--secondary-color);
+}
+
+.ts-custom-minimap-container:hover {
+  box-shadow:
+    0 0 15px var(--primary-color),
+    0 0 20px var(--secondary-color);
+  transform: scale(1.02);
+}
+
+.ts-custom-minimap-container .ts-minimap-canvas {
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  background: transparent;
+}
+
+.ts-custom-minimap-container .ts-minimap-labels {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  padding: 8px;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0) 100%);
+  color: var(--text-color);
+  text-shadow: 0 0 5px var(--primary-color);
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.ts-custom-minimap-container .ts-minimap-title {
+  font-weight: bold;
+  font-size: 12px;
+  margin-bottom: 2px;
+  letter-spacing: 0.5px;
+}
+
+.ts-custom-minimap-container .ts-minimap-hint {
+  font-size: 10px;
+  opacity: 0.8;
+}
+
+.ts-custom-minimap-container .ts-minimap-hint.active {
+  color: var(--primary-color);
+  font-weight: bold;
+}
+
+.ts-custom-minimap-container .ts-minimap-icon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: var(--primary-color);
+  opacity: 0.9;
+  animation: ts-iconPulse 2s infinite;
+}
+
+.ts-custom-minimap-container .ts-minimap-empty {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  color: #a0a0a0;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.ts-minimap-empty p {
+  margin: 0;
+  font-size: 10px;
+}
+
+@keyframes ts-neonPulse {
+  0% {
+    box-shadow:
+      0 0 5px var(--primary-color),
+      0 0 10px var(--primary-color);
+  }
+  50% {
+    box-shadow:
+      0 0 12px var(--primary-color),
+      0 0 20px var(--primary-color);
+  }
+  100% {
+    box-shadow:
+      0 0 5px var(--primary-color),
+      0 0 10px var(--primary-color);
+  }
+}
+
+@keyframes ts-iconPulse {
+  0% {
+    opacity: 0.5;
+    transform: translate(-50%, -50%) scale(0.95);
+  }
+  50% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.05);
+  }
+  100% {
+    opacity: 0.5;
+    transform: translate(-50%, -50%) scale(0.95);
+  }
+}
+
+@media (max-width: 768px) {
+  .ts-custom-minimap-container.expanded {
+    width: 150px;
+    height: 150px;
+  }
+
+  .ts-custom-minimap-container.collapsed {
+    width: 40px;
+    height: 40px;
+  }
+}

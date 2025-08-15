@@ -1,0 +1,131 @@
+/* ==========================================================================
+   Fuentes e Importaciones
+   ========================================================================== */
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Roboto+Mono:wght@400;500&family=Orbitron:wght@400;700&display=swap");
+
+/* ==========================================================================
+      Variables Globales
+      ========================================================================== */
+:root {
+  --primary-bg: #0a0e2f;
+  --accent-color: #00e0ff;
+  --text-color: #ffffff;
+  --glow: 0 0 10px rgba(0, 224, 255, 0.8);
+
+  --font-base: 16px;
+  --font-small: 14px;
+  --font-xsmall: 13px;
+
+  --padding-button: 10px 20px;
+  --border-radius: 8px;
+}
+
+/* ==========================================================================
+      Estilos Base
+      ========================================================================== */
+body:not(.marketplace) {
+  /* Excluir el Marketplace */
+  background: var(--primary-bg);
+  color: var(--text-color);
+  font-family: "Inter", sans-serif;
+  font-size: var(--font-base);
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
+button:not(.marketplace button) {
+  /* Excluir botones del Marketplace */
+  background: var(--accent-color);
+  color: var(--primary-bg);
+  border: none;
+  padding: var(--padding-button);
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  transition: box-shadow 0.3s ease;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+button:not(.marketplace button):hover {
+  box-shadow: var(--glow);
+}
+
+/* ==========================================================================
+      Media Queries Adaptativos
+      ========================================================================== */
+
+/* Pantallas 4K y ultra grandes */
+@media (min-width: 1441px) {
+  body:not(.marketplace) {
+    font-size: 17px;
+  }
+
+  button:not(.marketplace button) {
+    font-size: 1.1rem;
+    padding: 12px 24px;
+  }
+}
+
+/* Laptops grandes y pantallas estándar */
+@media (max-width: 1440px) {
+  body:not(.marketplace) {
+    font-size: 16px;
+  }
+}
+
+/* Laptops medianos (1025px a 1279px) */
+@media (max-width: 1279px) {
+  body:not(.marketplace) {
+    font-size: 15px;
+  }
+
+  button:not(.marketplace button) {
+    padding: 9px 18px;
+  }
+}
+
+/* Tablets grandes y medianos */
+@media (max-width: 1024px) {
+  body:not(.marketplace) {
+    font-size: var(--font-small);
+  }
+
+  button:not(.marketplace button) {
+    font-size: 0.95rem;
+    padding: 9px 16px;
+  }
+}
+
+/* Smartphones grandes y tablets pequeñas */
+@media (max-width: 768px) {
+  body:not(.marketplace) {
+    font-size: var(--font-small);
+  }
+
+  button:not(.marketplace button) {
+    font-size: 0.9rem;
+    padding: 8px 14px;
+  }
+}
+
+/* Móviles pequeños */
+@media (max-width: 480px) {
+  body:not(.marketplace) {
+    font-size: var(--font-xsmall);
+  }
+
+  button:not(.marketplace button) {
+    font-size: 0.85rem;
+    padding: 7px 12px;
+  }
+}
+
+body.marketplace-page {
+  z-index: 10000 !important;
+  overflow-y: auto !important;
+}
+
+body.marketplace-page .marketplace {
+  overflow: visible !important;
+}

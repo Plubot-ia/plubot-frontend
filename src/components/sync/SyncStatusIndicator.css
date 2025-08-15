@@ -1,0 +1,179 @@
+:root {
+  --color-blue: #4285f4;
+  --color-green: #34a853;
+  --color-red: #ea4335;
+  --color-gray: #9aa0a6;
+}
+
+.sync-indicator {
+  display: flex;
+  flex-direction: column;
+  background-color: rgba(255, 255, 255, 0.95);
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 10px;
+  margin: 8px 0;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border-left: 3px solid var(--status-color, var(--color-gray));
+  max-width: 300px;
+  overflow: hidden;
+}
+
+.sync-indicator:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.sync-indicator.expanded {
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+}
+
+.sync-indicator-basic {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.sync-icon {
+  font-size: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.sync-status-text {
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+}
+
+.sync-details {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #eee;
+  font-size: 13px;
+  overflow: hidden;
+}
+
+.sync-detail-item {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  color: #555;
+}
+
+.sync-errors {
+  margin-top: 10px;
+}
+
+.sync-errors h4 {
+  color: var(--color-red);
+  margin: 0 0 8px 0;
+  font-size: 13px;
+}
+
+.sync-errors ul {
+  margin: 0;
+  padding-left: 20px;
+  font-size: 12px;
+  color: #666;
+}
+
+.sync-controls {
+  margin-top: 12px;
+  display: flex;
+  justify-content: center;
+}
+
+.sync-now-btn {
+  background-color: var(--color-blue);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 6px 12px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.sync-now-btn:hover {
+  background-color: #3367d6;
+}
+
+.sync-now-btn:disabled {
+  background-color: var(--color-gray);
+  cursor: not-allowed;
+}
+
+/* Estados específicos */
+.sync-indicator.syncing .sync-status-text {
+  color: var(--color-blue);
+}
+
+.sync-indicator.success .sync-status-text {
+  color: var(--color-green);
+}
+
+.sync-indicator.error .sync-status-text {
+  color: var(--color-red);
+}
+
+/* Versión flotante para mostrar en la esquina de la pantalla */
+.sync-indicator.floating {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 1000;
+  max-width: 250px;
+}
+
+/* Versión compacta para barras de navegación */
+.sync-indicator.compact {
+  padding: 6px 10px;
+  border-radius: 20px;
+  max-width: auto;
+  border: none;
+  background-color: transparent;
+  box-shadow: none;
+}
+
+.sync-indicator.compact .sync-status-text {
+  display: none;
+}
+
+.sync-indicator.compact:hover .sync-status-text {
+  display: inline;
+}
+
+/* Estilos para modo oscuro */
+@media (prefers-color-scheme: dark) {
+  .sync-indicator {
+    background-color: rgba(32, 33, 36, 0.95);
+    border-left-color: var(--status-color, var(--color-gray));
+  }
+
+  .sync-status-text {
+    color: #e8eaed;
+  }
+
+  .sync-detail-item {
+    color: #bdc1c6;
+  }
+
+  .sync-details {
+    border-top-color: #3c4043;
+  }
+
+  .sync-errors ul {
+    color: #9aa0a6;
+  }
+}

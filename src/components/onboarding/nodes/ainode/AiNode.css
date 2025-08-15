@@ -1,0 +1,325 @@
+/* src/components/onboarding/nodes/ainode/AiNode.css */
+
+/* Base AiNode styles from AiNode.module.css (adapted) */
+.ai-node {
+  background-color: #2c3e50; /* Azul grisáceo oscuro para mejor contraste */
+  color: #ecf0f1; /* Texto claro para contraste */
+  border: 3px solid transparent; /* Borde base transparente para el efecto de brillo */
+  border-radius: 12px;
+  min-width: 300px;
+  max-width: 450px; /* Max width from module.css, AiNode.css had 600px */
+  font-family:
+    "Inter",
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    "Helvetica Neue",
+    Arial,
+    sans-serif;
+  box-shadow: 0 0 20px rgba(255, 215, 0, 0.3); /* Sombra dorada sutil base */
+  position: relative; /* Para el pseudo-elemento del borde */
+  padding: 0; /* El padding se manejará en las secciones internas y header/content */
+  transition: all 0.3s ease; /* From original AiNode.css */
+}
+
+/* Borde dorado brillante (estático para modo ultra, base para animación) */
+.ai-node::before {
+  content: "";
+  position: absolute;
+  top: -3px;
+  left: -3px;
+  right: -3px;
+  bottom: -3px; /* Ajustar al tamaño del borde */
+  border-radius: 12px; /* Mismo que el nodo */
+  border: 3px solid #ffd700; /* Dorado brillante */
+  z-index: -1; /* Detrás del contenido del nodo */
+  pointer-events: none; /* No interferir con el mouse */
+}
+
+/* Estilos para modo normal (con animación de resplandor) */
+.ai-node.ai-node--normal-mode::before {
+  /* Combined .ai-node with mode */
+  animation: pulseGoldBorder 3s infinite ease-in-out;
+}
+
+/* Estilos para modo ultra (sin animación) */
+.ai-node.ai-node--ultra-performance {
+  transition: none !important; /* Desactivar transición general del nodo */
+}
+
+.ai-node.ai-node--ultra-performance::before {
+  /* Combined .ai-node with mode */
+  animation: none !important; /* Asegurar que la animación del borde se desactive */
+  box-shadow: 0 0 15px 3px rgba(255, 215, 0, 0.7); /* Un resplandor estático más pronunciado */
+}
+
+@keyframes pulseGoldBorder {
+  0% {
+    box-shadow: 0 0 8px 0px rgba(255, 215, 0, 0.6);
+  }
+  50% {
+    box-shadow: 0 0 18px 5px rgba(255, 215, 0, 0.8);
+  }
+  100% {
+    box-shadow: 0 0 8px 0px rgba(255, 215, 0, 0.6);
+  }
+}
+
+/* Header styles */
+.ai-node-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  background-color: rgba(0, 0, 0, 0.2); /* Capa oscura semitransparente */
+  padding: 10px 15px;
+  border-top-left-radius: 9px;
+  border-top-right-radius: 9px;
+  border-bottom: 1px solid rgba(255, 215, 0, 0.3); /* Línea dorada sutil */
+}
+
+.ai-node-header h3 {
+  margin: 0;
+  font-size: 1.1em;
+  font-weight: bold;
+  color: gold;
+  text-shadow: 0 0 5px rgba(255, 215, 0, 0.7);
+}
+
+.collapse-toggle {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 215, 0, 0.5);
+  border-radius: 5px;
+  color: #ecf0f1;
+  cursor: pointer;
+  font-size: 12px;
+  padding: 5px 10px;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.collapse-toggle:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-1px);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.25);
+}
+
+/* Desactivar transiciones y transformaciones en modo ultra para el botón de colapsar */
+.ai-node.ai-node--ultra-performance .collapse-toggle {
+  transition: none !important;
+}
+
+.ai-node.ai-node--ultra-performance .collapse-toggle:hover {
+  transform: none !important; /* Evitar el movimiento en hover */
+  /* Opcionalmente, mantener el cambio de background si se desea, o neutralizarlo también */
+  /* background: rgba(255, 255, 255, 0.1); */ /* Mismo que el estado normal si no se quiere cambio visual */
+}
+
+/* Content wrapper */
+.ai-node-content {
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px; /* Espacio entre secciones */
+}
+
+/* Section styles */
+.ainode-section {
+  background-color: rgba(255, 255, 255, 0.03);
+  border-radius: 6px;
+  padding: 12px;
+  border: 1px solid rgba(255, 215, 0, 0.1);
+}
+
+.ainode-section-title {
+  font-size: 0.9em;
+  font-weight: 500;
+  color: #ffd700;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+}
+
+.ainode-section-title svg {
+  margin-right: 6px;
+  width: 16px;
+  height: 16px;
+}
+
+/* Input, Textarea, Select styles */
+.ainode-textarea,
+.ainode-input,
+.ainode-select {
+  background-color: #1f2a38;
+  color: #e0e0e0;
+  border: 1px solid #4a5568;
+  border-radius: 4px;
+  padding: 8px 10px;
+  margin-top: 4px;
+  font-family: inherit;
+  width: calc(100% - 20px);
+  box-sizing: border-box;
+}
+
+.ainode-textarea:focus,
+.ainode-input:focus,
+.ainode-select:focus {
+  border-color: gold;
+  outline: none;
+  box-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
+}
+
+.ainode-textarea {
+  min-height: 80px;
+  resize: vertical;
+  overflow-y: auto;
+}
+
+/* Parameter Grid styles */
+.ainode-parameter-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 10px;
+}
+
+.ainode-parameter-item label {
+  display: block;
+  font-size: 0.85em;
+  color: #b0b0b0;
+  margin-bottom: 4px;
+}
+
+/* Response Preview styles */
+.ainode-response-preview {
+  font-size: 0.9em;
+  color: #c0c0c0;
+  max-height: 100px;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+  background-color: rgba(0, 0, 0, 0.2);
+  padding: 10px;
+  border-radius: 4px;
+  border: 1px dashed rgba(255, 215, 0, 0.3);
+  margin-top: 5px;
+}
+
+/* Status Indicator styles */
+.ainode-status-indicator {
+  padding: 8px;
+  border-radius: 4px;
+  font-size: 0.85em;
+  text-align: center;
+  margin-top: 10px;
+}
+.ainode-status-loading {
+  background-color: rgba(255, 215, 0, 0.2);
+  color: #ffd700;
+  border: 1px solid rgba(255, 215, 0, 0.5);
+}
+.ainode-status-error {
+  background-color: rgba(255, 60, 60, 0.2);
+  color: #ff8080;
+  border: 1px solid rgba(255, 60, 60, 0.5);
+}
+.ainode-status-success {
+  background-color: rgba(60, 255, 120, 0.2);
+  color: #80ffa0;
+  border: 1px solid rgba(60, 255, 120, 0.5);
+}
+
+/* Button styles */
+.ainode-button {
+  background: linear-gradient(145deg, #ffd700, #f0c000);
+  color: #1a1a1a;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: 600;
+  text-align: center;
+  transition:
+    transform 0.1s,
+    box-shadow 0.2s;
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.ainode-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(255, 215, 0, 0.4);
+}
+.ainode-button:active {
+  transform: translateY(0px);
+  box-shadow: 0 2px 5px rgba(255, 215, 0, 0.3);
+}
+.ainode-button:disabled {
+  background: #555;
+  color: #888;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
+/* Preserved Handle styles from original AiNode.css */
+div.ai-node.ai-node--normal-mode .react-flow__handle.ai-node__handle {
+  width: 15px !important;
+  height: 15px !important;
+  background-color: #3b82f6 !important;
+  border: 2px solid white !important;
+  border-radius: 50% !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+  cursor: pointer !important;
+  z-index: 10 !important;
+  transition:
+    background-color 0.2s ease,
+    filter 0.2s ease,
+    border-color 0.2s ease;
+  filter: none;
+}
+
+div.ai-node.ai-node--normal-mode .react-flow__handle.ai-node__handle:hover {
+  background-color: #00aaff !important;
+  border-color: white !important;
+  filter: brightness(1.2) !important;
+}
+
+div.ai-node.ai-node--ultra-performance .react-flow__handle.ai-node__handle {
+  width: 10px !important;
+  height: 10px !important;
+  background-color: #888888 !important;
+  border: 1px solid #555555 !important;
+  border-radius: 50% !important;
+  box-shadow: none !important;
+  cursor: pointer !important;
+  z-index: 10 !important;
+  transition: none !important;
+  filter: none !important;
+}
+
+div.ai-node.ai-node--ultra-performance .react-flow__handle.ai-node__handle:hover {
+  background-color: #888888 !important;
+  border-color: #555555 !important;
+  filter: none !important;
+}
+
+/* Positioning for Normal Mode Handles */
+div.ai-node.ai-node--normal-mode .react-flow__handle-left.ai-node__handle {
+  left: -7.5px !important;
+}
+
+div.ai-node.ai-node--normal-mode .react-flow__handle-right.ai-node__handle {
+  right: -7.5px !important;
+}
+
+/* Positioning for Ultra-Performance Mode Handles */
+div.ai-node.ai-node--ultra-performance .react-flow__handle-left.ai-node__handle {
+  left: -5px !important;
+}
+
+div.ai-node.ai-node--ultra-performance .react-flow__handle-right.ai-node__handle {
+  right: -5px !important;
+}

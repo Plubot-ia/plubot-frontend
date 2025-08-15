@@ -1,0 +1,101 @@
+/* Estilo de notificaciones tipo StatusBubble */
+.global-notifications {
+  position: fixed;
+  bottom: 30px; /* Posicionado cerca de Byte, como StatusBubble */
+  right: 100px;
+  z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 250px;
+  pointer-events: auto;
+}
+
+.global-notification {
+  background-color: rgba(0, 224, 255, 0.9); /* Color cian brillante, similar a StatusBubble */
+  color: #0a1423; /* Texto oscuro para contraste */
+  padding: 10px 15px;
+  border-radius: 15px;
+  box-shadow:
+    0 0 15px rgba(0, 224, 255, 0.5),
+    0 0 25px rgba(0, 224, 255, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  text-align: center;
+  font-size: 0.9rem;
+  animation: fadeInGrow 0.5s forwards;
+  opacity: 0;
+  transform: translateY(20px) scale(0.9);
+}
+
+/* Estilos específicos por tipo */
+.notification-info {
+  background-color: rgba(0, 224, 255, 0.9); /* Azul cian como Byte */
+}
+
+.notification-success {
+  background-color: rgba(50, 205, 50, 0.9); /* Verde */
+}
+
+.notification-warning {
+  background-color: rgba(255, 165, 0, 0.9); /* Naranja */
+}
+
+.notification-error {
+  background-color: rgba(255, 69, 0, 0.9); /* Rojo */
+}
+
+.notification-message {
+  flex: 1;
+  font-family: "Inter", "Roboto", sans-serif;
+  font-weight: 500;
+}
+
+.notification-close {
+  background: rgba(0, 0, 0, 0.2);
+  border: none;
+  color: #0a1423;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  padding: 0 5px;
+  line-height: 1;
+  opacity: 0.9;
+  transition: all 0.2s ease;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  margin-left: 8px;
+}
+
+.notification-close:hover {
+  opacity: 1;
+  background: rgba(0, 0, 0, 0.3);
+}
+
+/* Animaciones */
+@keyframes fadeInGrow {
+  0% {
+    opacity: 0;
+    transform: translateY(20px) scale(0.9);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes fadeOutShrink {
+  0% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(20px) scale(0.9);
+  }
+}

@@ -1,0 +1,727 @@
+/**
+ * @file EndNode.css
+ * @description Estilos de élite mundial para el componente EndNode
+ * @version 4.1.0
+ * @author PLUBOT Team
+ */
+
+/* ======================================================
+ * VARIABLES CSS PARA PERSONALIZACIÓN Y COHERENCIA
+ * ====================================================== */
+:root {
+  /* Paleta magenta suave */
+  --node-shared-accent: 217, 70, 239; /* rgb(217, 70, 239) - Magenta principal */
+  --end-node-primary: var(--node-shared-accent);
+  --end-node-primary-hover: 192, 38, 211;
+  --end-node-primary-light: 240, 171, 252;
+  --end-node-primary-dark: 147, 51, 234;
+
+  /* Estados y feedback */
+  --end-node-success: 22, 163, 74;
+  --end-node-warning: 234, 179, 8;
+  --end-node-error: 220, 38, 38;
+  --end-node-info: 6, 182, 212;
+
+  /* Neutrales - Modo claro */
+  --end-node-text: 17, 24, 39;
+  --end-node-text-light: 107, 114, 128;
+  --end-node-text-lighter: 156, 163, 175;
+
+  /* Fondos - Modo claro */
+  --end-node-bg: 255, 255, 255;
+  --end-node-bg-light: 249, 250, 251;
+  --end-node-bg-dark: 243, 244, 246;
+
+  /* Neutrales - Modo oscuro */
+  --end-node-text-dark: 229, 231, 235;
+  --end-node-text-light-dark: 156, 163, 175;
+  --end-node-text-lighter-dark: 107, 114, 128;
+
+  /* Fondos - Modo oscuro */
+  --end-node-bg-dark-mode: 31, 41, 55;
+  --end-node-bg-light-dark: 55, 65, 81;
+  --end-node-bg-dark-dark: 17, 24, 39;
+
+  /* Bordes */
+  --end-node-border: 229, 231, 235;
+  --end-node-border-dark: 209, 213, 219;
+  --end-node-border-dark-mode: 75, 85, 99;
+
+  /* Sombras (Revisadas para parecerse a StartNode) */
+  --end-node-shadow-base: 0 2px 4px rgba(0, 0, 0, 0.06);
+  --end-node-shadow-hover:
+    0 4px 12px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(var(--end-node-primary), 0.2);
+  --end-node-shadow-selected:
+    0 6px 16px rgba(0, 0, 0, 0.12), 0 0 0 2.5px rgba(var(--end-node-primary), 0.4);
+  --end-node-shadow-selected-hover:
+    0 7px 18px rgba(0, 0, 0, 0.15), 0 0 0 3px rgba(var(--end-node-primary), 0.5); /* Para .selected:hover */
+
+  /* Dimensiones */
+  --end-node-border-radius: 12px; /* Ajustado */
+  --end-node-border-radius-sm: 4px;
+  --end-node-border-radius-lg: 16px; /* Ajustado para mayor redondez si se usa */
+  --end-node-border-width: 2px;
+
+  /* Transiciones */
+  --end-node-transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  --end-node-transition-slow: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --end-node-transition-bounce: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  --end-node-scale-hover: 1.02;
+  --end-node-scale-selected: 1.03;
+
+  /* Dimensiones del nodo */
+  --end-node-width: 220px;
+  --end-node-min-width: 150px;
+  --end-node-max-width: 350px;
+  --end-node-min-height: 120px;
+  --end-node-collapsed-height: 40px;
+  --end-node-header-height: 40px;
+  --end-node-footer-height: 40px;
+  --end-node-padding: 1rem; /* Ajustado */
+  --end-node-padding-sm: 0.5rem; /* Ajustado */
+  --end-node-padding-lg: 1.25rem; /* Ajustado */
+
+  /* Accesibilidad */
+  --end-node-focus-ring: 0 0 0 2px rgb(var(--end-node-primary));
+  --end-node-focus-ring-offset: 2px;
+  --end-node-min-touch-target: 44px;
+
+  /* Glassmorphism */
+  --end-node-glass-blur: 8px;
+  --end-node-glass-opacity: 0.8;
+  --end-node-glass-border: 1px solid rgba(255, 255, 255, 0.2);
+
+  /* Tipografía */
+  --end-node-font-family:
+    system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial,
+    sans-serif;
+  --end-node-font-size: clamp(12px, 1.5vw, 14px);
+  --end-node-font-size-sm: clamp(10px, 1.2vw, 12px);
+  --end-node-font-size-lg: clamp(14px, 1.8vw, 16px);
+  --end-node-line-height: 1.5;
+
+  /* Variables para handle */
+  --handle-default-size: 15px;
+  --handle-default-bg-color: #3b82f6;
+  --handle-default-border-width: 2px;
+  --handle-default-border-color: white;
+  --handle-default-offset: -8px;
+  --handle-ultra-size: 15px;
+  --handle-ultra-bg-color: #3b82f6;
+  --handle-ultra-border-width: 1px;
+  --handle-ultra-border-color: white;
+  --handle-ultra-offset: -5px;
+}
+
+/* ======================================================
+ * ESTILOS PRINCIPALES DEL NODO
+ * ====================================================== */
+.end-node {
+  background: linear-gradient(145deg, #5a2d3e, #9d355a);
+  border: 2px solid #c2185b;
+  border-radius: 12px;
+  box-shadow:
+    0 4px 15px rgba(0, 0, 0, 0.2),
+    0 0 10px rgba(194, 24, 91, 0.5);
+  color: #ffffff;
+  font-family: "Inter", sans-serif;
+  min-height: 100px;
+  min-width: 220px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: relative;
+  transform: translateY(-5px); /* Apply hover's vertical shift to base state */
+  transition: box-shadow 0.3s ease; /* Remove transform from transition */
+  /* animation: nodeAppear 0.5s ease-out; */ /* Temporarily commented out for testing pulse */
+}
+
+/* Anular efectos de hover/focus en modo ultra para EndNode */
+body.ultra-mode .end-node:hover,
+body.ultra-mode .end-node:focus,
+body.ultra-mode .end-node.selected:hover, /* Cubrir también el estado seleccionado + hover */
+body.ultra-mode .end-node.selected:focus {
+  /* Cubrir también el estado seleccionado + focus */
+  box-shadow:
+    0 4px 15px rgba(0, 0, 0, 0.2),
+    0 0 10px rgba(194, 24, 91, 0.5) !important; /* Sombra base del .end-node */
+  transform: translateY(-5px) !important; /* Transform base del .end-node */
+  border-color: #c2185b !important; /* Color de borde base del .end-node */
+  transition: none !important;
+  animation: none !important;
+}
+
+/* Estilos para los handles de EndNode con mayor especificidad */
+.end-node .react-flow__handle.end-node-handle {
+  width: var(--handle-default-size) !important; /* 15px */
+  height: var(--handle-default-size) !important; /* 15px */
+  background-color: var(--handle-default-bg-color) !important;
+  border: var(--handle-default-border-width) solid var(--handle-default-border-color) !important;
+  border-radius: 50% !important;
+  cursor: pointer !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important; /* Coincide con StartNode */
+  left: var(--handle-default-offset) !important; /* Ajustado para usar -8px */
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  z-index: 10 !important;
+  box-sizing: content-box !important; /* Clave para el tamaño del contenido */
+}
+
+.end-node .react-flow__handle.end-node-handle:hover {
+  background-color: var(--handle-default-bg-color) !important; /* Use base color */
+  filter: brightness(120%) !important; /* Match StartNode hover effect */
+}
+
+/* Estilos para modo ultra rendimiento */
+.ultra-performance .end-node .react-flow__handle.end-node-handle {
+  width: var(--handle-default-size) !important; /* Ensure same size even in ultra mode */
+  height: var(--handle-default-size) !important; /* Ensure same size even in ultra mode */
+  background-color: var(--handle-default-bg-color) !important;
+  border: var(--handle-default-border-width) solid var(--handle-default-border-color) !important;
+  box-shadow: none !important;
+  transition: none !important;
+  left: calc(var(--handle-default-size) * -0.5) !important;
+}
+
+/* Estilos para los handles de EndNode */
+.end-node-handle {
+  width: var(--handle-default-size);
+  height: var(--handle-default-size);
+  background-color: var(--handle-default-bg-color);
+  border: var(--handle-default-border-width) solid var(--handle-default-border-color);
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: var(--handle-default-box-shadow);
+  transition: var(--handle-default-transition);
+}
+
+.end-node-handle--target {
+  left: calc(var(--handle-default-size) * -0.5);
+}
+
+/* Estilos para modo ultra rendimiento */
+.ultra-performance .end-node-handle {
+  width: var(--handle-default-size);
+  height: var(--handle-default-size);
+  background-color: var(--handle-default-bg-color);
+  border: var(--handle-default-border-width) solid var(--handle-default-border-color);
+  box-shadow: none;
+  transition: none;
+}
+
+.ultra-performance .end-node-handle--target {
+  left: calc(var(--handle-default-size) * -0.5);
+}
+
+/* Handle styles with higher specificity */
+.end-node.react-flow__node .react-flow__handle {
+  left: -7.5px !important;
+  right: auto !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  background: rgb(59, 130, 246) !important;
+  border: 2px solid rgb(255, 255, 255) !important;
+  width: 15px !important;
+  height: 15px !important;
+  border-radius: 50% !important;
+  transition:
+    background-color 0.2s ease-in-out,
+    filter 0.2s ease-in-out,
+    transform 0.2s ease-in-out,
+    box-shadow 0.2s ease-in-out !important;
+  box-sizing: border-box !important;
+  z-index: 10 !important;
+  pointer-events: all !important;
+  visibility: visible !important;
+  box-shadow: rgba(0, 0, 0, 0.1) 0px 1px 3px 0px !important;
+  cursor: pointer !important;
+}
+
+.end-node.react-flow__node .react-flow__handle:hover {
+  background: #00aaff !important;
+}
+
+/* Ultra mode handle with higher specificity */
+.flow-editor-container.ultra-mode .end-node.react-flow__node .react-flow__handle {
+  width: 15px !important;
+  height: 15px !important;
+  background: rgb(59, 130, 246) !important;
+  border: 2px solid rgb(255, 255, 255) !important;
+  left: -7.5px !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  box-shadow: none !important;
+  transition: none !important;
+  pointer-events: all !important;
+  visibility: visible !important;
+  cursor: pointer !important;
+}
+
+/* Animación de aparición */
+@keyframes nodeAppear {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Efecto hover para versión normal */
+.end-node:hover {
+  /* transform: translateY(-5px); Removed as it's now in base state */
+  box-shadow:
+    0 8px 20px rgba(0, 0, 0, 0.3),
+    0 0 15px rgba(30, 136, 229, 0.7);
+}
+
+/* Ajustar el tamaño del handle para que coincida exactamente con StartNode */
+.end-node .react-flow__handle {
+  left: -7.5px;
+  right: auto;
+  top: 50%;
+  transform: translateY(-50%);
+  background: var(--handle-default-bg-color);
+  border: var(--handle-default-border-width) solid var(--handle-default-border-color);
+  width: var(--handle-default-size);
+  height: var(--handle-default-size);
+  border-radius: 50%;
+  transition: background 0.3s ease;
+  box-sizing: border-box;
+  z-index: 10;
+}
+
+.end-node .react-flow__handle:hover {
+  background: #00aaff;
+}
+
+.flow-editor-container.ultra-mode .end-node .react-flow__handle {
+  width: var(--handle-default-size);
+  height: var(--handle-default-size);
+  background: var(--handle-default-bg-color);
+  border: var(--handle-default-border-width) solid var(--handle-default-border-color);
+  left: -7.5px;
+  top: 50%;
+  transform: translateY(-50%);
+  box-shadow: none;
+  transition: none;
+}
+
+/* Título del nodo */
+.end-node-title {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  text-align: center;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+/* Contenido dinámico */
+.end-node-content {
+  font-size: 14px;
+  line-height: 1.4;
+  text-align: center;
+  opacity: 0.9;
+}
+
+/* Indicador visual de nodo final */
+.end-node-indicator {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(to right, #ff5252, #ff4081);
+  border-radius: 0 0 10px 10px;
+}
+
+/* Estilo para información adicional de élite */
+.end-node-elite-info {
+  margin-top: 12px;
+  font-size: 12px;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 6px 10px;
+  border-radius: 6px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.end-node-elite-info span {
+  display: inline-block;
+  margin-right: 8px;
+}
+
+/* Efecto de pulso para destacar */
+@keyframes pulse {
+  0% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.6;
+  }
+}
+
+.end-node-highlight {
+  animation: pulse 2s infinite;
+}
+
+/* Versión Optimizada para Modo Ultra Rendimiento */
+.end-node.ultra-mode,
+.end-node.ultra-mode:hover,
+.end-node.ultra-mode.selected,
+.end-node.ultra-mode.selected:hover {
+  transition: none !important;
+  transform: translateY(0) scale(1) !important;
+  animation: none !important;
+  background: linear-gradient(
+    135deg,
+    rgba(var(--end-node-primary-light), 0.1),
+    rgba(var(--end-node-primary), 0.15),
+    rgba(var(--end-node-primary-dark), 0.1)
+  ) !important;
+  box-shadow: var(--end-node-shadow) !important;
+  border-color: rgba(var(--end-node-primary), 0.6) !important;
+}
+
+.end-node.ultra-mode .end-node-handle,
+.end-node.ultra-mode .end-node-content,
+.end-node.ultra-mode .end-node-metrics {
+  transition: none !important;
+  transform: none !important;
+  animation: none !important;
+}
+
+/* ======================================================
+ * ESTADOS DEL NODO
+ * ====================================================== */
+
+/* Estado hover - microinteracción suave con efecto magenta */
+.end-node:hover {
+  /* transform: translateY(-5px); Removed as it's now in base state */
+  box-shadow:
+    0 8px 20px rgba(0, 0, 0, 0.3),
+    0 0 15px rgba(30, 136, 229, 0.7);
+}
+
+/* Estado focus - accesibilidad mejorada con efecto magenta */
+.end-node:focus-visible {
+  outline: none;
+  box-shadow:
+    var(--end-node-focus-ring),
+    var(--end-node-shadow-base),
+    0 0 15px rgba(var(--end-node-primary), 0.4); /* Usar shadow-base aquí también */
+  border-color: rgb(var(--end-node-primary));
+}
+
+/* Estado seleccionado - destacado premium con efecto magenta */
+.end-node.selected {
+  border-color: rgb(var(--end-node-primary));
+  border-width: var(--end-node-border-width);
+  box-shadow: var(--end-node-shadow-selected); /* Actualizado */
+  background: linear-gradient(
+    135deg,
+    rgba(var(--end-node-primary-light), 0.2),
+    rgba(var(--end-node-primary), 0.25),
+    rgba(var(--end-node-primary-dark), 0.2)
+  );
+  background-color: rgba(var(--end-node-bg), 0.9);
+  transform: scale(var(--end-node-scale-selected)); /* Añadido */
+}
+
+/* Estado seleccionado + hover - efecto combinado magenta */
+.end-node.selected:hover {
+  box-shadow: var(--end-node-shadow-selected-hover); /* Actualizado */
+  transform: translateY(-5px) scale(var(--end-node-scale-selected)); /* Asegurar translateY(-5px) para evitar movimiento vertical */
+  background: linear-gradient(
+    135deg,
+    rgba(var(--end-node-primary-light), 0.25),
+    rgba(var(--end-node-primary), 0.3),
+    rgba(var(--end-node-primary-dark), 0.25)
+  );
+  border-color: rgba(var(--end-node-primary), 0.9);
+}
+
+/* Estado de error con acento magenta */
+.end-node.error {
+  border-color: rgba(var(--end-node-error), 0.8);
+  box-shadow:
+    0 0 15px rgba(var(--end-node-error), 0.3),
+    0 0 5px rgba(var(--end-node-primary), 0.2),
+    var(--end-node-shadow-base);
+  background: linear-gradient(
+    135deg,
+    rgba(var(--end-node-error), 0.1),
+    rgba(var(--end-node-primary), 0.05)
+  );
+}
+
+/* Estado de advertencia con acento magenta */
+.end-node.warning {
+  border-color: rgba(var(--end-node-warning), 0.8);
+  box-shadow:
+    0 0 15px rgba(var(--end-node-warning), 0.3),
+    0 0 5px rgba(var(--end-node-primary), 0.2),
+    var(--end-node-shadow-base);
+  background: linear-gradient(
+    135deg,
+    rgba(var(--end-node-warning), 0.1),
+    rgba(var(--end-node-primary), 0.05)
+  );
+}
+
+/* Estado de éxito con acento magenta */
+.end-node.success {
+  border-color: rgba(var(--end-node-success), 0.8);
+  box-shadow:
+    0 0 15px rgba(var(--end-node-success), 0.3),
+    0 0 5px rgba(var(--end-node-primary), 0.2),
+    var(--end-node-shadow-base);
+  background: linear-gradient(
+    135deg,
+    rgba(var(--end-node-success), 0.1),
+    rgba(var(--end-node-primary), 0.05)
+  );
+}
+
+/* Animación de aparición del nodo */
+@keyframes nodeAppear {
+  0% {
+    opacity: 0;
+    transform: scale(0.95) translateY(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Estilos para los handles (manejadores de conexión) */
+.end-node .react-flow__handle {
+  left: -7.5px;
+  right: auto;
+  top: 50%;
+  transform: translateY(-50%);
+  background: var(--handle-default-bg-color);
+  border: var(--handle-default-border-width) solid var(--handle-default-border-color);
+  width: var(--handle-default-size);
+  height: var(--handle-default-size);
+  border-radius: 50%;
+  transition: background 0.3s ease;
+  box-sizing: border-box;
+  z-index: 10;
+}
+
+.end-node .react-flow__handle:hover {
+  background: #00aaff;
+}
+
+.flow-editor-container.ultra-mode .end-node .react-flow__handle {
+  width: var(--handle-default-size);
+  height: var(--handle-default-size);
+  background: var(--handle-default-bg-color);
+  border: var(--handle-default-border-width) solid var(--handle-default-border-color);
+  left: -7.5px;
+  top: 50%;
+  transform: translateY(-50%);
+  box-shadow: none;
+  transition: none;
+}
+
+/* Estilos específicos para el modo oscuro si es necesario */
+/* 
+.dark .end-node {
+  color: rgb(var(--end-node-text-dark));
+  background-color: rgba(var(--end-node-bg-dark-mode), var(--end-node-glass-opacity));
+  border-color: rgba(var(--end-node-primary), 0.4);
+}
+
+.dark .end-node:hover {
+  border-color: rgba(var(--end-node-primary), 0.9);
+}
+
+.dark .end-node.selected {
+  border-color: rgb(var(--end-node-primary));
+  background-color: rgba(var(--end-node-bg-light-dark), 0.9);
+}
+*/
+
+/* Animaciones - Versión Elite HD */
+@keyframes nodeAppear {
+  0% {
+    opacity: 0;
+    transform: scale(0.8) translateZ(0);
+    box-shadow: 0 0 0 rgba(0, 0, 0, 0);
+  }
+  70% {
+    opacity: 1;
+    transform: scale(1.03) translateZ(0);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateZ(0);
+    box-shadow: var(--node-shadow);
+  }
+}
+
+@keyframes errorPulse {
+  0% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) translateZ(0);
+    box-shadow:
+      0 3px 10px rgba(255, 77, 77, 0.5),
+      0 1px 3px rgba(0, 0, 0, 0.3);
+  }
+  50% {
+    opacity: 0.8;
+    transform: translateX(-50%) translateY(-2px) translateZ(0);
+    box-shadow:
+      0 5px 15px rgba(255, 77, 77, 0.6),
+      0 2px 5px rgba(0, 0, 0, 0.4);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) translateZ(0);
+    box-shadow:
+      0 3px 10px rgba(255, 77, 77, 0.5),
+      0 1px 3px rgba(0, 0, 0, 0.3);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateZ(0);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateZ(0);
+  }
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1) translateZ(0);
+  }
+  50% {
+    transform: scale(1.05) translateZ(0);
+  }
+  100% {
+    transform: scale(1) translateZ(0);
+  }
+}
+
+@keyframes borderGlow {
+  0% {
+    box-shadow:
+      0 0 0 rgba(255, 112, 112, 0),
+      var(--node-shadow);
+    border-color: rgba(255, 112, 112, 0.7);
+  }
+  50% {
+    box-shadow:
+      0 0 15px rgba(255, 112, 112, 0.5),
+      var(--node-shadow);
+    border-color: rgba(255, 112, 112, 1);
+  }
+  100% {
+    box-shadow:
+      0 0 0 rgba(255, 112, 112, 0),
+      var(--node-shadow);
+    border-color: rgba(255, 112, 112, 0.7);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes successPulse {
+  0% {
+    border-color: rgba(78, 204, 163, 0.7);
+  }
+  50% {
+    border-color: rgba(78, 204, 163, 1);
+    box-shadow:
+      0 0 15px rgba(78, 204, 163, 0.3),
+      var(--node-shadow);
+  }
+  100% {
+    border-color: rgba(78, 204, 163, 0.7);
+  }
+}
+
+@keyframes warningPulse {
+  0% {
+    border-color: rgba(255, 204, 92, 0.7);
+  }
+  50% {
+    border-color: rgba(255, 204, 92, 1);
+    box-shadow:
+      0 0 15px rgba(255, 204, 92, 0.3),
+      var(--node-shadow);
+  }
+  100% {
+    border-color: rgba(255, 204, 92, 0.7);
+  }
+}
+
+@keyframes infoPulse {
+  0% {
+    border-color: rgba(92, 171, 255, 0.7);
+  }
+  50% {
+    border-color: rgba(92, 171, 255, 1);
+    box-shadow:
+      0 0 15px rgba(92, 171, 255, 0.3),
+      var(--node-shadow);
+  }
+  100% {
+    border-color: rgba(92, 171, 255, 0.7);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes errorPulse {
+  0% {
+    opacity: 0.8;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.8;
+  }
+}

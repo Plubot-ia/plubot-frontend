@@ -1,0 +1,62 @@
+/**
+ * remove-debug-styles.css
+ * 
+ * Este archivo elimina los estilos de debugging (bordes rojos, fondos de colores, etc.)
+ * que pueden haber quedado en los nodos y aristas del editor.
+ */
+
+/* Eliminar bordes rojos de debugging */
+.react-flow__node,
+.react-flow__node-start,
+.react-flow__node-end,
+.react-flow__node-message,
+.react-flow__node-decision,
+.react-flow__node-action,
+.react-flow__node-option,
+.react-flow__node-httprequest,
+.react-flow__node-power {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Restaurar bordes específicos de los componentes de nodo */
+.start-node,
+.end-node,
+.message-node,
+.decision-node,
+.action-node,
+.option-node,
+.httprequest-node,
+.power-node {
+  /* Permitir que los componentes definan sus propios bordes */
+  border: initial;
+  box-shadow: initial;
+}
+
+/* Eliminar fondos de debugging */
+.react-flow__node {
+  background-color: transparent !important;
+}
+
+/* Corregir z-index para asegurar que los nodos estén por encima de las conexiones */
+.react-flow__node {
+  z-index: 10 !important;
+}
+
+/* Restaurar visibilidad de handles */
+.react-flow__handle {
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* Asegurar que no haya fondos de debugging en las aristas */
+.react-flow__edge-path {
+  stroke-width: 2px;
+  /* No forzar color aquí para permitir personalización */
+}
+
+/* Eliminar cualquier efecto de debugging en componentes anidados */
+.react-flow__node * {
+  outline: none !important;
+}

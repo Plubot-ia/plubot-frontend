@@ -1,0 +1,164 @@
+/**
+ * ZoomControls.css - ENCAPSULADO
+ * Estilos encapsulados para los controles de zoom y botones relacionados
+ * Todos los selectores están limitados al contexto del editor de flujo
+ */
+
+/* Contenedor principal - Encapsulado */
+.flow-editor-container .zoom-controls,
+.react-flow__controls.zoom-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  align-items: center;
+  z-index: 5;
+  pointer-events: auto;
+  background-color: rgba(10, 20, 35, 0.3);
+  padding: 8px 4px;
+  border-radius: 6px;
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+  width: 30px;
+  align-items: center;
+}
+
+/* Botón de control - Encapsulado */
+.flow-editor-container .zoom-control-button,
+.react-flow__controls .zoom-control-button,
+.editor-controls-container .zoom-control-button {
+  width: 30px;
+  height: 30px;
+  border-radius: 6px;
+  background-color: rgba(10, 20, 35, 0.5);
+  color: #00e0ff;
+  border: 1px solid rgba(0, 224, 255, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.85em;
+  box-shadow: 0 0 15px rgba(0, 224, 255, 0.5);
+  position: relative;
+  overflow: visible;
+  animation: pulse-cyan 2s infinite alternate;
+}
+
+/* Estados del botón - Encapsulados */
+.flow-editor-container .zoom-control-button:hover,
+.react-flow__controls .zoom-control-button:hover,
+.editor-controls-container .zoom-control-button:hover {
+  background-color: rgba(0, 224, 255, 0.3);
+  transform: translateY(-2px);
+  box-shadow:
+    0 0 15px rgba(0, 224, 255, 0.7),
+    0 0 25px rgba(0, 224, 255, 0.4);
+  color: #ffffff;
+  animation: none;
+}
+
+.flow-editor-container .zoom-control-button:active,
+.react-flow__controls .zoom-control-button:active,
+.editor-controls-container .zoom-control-button:active {
+  transform: translateY(1px);
+  box-shadow: 0 0 8px rgba(0, 224, 255, 0.6);
+  background-color: rgba(0, 224, 255, 0.4);
+}
+
+/* Tooltips - Encapsulados */
+.flow-editor-container .zoom-control-button .button-tooltip,
+.react-flow__controls .zoom-control-button .button-tooltip,
+.editor-controls-container .zoom-control-button .button-tooltip {
+  position: absolute;
+  right: 45px;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: rgba(0, 40, 80, 0.9);
+  color: #00e0ff;
+  padding: 4px 8px;
+  border-radius: 3px;
+  font-size: 11px;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+  pointer-events: none;
+  box-shadow: 0 0 10px rgba(0, 224, 255, 0.3);
+  border: 1px solid rgba(0, 224, 255, 0.5);
+  z-index: 1000;
+}
+
+/* Interacción con tooltips - Encapsulada */
+.flow-editor-container .zoom-control-button:hover .button-tooltip,
+.react-flow__controls .zoom-control-button:hover .button-tooltip,
+.editor-controls-container .zoom-control-button:hover .button-tooltip {
+  opacity: 1;
+  visibility: visible;
+  /* Mantener la misma posición que en estado normal para evitar saltos */
+  right: 45px;
+}
+
+/* Flecha del tooltip - Encapsulada */
+.flow-editor-container .zoom-control-button .button-tooltip::after,
+.react-flow__controls .zoom-control-button .button-tooltip::after,
+.editor-controls-container .zoom-control-button .button-tooltip::after {
+  content: "";
+  position: absolute;
+  right: -6px;
+  top: 50%;
+  transform: translateY(-50%);
+  border-width: 6px 0 6px 6px;
+  border-style: solid;
+  border-color: transparent transparent transparent rgba(0, 40, 80, 0.9);
+}
+
+/* Separador - Encapsulado */
+.flow-editor-container .controls-separator,
+.react-flow__controls .controls-separator,
+.editor-controls-container .controls-separator {
+  width: 80%;
+  height: 1px;
+  background-color: rgba(0, 224, 255, 0.3);
+  margin: 5px auto;
+  border-radius: 1px;
+  box-shadow: 0 0 5px rgba(0, 224, 255, 0.2);
+}
+
+/* Estilos para botones deshabilitados */
+.zoom-control-button.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  box-shadow: none;
+  border-color: rgba(0, 224, 255, 0.2);
+  animation: none; /* No animar botones deshabilitados */
+}
+
+.zoom-control-button.disabled:hover {
+  transform: none;
+  background-color: rgba(10, 20, 35, 0.7);
+}
+
+/* Animación de pulso para los botones */
+@keyframes pulse-cyan {
+  0% {
+    box-shadow: 0 0 8px rgba(0, 224, 255, 0.4);
+    border-color: rgba(0, 224, 255, 0.6);
+  }
+  100% {
+    box-shadow:
+      0 0 15px rgba(0, 224, 255, 0.7),
+      0 0 20px rgba(0, 224, 255, 0.3);
+    border-color: rgba(0, 224, 255, 0.9);
+  }
+}
+
+/* Estilos para botón activo (historial) */
+.zoom-control-button.active {
+  background-color: rgba(0, 224, 255, 0.2);
+  box-shadow:
+    0 0 15px rgba(0, 224, 255, 0.5),
+    inset 0 0 5px rgba(0, 224, 255, 0.3);
+  border-color: #00ffcc;
+  color: #00ffcc;
+}

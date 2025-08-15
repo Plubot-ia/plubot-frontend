@@ -1,0 +1,47 @@
+/* 
+ * SOLUCIÓN DIRECTA PARA EL POSICIONAMIENTO DE NODOS
+ * Este archivo corrige los problemas de posicionamiento de nodos en ReactFlow
+ */
+
+/* Asegurar que el pane reciba eventos de mouse */
+.react-flow__pane {
+  pointer-events: all !important;
+}
+
+/* Garantizar que el viewport mantenga transformaciones */
+.react-flow__viewport {
+  transform-origin: 0 0 !important;
+  will-change: transform !important;
+}
+
+/* Asegurar que los nodos sean visibles y arrastrarles */
+.react-flow__node {
+  position: absolute !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  pointer-events: all !important;
+  z-index: 5 !important;
+}
+
+/* Asegurar que los handles sean visibles */
+.react-flow__handle {
+  visibility: visible !important;
+  opacity: 1 !important;
+  pointer-events: all !important;
+  z-index: 6 !important;
+}
+
+/* COMENTADO: Esta regla estaba anulando las transformaciones que ReactFlow necesita
+.react-flow__node-default,
+.react-flow__node-input,
+.react-flow__node-output,
+.react-flow__node-group {
+  transform: none !important;
+}
+*/
+
+/* Arreglar posición de aristas */
+.react-flow__edge {
+  visibility: visible !important;
+  pointer-events: stroke !important;
+}

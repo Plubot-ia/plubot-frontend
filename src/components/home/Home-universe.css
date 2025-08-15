@@ -1,0 +1,171 @@
+/* ==========================================================================
+   La Historyverse - Encapsulated styles for Home-universe
+   ========================================================================== */
+.plubot-universe {
+  background-image: url("../../assets/img/home/universo.webp");
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-attachment: fixed;
+  background-size: cover; /* Cubre todo el área */
+  width: 100%; /* Asegura que ocupe todo el ancho */
+  max-width: none; /* Evita restricciones de contenedores padres */
+  min-height: 70vh; /* Reducido un 30% desde 100vh */
+  color: white;
+  text-align: center;
+  padding: 3rem 2rem; /* Ajustado para mejor espaciado del texto */
+  position: relative;
+  z-index: 1;
+  box-sizing: border-box; /* Evita que el padding afecte el ancho */
+  margin: 0; /* Elimina márgenes no deseados */
+  margin-top: 3rem; /* Espaciado superior para separar de la sección anterior */
+  display: flex; /* Usamos flexbox para centrar el contenido */
+  justify-content: center; /* Centrado horizontal */
+  align-items: center; /* Centrado vertical */
+}
+
+.plubot-universe .universe-content {
+  max-width: 800px;
+  margin: 0 auto;
+  font-family: "Orbitron", sans-serif;
+  position: relative; /* Ensure z-index works for layering */
+  z-index: 2; /* Place content above any potential overlay */
+}
+
+.plubot-universe .universe-content h2 {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+  color: #00e0ff; /* Bright cyan for a techy vibe */
+  text-shadow:
+    0 0 10px rgba(0, 224, 255, 0.8),
+    0 0 20px rgba(0, 224, 255, 0.6),
+    0 0 30px rgba(0, 224, 255, 0.4); /* Layered neon glow */
+  background: rgba(0, 0, 0, 0.5); /* Semi-transparent black background for contrast */
+  padding: 0.5rem 1rem; /* Padding to make the background visible */
+  border-radius: 8px; /* Rounded corners for a polished look */
+  animation: pulseGlow 2s ease-in-out infinite; /* Add a pulsing glow animation */
+}
+
+.plubot-universe .universe-content p {
+  font-size: 1.2rem;
+  margin-bottom: 1.5rem; /* Aumentado para dar espacio al botón */
+  color: #d0d0ff; /* Light purple for readability */
+  text-shadow:
+    0 0 8px rgba(0, 224, 255, 0.6),
+    0 0 15px rgba(0, 224, 255, 0.4); /* Softer neon glow for the paragraph */
+  background: rgba(0, 0, 0, 0.5); /* Semi-transparent background for contrast */
+  padding: 0.5rem 1rem; /* Padding for the background */
+  border-radius: 8px; /* Rounded corners */
+  animation: flicker 3s ease-in-out infinite; /* Add a subtle flicker effect */
+}
+
+.plubot-universe .universe-button {
+  display: inline-block;
+  padding: 0.8rem 1.5rem;
+  background: #00e0ff; /* Cyan neon para combinar con el tema */
+  color: #000; /* Texto negro para contraste */
+  font-family: "Orbitron", sans-serif;
+  font-size: 1rem;
+  text-decoration: none;
+  border-radius: 8px;
+  box-shadow:
+    0 0 10px rgba(0, 224, 255, 0.8),
+    0 0 20px rgba(0, 224, 255, 0.6);
+  animation: pulseGlow 2s ease-in-out infinite; /* Animación neon */
+  transition: all 0.3s ease;
+}
+
+.plubot-universe .universe-button:hover {
+  background: #00b8d4; /* Cyan más oscuro al hover */
+  box-shadow:
+    0 0 15px rgba(0, 224, 255, 1),
+    0 0 25px rgba(0, 224, 255, 0.8);
+  transform: scale(1.05); /* Ligero aumento de tamaño */
+}
+
+/* Animations for a technological, gamified effect */
+@keyframes pulseGlow {
+  0% {
+    text-shadow:
+      0 0 10px rgba(0, 224, 255, 0.8),
+      0 0 20px rgba(0, 224, 255, 0.6),
+      0 0 30px rgba(0, 224, 255, 0.4);
+  }
+  50% {
+    text-shadow:
+      0 0 20px rgba(0, 224, 255, 1),
+      0 0 30px rgba(0, 224, 255, 0.8),
+      0 0 40px rgba(0, 224, 255, 0.6);
+  }
+  100% {
+    text-shadow:
+      0 0 10px rgba(0, 224, 255, 0.8),
+      0 0 20px rgba(0, 224, 255, 0.6),
+      0 0 30px rgba(0, 224, 255, 0.4);
+  }
+}
+
+@keyframes flicker {
+  0% {
+    opacity: 1;
+    text-shadow:
+      0 0 8px rgba(0, 224, 255, 0.6),
+      0 0 15px rgba(0, 224, 255, 0.4);
+  }
+  50% {
+    opacity: 0.9;
+    text-shadow:
+      0 0 5px rgba(0, 224, 255, 0.4),
+      0 0 10px rgba(0, 224, 255, 0.2);
+  }
+  100% {
+    opacity: 1;
+    text-shadow:
+      0 0 8px rgba(0, 224, 255, 0.6),
+      0 0 15px rgba(0, 224, 255, 0.4);
+  }
+}
+
+/* ==========================================================================
+     Media Queries
+     ========================================================================== */
+@media (max-width: 768px) {
+  .plubot-universe {
+    padding: 1.5rem;
+    min-height: 60vh; /* Ajustado para pantallas más pequeñas */
+    margin-top: 2rem; /* Reducido para mantener proporciones */
+  }
+
+  .plubot-universe .universe-content h2 {
+    font-size: 2rem;
+  }
+
+  .plubot-universe .universe-content p {
+    font-size: 1rem;
+  }
+
+  .plubot-universe .universe-button {
+    padding: 0.7rem 1.2rem;
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .plubot-universe {
+    padding: 1rem;
+    min-height: 50vh; /* Ajustado aún más para móviles */
+    margin-top: 1.5rem; /* Reducido para móviles */
+  }
+
+  .plubot-universe .universe-content h2 {
+    font-size: 1.8rem;
+  }
+
+  .plubot-universe .universe-content p {
+    font-size: 0.9rem;
+  }
+
+  .plubot-universe .universe-button {
+    padding: 0.6rem 1rem;
+    font-size: 0.8rem;
+  }
+}

@@ -1,0 +1,184 @@
+/**
+ * EmotionDetectionNode.css
+ * 
+ * Estilos para el nodo de detección de emociones.
+ * Incluye un diseño base, un borde animado para el modo normal
+ * y estilos optimizados para el modo de alto rendimiento (ultra).
+ */
+
+.emotion-node {
+  background-color: #2c2a3e; /* Tono violeta oscuro */
+  border: 2px solid transparent;
+  border-radius: 12px;
+  padding: 15px 20px;
+  color: #e0e0e0;
+  font-family: "Inter", sans-serif;
+  width: 280px;
+  box-shadow:
+    0 10px 20px rgba(0, 0, 0, 0.3),
+    0 0 15px rgba(192, 108, 132, 0.2);
+  position: relative;
+  overflow: hidden; /* Necesario para que el borde animado no se salga */
+  transition:
+    box-shadow 0.3s ease-in-out,
+    border-color 0.3s ease-in-out;
+}
+
+/* Modo normal con borde animado */
+.emotion-node--normal-mode::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: conic-gradient(
+    transparent,
+    rgba(233, 130, 155, 0.8),
+    /* Rosa */ rgba(168, 102, 212, 0.8),
+    /* Violeta */ transparent 30%
+  );
+  animation: rotate 4s linear infinite;
+  z-index: 1;
+}
+
+.emotion-node--normal-mode .emotion-node__content {
+  position: relative;
+  z-index: 2;
+  background-color: #2c2a3e;
+  border-radius: 10px;
+  padding: 10px;
+}
+
+/* Modo ultra rendimiento (sin animación) */
+.emotion-node--ultra-performance {
+  border-color: #a866d4; /* Borde estático violeta */
+  transition: none;
+}
+
+.emotion-node__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 15px;
+}
+
+.emotion-node__header h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.emotion-node__body .form-group {
+  margin-bottom: 12px;
+}
+
+.emotion-node__body label {
+  display: block;
+  font-size: 12px;
+  color: #b0aacc;
+  margin-bottom: 4px;
+}
+
+.emotion-node__body input {
+  width: 100%;
+  background-color: #1e1c2f;
+  border: 1px solid #4a4662;
+  border-radius: 6px;
+  padding: 8px;
+  color: #f0f0f0;
+  font-size: 14px;
+}
+
+.emotion-node__preview {
+  margin-top: 15px;
+  padding: 10px;
+  background-color: #1e1c2f;
+  border-radius: 6px;
+  text-align: center;
+  font-size: 14px;
+  color: #e0e0e0;
+}
+
+.emotion-label {
+  font-weight: bold;
+  text-transform: capitalize;
+}
+
+/* Contenedor principal que permite que los handles se desborden */
+.emotion-node-wrapper {
+  position: relative;
+}
+
+/* Handle de entrada (superior) - Estilo StartNode */
+.emotion-handle-target {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translate(-50%, -50%); /* Centra y posiciona mitad/mitad */
+  width: 15px; /* Tamaño de StartNode */
+  height: 15px; /* Tamaño de StartNode */
+  background-color: #3b82f6; /* Azul de StartNode */
+  border: 2px solid white; /* Borde blanco de StartNode */
+  border-radius: 50%;
+  z-index: 11;
+  cursor: pointer !important;
+  transition: all 0.2s ease-in-out;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1); /* Sombra de StartNode */
+}
+
+.emotion-handle-target:hover {
+  transform: translate(-50%, -50%) scale(1.1);
+  filter: brightness(1.15);
+}
+
+/* Handle de salida (inferior) - El contenedor del icono */
+.emotion-handle-source {
+  position: absolute;
+  bottom: 0;
+  transform: translate(-50%, 50%); /* Centra y posiciona mitad/mitad */
+  width: 28px;
+  height: 28px;
+  background: transparent;
+  border: none;
+  border-radius: 50%;
+  z-index: 11;
+  cursor: pointer !important;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* El icono dentro del handle de salida */
+.emotion-handle-source .emotion-handle-icon {
+  width: 24px;
+  height: 24px;
+  background-color: #1e1c2f;
+  border: 1px solid #4a4662;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  color: #e0e0e0;
+  pointer-events: none; /* El handle padre gestiona los eventos */
+  transition: all 0.2s ease-in-out;
+  line-height: 1; /* Asegura el centrado vertical perfecto del emoji */
+}
+
+.emotion-handle-source:hover .emotion-handle-icon {
+  border-color: #e9829b;
+  transform: scale(1.1);
+}
+
+@keyframes rotate {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}

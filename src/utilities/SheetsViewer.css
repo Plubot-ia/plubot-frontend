@@ -1,0 +1,169 @@
+.sheets-viewer-container {
+  background-color: rgba(0, 0, 30, 0.7);
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 0 20px rgba(0, 224, 255, 0.3);
+  margin: 20px 0;
+  color: #ffffff;
+}
+
+.section-title {
+  font-size: 24px;
+  margin-bottom: 20px;
+  color: #00e0ff;
+  text-align: center;
+  text-shadow: 0 0 10px rgba(0, 224, 255, 0.5);
+}
+
+.connection-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 30px 0;
+}
+
+.connect-button,
+.fetch-button {
+  background: linear-gradient(45deg, #00e0ff, #ff00ff);
+  border: none;
+  border-radius: 25px;
+  padding: 12px 25px;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 0 15px rgba(0, 224, 255, 0.5);
+  transition: all 0.3s ease;
+}
+
+.cancel-button {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 25px;
+  padding: 12px 25px;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.connect-button:disabled,
+.fetch-button:disabled {
+  background: rgba(128, 128, 128, 0.5);
+  cursor: not-allowed;
+}
+
+.credentials-input-container {
+  width: 100%;
+  max-width: 700px;
+  margin-top: 20px;
+  background-color: rgba(0, 0, 40, 0.5);
+  border-radius: 8px;
+  padding: 20px;
+  border: 1px solid rgba(0, 224, 255, 0.3);
+}
+
+.instruction-text {
+  margin-bottom: 15px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #ccc;
+}
+
+.credentials-textarea {
+  width: 100%;
+  background-color: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(0, 224, 255, 0.3);
+  border-radius: 4px;
+  padding: 10px;
+  color: #fff;
+  font-family: monospace;
+  resize: vertical;
+}
+
+.credentials-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.sheets-data-section {
+  display: flex;
+  flex-direction: column;
+}
+
+.fetch-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-bottom: 20px;
+  align-items: flex-end;
+}
+
+.input-group {
+  flex: 1;
+  min-width: 200px;
+}
+
+.input-group label {
+  display: block;
+  margin-bottom: 5px;
+  color: #00e0ff;
+  font-size: 14px;
+}
+
+.sheet-input {
+  width: 100%;
+  background-color: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(0, 224, 255, 0.3);
+  border-radius: 4px;
+  padding: 10px;
+  color: #fff;
+}
+
+.error-message {
+  background-color: rgba(255, 50, 50, 0.2);
+  border-left: 4px solid #ff3232;
+  padding: 10px 15px;
+  margin: 15px 0;
+  border-radius: 4px;
+}
+
+.data-display {
+  margin-top: 20px;
+}
+
+.data-display h3 {
+  color: #00e0ff;
+  margin-bottom: 15px;
+  font-size: 18px;
+}
+
+.sheets-table-container {
+  overflow-x: auto;
+}
+
+.sheets-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+  background-color: rgba(0, 0, 30, 0.5);
+}
+
+.sheets-table th {
+  background-color: rgba(0, 224, 255, 0.2);
+  padding: 12px;
+  text-align: left;
+  font-weight: bold;
+  color: #00e0ff;
+  border-bottom: 2px solid rgba(0, 224, 255, 0.5);
+}
+
+.sheets-table td {
+  padding: 8px 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.sheets-table tr:hover {
+  background-color: rgba(0, 224, 255, 0.1);
+}

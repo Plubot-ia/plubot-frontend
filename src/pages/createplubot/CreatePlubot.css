@@ -1,0 +1,11 @@
+.create-plubot {
+  background: #0a0e2f;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  color: #ffffff;
+  font-family: "Inter", sans-serif;
+}

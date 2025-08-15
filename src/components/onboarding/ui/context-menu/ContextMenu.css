@@ -1,0 +1,135 @@
+/**
+ * @file ContextMenu.css
+ * @description Estilos para el menú contextual
+ * @version 1.0.0
+ * @author Plubot Team
+ */
+
+.context-menu {
+  min-width: 180px;
+  background: linear-gradient(135deg, #1e293b, #0f172a);
+  border-radius: 0.5rem;
+  box-shadow:
+    0 10px 25px rgba(0, 0, 0, 0.3),
+    0 2px 5px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+  z-index: 1000;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  animation: menuAppear 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  padding: 0.375rem;
+}
+
+.context-menu__item {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: none;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.875rem;
+  text-align: left;
+  cursor: pointer;
+  border-radius: 0.375rem;
+  transition: all 0.15s ease;
+  position: relative;
+  font-family:
+    "Inter",
+    system-ui,
+    -apple-system,
+    sans-serif;
+}
+
+.context-menu__item:hover {
+  background: rgba(59, 130, 246, 0.2);
+  color: white;
+}
+
+.context-menu__item:active {
+  background: rgba(59, 130, 246, 0.3);
+  transform: scale(0.98);
+}
+
+.context-menu__item:focus-visible {
+  outline: 2px solid rgba(59, 130, 246, 0.7);
+  outline-offset: 1px;
+}
+
+.context-menu__item--disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.context-menu__item--disabled:hover {
+  background: transparent;
+}
+
+.context-menu__item-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 0.75rem;
+  width: 1.25rem;
+  height: 1.25rem;
+  color: rgba(59, 130, 246, 0.9);
+  flex-shrink: 0;
+}
+
+.context-menu__icon {
+  width: 1rem;
+  height: 1rem;
+}
+
+.context-menu__item-label {
+  flex-grow: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.context-menu__item-shortcut {
+  margin-left: 1rem;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.5);
+  font-family: monospace;
+}
+
+/* Separador entre grupos de elementos */
+.context-menu__separator {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.1);
+  margin: 0.375rem 0;
+}
+
+@keyframes menuAppear {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Soporte para preferencias de movimiento reducido */
+@media (prefers-reduced-motion: reduce) {
+  .context-menu {
+    animation: menuAppearSimple 0.15s ease-out;
+  }
+
+  @keyframes menuAppearSimple {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  .context-menu__item:active {
+    transform: none;
+  }
+}

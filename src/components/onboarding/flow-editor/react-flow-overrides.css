@@ -1,0 +1,408 @@
+/* ==============================================
+ * Contenido de: ensure-node-visibility.css (Fusionado)
+ * ============================================== */
+
+/**
+ * ensure-node-visibility.css
+ * 
+ * SOLUCIÓN DEFINITIVA para nodos invisibles en ReactFlow
+ * Este archivo aplica reglas CSS con prioridad máxima para garantizar
+ * que todos los nodos sean visibles en el editor de flujos y completamente interactivos.
+ * 
+ * Versión 2.0 - Incorpora correcciones específicas para ReactFlow 11.x
+ */
+
+/* Estilos para el nodo de Opción (OptionNode) */
+
+/*
+ * NOTA DE REFACTORIZACIÓN (2024-06-12):
+ * El bloque de CSS para animar la transición entre la vista previa y el editor
+ * (usando 'grid' y 'position: absolute') ha sido eliminado.
+ * La lógica del componente (MessageNodeContent.jsx) fue cambiada a renderizado condicional
+ * para mayor estabilidad, lo que hacía que este CSS fuera obsoleto y la causa raíz del bug de layout.
+ * El redimensionamiento ahora se basa únicamente en el flujo de bloque normal y la llamada a `updateNodeInternals`.
+ */
+
+/* Reglas para el viewport */
+.react-flow__viewport {
+  transform-origin: 0 0 !important;
+}
+
+/* FORZAR visibilidad de nodos */
+.react-flow__node {
+  visibility: visible !important;
+  display: block !important;
+  opacity: 1 !important;
+  z-index: 5 !important;
+  pointer-events: all !important;
+  position: absolute !important;
+  /* ELIMINADO: Esta regla estaba sobrescribiendo las transformaciones de ReactFlow */
+  /* transform: translate(var(--translate-x, 0px), var(--translate-y, 0px)) !important; */
+  min-width: 150px !important; /* Garantizar tamaño mínimo */
+  min-height: 40px !important;
+  user-select: none !important; /* Facilitar arrastre */
+  touch-action: none !important; /* Mejorar interacción táctil */
+}
+
+/* Garantizar que el contenedor sea visible */
+.react-flow,
+.react-flow__container,
+.react-flow__renderer,
+.reactflow-wrapper {
+  overflow: visible !important;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* Permitir panning */
+.react-flow__pane {
+  cursor: grab !important;
+}
+
+/* Asegurar que los tipos de nodos específicos sean visibles */
+.message-node,
+.decision-node,
+.start-node,
+.end-node,
+.action-node,
+.option-node,
+.httpRequest-node,
+.power-node {
+  visibility: visible !important;
+  display: block !important;
+  opacity: 1 !important;
+  z-index: 10 !important; /* Prioridad extra */
+  /* ELIMINADO: transform: none !important; - Esta regla interfiere con ReactFlow */
+}
+
+/* Garantizar que los handles de conexión sean visibles e interactivos */
+.react-flow__handle {
+  visibility: visible !important;
+  display: block !important;
+  opacity: 1 !important;
+  pointer-events: all !important;
+  z-index: 15 !important; /* Prioridad mayor que los nodos */
+}
+
+/* Garantizar que las etiquetas y textos dentro de los nodos sean visibles */
+.node-label,
+.node-content,
+.node-title,
+.node-text,
+.message-content,
+.decision-content,
+.option-content {
+  visibility: visible !important;
+  display: block !important;
+  opacity: 1 !important;
+}
+
+/* Solucionar problemas con la capa de selección */
+.react-flow__nodesselection {
+  z-index: 4 !important;
+  pointer-events: none !important;
+}
+
+/* Asegurar que los edges siempre sean visibles */
+.react-flow__edge {
+  visibility: visible !important;
+  display: block !important;
+  opacity: 1 !important;
+}
+
+/* Prevenir que ReactFlow oculte nodos fuera del viewport */
+.react-flow__viewport {
+  overflow: visible !important;
+}
+
+/* Asegurar que el contenido interno de los nodos sea visible, EXCEPTO los tooltips */
+.react-flow__node *:not(.tooltip-content) {
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+/* ==============================================
+ * Contenido de: fix-transform-override.css
+ * ============================================== */
+
+/**
+ * fix-transform-override.css
+ * Corrige el apilamiento en (0,0) y problemas de transform.
+ */
+.react-flow__pane,
+.react-flow__container,
+.react-flow__edges {
+  pointer-events: all !important;
+}
+
+.react-flow__pane {
+  width: 100% !important;
+  height: 100% !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  z-index: 0 !important;
+}
+
+.react-flow__viewport {
+  transform-origin: 0 0 !important;
+  z-index: 2 !important;
+  pointer-events: none !important;
+  animation: none !important;
+  transition: none !important;
+  backdrop-filter: none !important;
+  box-shadow: none !important;
+}
+
+.react-flow__node {
+  position: absolute !important;
+  z-index: 3 !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: block !important;
+  pointer-events: all !important;
+}
+
+.react-flow__handle {
+  visibility: visible !important;
+  pointer-events: all !important;
+  opacity: 1 !important;
+}
+
+.react-flow__edge {
+  pointer-events: stroke !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+.react-flow__edge-path {
+  visibility: visible !important;
+  /* stroke: #00e0ff !important; */ /* Deshabilitado para permitir colores de arista personalizados como en EliteEdge */
+  stroke-width: 2px !important;
+}
+
+.react-flow__controls {
+  z-index: 5 !important;
+}
+
+.react-flow__selectionpane {
+  z-index: 5 !important;
+}
+
+/* ==============================================
+ * Contenido de: fix-overflow.css
+ * ============================================== */
+
+/* Ajustes de layout y overflow para que el editor llene la pantalla */
+.flow-editor-container {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.flow-editor-container .epic-header {
+  width: 100% !important;
+  left: 0 !important;
+  right: 0 !important;
+  max-width: 100% !important;
+}
+
+.flow-main-wrapper {
+  position: absolute;
+  top: 60px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100% !important;
+  overflow: hidden;
+}
+
+.reactflow-wrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 100%;
+  width: 100%;
+}
+
+.ts-byte-assistant {
+  position: fixed !important;
+  z-index: 9999 !important;
+  bottom: 0 !important;
+  right: 0 !important;
+  margin-right: 1rem !important;
+  width: 300px !important;
+  pointer-events: auto !important;
+}
+
+.vertical-buttons-container {
+  position: absolute !important;
+  z-index: 9990 !important;
+  pointer-events: auto !important;
+}
+
+body {
+  overflow-x: hidden !important;
+}
+
+/* ==============================================
+ * Contenido de: fix-overlay.css
+ * ============================================== */
+
+.loading-overlay:not(.node-component),
+.data-loading-indicator,
+.global-state-loading {
+  background: rgba(0, 0, 0, 0.3) !important;
+  backdrop-filter: blur(2px) !important;
+  -webkit-backdrop-filter: blur(2px) !important;
+  box-shadow: none !important;
+  color: #00e0ff !important;
+}
+
+.byte-notification,
+.status-bubble {
+  background: rgba(0, 224, 255, 0.2) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3) !important;
+  color: #fff !important;
+  z-index: 9999 !important;
+  pointer-events: none !important;
+}
+
+.app-loading-indicator,
+.loading-screen:not(.node-component),
+.global-loader {
+  background: rgba(0, 0, 0, 0.2) !important;
+  backdrop-filter: blur(3px) !important;
+  border-radius: 8px;
+  color: #00e0ff;
+}
+
+.ts-loading,
+.loading,
+.loading-container {
+  background: transparent !important;
+  color: #00e0ff !important;
+}
+
+/* ==============================================
+ * Contenido de: forcePatch.css
+ * ============================================== */
+
+/* Sistema de capas y visibilidad extra */
+.react-flow {
+  width: 100%;
+  height: 100%;
+}
+
+.react-flow__edge {
+  z-index: 5;
+}
+.react-flow__node {
+  z-index: 10;
+}
+
+/* ======================================================================
+   ESTILOS PARA MESSAGENODE (EXPANDIR/CONTRAER Y RENDERIZADO)
+   ====================================================================== */
+
+/*
+ * SOLUCIÓN DE LAYOUT DEFINITIVA PARA MESSAGENODE
+ * --------------------------------------------------
+ * Se anula la altura fija calculada por React Flow en su contenedor principal (.react-flow__node-message).
+ * Esto, combinado con la llamada a `updateNodeInternals` en el componente,
+ * permite que el nodo se expanda y contraiga correctamente.
+ */
+.react-flow__node-message {
+  height: auto !important;
+}
+
+/*
+ * Se asegura que nuestro componente interno .message-node ocupe todo el ancho
+ * y tenga una altura natural basada en su contenido. Se elimina toda la complejidad
+ * de flexbox que causaba conflictos.
+*/
+/* Contenedor del mensaje: gestiona la altura y la transición */
+.message-node__message {
+  overflow: hidden;
+  transition: max-height 0.25s ease-in-out;
+  position: relative;
+}
+
+/* Estado truncado: limita la altura y aplica una máscara para el degradado */
+.message-node__message--truncated {
+  max-height: calc(3 * 1.5em); /* Limita a ~3 líneas */
+  /* La máscara crea el efecto de desvanecimiento sin usar colores fijos */
+  -webkit-mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
+  mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
+}
+
+/* Se elimina cualquier pseudo-elemento que pueda añadir un fondo de color */
+.message-node__message--truncated::after {
+  display: none;
+  content: none;
+}
+
+/* Botón para expandir/colapsar */
+.message-node__expand-button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.5rem;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: var(--message-node-text-secondary);
+  font-weight: var(--message-node-font-weight-semibold);
+  font-size: var(--message-node-font-size-small);
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.message-node__expand-button:hover {
+  color: var(--message-node-primary);
+}
+
+/*
+ * NOTA: El bloque .message-node__preview-display, .message-node__editor que estaba aquí
+ * ha sido eliminado. Creaba un conflicto directo con las reglas de animación de la parte
+ * superior de este archivo, impidiendo que las transiciones de opacidad y transform funcionaran.
+ * La lógica de animación ahora reside únicamente en las reglas de .message-node__content-wrapper.
+ */
+
+/* Ocultar footer solo dentro del editor y TrainingScreen */
+.flow-editor-container .layout > footer,
+.flow-editor-container .quantum-footer,
+.flow-editor-container [class*="footer"],
+.training-screen .layout > footer,
+.training-screen .quantum-footer,
+.training-screen [class*="footer"] {
+  display: none !important;
+  visibility: hidden !important;
+  height: 0 !important;
+  width: 0 !important;
+  opacity: 0 !important;
+  position: absolute !important;
+  z-index: -9999 !important;
+  pointer-events: none !important;
+}
+
+/* Optimización de nodos al arrastrar */
+.react-flow__node.dragging,
+.react-flow__node:active {
+  z-index: 1000 !important;
+}
+
+/* Rendimiento */
+.react-flow__node {
+  will-change: transform !important;
+  transition: box-shadow 0.2s ease !important;
+  contain: layout style !important;
+}

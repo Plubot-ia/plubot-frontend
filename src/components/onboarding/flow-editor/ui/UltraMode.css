@@ -1,0 +1,128 @@
+/* Estilos para el modo Ultra Rendimiento - Versión mejorada */
+
+/* ---------- 1. REGLA GLOBAL PARA ELIMINAR TODAS LAS ANIMACIONES ---------- */
+/* Esta regla tiene alta especificidad para asegurar que se aplique a todo */
+/* COMENTADO: Esta regla estaba rompiendo el posicionamiento de los nodos en ReactFlow
+body.ultra-mode *,
+body.ultra-mode *::before,
+body.ultra-mode *::after {
+  transition-property: none !important;
+  transition-duration: 0s !important;
+  transition-delay: 0s !important;
+  transition-timing-function: unset !important;
+  animation: none !important;
+  animation-duration: 0s !important;
+  animation-delay: 0s !important;
+  animation-iteration-count: 0 !important;
+  transform: none !important;
+  backdrop-filter: none !important;
+  text-shadow: none !important;
+}
+*/
+
+/* NUEVA REGLA MÁS SEGURA - No afecta transformaciones */
+body.ultra-mode * {
+  /* Deshabilitar solo animaciones y transiciones, no transformaciones */
+  transition-property: none !important;
+  transition-duration: 0s !important;
+  animation: none !important;
+  /* NO incluir transform: none !important; aquí */
+}
+
+/* ---------- 2. REGLAS ESPECÍFICAS PARA COMPONENTES PROBLEMÁTICOS ---------- */
+
+/* CustomMiniMap - Eliminar completamente todas sus animaciones */
+body.ultra-mode .ts-custom-minimap-container,
+body.ultra-mode .ts-custom-minimap-container.collapsed,
+body.ultra-mode .ts-custom-minimap-container.expanded,
+body.ultra-mode .ts-custom-minimap-container:hover {
+  animation: none !important;
+  transition: none !important;
+  transform: none !important;
+  box-shadow: 0 0 5px rgba(0, 200, 224, 0.5) !important;
+  filter: none !important;
+}
+
+/* Excepción: Restaurar la animación de pulso para el icono del minimapa */
+body.ultra-mode .custom-minimap-toggle-icon {
+  animation: pulse 2s infinite !important;
+}
+
+/* ByteAssistant - Eliminar todas sus animaciones */
+body.ultra-mode .ts-byte-assistant,
+body.ultra-mode .ts-byte-assistant *,
+body.ultra-mode .ts-byte-image,
+body.ultra-mode .ts-byte-glow,
+body.ultra-mode .ts-byte-thinking,
+body.ultra-mode .ts-byte-hologram,
+body.ultra-mode .ts-byte-minimized {
+  animation: none !important;
+  transition: none !important;
+  transform: none !important;
+  filter: none !important;
+  box-shadow: none !important;
+}
+
+/* Botones de control del editor */
+body.ultra-mode .editor-button,
+body.ultra-mode .zoom-control-button,
+body.ultra-mode .sync-control-button,
+body.ultra-mode .editor-controls-container button,
+body.ultra-mode .vertical-buttons-container button {
+  animation: none !important;
+  transition: none !important;
+  transform: none !important;
+  filter: none !important;
+  box-shadow: 0 0 4px rgba(0, 200, 224, 0.5) !important;
+}
+
+body.ultra-mode .editor-button:hover,
+body.ultra-mode .zoom-control-button:hover,
+body.ultra-mode .sync-control-button:hover,
+body.ultra-mode .editor-controls-container button:hover,
+body.ultra-mode .vertical-buttons-container button:hover {
+  transform: none !important;
+  box-shadow: 0 0 4px rgba(0, 200, 224, 0.5) !important;
+  background-color: rgba(10, 20, 35, 0.7) !important;
+}
+
+/* TemplateSelector - Asegurar que las tarjetas sean visibles */
+body.ultra-mode .ts-template-item {
+  opacity: 1 !important;
+  transform: none !important;
+  animation: none !important; /* Doble seguridad */
+}
+
+/* Tooltips */
+body.ultra-mode .button-tooltip {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  transition: none !important;
+  transform: none !important;
+  animation: none !important;
+}
+
+body.ultra-mode .editor-button:hover .button-tooltip,
+body.ultra-mode .zoom-control-button:hover .button-tooltip,
+body.ultra-mode .sync-control-button:hover .button-tooltip {
+  opacity: 1 !important;
+  visibility: visible !important;
+  transform: none !important;
+  right: 45px !important;
+}
+
+/* Partículas y fondos - Eliminar efectos */
+body.ultra-mode .particles-container,
+body.ultra-mode .background-scene,
+body.ultra-mode .particle,
+body.ultra-mode .background-gradient {
+  animation: none !important;
+  transition: none !important;
+  opacity: 0.5 !important;
+}
+
+/* Sincronización */
+body.ultra-mode .sync-icon,
+body.ultra-mode .sync-pulse {
+  animation: none !important;
+}

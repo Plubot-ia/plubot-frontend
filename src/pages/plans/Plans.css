@@ -1,0 +1,1153 @@
+/* ==========================================================================
+   Fuentes e Importaciones - Optimizado con preload para mejor rendimiento
+   ========================================================================== */
+@import url("https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Orbitron:wght@400;700&display=swap");
+
+/* ==========================================================================
+      Variables CSS para consistencia y fácil mantenimiento
+      ========================================================================== */
+:root {
+  --color-primary: #00e0ff;
+  --color-secondary: #ff00ff;
+  --color-accent: #00ff96;
+  --color-background: rgba(0, 10, 30, 1);
+  --color-background-dark: rgba(0, 0, 10, 1);
+  --color-card-bg: rgba(0, 0, 0, 0.7);
+  --color-text: #ffffff;
+  --color-text-muted: rgba(255, 255, 255, 0.7);
+  --border-glow: 0 0 20px rgba(0, 224, 255, 0.5);
+  --shadow-intense: 0 0 40px rgba(0, 224, 255, 0.6), 0 0 100px rgba(0, 0, 0, 0.8);
+  --font-primary: "Rajdhani", sans-serif;
+  --font-display: "Orbitron", sans-serif;
+  --animation-slow: 15s;
+  --animation-medium: 8s;
+  --animation-fast: 3s;
+  --border-radius-lg: 25px;
+  --border-radius-md: 15px;
+  --border-radius-sm: 10px;
+}
+
+/* ==========================================================================
+      Animaciones - Mantenidas globales para reutilización
+      ========================================================================== */
+@keyframes plans-pulseLine {
+  0%,
+  100% {
+    opacity: 0.6;
+    width: 60%;
+  }
+  50% {
+    opacity: 1;
+    width: 90%;
+  }
+}
+
+@keyframes plans-glowingBorder {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes plans-gradientShift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes plans-beamMovement1 {
+  0%,
+  100% {
+    transform: rotate(25deg) translateY(0px);
+    opacity: 0.3;
+  }
+  50% {
+    transform: rotate(28deg) translateY(-5px);
+    opacity: 0.5;
+  }
+}
+
+@keyframes plans-beamMovement2 {
+  0%,
+  100% {
+    transform: rotate(-15deg) translateY(0px);
+    opacity: 0.2;
+  }
+  50% {
+    transform: rotate(-12deg) translateY(-3px);
+    opacity: 0.4;
+  }
+}
+
+@keyframes plans-beamMovement3 {
+  0%,
+  100% {
+    transform: rotate(5deg) translateY(0px);
+    opacity: 0.15;
+  }
+  50% {
+    transform: rotate(8deg) translateY(-2px);
+    opacity: 0.25;
+  }
+}
+
+@keyframes plans-particleFloat1 {
+  0% {
+    transform: translate(0, 0) scale(0.5);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.9;
+  }
+  100% {
+    transform: translate(-30px, -40px) scale(0);
+    opacity: 0;
+  }
+}
+
+@keyframes plans-particleFloat2 {
+  0% {
+    transform: translate(0, 0) scale(0.7);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: translate(35px, -35px) scale(0);
+    opacity: 0;
+  }
+}
+
+@keyframes plans-particleFloat3 {
+  0% {
+    transform: translate(0, 0) scale(0.6);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.9;
+  }
+  100% {
+    transform: translate(-25px, 35px) scale(0);
+    opacity: 0;
+  }
+}
+
+@keyframes plans-particleFloat4 {
+  0% {
+    transform: translate(0, 0) scale(0.8);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.7;
+  }
+  100% {
+    transform: translate(30px, 30px) scale(0);
+    opacity: 0;
+  }
+}
+
+@keyframes plans-particleFloat5 {
+  0% {
+    transform: translate(0, 0) scale(0.5);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: translate(0, 40px) scale(0);
+    opacity: 0;
+  }
+}
+
+@keyframes plans-particleFloat6 {
+  0% {
+    transform: translate(0, 0) scale(0.6);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.9;
+  }
+  100% {
+    transform: translate(-20px, -35px) scale(0);
+    opacity: 0;
+  }
+}
+
+@keyframes plans-scanlines {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(100px);
+  }
+}
+
+@keyframes plans-fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes plans-shine {
+  0% {
+    background-position: -100% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes plans-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+@keyframes faq-logoGlow {
+  0% {
+    transform: rotate(0deg) scale(1);
+    filter: drop-shadow(0 0 5px rgba(0, 224, 255, 0.6));
+  }
+  50% {
+    transform: rotate(10deg) scale(1.1);
+    filter: drop-shadow(0 0 15px rgba(0, 224, 255, 0.9));
+  }
+  100% {
+    transform: rotate(0deg) scale(1);
+    filter: drop-shadow(0 0 5px rgba(0, 224, 255, 0.6));
+  }
+}
+
+/* ==========================================================================
+      Estilos de la Página - Encapsulados en .plans-wrapper
+      ========================================================================== */
+.plans-wrapper {
+  padding-top: 120px;
+  padding-bottom: 6rem;
+  min-height: 100vh;
+  width: 100%;
+  background: radial-gradient(
+    circle at 50% -30%,
+    var(--color-background),
+    var(--color-background-dark)
+  );
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+
+.plans-wrapper .plans-page {
+  position: relative;
+  width: 100%;
+  max-width: 100vw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-family: var(--font-primary);
+  color: var(--color-text);
+  box-sizing: border-box;
+  overflow-x: hidden;
+  z-index: 1;
+  will-change: transform, opacity;
+}
+
+.plans-wrapper .plans-page * {
+  box-sizing: border-box;
+}
+
+.plans-wrapper .plans-page .cosmic-lights {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  z-index: 0;
+  pointer-events: none;
+  will-change: transform;
+}
+
+.plans-wrapper .plans-page .light-beam {
+  position: absolute;
+  width: 100%;
+  max-width: 100vw;
+  height: 4px;
+  background: linear-gradient(
+    90deg,
+    rgba(0, 224, 255, 0) 0%,
+    rgba(0, 224, 255, 0.5) 50%,
+    rgba(0, 224, 255, 0) 100%
+  );
+  opacity: 0.3;
+  transform-origin: left center;
+  filter: blur(3px);
+  box-shadow: 0 0 15px rgba(0, 224, 255, 0.5);
+  will-change: transform, opacity;
+}
+
+.plans-wrapper .plans-page .light-beam-1 {
+  top: 20%;
+  left: 0;
+  transform: rotate(25deg);
+  animation: plans-beamMovement1 15s infinite alternate ease-in-out;
+}
+
+.plans-wrapper .plans-page .light-beam-2 {
+  top: 65%;
+  left: 0;
+  transform: rotate(-15deg);
+  animation: plans-beamMovement2 18s infinite alternate ease-in-out;
+  opacity: 0.2;
+}
+
+.plans-wrapper .plans-page .light-beam-3 {
+  top: 40%;
+  left: 0;
+  transform: rotate(5deg);
+  animation: plans-beamMovement3 20s infinite alternate ease-in-out;
+  opacity: 0.15;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 0, 255, 0) 0%,
+    rgba(255, 0, 255, 0.4) 50%,
+    rgba(255, 0, 255, 0) 100%
+  );
+}
+
+.plans-wrapper .plans-page .particles {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+  will-change: transform;
+}
+
+.plans-wrapper .plans-page .particle {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: linear-gradient(45deg, var(--color-primary), var(--color-secondary));
+  opacity: 0;
+  filter: blur(1px);
+  will-change: transform, opacity;
+}
+
+.plans-wrapper .plans-page .particle-1 {
+  top: 10%;
+  left: 10%;
+  animation: plans-particleFloat1 3s infinite ease-out;
+}
+.plans-wrapper .plans-page .particle-2 {
+  top: 20%;
+  left: 80%;
+  animation: plans-particleFloat2 4s infinite ease-out;
+}
+.plans-wrapper .plans-page .particle-3 {
+  top: 70%;
+  left: 20%;
+  animation: plans-particleFloat3 5s infinite ease-out;
+}
+.plans-wrapper .plans-page .particle-4 {
+  top: 60%;
+  left: 90%;
+  animation: plans-particleFloat4 3.2s infinite ease-out;
+}
+.plans-wrapper .plans-page .particle-5 {
+  top: 90%;
+  left: 50%;
+  animation: plans-particleFloat5 3.8s infinite ease-out;
+}
+.plans-wrapper .plans-page .particle-6 {
+  top: 30%;
+  left: 30%;
+  animation: plans-particleFloat6 4.2s infinite ease-out;
+}
+
+.plans-wrapper .plans-page .interactive-particle {
+  position: absolute;
+  border-radius: 50%;
+  opacity: 0.7;
+  pointer-events: none;
+  transition:
+    transform 0.6s ease-out,
+    opacity 0.6s ease-out;
+  z-index: 5;
+  will-change: transform, opacity;
+}
+
+.plans-wrapper .plans-page .plans-container {
+  position: relative;
+  width: 100%;
+  max-width: 1200px;
+  z-index: 10;
+  padding: 3rem;
+  margin: 3rem auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  background: rgba(0, 0, 0, 0.7);
+  border-radius: var(--border-radius-lg);
+  border: 1px solid rgba(0, 224, 255, 0.7);
+  box-shadow:
+    var(--shadow-intense),
+    inset 0 0 20px rgba(0, 224, 255, 0.3);
+  animation: plans-fadeIn 1s ease-out forwards;
+  will-change: box-shadow;
+  transition: box-shadow 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+  overflow: hidden;
+}
+
+.plans-wrapper .plans-page .plans-container:hover {
+  box-shadow:
+    0 0 50px rgba(0, 224, 255, 0.8),
+    0 0 120px rgba(0, 0, 0, 0.9),
+    inset 0 0 25px rgba(0, 224, 255, 0.5);
+}
+
+/* Comentado para probar si elimina la línea celeste */
+/*
+   .plans-wrapper .plans-page .plans-container::after {
+     content: '';
+     position: absolute;
+     top: 0;
+     left: 0;
+     width: 100%;
+     height: 100%;
+     background: repeating-linear-gradient(
+       0deg,
+       rgba(0, 224, 255, 0.03) 0px,
+       rgba(0, 224, 255, 0.03) 1px,
+       rgba(0, 0, 0, 0) 1px,
+       rgba(0, 0, 0, 0) 4px
+     );
+     pointer-events: none;
+     z-index: 5;
+     opacity: 0.4;
+     animation: plans-scanlines 8s linear infinite;
+     will-change: transform;
+     border-radius: var(--border-radius-lg);
+   }
+   */
+
+.plans-wrapper .plans-page .plans-header {
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.plans-wrapper .plans-page .plans-title {
+  font-family: var(--font-display);
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--color-primary);
+  text-shadow:
+    0 0 10px rgba(0, 224, 255, 0.6),
+    0 0 20px rgba(0, 224, 255, 0.3);
+  letter-spacing: 1px;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.plans-wrapper .plans-page .faq-title-logo {
+  width: 2.5rem;
+  height: 2.5rem;
+  margin-left: 0rem;
+  position: relative;
+  top: -25px;
+  animation: faq-logoGlow 4s ease-in-out infinite;
+}
+
+.plans-wrapper .plans-page .plans-title-icon {
+  margin: 0 0.4rem;
+  font-size: 1.8rem;
+}
+
+.plans-wrapper .plans-page .plans-subtitle-container {
+  position: relative;
+  margin: 1.5rem auto;
+  max-width: 500px;
+}
+
+.plans-wrapper .plans-page .plans-subtitle {
+  font-size: 1.1rem;
+  color: var(--color-text-muted);
+  letter-spacing: 0.5px;
+  margin-bottom: 1rem;
+}
+
+.plans-wrapper .plans-page .plans-subtitle-line {
+  height: 2px;
+  width: 70%;
+  background: linear-gradient(
+    90deg,
+    rgba(0, 224, 255, 0) 0%,
+    rgba(0, 224, 255, 0.8) 50%,
+    rgba(0, 224, 255, 0) 100%
+  );
+  margin: 0 auto;
+  animation: plans-pulseLine 4s infinite ease-in-out;
+}
+
+.plans-wrapper .plans-page .plans-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  width: 100%;
+  max-width: 100%;
+  padding: 0 0.5rem;
+}
+
+.plans-wrapper .plans-page .plan-card {
+  position: relative;
+  background: var(--color-card-bg);
+  border-radius: var(--border-radius-md);
+  border: 1px solid rgba(0, 224, 255, 0.4);
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  box-shadow:
+    0 0 20px rgba(0, 224, 255, 0.3),
+    inset 0 0 10px rgba(0, 0, 20, 0.5);
+  overflow: hidden;
+  will-change: transform, box-shadow;
+}
+
+.plans-wrapper .plans-page .plan-card::before {
+  content: "";
+  position: absolute;
+  top: -100%;
+  left: -100%;
+  width: 300%;
+  height: 300%;
+  background: linear-gradient(
+    45deg,
+    transparent 20%,
+    rgba(0, 224, 255, 0.1) 30%,
+    rgba(255, 255, 255, 0.2) 48%,
+    rgba(0, 224, 255, 0.1) 70%,
+    transparent 80%
+  );
+  background-size: 200% 200%;
+  animation: plans-shine 15s linear infinite;
+  pointer-events: none;
+  opacity: 0.3;
+  transform: rotate(25deg);
+  will-change: transform;
+}
+
+.plans-wrapper .plans-page .plan-card:hover::before {
+  opacity: 0.5;
+}
+
+.plans-wrapper .plans-page .plan-card-active {
+  transform: translateY(-8px) scale(1.02);
+  border: 1px solid rgba(0, 224, 255, 0.7);
+  box-shadow:
+    0 0 30px rgba(0, 224, 255, 0.4),
+    inset 0 0 15px rgba(0, 224, 255, 0.2);
+  z-index: 2;
+}
+
+.plans-wrapper .plans-page .plan-card-active::after {
+  content: "";
+  position: absolute;
+  top: -1px;
+  left: -1px;
+  right: -1px;
+  bottom: -1px;
+  border-radius: calc(var(--border-radius-md) + 1px);
+  background: linear-gradient(
+    45deg,
+    var(--color-primary),
+    var(--color-secondary),
+    var(--color-accent),
+    var(--color-primary)
+  );
+  background-size: 300% 300%;
+  animation: plans-glowingBorder 3s linear infinite;
+  z-index: -1;
+  opacity: 0.8;
+}
+
+.plans-wrapper .plans-page .plan-card-active .plan-header {
+  transform: translateY(-5px);
+}
+
+.plans-wrapper .plans-page .plan-card-active .plan-features {
+  transform: translateY(-3px);
+}
+
+.plans-wrapper .plans-page .plan-card-active .plan-ideal-for {
+  transform: translateY(-2px);
+}
+
+.plans-wrapper .plans-page .plan-card-active .plan-icon {
+  animation: plans-pulse 2s infinite ease-in-out;
+}
+
+.plans-wrapper .plans-page .plan-tag {
+  position: absolute;
+  top: 12px;
+  right: 1rem;
+  background: linear-gradient(90deg, var(--color-primary) 0%, var(--color-accent) 100%);
+  color: var(--color-text);
+  font-weight: 600;
+  font-size: 0.75rem;
+  padding: 0.4rem 1rem;
+  border-radius: 10px;
+  letter-spacing: 0.5px;
+  box-shadow: 0 0 8px rgba(0, 224, 255, 0.4);
+  z-index: 3;
+  text-transform: uppercase;
+  white-space: nowrap;
+  text-shadow: 0 0 3px rgba(0, 0, 0, 0.5);
+}
+
+.plans-wrapper .plans-page .plan-header {
+  text-align: center;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(0, 224, 255, 0.3);
+  position: relative;
+}
+
+.plans-wrapper .plans-page .plan-icon-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 0.8rem;
+}
+
+.plans-wrapper .plans-page .plan-icon {
+  font-size: 2rem;
+  line-height: 1;
+  filter: drop-shadow(0 0 8px rgba(0, 224, 255, 0.5));
+}
+
+.plans-wrapper .plans-page .plan-name {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0.5rem;
+  color: var(--color-primary);
+  text-shadow: 0 0 10px rgba(0, 224, 255, 0.5);
+}
+
+.plans-wrapper .plans-page .plan-price {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--color-text);
+  margin: 0.3rem 0;
+}
+
+.plans-wrapper .plans-page .plan-features {
+  flex: 1;
+  list-style: none;
+  padding: 0;
+  margin: 0.5rem 0;
+  font-size: 0.95rem;
+}
+
+.plans-wrapper .plans-page .plan-feature {
+  position: relative;
+  padding: 0.5rem 0 0.5rem 1.5rem;
+  margin: 0.2rem 0;
+  color: var(--color-text-muted);
+}
+
+.plans-wrapper .plans-page .plan-feature:hover {
+  color: var(--color-text);
+  transform: translateX(5px);
+  transition:
+    color 0.3s ease,
+    transform 0.3s ease;
+}
+
+.plans-wrapper .plans-page .plan-feature::before {
+  content: "✦";
+  position: absolute;
+  left: 0;
+  color: var(--color-primary);
+  font-size: 0.8rem;
+  line-height: 1.5;
+}
+
+.plans-wrapper .plans-page .plan-ideal-for {
+  font-size: 0.9rem;
+  font-style: italic;
+  color: var(--color-text-muted);
+  text-align: center;
+  margin-top: auto;
+  padding-top: 0.5rem;
+}
+
+.plans-wrapper .plans-page .plan-button {
+  background: linear-gradient(90deg, rgba(0, 224, 255, 0.8) 0%, rgba(0, 157, 255, 0.8) 100%);
+  border: none;
+  color: #000;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1rem;
+  padding: 0.8rem 1rem;
+  border-radius: var(--border-radius-sm);
+  cursor: pointer;
+  margin-top: 0.5rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 15px rgba(0, 224, 255, 0.4);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  outline: none;
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.plans-wrapper .plans-page .plan-button::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: all 0.6s ease;
+  z-index: -1;
+}
+
+.plans-wrapper .plans-page .plan-button:hover::before {
+  left: 100%;
+}
+
+.plans-wrapper .plans-page .plan-button:active {
+  transform: translateY(2px);
+}
+
+.plans-wrapper .plans-page .plan-button:focus {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.plans-wrapper .plans-page .plans-cta {
+  text-align: center;
+  padding: 2rem;
+  margin-top: 2rem;
+  background: rgba(0, 10, 30, 0.5);
+  border-radius: var(--border-radius-md);
+  border: 1px solid rgba(0, 224, 255, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.plans-wrapper .plans-page .plans-cta::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    45deg,
+    rgba(0, 224, 255, 0.1) 25%,
+    transparent 25%,
+    transparent 50%,
+    rgba(0, 224, 255, 0.1) 50%,
+    rgba(0, 224, 255, 0.1) 75%,
+    transparent 75%,
+    transparent
+  );
+  background-size: 20px 20px;
+  opacity: 0.1;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.plans-wrapper .plans-page .plans-cta-title {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  margin-bottom: 1rem;
+  color: var(--color-primary);
+}
+
+.plans-wrapper .plans-page .plans-cta-text {
+  color: var(--color-text-muted);
+  margin-bottom: 1.5rem;
+  font-size: 1rem;
+}
+
+.plans-wrapper .plans-page .plans-cta-button {
+  background: linear-gradient(90deg, rgba(0, 255, 150, 0.8) 0%, rgba(0, 224, 255, 0.8) 100%);
+  border: none;
+  color: #000;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1rem;
+  padding: 0.8rem 1.5rem;
+  border-radius: var(--border-radius-sm);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 15px rgba(0, 255, 150, 0.4);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.plans-wrapper .plans-page .plans-cta-button:hover {
+  box-shadow: 0 0 20px rgba(0, 255, 150, 0.6);
+}
+
+.plans-wrapper .plans-page .plans-cta-button:active {
+  transform: translateY(2px);
+}
+
+.plans-wrapper .plans-page .plans-cta-button:focus {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.plans-wrapper .plans-page .plans-notes {
+  font-size: 0.9rem;
+  color: var(--color-text-muted);
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: var(--border-radius-md);
+  padding: 1.5rem;
+  margin-top: 2rem;
+  border-left: 3px solid var(--color-primary);
+}
+
+.plans-wrapper .plans-page .plans-notes h3 {
+  font-size: 1.1rem;
+  margin-top: 0;
+  margin-bottom: 0.8rem;
+  color: var(--color-text);
+}
+
+.plans-wrapper .plans-page .plans-notes ul {
+  padding-left: 1.5rem;
+  margin: 0.5rem 0;
+}
+
+.plans-wrapper .plans-page .plans-notes li {
+  margin-bottom: 0.5rem;
+}
+
+.plans-wrapper .plans-page a,
+.plans-wrapper .plans-page button {
+  transition:
+    color 0.3s ease,
+    background 0.3s ease,
+    transform 0.3s ease;
+}
+
+.plans-wrapper .plans-page .interactive-particle,
+.plans-wrapper .plans-page .particle,
+.plans-wrapper .plans-page .light-beam {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+.plans-wrapper .plans-page .plan-card-active .plan-header,
+.plans-wrapper .plans-page .plan-card-active .plan-features,
+.plans-wrapper .plans-page .plan-card-active .plan-ideal-for {
+  transition:
+    transform 0.4s ease,
+    opacity 0.4s ease;
+}
+
+.plans-wrapper .plans-page * {
+  animation-fill-mode: forwards;
+}
+
+/* ==========================================================================
+      Media Queries - Encapsuladas en .plans-wrapper
+      ========================================================================== */
+@media (max-width: 1200px) {
+  .plans-wrapper .plans-page .plans-container {
+    padding: 2rem;
+    margin: 2rem 1rem;
+  }
+
+  .plans-wrapper .plans-page .plans-grid {
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  }
+
+  .plans-wrapper .plans-page .plans-title {
+    font-size: 2.2rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .plans-wrapper {
+    padding-top: 80px;
+  }
+
+  .plans-wrapper .plans-page .plans-container {
+    padding: 1.5rem;
+    margin: 1rem;
+  }
+
+  .plans-wrapper .plans-page .plans-grid {
+    grid-template-columns: 1fr;
+    max-width: 450px;
+    margin: 0 auto;
+    gap: 2rem;
+  }
+
+  .plans-wrapper .plans-page .plans-title {
+    font-size: 1.8rem;
+  }
+
+  .plans-wrapper .plans-page .plans-title-icon {
+    font-size: 1.4rem;
+  }
+
+  .plans-wrapper .plans-page .plans-cta {
+    padding: 1.5rem;
+  }
+
+  .plans-wrapper .plans-page .plans-cta-title {
+    font-size: 1.2rem;
+  }
+
+  .plans-wrapper .plans-page .plan-card {
+    padding: 1.2rem;
+  }
+
+  .plans-wrapper .plans-page .plan-name {
+    font-size: 1.3rem;
+  }
+
+  .plans-wrapper .plans-page .cosmic-lights {
+    opacity: 0.5;
+  }
+
+  .plans-wrapper .plans-page .light-beam {
+    filter: blur(2px);
+  }
+
+  .plans-wrapper .plans-page .plans-container:hover {
+    box-shadow:
+      var(--shadow-intense),
+      inset 0 0 20px rgba(0, 224, 255, 0.3);
+  }
+
+  .plans-wrapper .plans-page .plan-tag {
+    font-size: 0.7rem;
+    padding: 0.3rem 0.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .plans-wrapper {
+    padding-top: 60px;
+  }
+
+  .plans-wrapper .plans-page .plans-container {
+    padding: 1rem;
+    margin: 0.5rem;
+  }
+
+  .plans-wrapper .plans-page .plans-title {
+    font-size: 1.6rem;
+  }
+
+  .plans-wrapper .plans-page .faq-title-logo {
+    width: 1.6rem;
+    height: 1.6rem;
+  }
+
+  .plans-wrapper .plans-page .plans-subtitle {
+    font-size: 0.95rem;
+  }
+
+  .plans-wrapper .plans-page .plan-header {
+    padding-bottom: 0.8rem;
+  }
+
+  .plans-wrapper .plans-page .plan-name {
+    font-size: 1.2rem;
+  }
+
+  .plans-wrapper .plans-page .plan-price {
+    font-size: 1.3rem;
+  }
+
+  .plans-wrapper .plans-page .plan-feature {
+    font-size: 0.9rem;
+  }
+
+  .plans-wrapper .plans-page .plans-notes {
+    font-size: 0.8rem;
+    padding: 1rem;
+  }
+
+  .plans-wrapper .plans-page .cosmic-lights,
+  .plans-wrapper .plans-page .plans-container::after {
+    display: none;
+  }
+
+  .plans-wrapper .plans-page .particle {
+    filter: none;
+  }
+
+  .plans-wrapper .plans-page .plan-tag {
+    font-size: 0.65rem;
+    padding: 0.3rem 0.7rem;
+    top: 10px;
+    right: 0.8rem;
+  }
+}
+
+@media (hover: none) {
+  .plans-wrapper .plans-page .plan-card:hover {
+    transform: none;
+  }
+
+  .plans-wrapper .plans-page .plan-button:hover::before {
+    left: -100%;
+  }
+
+  .plans-wrapper .plans-page .plans-container:hover {
+    box-shadow:
+      var(--shadow-intense),
+      inset 0 0 20px rgba(0, 224, 255, 0.3);
+  }
+}
+
+@media (min-width: 769px) {
+  .plans-wrapper .plans-page .particles {
+    transform: translateZ(10px);
+  }
+
+  .plans-wrapper .plans-page .plans-header {
+    transform: translateZ(20px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .plans-wrapper .plans-page .plan-card,
+  .plans-wrapper .plans-page .plans-container,
+  .plans-wrapper .plans-page .light-beam,
+  .plans-wrapper .plans-page .particle,
+  .plans-wrapper .plans-page .interactive-particle,
+  .plans-wrapper .plans-page .plans-container::after {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  .plans-wrapper .plans-page .plan-card:hover,
+  .plans-wrapper .plans-page .plans-container:hover {
+    transform: none;
+    box-shadow: var(--shadow-intense);
+  }
+
+  .plans-wrapper .plans-page .plan-button::before,
+  .plans-wrapper .plans-page .plans-cta-button::before {
+    display: none;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .plans-wrapper .plans-page .plans-container {
+    background: rgba(0, 0, 0, 0.8);
+  }
+
+  .plans-wrapper .plans-page .plan-card {
+    background: rgba(0, 0, 0, 0.75);
+  }
+}
+
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .plans-wrapper .plans-page .light-beam {
+    filter: blur(2px);
+  }
+
+  .plans-wrapper .plans-page .plans-container {
+    border: 0.5px solid rgba(0, 224, 255, 0.7);
+  }
+}
+
+@media print {
+  .plans-wrapper .plans-page .cosmic-lights,
+  .plans-wrapper .plans-page .particles,
+  .plans-wrapper .plans-page .plans-container::after,
+  .plans-wrapper .plans-page .plan-card::before,
+  .plans-wrapper .plans-page .plan-card::after {
+    display: none;
+  }
+
+  .plans-wrapper .plans-page .plans-container {
+    background: none;
+    box-shadow: none;
+    border: 1px solid #000;
+  }
+
+  .plans-wrapper .plans-page .plan-card {
+    border: 1px solid #000;
+    box-shadow: none;
+    background: #fff;
+  }
+
+  .plans-wrapper .plans-page .plans-title,
+  .plans-wrapper .plans-page .plan-name,
+  .plans-wrapper .plans-page .plans-cta-title {
+    color: #000;
+    text-shadow: none;
+  }
+
+  .plans-wrapper .plans-page .plan-button,
+  .plans-wrapper .plans-page .plans-cta-button {
+    background: #ccc;
+    color: #000;
+    box-shadow: none;
+  }
+}
+
+/* ==========================================================================
+      Estilos adicionales encapsulados
+      ========================================================================== */
+.plans-wrapper .plans-page .plan-feature,
+.plans-wrapper .plans-page .plans-cta-text,
+.plans-wrapper .plans-page .plans-notes li {
+  line-height: 1.6;
+  text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+}
+
+.plans-wrapper .plans-page .plans-grid {
+  padding: 0 0.5rem;
+  max-width: 100%;
+}
+
+.plans-wrapper .plans-page .plan-card::before {
+  transition: opacity 0.5s ease;
+}

@@ -1,0 +1,189 @@
+.google-auth-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 50px;
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.25);
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  padding: 0;
+  margin: 10px 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.google-auth-button::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  transition: left 0.6s ease;
+  z-index: 1;
+}
+
+.google-auth-button:hover {
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+  transform: translateY(-2px);
+}
+
+.google-auth-button:hover::before {
+  left: 100%;
+}
+
+.google-auth-button:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.3);
+}
+
+.google-icon-wrapper {
+  width: 24px;
+  height: 24px;
+  margin-right: 12px;
+}
+
+.google-icon {
+  width: 100%;
+  height: 100%;
+}
+
+.google-button-text {
+  color: #000000;
+  font-family: "Inter", sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.25px;
+}
+
+/* Estilo futurista para combinar con el tema de Plubot */
+.google-auth-button.futuristic {
+  background: rgba(0, 0, 0, 0.7);
+  border: 1px solid rgba(0, 224, 255, 0.5);
+  box-shadow: 0 0 15px rgba(0, 224, 255, 0.3);
+}
+
+.google-auth-button.futuristic .google-button-text {
+  color: #ffffff;
+}
+
+.google-auth-button.futuristic:hover {
+  box-shadow: 0 0 25px rgba(0, 224, 255, 0.5);
+  border: 1px solid rgba(0, 224, 255, 0.8);
+}
+
+/* Versión para modo oscuro */
+.dark-mode .google-auth-button {
+  background-color: #333333;
+  border: 1px solid #444444;
+}
+
+.dark-mode .google-auth-button .google-button-text {
+  color: #ffffff;
+}
+
+/* Versión para dispositivos móviles */
+@media (max-width: 768px) {
+  .google-auth-button {
+    height: 44px;
+  }
+
+  .google-button-text {
+    font-size: 16px;
+    color: #444;
+    font-weight: 500;
+  }
+
+  .google-icon-wrapper {
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+  }
+}
+
+/* Estilos para el estado de carga */
+.google-auth-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 50px;
+  background-color: rgba(0, 224, 255, 0.1);
+  border-radius: 8px;
+  border: 1px solid rgba(0, 224, 255, 0.3);
+  padding: 0 15px;
+  margin: 10px 0;
+  flex-direction: column;
+}
+
+.google-auth-loading .loading-spinner {
+  width: 30px;
+  height: 30px;
+  margin-bottom: 8px;
+  position: relative;
+}
+
+.google-auth-loading .spinner-inner {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border: 3px solid rgba(0, 224, 255, 0.3);
+  border-top: 3px solid rgba(0, 224, 255, 1);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.google-auth-loading .loading-text {
+  font-size: 14px;
+  color: rgba(0, 224, 255, 0.8);
+  font-weight: 500;
+}
+
+/* Estilos para el estado de éxito */
+.google-auth-success {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 50px;
+  background-color: rgba(52, 168, 83, 0.1);
+  border-radius: 8px;
+  border: 1px solid rgba(52, 168, 83, 0.3);
+  padding: 0 15px;
+  margin: 10px 0;
+  flex-direction: column;
+}
+
+.google-auth-success .success-icon {
+  width: 30px;
+  height: 30px;
+  margin-bottom: 8px;
+}
+
+.google-auth-success .success-text {
+  font-size: 14px;
+  color: #34a853;
+  font-weight: 500;
+}
+
+/* Estilos para el botón deshabilitado */
+.google-auth-button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}

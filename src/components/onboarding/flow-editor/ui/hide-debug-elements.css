@@ -1,0 +1,67 @@
+/**
+ * hide-debug-elements.css
+ * Este archivo elimina completamente todos los elementos de depuración visual
+ * y los bordes rojos que pudieran estar en el editor de flujos.
+ */
+
+/* Ocultar todos los bordes rojos de depuración */
+.react-flow__node,
+.react-flow__edge,
+.react-flow__edge-path,
+.react-flow__edge-interaction,
+.react-flow__connection-path {
+  border-color: transparent !important;
+  outline: none !important;
+}
+
+/* Eliminar cualquier estilo de borde de diagnóstico rojo */
+[data-debug],
+[debug],
+[debug="true"],
+.debug-outline,
+.debug-border,
+.debug-highlight {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Ocultar etiquetas de depuración */
+.debug-label,
+.debug-info,
+.debug-overlay,
+.debug-text {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+}
+
+/* Asegurar que los nodos y aristas tengan apariencia limpia */
+.react-flow__edge.debug,
+.react-flow__node.debug {
+  border: none !important;
+  background: transparent !important;
+}
+
+/* Eliminar cualquier texto de depuración que pueda aparecer */
+[data-debug-text],
+.debug-coordinates,
+.node-debug-info,
+.edge-debug-info {
+  display: none !important;
+}
+
+/* Eliminar cualquier posible consola de depuración flotante */
+.debug-console,
+.debug-panel,
+.debug-log {
+  display: none !important;
+  visibility: hidden !important;
+}
+
+/* Asegurar que los handles tengan una apariencia limpia */
+.react-flow__handle.debug,
+.debug-handle {
+  border-color: transparent !important;
+  background-color: inherit !important;
+}

@@ -1,0 +1,182 @@
+/*
+ * SOLUCIÓN PARA LA VISUALIZACIÓN CORRECTA DE NODOS
+ * Este archivo resuelve los problemas de visibilidad de nodos y aristas
+ * sin interferir con las funcionalidades clave de ReactFlow
+ */
+
+/* Asegurar que los contenedores de ReactFlow tengan las dimensiones adecuadas */
+.react-flow {
+  width: 100%;
+  height: 100%;
+
+  width: 100%;
+}
+
+/* Permitir que los nodos sean completamente visibles */
+/* .react-flow__viewport {
+  /* Se eliminaron reglas vacías que causaban un error de linting */
+/* } */
+
+/* Priorizar la visibilidad de los nodos */
+.react-flow__node {
+  z-index: 10;
+
+  /* Evitar que los nodos sean recortados */
+}
+
+/* Asegurar que las aristas sean visibles */
+.react-flow__edge {
+  z-index: 5;
+}
+
+/* Evitar que el panel de fondo interfiera con los nodos */
+.react-flow__pane {
+  z-index: 1;
+}
+
+/* ==== 2. ELIMINACIÓN DEL FOOTER SOLO EN EL EDITOR DE FLUJOS Y TRAININGSCREEN ==== */
+
+/* Solo ocultar el footer si estamos en el editor de flujos o TrainingScreen */
+.flow-editor-container .layout > footer,
+.flow-editor-container .quantum-footer,
+.flow-editor-container [class*="footer"],
+.training-screen .layout > footer,
+.training-screen .quantum-footer,
+.training-screen [class*="footer"] {
+  display: none !important;
+  visibility: hidden !important;
+  height: 0 !important;
+  width: 0 !important;
+  opacity: 0 !important;
+  position: absolute !important;
+  z-index: -9999 !important;
+  pointer-events: none !important;
+}
+
+/* El footer debe ser visible en el resto del sitio */
+
+/* ==== 3. SISTEMA DE CAPAS (Z-INDEX) COMPLETAMENTE REDISEÑADO ==== */
+
+/* Estructura de capas clara y bien definida */
+/* Capa 1: Fondo */
+.ts-background-scene-container,
+.react-flow__background {
+  z-index: -10 !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+}
+
+/* Capa 2: Lienzo base */
+.react-flow__pane {
+  z-index: 0 !important;
+}
+
+/* Capa 3: Conexiones (edges) */
+.react-flow__edge,
+.react-flow__edge-path,
+.react-flow__connection,
+.react-flow__connection-path {
+  z-index: 5 !important;
+  opacity: 1 !important;
+}
+
+/* Capa 4: Nodos (elementos normales) */
+.react-flow__node {
+  z-index: 10 !important;
+
+  opacity: 1 !important;
+  /* Importante: dimensiones naturales para evitar estiramientos */
+  height: auto !important;
+  /* Crucial: mostrar una línea de borde para ver límites */
+  /* outline: 1px solid rgba(0, 100, 255, 0.1) !important; */ /* Eliminado para quitar borde fino */
+}
+
+/* Capa 5: Nodo seleccionado (prioridad superior) */
+.react-flow__node.selected {
+  z-index: 100 !important;
+}
+
+/* Capa 6: Controles UI */
+.react-flow__panel,
+.zoom-controls,
+.performance-button {
+  z-index: 1000 !important;
+}
+
+/* ==== 4. ESTADO DE ARRASTRE OPTIMIZADO ==== */
+
+/* Durante el arrastre, asegurar que el nodo permanezca totalmente visible */
+.elite-node-dragging .react-flow__node,
+.react-flow__node.dragging,
+.react-flow__node:active {
+  z-index: 1000 !important; /* Superar cualquier otro elemento */
+  /* Mostrar un halo sutil para identificar bordes */
+  /* box-shadow: 0 0 0 2px rgba(0, 150, 255, 0.2),
+              0 0 10px rgba(0, 0, 0, 0.2) !important; */ /* Eliminado para quitar halo/margen */
+  /* Marcar visualmente para debugging */
+  /* outline: 2px dashed rgba(255, 150, 0, 0.3) !important; */ /* Eliminado para quitar borde de guiones */
+}
+
+/* ==== 5. AJUSTES VISUALES SOLO PARA EL CANVAS DE REACTFLOW ==== */
+
+/* IMPORTANTE: No ocultar ni alterar modales, overlays ni elementos globales del sitio. */
+/* Solo ajustar estilos de nodos, edges y capas internas del editor de flujos. */
+
+/* Elimina o comenta cualquier regla destructiva sobre modales o overlays globales. */
+/* Si necesitas ocultar overlays internos, usa clases específicas del editor, nunca selectores genéricos. */
+
+/* Ejemplo de ajuste permitido: */
+.flow-editor-container .react-flow__node {
+  z-index: 10 !important;
+  opacity: 1 !important;
+  /* outline: 1px solid rgba(0, 100, 255, 0.1) !important; */ /* Eliminado para quitar borde fino */
+}
+
+.flow-editor-container .react-flow__node.selected {
+  z-index: 100 !important;
+}
+
+.flow-editor-container .react-flow__edge {
+  z-index: 5 !important;
+}
+
+/* ...otros ajustes internos del editor... */
+
+/* ¡No tocar ni ocultar [class*="modal"], [class*="overlay"], [class*="mask"] globales! */
+/* Si necesitas overlays internos, usa .flow-editor-modal o clases propias del editor. */
+
+/* ==== 6. OPTIMIZACIONES DE RENDIMIENTO ==== */
+
+/* Maintain performance while ensuring visibility */
+.react-flow__node {
+  will-change: transform !important;
+  /* NO forzar transform para permitir el arrastre natural */
+  transition: box-shadow 0.2s ease !important;
+  /* Asegurar que el contenido se renderice correctamente */
+  contain: layout style !important;
+}
+
+/* ==== 7. DEBUGGING VISUAL (DESACTIVADO) ==== */
+/* Estos estilos de debugging estaban sobreescribiendo completamente los nodos
+.react-flow__node, .flow-editor-wrapper .react-flow__node, .flow-editor-container .react-flow__node {
+  border: 3px solid red !important;
+  background: yellow !important;
+  color: black !important;
+  font-size: 18px !important;
+  min-width: 40px !important;
+  min-height: 30px !important;
+  z-index: 10000 !important;
+}
+
+.react-flow__viewport, .flow-editor-wrapper .react-flow__viewport, .flow-editor-container .react-flow__viewport {
+  outline: 2px dashed blue !important;
+  background: rgba(0,0,255,0.07) !important;
+  z-index: 9999 !important;
+}
+*/
+
+/* Estos estilos pueden activarse temporalmente para ver los límites */
+/* .react-flow__node { outline: 1px solid red !important; } */
+/* .react-flow__viewport { outline: 2px dashed blue !important; } */
+/* .flow-editor-container { outline: 2px solid green !important; } */

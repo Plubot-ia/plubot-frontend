@@ -1,0 +1,92 @@
+.whatsapp-integration-panel {
+  padding: 20px;
+  text-align: center;
+}
+
+.whatsapp-explanation {
+  font-size: 14px;
+  color: #6c757d;
+  margin-bottom: 25px;
+  max-width: 500px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.whatsapp-button {
+  background-color: #25d366;
+  color: white;
+  border: none;
+  padding: 12px 25px;
+  border-radius: 25px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.whatsapp-button:hover {
+  background-color: #1ebe57;
+}
+
+.whatsapp-button.disconnect {
+  background-color: #e74c3c;
+}
+
+.whatsapp-button.disconnect:hover {
+  background-color: #c0392b;
+}
+
+.connection-status {
+  margin-top: 20px;
+  padding: 15px;
+  border-radius: 8px;
+}
+
+.connection-status.connected {
+  background-color: #e8f5e9;
+  border: 1px solid #4caf50;
+}
+
+.connection-status.disconnected {
+  background-color: #fbe9e7;
+  border: 1px solid #ff5722;
+}
+
+.loading-spinner,
+.initiate-connection,
+.qr-code-container {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+}
+
+.qr-code-container img {
+  max-width: 250px;
+  border: 5px solid #e0e0e0;
+  border-radius: 8px;
+}
+
+.polling-indicator {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #007bff;
+  font-size: 14px;
+}
+
+.polling-indicator .spin {
+  animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}

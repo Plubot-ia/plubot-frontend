@@ -1,0 +1,388 @@
+/* Estilos para HttpRequestNode */
+
+.ts-http-request-node {
+  /* Estilos base ya heredados de .ts-node-base */
+  border-color: #4a90e2; /* Un color distintivo, por ejemplo */
+}
+
+.ts-http-request-node .ts-node-header {
+  background-color: #4a90e2;
+  color: white;
+}
+
+.ts-http-request-node .ts-node-icon {
+  margin-right: 8px;
+}
+
+/* Estilos para la sección de configuración dentro del nodo */
+.ts-http-request-node .ts-node-content {
+  padding: 10px;
+  font-size: 0.9em;
+  background-color: #f8f9fa; /* Un fondo claro para el contenido */
+}
+
+.ts-http-request-node .ts-node-setting {
+  margin-bottom: 12px;
+  display: flex;
+  flex-direction: column;
+}
+
+.ts-http-request-node .ts-node-setting label {
+  font-weight: bold;
+  margin-bottom: 4px;
+  color: #333;
+}
+
+.ts-http-request-node .ts-node-setting input[type="text"],
+.ts-http-request-node .ts-node-setting select,
+.ts-http-request-node .ts-node-setting textarea {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 1em;
+  width: 100%; /* Asegura que ocupen el ancho disponible */
+  box-sizing: border-box; /* Incluye padding y border en el ancho total */
+}
+
+.ts-http-request-node .ts-node-setting input[type="text"]:disabled,
+.ts-http-request-node .ts-node-setting select:disabled,
+.ts-http-request-node .ts-node-setting textarea:disabled {
+  background-color: #e9ecef;
+  cursor: not-allowed;
+}
+
+.ts-http-request-node .ts-node-section-title {
+  font-weight: bold;
+  margin-top: 15px;
+  margin-bottom: 8px;
+  color: #4a90e2; /* Color del título de sección */
+  border-bottom: 1px solid #eee;
+  padding-bottom: 4px;
+}
+
+/* Estilos específicos para los handles de salida */
+.ts-http-request-node .ts-handle-success .react-flow__handle {
+  background-color: #28a745; /* Verde para éxito */
+}
+
+.ts-http-request-node .ts-handle-error .react-flow__handle {
+  background-color: #dc3545; /* Rojo para error */
+}
+
+/* Tooltips en handles (si los iconos están dentro del Handle) */
+.ts-http-request-node .react-flow__handle svg {
+  pointer-events: none; /* Para que el tooltip del Handle funcione */
+}
+
+.ts-http-request-node .ts-node-notes {
+  font-size: 0.8em;
+  color: #6c757d;
+  margin-top: 10px;
+  padding-top: 5px;
+  border-top: 1px dashed #eee;
+}
+
+/* Estilos para la sección de Cabeceras */
+.ts-http-request-node .ts-header-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+  gap: 8px; /* Espacio entre los inputs y el botón */
+}
+
+.ts-http-request-node .ts-header-input {
+  flex-grow: 1; /* Permite que los inputs crezcan y ocupen el espacio */
+  /* Otros estilos ya definidos en .ts-node-setting input[type="text"] se aplican,
+       pero podemos añadir o sobreescribir si es necesario */
+}
+
+.ts-http-request-node .ts-icon-button {
+  background: none;
+  border: none;
+  padding: 4px;
+  cursor: pointer;
+  color: #6c757d; /* Un color gris estándar para iconos */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ts-http-request-node .ts-icon-button:hover {
+  color: #dc3545; /* Color de peligro al pasar el mouse sobre el botón de eliminar */
+}
+
+.ts-http-request-node .ts-remove-header-button {
+  /* Hereda de .ts-icon-button */
+  margin-left: auto; /* Empuja el botón de eliminar a la derecha si es necesario, aunque el gap ayuda */
+}
+
+.ts-http-request-node .ts-add-button {
+  background-color: #4a90e2; /* Color principal del nodo */
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9em;
+  margin-top: 8px; /* Espacio después de la lista de cabeceras */
+  transition: background-color 0.2s ease;
+}
+
+.ts-http-request-node .ts-add-button:hover {
+  background-color: #357abd; /* Un tono más oscuro al pasar el mouse */
+}
+
+.ts-http-request-node .ts-add-button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+/* Estilos para elementos comunes de clave-valor (aplicable a Headers y Form Data) */
+.ts-http-request-node .ts-key-value-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+  gap: 8px;
+}
+
+.ts-http-request-node .ts-key-value-input-key,
+.ts-http-request-node .ts-key-value-input-value {
+  flex-grow: 1;
+  padding: 6px 8px;
+  border: 1px solid var(--node-border-color);
+  border-radius: var(--node-border-radius);
+  background-color: var(--input-background-color);
+  color: var(--text-color-primary);
+  font-size: 0.9em;
+}
+
+.ts-http-request-node .ts-key-value-input-key:disabled,
+.ts-http-request-node .ts-key-value-input-value:disabled {
+  background-color: var(--input-disabled-background-color);
+  color: var(--text-color-disabled);
+  cursor: not-allowed;
+}
+
+/* Aplicar a .ts-header-item para unificar si es necesario */
+.ts-http-request-node .ts-header-item {
+  /* Hereda de .ts-key-value-item si se aplica la clase, 
+       o se pueden mantener estilos específicos si ya los tiene 
+       y son diferentes de los de form-data. 
+       Por ahora, asumimos que .ts-key-value-item será la base. */
+}
+
+.ts-http-request-node .ts-header-input {
+  /* Hereda de .ts-key-value-input-key o .ts-key-value-input-value 
+       si se aplican esas clases a los inputs de header.
+       Si no, mantener/ajustar sus estilos específicos. */
+}
+
+/* Estilos específicos para la sección de Form Data */
+.ts-http-request-node .ts-formdata-section {
+  margin-top: 10px; /* Espacio sobre la sección de form data */
+}
+
+.ts-http-request-node .ts-formdata-item {
+  /* Hereda de .ts-key-value-item */
+}
+
+.ts-http-request-node .ts-formdata-input {
+  /* Hereda de .ts-key-value-input-key o .ts-key-value-input-value */
+}
+
+.ts-http-request-node .ts-remove-formdata-button {
+  /* Hereda estilos de .ts-icon-button si se usa esa clase.
+       Asegurar que tenga el mismo aspecto que .ts-remove-header-button */
+  background: transparent;
+  border: none;
+  color: var(--text-color-secondary);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: var(--node-border-radius);
+}
+
+.ts-http-request-node .ts-remove-formdata-button:hover {
+  background-color: var(--button-hover-background-color);
+  color: var(--accent-color);
+}
+
+/* Estilos para el área de texto del cuerpo JSON/Text */
+.ts-http-request-node .ts-body-textarea {
+  width: calc(100% - 16px); /* Ajustar padding si es necesario */
+  padding: 8px;
+  border: 1px solid var(--node-border-color);
+  border-radius: var(--node-border-radius);
+  background-color: var(--input-background-color);
+  color: var(--text-color-primary);
+  font-size: 0.9em;
+  min-height: 80px;
+  resize: vertical;
+  margin-top: 4px; /* Espacio sobre el textarea */
+}
+
+.ts-http-request-node .ts-body-textarea:disabled {
+  background-color: var(--input-disabled-background-color);
+  color: var(--text-color-disabled);
+  cursor: not-allowed;
+}
+
+/* Estilos para la sección de Mapeo de Respuesta */
+.ts-http-request-node .ts-response-map-item {
+  border: 1px solid var(--node-border-color-lighter, #e0e0e0);
+  border-radius: var(--node-border-radius);
+  padding: 10px;
+  margin-bottom: 12px;
+  background-color: var(--node-content-background-alt, #f9f9f9);
+  position: relative; /* Para el botón de eliminar */
+}
+
+.ts-http-request-node .ts-response-map-row {
+  display: flex;
+  flex-direction: column; /* Etiqueta encima del input/select */
+  margin-bottom: 8px;
+}
+
+.ts-http-request-node .ts-response-map-row label {
+  font-size: 0.85em;
+  color: var(--text-color-secondary);
+  margin-bottom: 4px;
+}
+
+.ts-http-request-node .ts-response-map-select,
+.ts-http-request-node .ts-response-map-input {
+  width: 100%;
+  padding: 6px 8px;
+  border: 1px solid var(--node-border-color);
+  border-radius: var(--node-border-radius);
+  background-color: var(--input-background-color);
+  color: var(--text-color-primary);
+  font-size: 0.9em;
+  box-sizing: border-box; /* Asegura que padding no aumente el ancho total */
+}
+
+.ts-http-request-node .ts-response-map-select:disabled,
+.ts-http-request-node .ts-response-map-input:disabled {
+  background-color: var(--input-disabled-background-color);
+  color: var(--text-color-disabled);
+  cursor: not-allowed;
+}
+
+.ts-http-request-node .ts-remove-map-entry-button {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: transparent;
+  border: none;
+  color: var(--text-color-secondary);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: var(--node-border-radius);
+}
+
+.ts-http-request-node .ts-remove-map-entry-button:hover {
+  background-color: var(--button-hover-background-color);
+  color: var(--accent-color);
+}
+
+/* Ajustar el botón de Añadir Mapeo si es necesario, podría heredar de .ts-add-button */
+
+/* Estilos para la sección de Prueba de Solicitud */
+.ts-http-request-node .ts-test-section {
+  margin-top: 15px;
+  padding-top: 10px;
+  border-top: 1px solid var(--node-border-color-lighter, #e0e0e0);
+}
+
+.ts-http-request-node .ts-test-button {
+  /* Puede heredar de .ts-add-button o tener estilos propios */
+  /* Si hereda, asegurarse de que se vea bien en este contexto */
+  width: 100%; /* Ocupar todo el ancho disponible en la sección */
+  margin-bottom: 10px;
+  display: flex; /* Para alinear spinner y texto */
+  align-items: center;
+  justify-content: center;
+  gap: 8px; /* Espacio entre spinner y texto */
+}
+
+.ts-http-request-node .ts-test-button:disabled {
+  background-color: var(--button-disabled-background-color, #cccccc);
+  border-color: var(--button-disabled-border-color, #cccccc);
+  color: var(--button-disabled-text-color, #666666);
+  cursor: not-allowed;
+}
+
+/* Spinner de carga simple */
+.ts-http-request-node .ts-loading-spinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: #fff; /* O el color del texto del botón */
+  animation: ts-spin 1s ease-in-out infinite;
+}
+
+@keyframes ts-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.ts-http-request-node .ts-test-result {
+  margin-top: 10px;
+  padding: 10px;
+  border-radius: var(--node-border-radius);
+  font-size: 0.9em;
+}
+
+.ts-http-request-node .ts-test-result strong {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.ts-http-request-node .ts-test-result p {
+  margin: 4px 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.ts-http-request-node .ts-test-success {
+  background-color: var(--success-background-light, #e6ffed);
+  border: 1px solid var(--success-color, #28a745);
+  color: var(--success-text-color, #155724);
+}
+
+.ts-http-request-node .ts-test-error {
+  background-color: var(--error-background-light, #ffebee);
+  border: 1px solid var(--error-color, #dc3545);
+  color: var(--error-text-color, #721c24);
+}
+
+.ts-http-request-node .ts-icon-success {
+  color: var(--success-color, #28a745);
+}
+
+.ts-http-request-node .ts-icon-error {
+  color: var(--error-color, #dc3545);
+}
+
+.ts-http-request-node .ts-test-preview-area {
+  background-color: var(--code-background-color, #f0f0f0);
+  padding: 8px;
+  border-radius: var(--node-border-radius-sm, 3px);
+  border: 1px solid var(--node-border-color-lighter, #e0e0e0);
+  white-space: pre-wrap; /* Para que el contenido se ajuste */
+  word-break: break-all; /* Para romper palabras largas */
+  font-size: 0.85em;
+  max-height: 150px; /* Limitar altura y permitir scroll */
+  overflow-y: auto;
+  margin-top: 4px;
+}
+
+.ts-http-request-node .ts-test-error-details {
+  font-size: 0.8em;
+  color: var(--text-color-secondary-muted, #6c757d);
+  margin-top: 6px;
+}

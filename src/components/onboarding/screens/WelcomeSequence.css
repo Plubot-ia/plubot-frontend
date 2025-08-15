@@ -1,0 +1,663 @@
+@import url("https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800&family=Rajdhani:wght@300;500;700&display=swap");
+
+.welcome-screen {
+  position: relative;
+  height: 100vh;
+  width: 100vw;
+  background: radial-gradient(circle at 50% 50%, rgba(0, 10, 30, 1) 0%, rgba(0, 0, 10, 1) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  z-index: 1;
+  perspective: 1000px;
+  font-family: "Rajdhani", sans-serif;
+  padding-top: 80px; /* Reducido de 100px a 80px para acercar al header */
+}
+
+.welcome-screen .welcome-content {
+  position: relative;
+  z-index: 10;
+  color: white;
+  text-align: center;
+  padding: 2.5rem 2rem;
+  width: 100%;
+  max-width: 950px; /* Aumentado de 800px a 950px para evitar desbordamiento horizontal */
+  max-height: calc(
+    100vh - 160px
+  ); /* Aumentado para evitar desbordamiento vertical (80px header + 80px margen inferior) */
+  overflow: hidden; /* Cambiado de overflow-y: auto a overflow: hidden para evitar barras de desplazamiento */
+  backdrop-filter: blur(10px);
+  background: rgba(0, 0, 0, 0.7);
+  border-radius: 25px;
+  border: 1px solid rgba(0, 224, 255, 0.7);
+  box-shadow:
+    0 0 40px rgba(0, 224, 255, 0.5),
+    0 0 80px rgba(0, 0, 0, 0.6);
+  transform-style: preserve-3d;
+}
+
+.welcome-screen .welcome-content::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(0, 224, 255, 0.1) 0%,
+    rgba(255, 0, 255, 0.05) 50%,
+    transparent 100%
+  );
+  z-index: -1;
+}
+
+.welcome-screen .intro-text-container {
+  position: relative;
+  margin-bottom: 2rem;
+  perspective: 1000px;
+}
+
+.welcome-screen .intro-text {
+  font-size: 2.2rem;
+  line-height: 1.5;
+  color: #00e0ff;
+  font-family: "Orbitron", sans-serif;
+  margin-bottom: 1rem;
+  text-shadow: 0 0 10px rgba(0, 224, 255, 0.6);
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+
+.welcome-screen .typewriter-container {
+  position: relative;
+  padding: 1rem;
+  background: rgba(0, 10, 20, 0.5);
+  border-radius: 15px;
+  border-left: 3px solid #00e0ff;
+  margin: 0.5rem 0;
+  box-shadow: 0 0 20px rgba(0, 224, 255, 0.2);
+  transform: perspective(1000px) rotateX(2deg);
+  transition: all 0.5s ease;
+}
+
+.welcome-screen .typewriter-container:hover {
+  transform: perspective(1000px) rotateX(0deg) scale(1.02);
+  box-shadow: 0 0 30px rgba(0, 224, 255, 0.3);
+}
+
+.welcome-screen .typewriter-line {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 3px;
+  background: #00e0ff;
+  filter: drop-shadow(0 0 5px #00e0ff);
+  animation: pulseLine 2s infinite;
+}
+
+@keyframes pulseLine {
+  0%,
+  100% {
+    opacity: 1;
+    height: 100%;
+  }
+  50% {
+    opacity: 0.7;
+    height: 90%;
+  }
+}
+
+.welcome-screen .typewriter-text {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+  min-height: 6rem; /* Reducido de 8rem para optimizar espacio vertical */
+  text-align: left;
+  padding: 0.5rem 0;
+  font-size: 1.8rem;
+  font-weight: 500;
+  font-family: "Rajdhani", sans-serif;
+}
+
+.welcome-screen .cursor {
+  display: inline-block;
+  width: 3px;
+  height: 1.8rem;
+  background-color: #00e0ff;
+  margin-left: 2px;
+  vertical-align: middle;
+  animation: blink 1s step-end infinite;
+  box-shadow: 0 0 8px #00e0ff;
+}
+
+@keyframes blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+
+.welcome-screen .intro-button {
+  position: relative;
+  background: linear-gradient(45deg, #00e0ff, #9900ff, #ff00ff);
+  background-size: 200% 200%;
+  animation: gradientShift 5s ease infinite;
+  color: white;
+  font-size: 1.4rem;
+  padding: 1.2rem 2.5rem;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: "Orbitron", sans-serif;
+  margin-top: 1rem; /* Reducido de 1.5rem para optimizar espacio vertical */
+  text-transform: uppercase;
+  font-weight: 600;
+  letter-spacing: 2px;
+  overflow: hidden;
+  z-index: 5;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+  box-shadow:
+    0 0 20px rgba(0, 224, 255, 0.5),
+    0 5px 15px rgba(0, 0, 0, 0.3);
+  transform: translateZ(0);
+}
+
+.welcome-screen .intro-button:hover {
+  transform: translateY(-3px) translateZ(0);
+  box-shadow:
+    0 0 25px rgba(0, 224, 255, 0.7),
+    0 8px 20px rgba(0, 0, 0, 0.4);
+}
+
+.welcome-screen .intro-button:active {
+  transform: translateY(1px) translateZ(0);
+}
+
+.welcome-screen .button-text {
+  position: relative;
+  z-index: 2;
+}
+
+.welcome-screen .button-glow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0) 70%);
+  mix-blend-mode: overlay;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 1;
+}
+
+.welcome-screen .intro-button:hover .button-glow {
+  opacity: 0.6;
+  animation: pulseGlow 2s infinite;
+}
+
+@keyframes pulseGlow {
+  0%,
+  100% {
+    opacity: 0.6;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.1);
+  }
+}
+
+@keyframes gradientShift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.welcome-screen .plubot-icon-container {
+  position: absolute;
+  top: -80px;
+  right: 30px;
+  width: 100px;
+  height: 100px;
+  z-index: 15;
+  perspective: 1000px;
+  transform-style: preserve-3d;
+}
+
+.welcome-screen .plubot-icon {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  z-index: 2;
+  transition: transform 0.5s ease;
+}
+
+.welcome-screen .plubot-glow {
+  position: absolute;
+  top: -20%;
+  left: -20%;
+  width: 140%;
+  height: 140%;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(0, 224, 255, 0.4) 0%,
+    rgba(255, 0, 255, 0.2) 40%,
+    rgba(0, 0, 0, 0) 70%
+  );
+  filter: blur(12px);
+  opacity: 0.8;
+  z-index: 1;
+  animation: pulseGlow 3s infinite alternate;
+}
+
+.welcome-screen .plubot-icon img {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 0 8px #00e0ff);
+  z-index: 2;
+  transition: all 0.5s ease;
+}
+
+.welcome-screen .plubot-icon:hover img {
+  filter: drop-shadow(0 0 15px #00e0ff) brightness(1.2);
+  transform: scale(1.1) rotate(5deg);
+}
+
+.welcome-screen .plubot-greeting {
+  position: absolute;
+  bottom: -40px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 10, 30, 0.8);
+  backdrop-filter: blur(8px);
+  padding: 8px 15px;
+  border-radius: 12px;
+  color: #00e0ff;
+  font-size: 14px;
+  font-family: "Rajdhani", sans-serif;
+  white-space: nowrap;
+  box-shadow: 0 0 15px rgba(0, 224, 255, 0.6);
+  border: 1px solid rgba(0, 224, 255, 0.5);
+  text-shadow: 0 0 5px rgba(0, 224, 255, 0.8);
+  z-index: 20;
+}
+
+/* Estilos para partículas optimizadas */
+.welcome-screen .optimized-particles {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.welcome-screen .optimized-particle {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background-color: #00e0ff;
+  opacity: 0.7;
+  animation: floatParticle 5s ease-in-out infinite alternate;
+}
+
+.welcome-screen .optimized-particle:nth-child(3n) {
+  background-color: #9900ff;
+  width: 3px;
+  height: 3px;
+}
+
+.welcome-screen .optimized-particle:nth-child(5n) {
+  background-color: #ffffff;
+  width: 2px;
+  height: 2px;
+  opacity: 0.6;
+}
+
+@keyframes floatParticle {
+  0% {
+    transform: translateY(0) translateX(0);
+    opacity: 0.2;
+  }
+  50% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateY(-20px) translateX(20px);
+    opacity: 0.2;
+  }
+}
+
+.welcome-screen .energy-ring {
+  position: absolute;
+  top: -15%;
+  left: -15%;
+  width: 130%;
+  height: 130%;
+  border-radius: 50%;
+  border: 2px solid rgba(0, 224, 255, 0.7);
+  box-shadow: 0 0 15px rgba(0, 224, 255, 0.4);
+  z-index: 0;
+  animation: ringPulse 3s infinite;
+}
+
+@keyframes ringPulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.3;
+  }
+}
+
+.welcome-screen .epic-reveal {
+  position: relative;
+  margin: 1.5rem 0; /* Reducido de 2rem para optimizar espacio vertical */
+  perspective: 1000px;
+}
+
+.welcome-screen .reveal-glow {
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(0, 224, 255, 0.6) 0%,
+    rgba(255, 0, 255, 0.4) 30%,
+    rgba(0, 0, 0, 0) 70%
+  );
+  filter: blur(20px);
+  opacity: 0.7;
+  z-index: 1;
+}
+
+.welcome-screen .reveal-text {
+  position: relative;
+  font-family: "Orbitron", sans-serif;
+  font-size: 4.5rem;
+  font-weight: 800;
+  color: transparent;
+  -webkit-text-stroke: 2px #00e0ff;
+  text-shadow:
+    0 0 20px rgba(0, 224, 255, 0.7),
+    0 0 40px rgba(0, 224, 255, 0.3);
+  letter-spacing: 10px;
+  text-align: center;
+  transform-style: preserve-3d;
+  z-index: 2;
+}
+
+.welcome-screen .cosmic-lights {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.welcome-screen .light-beam {
+  position: absolute;
+  width: 150vmax;
+  height: 3px;
+  background: linear-gradient(
+    90deg,
+    rgba(0, 224, 255, 0) 0%,
+    rgba(0, 224, 255, 0.3) 50%,
+    rgba(0, 224, 255, 0) 100%
+  );
+  opacity: 0.2;
+  transform-origin: left center;
+  filter: blur(2px);
+  will-change: transform; /* Optimización para animaciones */
+}
+
+.welcome-screen .light-beam-1 {
+  top: 20%;
+  left: -50%;
+  transform: rotate(25deg);
+  animation: beamMovement1 15s infinite alternate ease-in-out;
+}
+
+.welcome-screen .light-beam-3 {
+  top: 40%;
+  left: -50%;
+  transform: rotate(5deg);
+  animation: beamMovement3 20s infinite alternate ease-in-out;
+  opacity: 0.15;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 0, 255, 0) 0%,
+    rgba(255, 0, 255, 0.3) 50%,
+    rgba(255, 0, 255, 0) 100%
+  );
+}
+
+@keyframes beamMovement1 {
+  0%,
+  100% {
+    transform: rotate(25deg);
+    opacity: 0.2;
+  }
+  50% {
+    transform: rotate(28deg);
+    opacity: 0.3;
+  }
+}
+
+@keyframes beamMovement3 {
+  0%,
+  100% {
+    transform: rotate(5deg);
+    opacity: 0.15;
+  }
+  50% {
+    transform: rotate(8deg);
+    opacity: 0.2;
+  }
+}
+
+.welcome-screen::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background:
+    linear-gradient(
+      90deg,
+      rgba(0, 0, 0, 0.8) 0%,
+      rgba(0, 0, 0, 0) 20%,
+      rgba(0, 0, 0, 0) 80%,
+      rgba(0, 0, 0, 0.8) 100%
+    ),
+    linear-gradient(
+      0deg,
+      rgba(0, 0, 0, 0.8) 0%,
+      rgba(0, 0, 0, 0) 20%,
+      rgba(0, 0, 0, 0) 80%,
+      rgba(0, 0, 0, 0.8) 100%
+    );
+  z-index: 0;
+  pointer-events: none;
+}
+
+@media (hover: hover) {
+  .welcome-screen .welcome-content {
+    transition:
+      transform 0.4s ease,
+      box-shadow 0.4s ease;
+  }
+
+  .welcome-screen .welcome-content:hover {
+    transform: translateZ(10px);
+    box-shadow: 0 0 40px rgba(0, 224, 255, 0.6);
+  }
+}
+
+.welcome-screen .skip-hint {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  color: rgba(0, 224, 255, 0.7);
+  font-size: 0.9rem;
+  font-family: "Rajdhani", sans-serif;
+  text-shadow: 0 0 8px rgba(0, 224, 255, 0.6);
+  opacity: 0.8;
+  z-index: 50;
+  pointer-events: none;
+  letter-spacing: 1px;
+}
+
+/* Optimizaciones para móviles */
+@media (max-width: 768px) {
+  .welcome-screen {
+    padding-top: 70px; /* Reducido de 90px a 70px para acercar al header */
+  }
+
+  .welcome-screen .welcome-content {
+    padding: 2rem 1.5rem;
+    max-height: calc(100vh - 150px); /* Ajustado para header de 70px + 80px margen inferior */
+    max-width: 90%; /* Reducido para pantallas más pequeñas */
+  }
+
+  .welcome-screen .intro-text {
+    font-size: 1.8rem;
+  }
+
+  .welcome-screen .typewriter-text {
+    font-size: 1.5rem;
+    min-height: 5rem; /* Reducido de 6rem */
+  }
+
+  .welcome-screen .cursor {
+    height: 1.5rem;
+  }
+
+  .welcome-screen .reveal-text {
+    font-size: 3.5rem;
+    letter-spacing: 5px;
+    -webkit-text-stroke: 1px #00e0ff;
+  }
+
+  .welcome-screen .intro-button {
+    font-size: 1.2rem;
+    padding: 1rem 2rem;
+  }
+
+  .welcome-screen .plubot-icon-container {
+    top: -60px;
+    right: 20px;
+    width: 80px;
+    height: 80px;
+  }
+}
+
+/* Optimizaciones para pantallas más pequeñas */
+@media (max-width: 480px) {
+  .welcome-screen {
+    padding-top: 60px; /* Reducido de 80px a 60px para acercar al header */
+  }
+
+  .welcome-screen .welcome-content {
+    padding: 1.5rem 1rem;
+    max-height: calc(100vh - 140px); /* Ajustado para header de 60px + 80px margen inferior */
+    max-width: 90%;
+  }
+
+  .welcome-screen .intro-text {
+    font-size: 1.5rem;
+  }
+
+  .welcome-screen .typewriter-text {
+    font-size: 1.3rem;
+    min-height: 4rem; /* Reducido de 5rem */
+  }
+
+  .welcome-screen .cursor {
+    height: 1.3rem;
+  }
+
+  .welcome-screen .reveal-text {
+    font-size: 2.8rem;
+    letter-spacing: 3px;
+    -webkit-text-stroke: 1px #00e0ff;
+  }
+
+  .welcome-screen .intro-button {
+    font-size: 1.1rem;
+    padding: 0.8rem 1.8rem;
+    letter-spacing: 1px;
+  }
+
+  .welcome-screen .plubot-icon-container {
+    top: -50px;
+    right: 10px;
+    width: 60px;
+    height: 60px;
+  }
+}
+
+/* Optimizaciones para pantallas muy pequeñas */
+@media (max-width: 360px) {
+  .welcome-screen {
+    padding-top: 50px; /* Reducido de 70px a 50px para acercar al header */
+  }
+
+  .welcome-screen .welcome-content {
+    max-height: calc(100vh - 130px); /* Ajustado para header de 50px + 80px margen inferior */
+    max-width: 90%;
+  }
+
+  .welcome-screen .reveal-text {
+    font-size: 2.5rem; /* Reducido para evitar desbordamiento */
+    letter-spacing: 2px;
+  }
+}
+
+/* Optimizaciones para animaciones en dispositivos con preferencia de movimiento reducido */
+@media (prefers-reduced-motion: reduce) {
+  .welcome-screen .plubot-icon,
+  .welcome-screen .energy-ring,
+  .welcome-screen .optimized-particle,
+  .welcome-screen .cursor,
+  .welcome-screen .typewriter-line,
+  .welcome-screen .intro-button,
+  .welcome-screen .light-beam {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .welcome-screen .welcome-content {
+    transition: none !important;
+  }
+}

@@ -1,0 +1,204 @@
+.custom-minimap {
+  width: 200px;
+  height: 150px;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 0 10px rgba(0, 224, 255, 0.5);
+  transition: all 0.3s ease;
+  border: 1px solid #00e0ff;
+  background: rgba(23, 23, 39, 0.9);
+  position: fixed;
+  bottom: 15px;
+  left: 15px;
+  z-index: 1000;
+}
+
+.custom-minimap.ultra-mode {
+  box-shadow: 0 0 10px rgba(255, 0, 255, 0.5);
+  border-color: #ff00ff;
+}
+
+.custom-minimap-content {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.custom-minimap-nodes {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  user-select: none;
+}
+
+.custom-minimap-nodes.dragging {
+  cursor: grabbing !important;
+  background-color: rgba(0, 224, 255, 0.1);
+}
+
+.custom-minimap-drag-indicator {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(0, 0, 0, 0.7);
+  color: #00e0ff;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  z-index: 10;
+  transition: opacity 0.2s ease;
+  pointer-events: none;
+}
+
+.custom-minimap-node {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 0 4px rgba(0, 224, 255, 0.8);
+}
+
+.custom-minimap-node.start {
+  background-color: #4caf50;
+  box-shadow: 0 0 4px rgba(76, 175, 80, 0.8);
+}
+
+.custom-minimap-node.end {
+  background-color: #f44336;
+  box-shadow: 0 0 4px rgba(244, 67, 54, 0.8);
+}
+
+.custom-minimap-node.decision {
+  background-color: #ffc107;
+  box-shadow: 0 0 4px rgba(255, 193, 7, 0.8);
+}
+
+.custom-minimap-node.action {
+  background-color: #2196f3;
+  box-shadow: 0 0 4px rgba(33, 150, 243, 0.8);
+}
+
+.custom-minimap-mask {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(10, 10, 20, 0.1);
+  pointer-events: none;
+}
+
+.custom-minimap.ultra-mode .custom-minimap-node {
+  box-shadow: 0 0 4px rgba(255, 0, 255, 0.8);
+}
+
+/* Estilo para el mapa expandido */
+.custom-minimap.expanded {
+  width: 200px;
+  height: 150px;
+  background: rgba(10, 20, 35, 0.7);
+  border: 1px solid #00e0ff;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 224, 255, 0.5);
+  overflow: hidden;
+}
+
+/* Estilo para el mapa contraído (burbuja) */
+.custom-minimap.collapsed {
+  width: 50px;
+  height: 50px;
+  overflow: visible;
+}
+
+.custom-minimap-bubble {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: rgba(10, 20, 35, 0.8);
+  border: 2px solid #00e0ff;
+  box-shadow: 0 0 15px rgba(0, 224, 255, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.custom-minimap-bubble:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 20px rgba(0, 224, 255, 0.9);
+}
+
+.custom-minimap-bubble-content {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  width: 70%;
+  height: 70%;
+}
+
+.custom-minimap-node-mini {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  margin: 2px;
+  background-color: #00e0ff;
+  box-shadow: 0 0 4px rgba(0, 224, 255, 0.8);
+}
+
+.custom-minimap-toggle-icon {
+  position: absolute;
+  bottom: -5px;
+  right: -5px;
+  background: rgba(10, 20, 35, 0.9);
+  border: 1px solid #00e0ff;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #00e0ff;
+  animation: pulse 2s infinite;
+}
+
+.custom-minimap-toggle {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  background: rgba(10, 20, 35, 0.7);
+  border: 1px solid #00e0ff;
+  border-radius: 4px;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #00e0ff;
+  cursor: pointer;
+  z-index: 10;
+}
+
+.custom-minimap-toggle:hover {
+  background: rgba(0, 224, 255, 0.2);
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(0, 224, 255, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 5px rgba(0, 224, 255, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(0, 224, 255, 0);
+  }
+}

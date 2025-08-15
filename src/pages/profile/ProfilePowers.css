@@ -1,0 +1,163 @@
+/* ProfilePowers.css - Estilos para la sección de poderes con estética cyberpunk */
+
+/* ==========================================================================
+   Cuadrícula de Poderes
+   ========================================================================== */
+.powers-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 1rem;
+}
+
+/* ==========================================================================
+     Elemento de Poder
+     ========================================================================== */
+.power-item {
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(0, 224, 255, 0.3);
+  border-radius: 8px;
+  padding: 1rem;
+  text-align: center;
+  transition: all 0.5s ease;
+  transform-style: preserve-3d;
+  perspective: 800px;
+  opacity: 0;
+  transform: translateY(20px) rotateX(10deg);
+  position: relative;
+}
+
+.power-item.active {
+  opacity: 1;
+  transform: translateY(0) rotateX(0deg);
+  animation: power-appear 0.8s forwards;
+}
+
+.power-item.removing {
+  animation: power-remove 0.8s forwards;
+}
+
+.power-item:hover {
+  transform: translateZ(10px) scale(1.05);
+  border-color: var(--primary-glow);
+  box-shadow: 0 0 15px rgba(0, 224, 255, 0.5);
+}
+
+.power-item.large {
+  grid-column: span 2;
+}
+
+.power-item-styles,
+.power-item-large-styles {
+  position: relative;
+}
+
+/* ==========================================================================
+     Ícono y Nombre de Poder
+     ========================================================================== */
+.power-icon {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.power-icon.large {
+  font-size: 2rem;
+}
+
+.power-name {
+  font-size: 0.875rem;
+  color: var(--primary-glow);
+  text-shadow: 0 0 5px rgba(0, 224, 255, 0.5);
+}
+
+/* ==========================================================================
+     Tooltip de Poder
+     ========================================================================== */
+.power-tooltip {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.9);
+  border: 1px solid var(--primary-glow);
+  border-radius: 8px;
+  padding: 1rem;
+  font-size: 0.75rem;
+  color: var(--primary-glow);
+  text-shadow: 0 0 5px rgba(0, 224, 255, 0.5);
+  z-index: 20;
+  min-width: 200px;
+  box-shadow: 0 0 15px rgba(0, 224, 255, 0.3);
+  animation: tooltip-appear 0.3s ease-out;
+}
+
+.tooltip-title {
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+
+.tooltip-description {
+  margin-bottom: 0.5rem;
+}
+
+/* ==========================================================================
+     Formulario de Poder
+     ========================================================================== */
+.power-form-container {
+  margin-top: 1rem;
+}
+
+.power-select-styles {
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(0, 224, 255, 0.5);
+  color: var(--primary-glow);
+  padding: 0.5rem;
+  border-radius: 4px;
+  font-family: var(--terminal-font);
+  width: 100%;
+  margin-bottom: 0.5rem;
+}
+
+/* ==========================================================================
+     Animaciones
+     ========================================================================== */
+@keyframes power-appear {
+  from {
+    opacity: 0;
+    transform: translateY(20px) rotateX(20deg);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) rotateX(0deg);
+  }
+}
+
+@keyframes power-remove {
+  from {
+    opacity: 1;
+    transform: translateY(0) rotateX(0deg);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(20px) rotateX(-20deg);
+  }
+}
+
+@keyframes tooltip-appear {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+/* ==========================================================================
+     Media Queries
+     ========================================================================== */
+@media (max-width: 480px) {
+  .power-item {
+    grid-column: span 1;
+  }
+}

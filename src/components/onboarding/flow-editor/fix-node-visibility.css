@@ -1,0 +1,90 @@
+/* 
+ * SOLUCIÓN CRÍTICA: Estilos para forzar la visibilidad de los nodos en el editor de flujos
+ * Este archivo contiene reglas CSS con !important para asegurar que los nodos sean visibles
+ */
+
+/* Seleccionar absolutamente todos los nodos con alta especificidad */
+html body .react-flow__node,
+#root .react-flow__node,
+.flow-editor-wrapper .react-flow__node,
+.react-flow__viewport .react-flow__node,
+[data-id].react-flow__node,
+div[class^="react-flow__node"],
+div.react-flow__node,
+.react-flow .react-flow__node {
+  /* Visibilidad forzada */
+  visibility: visible !important;
+  display: block !important;
+  opacity: 1 !important;
+  position: absolute !important;
+
+  /* Capa superior */
+  z-index: 9999 !important;
+  pointer-events: all !important;
+
+  /* Prevenir recortes */
+  overflow: visible !important;
+  clip: auto !important;
+  clip-path: none !important;
+
+  /* Tamaño mínimo visible */
+  min-width: 30px !important;
+  min-height: 30px !important;
+
+  /* ELIMINADO: Bordes de depuración */
+  /* outline: 2px solid rgba(255, 0, 0, 0.7) !important; */
+
+  /* Transiciones */
+  transition:
+    transform 0.2s,
+    opacity 0.2s !important;
+}
+
+/* Asegurar que los contenedores no oculten el contenido */
+.react-flow,
+.react-flow__container,
+.react-flow__pane,
+.react-flow__viewport,
+.react-flow__renderer,
+.flow-editor-wrapper,
+.flow-editor-container {
+  overflow: visible !important;
+  clip: auto !important;
+  clip-path: none !important;
+}
+
+/* Asegurar que los controles estén por debajo de los nodos */
+.react-flow__controls {
+  z-index: 8 !important;
+}
+
+/* Estilos específicos para los handles de conexión */
+.react-flow__handle {
+  visibility: visible !important;
+  display: block !important;
+  opacity: 1 !important;
+  pointer-events: all !important;
+  z-index: 9999 !important;
+}
+
+/* Eliminar la marca de agua de ReactFlow */
+.react-flow__attribution {
+  display: none !important;
+}
+
+/* Forzar visibilidad de nodos específicos por tipo */
+.react-flow__node-start,
+.react-flow__node-end,
+.react-flow__node-message,
+.react-flow__node-decision,
+.react-flow__node-action,
+.react-flow__node-option,
+.react-flow__node-api,
+.react-flow__node-http {
+  visibility: visible !important;
+  display: block !important;
+  opacity: 1 !important;
+  /* ELIMINADO: No forzar colores de fondo/texto que sobrescriben los estilos del nodo */
+  /* background-color: rgba(30, 30, 50, 0.9) !important; */
+  /* color: white !important; */
+}

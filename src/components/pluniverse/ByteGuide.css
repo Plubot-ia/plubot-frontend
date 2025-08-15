@@ -1,0 +1,49 @@
+.byte-guide-container {
+  position: fixed;
+  z-index: 1000;
+}
+
+.byte-guide-container.bottom-right {
+  bottom: 20px;
+  right: 20px;
+}
+
+.byte-guide {
+  background: rgba(0, 0, 0, 0.7);
+  border-radius: 8px;
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  position: relative;
+  box-shadow: 0 0 10px rgba(0, 224, 255, 0.8);
+}
+
+.byte-avatar {
+  width: 40px;
+  height: 40px;
+  margin-right: 1rem;
+}
+
+.byte-message p {
+  color: #d0d0ff;
+  text-shadow: 0 0 8px rgba(0, 224, 255, 0.6);
+  margin: 0;
+  font-size: 1rem;
+}
+
+.byte-guide button {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  background: none;
+  border: none;
+  color: #00e0ff;
+  font-size: 1.2rem;
+  cursor: pointer;
+  text-shadow: 0 0 5px rgba(0, 224, 255, 0.8);
+  transition: transform 0.2s ease;
+}
+
+.byte-guide button:hover {
+  transform: scale(1.2);
+}

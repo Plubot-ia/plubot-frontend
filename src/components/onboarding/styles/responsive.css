@@ -1,0 +1,212 @@
+/* Estilos responsivos para los componentes de Plubot */
+
+/* Media queries para pantallas grandes */
+@media (min-width: 1200px) {
+  .ts-training-screen-container {
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+}
+
+/* Media queries para tablets */
+@media (max-width: 1024px) {
+  .ts-training-screen-container {
+    padding: 0 10px;
+  }
+
+  .ts-training-screen-header {
+    flex-direction: column;
+    gap: 10px;
+    padding: 10px;
+  }
+
+  .ts-training-screen-header .ts-header-buttons {
+    width: 100%;
+    justify-content: space-around;
+  }
+
+  .ts-node-palette-container {
+    width: 220px;
+  }
+
+  .ts-flow-editor-container {
+    margin-left: 220px;
+  }
+
+  .ts-zoom-controls,
+  .ts-history-button,
+  .ts-zoom-button {
+    transform: scale(0.9);
+  }
+}
+
+/* Media queries para tablets pequeñas y móviles grandes */
+@media (max-width: 768px) {
+  .ts-training-screen-container {
+    flex-direction: column;
+    height: auto;
+  }
+
+  .ts-training-screen-header {
+    padding: 8px;
+  }
+
+  .ts-training-screen-header .ts-header-title {
+    font-size: 1.2rem;
+  }
+
+  .ts-training-screen-header .ts-header-buttons {
+    flex-wrap: wrap;
+    gap: 5px;
+  }
+
+  .ts-training-screen-header .ts-header-button {
+    padding: 6px 10px;
+    font-size: 0.8rem;
+  }
+
+  .ts-node-palette-container {
+    width: 100%;
+    height: auto;
+    position: relative;
+    top: auto;
+    left: auto;
+    border-right: none;
+    border-bottom: 1px solid var(--border-color);
+    padding: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+  }
+
+  .ts-flow-editor-container {
+    margin-left: 0;
+    height: 70vh;
+    width: 100%;
+  }
+
+  .ts-zoom-controls {
+    top: 10px;
+    right: 10px;
+  }
+
+  .ts-byte-assistant-container {
+    bottom: 10px;
+    right: 10px;
+  }
+
+  .ts-status-bubble {
+    bottom: 70px;
+    right: 10px;
+    max-width: 200px;
+  }
+
+  .embed-modal {
+    width: 95%;
+    max-width: 95%;
+    padding: 15px;
+  }
+}
+
+/* Media queries para móviles */
+@media (max-width: 480px) {
+  .ts-training-screen-header .ts-header-title {
+    font-size: 1rem;
+  }
+
+  .ts-training-screen-header .ts-header-buttons {
+    justify-content: center;
+  }
+
+  .ts-training-screen-header .ts-header-button {
+    padding: 5px 8px;
+    font-size: 0.7rem;
+  }
+
+  .ts-node-palette-container {
+    padding: 5px;
+  }
+
+  .ts-node-palette-item {
+    transform: scale(0.9);
+    margin: 2px;
+  }
+
+  .ts-flow-editor-container {
+    height: 60vh;
+  }
+
+  .ts-zoom-controls,
+  .ts-history-button,
+  .ts-zoom-button {
+    transform: scale(0.8);
+  }
+
+  .ts-byte-assistant-container {
+    transform: scale(0.8);
+    bottom: 5px;
+    right: 5px;
+  }
+
+  .ts-status-bubble {
+    bottom: 60px;
+    right: 5px;
+    max-width: 180px;
+    font-size: 0.8rem;
+    padding: 8px;
+  }
+
+  .embed-modal {
+    padding: 10px;
+  }
+
+  .embed-modal h2 {
+    font-size: 1.4rem;
+  }
+
+  .embed-section {
+    padding: 10px;
+    margin-bottom: 15px;
+  }
+}
+
+/* Ajustes específicos para el EmbedModal */
+@media (max-width: 768px) {
+  .embed-modal .embed-tabs {
+    flex-wrap: wrap;
+  }
+
+  .embed-modal .embed-tab {
+    padding: 8px 12px;
+    font-size: 0.9rem;
+  }
+
+  .embed-modal .embed-achievements {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .embed-modal .embed-tabs {
+    justify-content: center;
+  }
+
+  .embed-modal .embed-tab {
+    padding: 6px 10px;
+    font-size: 0.8rem;
+    margin-bottom: 5px;
+  }
+
+  .embed-modal .embed-achievements {
+    grid-template-columns: 1fr;
+  }
+
+  .embed-modal .embed-qr-container {
+    flex-direction: column;
+  }
+
+  .embed-modal .embed-qr-image {
+    max-width: 150px;
+  }
+}

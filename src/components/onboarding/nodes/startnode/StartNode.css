@@ -1,0 +1,592 @@
+/**
+ * @file StartNode.css
+ * @description Estilos premium para el componente StartNode - Nodo de inicio de clase mundial
+ * Implementa diseño profesional con estética azul vibrante y optimización para modo normal y ultra rendimiento.
+ * Coherente con OptionNode y DecisionNode para una experiencia visual unificada.
+ * 
+ * @version 3.0.0
+ * @author Plubot Team
+ */
+
+/* ======================================================
+   IMPORTACIONES Y VARIABLES GLOBALES
+   ====================================================== */
+
+/* Importar fuente Inter para un aspecto premium */
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
+
+/* Variables CSS para el nodo de inicio - Nivel Premium */
+:root {
+  /* Paleta de colores premium con azul vibrante */
+  --start-node-accent-rgb: 37, 99, 235; /* Azul vibrante como color principal (RGB for opacity) */
+  --start-node-accent-hex: #2563eb; /* Azul vibrante como color principal (HEX) */
+  --start-node-bg: linear-gradient(145deg, #ffffff, #f8fafc);
+  --start-node-border: #d1d5db;
+  --start-node-border-selected: var(--start-node-accent-hex);
+  --start-node-border-hover: rgba(var(--start-node-accent-rgb), 0.5);
+  --start-node-text: #1f2937;
+  --start-node-text-secondary: #4b5563;
+  --start-node-icon: var(--start-node-accent-hex);
+  --start-node-handle: var(
+    --start-node-accent-hex
+  ); /* Estilos para el handle cuando el cursor está encima */
+  --start-node-handle-hover: #00aaff; /* Un azul un poco más claro para hover, o ajusta según preferencia */
+
+  /* Tipografía premium */
+  --start-node-font-family: "Inter", system-ui, -apple-system, sans-serif;
+  --start-node-label-size: 0.9375rem;
+  --start-node-label-weight: 600;
+  --start-node-text-size: 0.875rem;
+
+  /* Dimensiones y espaciado ergonómico */
+  --start-node-border-radius: 12px;
+  --start-node-border-width: 1px;
+  --start-node-padding: 1.25rem;
+  --start-node-gap: 0.75rem;
+  --start-node-min-width: 120px;
+  --start-node-min-height: 80px;
+
+  /* Sombras y efectos */
+  --start-node-shadow: 0 8px 32px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  --start-node-shadow-hover: 0 10px 36px rgba(0, 0, 0, 0.12);
+  --start-node-shadow-selected:
+    0 0 0 2px rgba(var(--start-node-accent-rgb), 0.5), 0 8px 32px rgba(0, 0, 0, 0.12);
+
+  /* Transiciones y animaciones suaves */
+  --start-node-transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --start-node-animation-duration: 0.5s;
+
+  /* Modo Ultra Rendimiento - Minimalista y eficiente */
+  --start-node-ultra-bg: #2c7be5; /* Azul más claro, similar al acento normal */
+  --start-node-ultra-border: #4b5563;
+  --start-node-ultra-text: #ffffff; /* Texto blanco para mejor contraste con el nuevo fondo azul */
+  --start-node-ultra-text-secondary: #9ca3af;
+  --start-node-ultra-accent-rgb: 59, 130, 246;
+  --start-node-ultra-accent-hex: #3b82f6;
+  --start-node-ultra-padding: 0.75rem;
+  --start-node-ultra-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  --start-node-ultra-border-radius: 8px;
+
+  /* === Standardized Handle Styles === */
+  /* Normal Mode */
+  --handle-default-size: 15px;
+  --handle-default-border-width: 2px;
+  --handle-default-border-color: white;
+  --handle-default-bg-color: #3b82f6;
+  --handle-default-offset: -8px;
+
+  /* Ultra Performance Mode */
+  --handle-ultra-size: 15px;
+  --handle-ultra-border-width: 1px;
+  --handle-ultra-border-color: #555555;
+  --handle-ultra-bg-color: #888888;
+  --handle-ultra-offset: -4px;
+  /* ================================ */
+
+  /* Variables for styles previously in JSX (dynamic, not themed) */
+  --start-node-bg-base-jsx: linear-gradient(135deg, #0080ff 0%, #0060c0 100%);
+  --start-node-bg-hover-jsx: linear-gradient(135deg, #0090ff 0%, #0070d0 100%);
+  --start-node-bg-selected-jsx: linear-gradient(135deg, #00a0ff 0%, #0080e0 100%);
+  --start-node-shadow-base-jsx: 0 4px 12px rgba(0, 100, 200, 0.15); /* Softer base shadow */
+  --start-node-shadow-hover-jsx: 0 8px 20px rgba(0, 128, 255, 0.3);
+  --start-node-shadow-selected-jsx: 0 10px 25px rgba(0, 128, 255, 0.4);
+  --start-node-selected-outline-color-jsx: #00c0ff; /* Bright blue for selected outline */
+  --start-node-scale-hover-jsx: 1.02;
+  --start-node-scale-selected-jsx: 1.05;
+  --start-node-transition-jsx: all 0.3s ease;
+}
+
+/* Soporte para modo oscuro */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --start-node-bg: linear-gradient(145deg, #1f2937, #111827);
+    --start-node-border: #4b5563;
+    --start-node-text: #e5e7eb;
+    --start-node-text-secondary: #9ca3af;
+    --start-node-shadow: 0 8px 24px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    --start-node-shadow-hover: 0 12px 32px rgba(0, 0, 0, 0.25);
+    --start-node-ultra-bg: #2c7be5; /* Aplicar el azul claro también en dark mode */
+    --start-node-ultra-icon-color: #ffffff; /* Icono blanco para contraste */
+    --start-node-ultra-text: #ffffff; /* Asegurar texto blanco en dark mode ultra */
+
+    /* Dark mode variants for styles from JSX (blue theme) */
+    --start-node-bg-base-jsx: linear-gradient(135deg, #0059b3 0%, #004080 100%);
+    --start-node-bg-hover-jsx: linear-gradient(135deg, #006bb3 0%, #005090 100%);
+    --start-node-bg-selected-jsx: linear-gradient(135deg, #007acc 0%, #0060a0 100%);
+
+    --start-node-shadow-base-jsx: 0 4px 12px rgba(0, 60, 120, 0.25); /* Darker base shadow for dark mode */
+    --start-node-shadow-hover-jsx: 0 8px 20px rgba(0, 89, 179, 0.25);
+    --start-node-shadow-selected-jsx: 0 10px 25px rgba(0, 89, 179, 0.35);
+    --start-node-selected-outline-color-jsx: #008cff;
+  }
+}
+
+/* ======================================================
+   COMPONENTE BASE
+   ====================================================== */
+
+/**
+ * Componente StartNode
+ * Estructura BEM (Block Element Modifier)
+ */
+.start-node {
+  /* Diseño base premium con glassmorphism */
+  background: var(--start-node-bg-base-jsx);
+  border: var(--start-node-border-width) solid transparent; /* Border color set by states or default to transparent if using box-shadow for outline */
+  border-radius: var(--start-node-border-radius);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--start-node-font-family);
+  font-size: var(--start-node-text-size);
+  color: var(--start-node-text);
+  font-weight: 500;
+  position: relative;
+  transition: var(--start-node-transition-jsx);
+  padding: var(--start-node-padding);
+  box-shadow: var(--start-node-shadow-base-jsx);
+  min-width: var(
+    --start-node-min-width
+  ); /* Ensure this uses the value from JS NODE_CONFIG if different */
+  min-height: var(
+    --start-node-min-height
+  ); /* Ensure this uses the value from JS NODE_CONFIG if different */
+
+  /* Optimizaciones de rendimiento */
+  user-select: none;
+  will-change: transform, box-shadow;
+  transform: translateY(-5px) scale(1);
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  /* Efectos visuales avanzados */
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+
+  /* Animación de aparición */
+  animation: nodeAppear var(--start-node-animation-duration) cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* Animación de aparición mejorada */
+@keyframes nodeAppear {
+  0% {
+    opacity: 0;
+    transform: translateY(12px) scale(0.98);
+    box-shadow: 0 0 0 rgba(0, 0, 0, 0);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(-5px) scale(1);
+    box-shadow: var(--start-node-shadow);
+  }
+}
+
+/* ======================================================
+   ESTADOS DEL NODO
+   ====================================================== */
+
+/* Hover - Interacción suave */
+.start-node--hovered {
+  background: var(--start-node-bg-hover-jsx);
+  box-shadow: var(--start-node-shadow-hover-jsx);
+  transform: translateY(-5px) scale(var(--start-node-scale-hover-jsx));
+}
+
+/* Seleccionado - Destacado con borde claro */
+.start-node--selected {
+  background: var(--start-node-bg-selected-jsx);
+  box-shadow:
+    0 0 0 2px var(--start-node-selected-outline-color-jsx),
+    var(--start-node-shadow-selected-jsx);
+  transform: scale(var(--start-node-scale-selected-jsx));
+  border-color: transparent; /* Ensures box-shadow outline is primary */
+}
+
+/* Editando - Modo de edición con estilo premium */
+.start-node--editing {
+  border-color: rgba(var(--start-node-accent-rgb), 0.6);
+  box-shadow:
+    0 0 0 2px rgba(var(--start-node-accent-rgb), 0.3),
+    var(--start-node-shadow-base-jsx);
+}
+
+/* Error - Indicación visual clara de error */
+.start-node--has-error {
+  border-color: rgba(239, 68, 68, 0.7);
+  box-shadow:
+    0 0 0 2px rgba(239, 68, 68, 0.3),
+    var(--start-node-shadow-base-jsx);
+}
+
+/* Saving state */
+.start-node--saving {
+  opacity: 0.8;
+  animation: savingPulse 1.5s infinite ease-in-out;
+}
+
+@keyframes savingPulse {
+  0%,
+  100% {
+    box-shadow:
+      var(--start-node-shadow-base-jsx),
+      0 0 0 0px rgba(var(--start-node-accent-rgb), 0.3);
+  }
+  50% {
+    box-shadow:
+      var(--start-node-shadow-base-jsx),
+      0 0 0 4px rgba(var(--start-node-accent-rgb), 0.15);
+  }
+}
+
+/* ======================================================
+   MODO ULTRA RENDIMIENTO
+   ====================================================== */
+
+/**
+ * Modo Ultra Rendimiento
+ * Optimizado para flujos complejos con cientos de nodos
+ * Elimina efectos visuales costosos manteniendo la funcionalidad
+ */
+.start-node--ultra-performance {
+  /* Diseño minimalista y eficiente */
+  background: var(--start-node-ultra-bg);
+  border: 1px solid var(--start-node-ultra-border);
+  border-radius: var(--start-node-ultra-border-radius);
+  color: var(--start-node-ultra-text);
+  padding: var(--start-node-ultra-padding);
+  box-shadow: var(--start-node-ultra-shadow);
+  backdrop-filter: none; /* Disable expensive blur */
+  -webkit-backdrop-filter: none; /* Disable expensive blur */
+  transition: none !important; /* Disable transitions */
+  animation: none !important; /* Disable animations */
+  transform: none !important; /* Reset any transform */
+  will-change: auto; /* Reset will-change */
+}
+
+/* En modo ultra, los hijos también deben tener transiciones/animaciones deshabilitadas */
+.start-node--ultra-performance * {
+  transition: none !important;
+  animation: none !important;
+}
+
+.start-node--ultra-performance .start-node__header,
+.start-node--ultra-performance .start-node__content,
+.start-node--ultra-performance .start-node__icon,
+.start-node--ultra-performance .start-node__label,
+.start-node--ultra-performance .start-node__timestamp,
+.start-node--ultra-performance .start-node__dynamic-content-display,
+.start-node--ultra-performance .start-node__input,
+.start-node--ultra-performance .start-node__textarea {
+  background: transparent;
+  color: var(--start-node-ultra-text);
+  text-shadow: none;
+  box-shadow: none;
+}
+
+.start-node--ultra-performance .start-node__label {
+  font-size: 0.875rem; /* Consistent with non-ultra label if desired, or smaller */
+  color: var(--start-node-ultra-text);
+  font-weight: var(--start-node-label-weight); /* Maintain weight for readability */
+}
+
+.start-node--ultra-performance .start-node__timestamp {
+  color: var(--start-node-ultra-text-secondary);
+  font-size: 0.7rem;
+}
+
+.start-node--ultra-performance .start-node__handle {
+  width: var(--handle-ultra-size) !important;
+  height: var(--handle-ultra-size) !important;
+  background-color: var(--handle-ultra-bg-color) !important;
+  border: var(--handle-ultra-border-width) solid var(--handle-ultra-border-color) !important;
+  box-shadow: none !important; /* Minimal or no shadow for ultra performance */
+  /* animation: none !important; is covered by .start-node--ultra-performance * rule */
+}
+
+/* No specific :hover styles for .start-node__handle in ultra-performance mode for simplicity. */
+/* It will inherit styles from .start-node--ultra-performance .start-node__handle */
+/* The ::after pseudo-element (pulse animation) is also not needed. */
+
+.start-node--ultra-performance .start-node__handle--source {
+  right: var(--handle-ultra-offset) !important;
+}
+
+/* ======================================================
+   ELEMENTOS INTERNOS
+   ====================================================== */
+
+/**
+ * Contenedor principal
+ */
+.start-node__content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  gap: var(--start-node-gap);
+}
+
+/**
+ * Cabecera del nodo
+ */
+.start-node__header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  position: relative;
+}
+
+/* Icono (si se usa uno, como un rayo o similar) */
+.start-node__icon {
+  color: var(--start-node-text); /* White text on blue gradient */
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+/* Etiqueta (Título del nodo) */
+.start-node__label {
+  flex-grow: 1;
+  font-size: var(--start-node-label-size);
+  font-weight: var(--start-node-label-weight);
+  color: var(--start-node-text); /* White text on blue gradient */
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Timestamp (Fecha de modificación) */
+.start-node__timestamp {
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.7); /* Lighter white for secondary text */
+  text-align: right;
+  flex-shrink: 0;
+}
+
+/* Contenido principal del nodo */
+.start-node__content {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--start-node-gap);
+  color: var(--start-node-text); /* White text */
+}
+
+/* Estilos para la visualización del contenido dinámico (cuando no se edita) */
+.start-node__dynamic-content-display {
+  font-size: var(--start-node-text-size);
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.9);
+  white-space: pre-wrap; /* Respetar saltos de línea y espacios */
+  word-break: break-word;
+  padding: 0.5rem;
+  background-color: rgba(0, 0, 0, 0.1);
+  border-radius: calc(var(--start-node-border-radius) - 6px);
+  min-height: 40px; /* Para que tenga algo de altura incluso vacío */
+}
+
+/* Campos de entrada y textarea */
+.start-node__input,
+.start-node__textarea {
+  width: 100%;
+  padding: 0.6rem 0.8rem;
+  border: 1px solid rgba(var(--start-node-accent-rgb), 0.3);
+  border-radius: calc(var(--start-node-border-radius) - 4px);
+  background-color: rgba(255, 255, 255, 0.1);
+  color: var(--start-node-text);
+  font-family: var(--start-node-font-family);
+  font-size: var(--start-node-text-size);
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+  box-sizing: border-box; /* Important for width 100% and padding */
+}
+
+.start-node__input::placeholder,
+.start-node__textarea::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+  opacity: 1; /* Firefox */
+}
+
+.start-node__input:focus,
+.start-node__textarea:focus {
+  outline: none;
+  border-color: var(--start-node-selected-outline-color-jsx);
+  background-color: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 0 0 2px rgba(var(--start-node-accent-rgb), 0.2);
+}
+
+.start-node__textarea {
+  min-height: 60px;
+  resize: vertical; /* Permitir redimensionar verticalmente */
+  line-height: 1.5;
+}
+
+/* ======================================================
+   HANDLE (CONECTOR DE SALIDA)
+   ====================================================== */
+
+/* ======================================================
+   HANDLES (PUNTOS DE CONEXIÓN) - MODO NORMAL
+   ====================================================== */
+
+/* Estilo base para los handles, tanto source como target si los hubiera */
+.react-flow__handle.start-node__handle {
+  /* Standardized handle style */
+  width: var(--handle-default-size) !important;
+  height: var(--handle-default-size) !important;
+  background-color: var(--handle-default-bg-color) !important;
+  border-radius: 50% !important;
+  border: var(--handle-default-border-width) solid var(--handle-default-border-color) !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); /* Simplified shadow */
+  cursor: pointer !important;
+  z-index: 10 !important; /* Keep z-index for visibility */
+  /* position and animation are typically managed by React Flow or not needed here */
+}
+
+/* Estilos para el handle cuando el cursor está encima */
+.react-flow__handle.start-node__handle:hover {
+  background-color: var(--handle-default-bg-color) !important; /* Use base color */
+  filter: brightness(120%); /* Make it slightly brighter on hover */
+}
+
+/* Estilos para el handle cuando se está conectando (arrastrando una arista) */
+.react-flow__handle.start-node__handle.connecting {
+  animation: energyPulse 1.5s infinite ease-in-out !important;
+  /* Opcional: aplicar también el background-color de hover si se desea más énfasis */
+  /* background-color: var(--start-node-handle-hover) !important; */
+}
+
+/* Animación de pulso para el handle (usada en .connecting y opcionalmente en hover) */
+@keyframes energyPulse {
+  0% {
+    box-shadow:
+      0 0 0 0px rgba(var(--start-node-accent-rgb), 0.7),
+      0 0 0 2px rgba(0, 0, 0, 0.15),
+      0 4px 6px rgba(0, 0, 0, 0.1) !important;
+  }
+  50% {
+    box-shadow:
+      0 0 0 6px rgba(var(--start-node-accent-rgb), 0.3),
+      0 0 0 2px rgba(0, 0, 0, 0.15),
+      0 4px 6px rgba(0, 0, 0, 0.1) !important;
+  }
+  100% {
+    box-shadow:
+      0 0 0 0px rgba(var(--start-node-accent-rgb), 0.7),
+      0 0 0 2px rgba(0, 0, 0, 0.15),
+      0 4px 6px rgba(0, 0, 0, 0.1) !important;
+  }
+}
+
+/* Posicionamiento específico para el handle de tipo 'source' (salida) */
+.react-flow__handle.start-node__handle--source {
+  right: var(--handle-default-offset) !important; /* Use standardized offset */
+  /* React Flow handles top/transform for vertical centering with Position.Right */
+}
+
+/* Si tuvieras handles de tipo 'target' (entrada), podrías definirlos así: */
+/*
+.react-flow__handle.start-node__handle--target {
+  left: -11px;
+}
+*/
+
+/* ======================================================
+   ACCESIBILIDAD
+   ====================================================== */
+
+/* Texto para lectores de pantalla */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Soporte para navegación con teclado */
+.start-node:focus-visible,
+.start-node__handle:focus-visible,
+.start-node__input:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+/* ======================================================
+   SOPORTE PARA DISPOSITIVOS MÓVILES
+   ====================================================== */
+
+@media (max-width: 768px) {
+  :root {
+    --start-node-padding: 0.75rem;
+    --start-node-min-width: 100px;
+  }
+
+  .start-node__label {
+    font-size: 0.875rem;
+  }
+
+  .start-node__handle {
+    width: 14px;
+    height: 14px;
+  }
+
+  .start-node--ultra-performance {
+    padding: 0.5rem;
+    min-width: 90px;
+  }
+}
+
+/* ======================================================
+   ANIMACIONES Y MICROINTERACCIONES
+   ====================================================== */
+
+/* Animación para el nodo seleccionado */
+@keyframes selectedPulse {
+  0% {
+    box-shadow: var(--start-node-shadow-selected);
+  }
+  50% {
+    box-shadow:
+      0 0 0 3px rgba(var(--start-node-accent-rgb), 0.6),
+      0 8px 32px rgba(0, 0, 0, 0.15);
+  }
+  100% {
+    box-shadow: var(--start-node-shadow-selected);
+  }
+}
+
+.start-node--selected:not(.start-node--ultra-performance) {
+  animation: selectedPulse 2s infinite;
+}
+
+/* Animación para el handle */
+@keyframes handlePulse {
+  0% {
+    transform: translateX(-50%) scale(1);
+  }
+  50% {
+    transform: translateX(-50%) scale(1.1);
+  }
+  100% {
+    transform: translateX(-50%) scale(1);
+  }
+}
+
+/* Desactivar todas las animaciones en modo ultra rendimiento */
+.start-node--ultra-performance,
+.start-node--ultra-performance *,
+.start-node--ultra-performance *::before,
+.start-node--ultra-performance *::after {
+  animation: none !important;
+  transition: none !important;
+}

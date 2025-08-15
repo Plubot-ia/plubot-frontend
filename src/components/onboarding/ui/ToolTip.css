@@ -1,0 +1,53 @@
+/* Contenedor del elemento que dispara el tooltip */
+.tooltip-trigger-wrapper {
+  position: relative; /* Necesario para algunos cálculos, pero el tooltip ya no es hijo directo */
+  display: inline-block; /* O block, según el uso */
+  cursor: help; /* Indica que hay un tooltip */
+}
+
+/* Estilos para el contenido del tooltip que se renderiza en el portal */
+/* Estos estilos se aplicarán al div con clase .tooltip-portal-content */
+.tooltip-portal-content {
+  white-space: pre-line; /* Para renderizar \n como saltos de línea */
+  /* position: absolute; ya se aplica inline */
+  /* top, left, z-index: ya se aplican inline */
+
+  background-color: #333333; /* Fondo oscuro y sólido */
+  color: #ffffff; /* Texto blanco */
+  text-align: left; /* Alineación a la izquierda para texto largo */
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 0.8rem;
+  line-height: 1.4;
+  max-width: 250px; /* Ancho máximo para el tooltip */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  /* La visibilidad y opacidad se manejan por el montaje/desmontaje del portal */
+  /* y podrían añadirse transiciones si se desea un efecto de fade */
+  pointer-events: none; /* Para que el tooltip no interfiera con el mouse */
+}
+
+/* Opcional: Flecha para el tooltip (adaptar si es necesario) */
+/* Si se usa una flecha, su posicionamiento también deberá considerar que el tooltip está en un portal */
+.tooltip-portal-content.tooltip-content--top::after {
+  content: "";
+  position: absolute;
+  top: 100%; /* En la parte inferior del tooltip */
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 5px;
+  border-style: solid;
+  border-color: #333333 transparent transparent transparent;
+}
+
+.tooltip-portal-content.tooltip-content--bottom::after {
+  content: "";
+  position: absolute;
+  bottom: 100%; /* En la parte superior del tooltip */
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 5px;
+  border-style: solid;
+  border-color: transparent transparent #333333 transparent;
+}
+
+/* Añadir estilos para .tooltip-content--left::after y .tooltip-content--right::after si se necesitan */

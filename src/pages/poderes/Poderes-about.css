@@ -1,0 +1,202 @@
+/* ==========================================================================
+   Poderes About Page (Scoped)
+   ========================================================================== */
+.poderes-about-page {
+  background:
+    radial-gradient(circle at center, rgba(10, 14, 47, 0.8) 0%, rgba(0, 0, 0, 0.8) 100%),
+    url("/src/assets/img/background-poderes.jpg") no-repeat center center fixed;
+  background-size: cover;
+  background-blend-mode: overlay;
+  color: white;
+  padding: 3rem 1.5rem;
+  font-family: "Orbitron", sans-serif;
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+}
+
+.poderes-about-page .particles-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.poderes-about-page .poderes-about-hero {
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.poderes-about-page .poderes-about-hero h1 {
+  font-size: 3rem;
+  color: #00f7ff;
+  text-shadow: 0 0 15px rgba(0, 224, 255, 0.8);
+  margin-bottom: 1.5rem;
+}
+
+.poderes-about-page .poderes-about-hero p {
+  font-family: "Inter", sans-serif;
+  font-size: 1.2rem;
+  color: #e0e0e0;
+  max-width: 700px;
+  margin: 0 auto 2.5rem;
+  line-height: 1.5;
+  text-shadow: 0 0 5px rgba(0, 224, 255, 0.3);
+}
+
+.poderes-about-page .hero-image {
+  width: 100%;
+  max-width: 800px;
+  height: auto;
+  border-radius: 12px;
+  box-shadow: 0 0 20px rgba(0, 224, 255, 0.5);
+  margin: 0 auto;
+  display: block;
+}
+
+.poderes-about-page .poderes-about-content {
+  max-width: 1000px;
+  margin: 0.5rem auto;
+}
+
+.poderes-about-page .content-section {
+  margin-bottom: 2rem;
+}
+
+.poderes-about-page .content-section h2 {
+  font-size: 2rem;
+  color: #00e0ff;
+  text-shadow: 0 0 10px rgba(0, 224, 255, 0.8);
+  margin-bottom: 1rem;
+}
+
+.poderes-about-page .content-section p {
+  font-family: "Inter", sans-serif;
+  font-size: 1.1rem;
+  color: #cccccc;
+  line-height: 1.6;
+}
+
+.poderes-about-page .content-section ul {
+  list-style: none;
+  padding: 0;
+  font-family: "Inter", sans-serif;
+  font-size: 1rem;
+  color: #cccccc;
+}
+
+.poderes-about-page .content-section ul li {
+  margin-bottom: 1rem;
+  padding-left: 1.5rem;
+  position: relative;
+}
+
+.poderes-about-page .content-section ul li::before {
+  content: "★";
+  color: #00f7ff;
+  position: absolute;
+  left: 0;
+  top: 2px;
+}
+
+.poderes-about-page .content-section ul li strong {
+  color: #fff;
+}
+
+.poderes-about-page .poderes-about-cta {
+  text-align: center;
+  margin: 1.5rem 0;
+}
+
+.poderes-about-page .poderes-about-cta h2 {
+  font-size: 2rem;
+  color: #00e0ff;
+  text-shadow: 0 0 10px rgba(0, 224, 255, 0.8);
+  margin-bottom: 0.5rem;
+}
+
+.poderes-about-page .poderes-about-cta p {
+  font-family: "Inter", sans-serif;
+  font-size: 1.1rem;
+  color: #cccccc;
+  margin-bottom: 1.5rem;
+}
+
+.poderes-about-page .cta-button {
+  display: inline-block;
+  padding: 0.8rem 2rem;
+  border-radius: 25px;
+  background: linear-gradient(90deg, #00f7ff, #00d4ff);
+  color: #000;
+  font-family: "Inter", sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  text-decoration: none;
+  box-shadow: 0 0 12px rgba(0, 224, 255, 0.6);
+  transition: all 0.3s ease;
+}
+
+.poderes-about-page .cta-button:hover {
+  background: linear-gradient(90deg, #00d4ff, #00aaff);
+  box-shadow: 0 0 20px rgba(0, 224, 255, 0.9);
+  transform: scale(1.05);
+}
+
+/* ==========================================================================
+   Media Queries (Scoped)
+   ========================================================================== */
+@media (max-width: 768px) {
+  .poderes-about-page .poderes-about-hero h1 {
+    font-size: 2.2rem;
+  }
+
+  .poderes-about-page .poderes-about-hero p {
+    font-size: 1rem;
+  }
+
+  .poderes-about-page .hero-image {
+    max-width: 600px;
+  }
+
+  .poderes-about-page .content-section h2 {
+    font-size: 1.5rem;
+  }
+
+  .poderes-about-page .content-section p {
+    font-size: 0.95rem;
+  }
+
+  .poderes-about-page .content-section ul {
+    font-size: 0.9rem;
+  }
+
+  .poderes-about-page .poderes-about-cta h2 {
+    font-size: 1.6rem;
+  }
+
+  .poderes-about-page .poderes-about-cta p {
+    font-size: 0.95rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .poderes-about-page {
+    padding: 2rem 1rem;
+  }
+
+  .poderes-about-page .poderes-about-hero h1 {
+    font-size: 1.8rem;
+  }
+
+  .poderes-about-page .hero-image {
+    max-width: 100%;
+  }
+
+  .poderes-about-page .content-section h2 {
+    font-size: 1.3rem;
+  }
+}

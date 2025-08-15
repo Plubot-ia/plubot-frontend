@@ -1,0 +1,111 @@
+/* ==========================================================================
+   WhatsApp Button Styles - Estilo Galáctico (Encapsulado)
+   ========================================================================== */
+.whatsapp-btn-wrapper {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  z-index: 1000;
+}
+
+.whatsapp-btn-wrapper .whatsapp-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 60px;
+  background: #00e0ff;
+  color: #121212;
+  border-radius: 50%;
+  font-size: 1.75rem;
+  box-shadow:
+    0 0 10px rgba(0, 224, 255, 0.5),
+    0 0 20px rgba(0, 224, 255, 0.3);
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.whatsapp-btn-wrapper .whatsapp-btn:hover {
+  background: #25d366;
+  color: #ffffff;
+  box-shadow:
+    0 0 15px rgba(37, 211, 102, 0.7),
+    0 0 25px rgba(37, 211, 102, 0.5);
+  transform: scale(1.1);
+}
+
+.whatsapp-btn-wrapper .whatsapp-btn i {
+  font-size: 1.75rem;
+}
+
+.whatsapp-btn-wrapper .whatsapp-tooltip {
+  position: absolute;
+  bottom: 100%;
+  right: 50%;
+  transform: translateX(50%);
+  background: rgba(18, 18, 18, 0.95);
+  color: #ffffff;
+  font-family: "Roboto Mono", monospace;
+  font-size: 0.85rem;
+  padding: 0.5rem 1rem;
+  border-radius: 5px;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+  margin-bottom: 0.5rem;
+  border: 1px solid rgba(0, 224, 255, 0.3);
+}
+
+.whatsapp-btn-wrapper .whatsapp-btn:hover .whatsapp-tooltip {
+  opacity: 1;
+  visibility: visible;
+  bottom: 110%;
+}
+
+/* ==========================================================================
+   Media Queries
+   ========================================================================== */
+@media (max-width: 768px) {
+  .whatsapp-btn-wrapper {
+    bottom: 1.5rem;
+    right: 1.5rem;
+  }
+
+  .whatsapp-btn-wrapper .whatsapp-btn {
+    width: 50px;
+    height: 50px;
+    font-size: 1.5rem;
+  }
+
+  .whatsapp-btn-wrapper .whatsapp-btn i {
+    font-size: 1.5rem;
+  }
+
+  .whatsapp-btn-wrapper .whatsapp-tooltip {
+    font-size: 0.75rem;
+    padding: 0.4rem 0.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .whatsapp-btn-wrapper {
+    bottom: 1rem;
+    right: 1rem;
+  }
+
+  .whatsapp-btn-wrapper .whatsapp-btn {
+    width: 45px;
+    height: 45px;
+    font-size: 1.25rem;
+  }
+
+  .whatsapp-btn-wrapper .whatsapp-btn i {
+    font-size: 1.25rem;
+  }
+
+  .whatsapp-btn-wrapper .whatsapp-tooltip {
+    font-size: 0.7rem;
+    padding: 0.3rem 0.6rem;
+  }
+}

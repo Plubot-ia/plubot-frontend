@@ -1,0 +1,148 @@
+.ts-import-export-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1004;
+}
+
+.ts-import-export-modal .ts-modal-content {
+  background: rgba(18, 18, 40, 0.7);
+  backdrop-filter: blur(10px);
+  padding: 1.5rem;
+  border-radius: 8px;
+  border: 1px solid #00e0ff;
+  width: 400px;
+  box-shadow:
+    0 0 8px #00e0ff,
+    0 0 12px #ff00ff;
+}
+
+.ts-import-export-modal .ts-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.ts-import-export-modal .ts-modal-header h3 {
+  color: #00e0ff;
+  margin: 0;
+}
+
+.ts-import-export-modal .ts-close-button {
+  background: transparent;
+  border: none;
+  color: #e0e0ff;
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+
+.ts-import-export-modal .ts-close-button:hover {
+  color: #ff2e5b;
+}
+
+.ts-import-export-modal .ts-modal-tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.ts-import-export-modal .ts-modal-tabs button {
+  background: #171727;
+  border: 1px solid #00e0ff;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  color: #e0e0ff;
+}
+
+.ts-import-export-modal .ts-modal-tabs button.active {
+  background: #00e0ff;
+  color: #0a0a14;
+}
+
+.ts-import-export-modal .ts-file-input-container input {
+  display: none;
+}
+
+.ts-import-export-modal .ts-file-input-label {
+  background: #ff00ff;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #0a0a14;
+}
+
+.ts-import-export-modal .ts-import-textarea {
+  width: 100%;
+  background: #171727;
+  border: 1px solid #00e0ff;
+  border-radius: 4px;
+  padding: 0.5rem;
+  color: #e0e0ff;
+}
+
+.ts-import-export-modal .ts-warning-message {
+  background: rgba(255, 183, 0, 0.3);
+  padding: 0.5rem;
+  border-radius: 4px;
+  margin: 0.5rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  border: 1px solid #ffb700;
+}
+
+.ts-import-export-modal .ts-import-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.ts-import-export-modal .ts-primary-button {
+  background: #00ff9d;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  color: #0a0a14;
+}
+
+.ts-import-export-modal .ts-secondary-button {
+  background: #ff2e5b;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  color: #0a0a14;
+}
+
+.ts-import-export-modal .ts-export-section,
+.ts-import-export-modal .ts-import-section {
+  padding: 0.5rem;
+}
+
+.ts-import-export-modal .ts-export-options,
+.ts-import-export-modal .ts-import-options {
+  margin-bottom: 1rem;
+}
+
+.ts-import-export-modal .ts-format-selection {
+  margin-top: 0.5rem;
+}
+
+.ts-import-export-modal .ts-format-selection label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #e0e0ff;
+}

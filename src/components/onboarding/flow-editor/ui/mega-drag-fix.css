@@ -1,0 +1,64 @@
+/**
+ * MEGA-DRAG-FIX.CSS
+ * Solución definitiva para el movimiento fluido de nodos
+ * Este archivo tiene la máxima prioridad sobre todos los demás
+ */
+
+/* SOLUCIÓN 1: Estilo para nodos durante el arrastre - !important es necesario para sobreescribir otros estilos */
+.react-flow__node.dragging,
+.react-flow__node.dragging *,
+.react-flow__node[data-dragging="true"],
+.react-flow__node[data-dragging="true"] * {
+  /* PERMITIR el uso de transform para posicionamiento */
+  will-change: transform !important;
+  transition: none !important;
+  animation: none !important;
+
+  /* Asegurar visibilidad máxima */
+  pointer-events: all !important;
+  z-index: 9999 !important;
+
+  /* Desactivar todas las reglas que puedan interferir con el rendimiento */
+  contain: none !important;
+  backdrop-filter: none !important;
+  filter: none !important;
+  box-shadow: none !important;
+}
+
+/* SOLUCIÓN 2: NUNCA forzar transform: none en contenedores principales */
+.react-flow,
+.react-flow__renderer,
+.react-flow__viewport,
+.react-flow__pane,
+.react-flow__nodes,
+.react-flow__node {
+  transform: translate3d(0, 0, 0); /* Usar aceleración hardware sin forzar posición */
+  backface-visibility: visible !important;
+  perspective: 1000 !important;
+
+  /* NUNCA usar estas propiedades que interfieren con el rendimiento */
+  contain: none !important;
+}
+
+/* SOLUCIÓN 3: Deshabilitar temporalmente bordes y efectos durante arrastre */
+body.dragging-in-progress .react-flow__edge,
+body.dragging-in-progress .react-flow__connection {
+  opacity: 0.5 !important;
+  pointer-events: none !important;
+}
+
+/* SOLUCIÓN 4: Desactivar cualquier validación o monitoreo durante arrastre */
+body.dragging-in-progress .position-validator-observer,
+body.dragging-in-progress .node-interaction-observer {
+  display: none !important;
+}
+
+/* SOLUCIÓN 5: Aplicar arreglo a nodos específicos */
+.react-flow__node.start-node.dragging,
+.react-flow__node.message-node.dragging,
+.react-flow__node.decision-node.dragging,
+.react-flow__node.option-node.dragging,
+.react-flow__node.action-node.dragging,
+.react-flow__node.end-node.dragging {
+  cursor: grabbing !important;
+}

@@ -1,0 +1,266 @@
+/* TemplateSelector.css - Refined Cyberpunk Aesthetic */
+
+:root {
+  --ts-primary: #00e0ff;
+  --ts-accent: #ff00ff;
+  --ts-text: #e0e0ff;
+  --ts-bg-dark: #0a0f1a;
+  --ts-bg-medium: #141a2e;
+  --ts-bg-light: #222b45;
+  --ts-border-color: rgba(0, 224, 255, 0.25);
+}
+
+.template-selector-wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  backdrop-filter: blur(8px);
+}
+
+.ts-modal {
+  background-color: var(--ts-bg-dark);
+  border-radius: 12px;
+  width: 90%;
+  max-width: 1100px;
+  max-height: 90vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  border: 1px solid var(--ts-border-color);
+  animation: glowPulse 4s infinite alternate;
+}
+
+@keyframes glowPulse {
+  from {
+    box-shadow:
+      0 0 40px rgba(0, 0, 0, 0.7),
+      0 0 15px rgba(0, 224, 255, 0.15);
+    border-color: rgba(0, 224, 255, 0.15);
+  }
+  to {
+    box-shadow:
+      0 0 50px rgba(0, 0, 0, 0.8),
+      0 0 25px rgba(0, 224, 255, 0.3);
+    border-color: rgba(0, 224, 255, 0.3);
+  }
+}
+
+.ts-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 25px;
+  background-color: rgba(5, 10, 20, 0.5);
+  border-bottom: 1px solid var(--ts-border-color);
+  position: relative;
+  z-index: 10;
+}
+
+.ts-header h2 {
+  margin: 0;
+  color: #fff;
+  font-size: 1.8rem;
+  font-family: "Orbitron", sans-serif;
+  text-shadow: 0 0 10px var(--ts-primary);
+  letter-spacing: 1px;
+}
+
+.ts-btn-close {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  width: 40px;
+  height: 40px;
+  background-color: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  color: var(--ts-text);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  z-index: 20;
+}
+
+.ts-btn-close:hover {
+  background-color: rgba(0, 224, 255, 0.2);
+  color: #fff;
+  transform: rotate(90deg) scale(1.1);
+  border-color: var(--ts-primary);
+  box-shadow: 0 0 15px var(--ts-primary);
+}
+
+.ts-categories {
+  display: flex;
+  padding: 15px 25px;
+  gap: 10px;
+  background-color: rgba(10, 15, 25, 0.3);
+  border-bottom: 1px solid var(--ts-border-color);
+  overflow-x: auto;
+}
+
+.ts-category-btn {
+  background: transparent;
+  border: 1px solid var(--ts-border-color);
+  color: var(--ts-text);
+  padding: 8px 18px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.ts-category-btn:hover {
+  background: var(--ts-primary);
+  border-color: var(--ts-primary);
+  color: var(--ts-bg-dark);
+  text-shadow: none;
+}
+
+.ts-category-btn.active {
+  background: var(--ts-primary);
+  border-color: var(--ts-primary);
+  color: var(--ts-bg-dark);
+  box-shadow: 0 0 15px rgba(0, 224, 255, 0.5);
+  font-weight: 700;
+  text-shadow: none;
+}
+
+.ts-content {
+  padding: 25px;
+  overflow-y: auto;
+  flex-grow: 1;
+}
+
+.ts-template-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 25px;
+}
+
+.ts-template-list.animate .ts-template-item {
+  animation: fadeInUp 0.5s ease forwards;
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+@keyframes fadeInUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.ts-template-item {
+  background-color: var(--ts-bg-medium);
+  padding: 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--ts-border-color);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+  display: flex;
+  flex-direction: column;
+  min-height: 180px;
+}
+
+.ts-template-item:hover {
+  transform: translateY(-8px) scale(1.03);
+  background-color: var(--ts-bg-light);
+  border-color: var(--ts-primary);
+  box-shadow:
+    0 12px 30px rgba(0, 0, 0, 0.5),
+    0 0 20px rgba(0, 224, 255, 0.3);
+}
+
+.template-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(145deg, var(--ts-bg-light), var(--ts-bg-medium));
+  border-radius: 50%;
+  margin-bottom: 15px;
+  color: var(--ts-primary);
+  border: 1px solid var(--ts-border-color);
+  transition: all 0.3s ease;
+}
+
+.ts-template-item:hover .template-icon {
+  color: #fff;
+  background: var(--ts-primary);
+  box-shadow: 0 0 10px var(--ts-primary);
+  transform: rotate(-15deg);
+}
+
+.ts-template-item h3 {
+  margin: 0 0 12px;
+  color: #fff;
+  font-family: "Orbitron", sans-serif;
+  font-size: 1.4rem;
+  position: relative;
+  padding-bottom: 10px;
+  text-shadow: 0 0 8px var(--ts-primary);
+}
+
+.ts-template-item h3::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 30px;
+  height: 3px;
+  background: var(--ts-primary);
+  box-shadow: 0 0 5px var(--ts-primary);
+  transition: width 0.3s ease;
+  border-radius: 2px;
+}
+
+.ts-template-item:hover h3::after {
+  width: 100%;
+}
+
+.ts-template-item p {
+  margin: 0;
+  color: var(--ts-text);
+  font-size: 0.95rem;
+  line-height: 1.6;
+  flex-grow: 1;
+}
+
+.ts-template-item .template-preview {
+  display: none;
+}
+
+.ts-template-list.animate .ts-template-item:nth-child(1) {
+  animation-delay: 0.1s;
+}
+.ts-template-list.animate .ts-template-item:nth-child(2) {
+  animation-delay: 0.15s;
+}
+.ts-template-list.animate .ts-template-item:nth-child(3) {
+  animation-delay: 0.2s;
+}
+.ts-template-list.animate .ts-template-item:nth-child(4) {
+  animation-delay: 0.25s;
+}
+.ts-template-list.animate .ts-template-item:nth-child(5) {
+  animation-delay: 0.3s;
+}
+.ts-template-list.animate .ts-template-item:nth-child(6) {
+  animation-delay: 0.35s;
+}

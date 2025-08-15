@@ -1,0 +1,89 @@
+/* ==========================================================================
+   Planes y Monetización (Encapsulado)
+   ========================================================================== */
+.plubot-arsenal {
+  background: linear-gradient(180deg, rgba(18, 18, 56, 0.5), rgba(0, 0, 0, 0.3));
+}
+
+.plubot-arsenal .arsenal-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 2rem;
+}
+
+.plubot-arsenal .arsenal-card {
+  background: rgba(0, 0, 0, 0.2);
+  padding: 2rem;
+  border-radius: 10px;
+  border: 1px solid #00e0ff;
+  text-align: center;
+  box-shadow: 0 0 15px rgba(0, 224, 255, 0.4);
+  transition: transform 0.3s ease;
+}
+
+.plubot-arsenal .arsenal-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 0 25px rgba(0, 224, 255, 0.7);
+}
+
+.plubot-arsenal .arsenal-card h3 {
+  font-family: "Inter", sans-serif;
+  font-size: 1.5rem;
+  color: #00e0ff;
+  margin-bottom: 1rem;
+}
+
+.plubot-arsenal .arsenal-card p {
+  color: #d0d0d0;
+  margin-bottom: 1.5rem;
+  font-size: 1rem;
+}
+
+.plubot-arsenal .arsenal-button {
+  padding: 1rem 2.5rem;
+  border-radius: 50px;
+  background: #00e0ff;
+  color: #000;
+  font-family: "Inter", sans-serif;
+  font-size: 1.2rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  text-decoration: none;
+  box-shadow: 0 0 15px rgba(0, 224, 255, 0.7);
+  transition: transform 0.3s ease;
+}
+
+.plubot-arsenal .arsenal-button:hover {
+  box-shadow: 0 0 25px rgba(0, 224, 255, 1);
+  background: #00c4ff;
+  transform: scale(1.05);
+}
+
+/* ==========================================================================
+     Media Queries (Encapsuladas)
+     ========================================================================== */
+@media (max-width: 768px) {
+  .plubot-arsenal .arsenal-container {
+    grid-template-columns: 1fr;
+  }
+
+  .plubot-arsenal .arsenal-button {
+    padding: 0.8rem 2rem;
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .plubot-arsenal .arsenal-card h3 {
+    font-size: 1.4rem;
+  }
+
+  .plubot-arsenal .arsenal-card p {
+    font-size: 0.9rem;
+  }
+
+  .plubot-arsenal .arsenal-button {
+    padding: 0.6rem 1.5rem;
+    font-size: 0.9rem;
+  }
+}

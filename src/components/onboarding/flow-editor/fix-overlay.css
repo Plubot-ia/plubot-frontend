@@ -1,0 +1,52 @@
+/*
+ * FIX-OVERLAY.CSS - OPTIMIZADO
+ * Corrige problemas de overlays sin afectar a componentes legítimos
+ * Versión mejorada que preserva estética de nodos
+ */
+
+/* Estilos ACOTADOS solo para overlays específicos problematicos */
+.loading-overlay:not(.node-component),
+.data-loading-indicator,
+.global-state-loading {
+  /* Overlay semitransparente con blur sutil */
+  background: rgba(0, 0, 0, 0.3) !important;
+  backdrop-filter: blur(2px) !important;
+  -webkit-backdrop-filter: blur(2px) !important;
+  /* Estilo atractivo */
+  box-shadow: none !important;
+  color: #00e0ff !important;
+}
+
+/* Asegurarse de que los mensajes de guardado no causen problemas visuales */
+.byte-notification,
+.status-bubble {
+  background: rgba(0, 224, 255, 0.2) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3) !important;
+  color: #fff !important;
+  z-index: 9999 !important;
+  pointer-events: none !important;
+}
+
+/* ELIMINAMOS el selector destructivo que afectaba a cualquier fondo oscuro */
+/* Este selector era extremadamente perjudicial para la UI y la estética */
+
+/* En su lugar, aplicamos estilos a componentes específicos de carga */
+.app-loading-indicator,
+.loading-screen:not(.node-component),
+.global-loader {
+  /* Mantener visible pero mejorar apariencia */
+  background: rgba(0, 0, 0, 0.2) !important;
+  backdrop-filter: blur(3px) !important;
+  border-radius: 8px;
+  color: #00e0ff;
+}
+
+/* Asegurarse de que los elementos de carga no interfieran con la UI */
+.ts-loading,
+.loading,
+.loading-container {
+  background: transparent !important;
+  color: #00e0ff !important;
+}

@@ -1,0 +1,312 @@
+/* Estructura principal del asistente */
+.ts-byte-assistant {
+  position: fixed;
+  bottom: 1rem;
+  right: 1rem;
+  width: 320px;
+  max-height: 500px;
+  z-index: 1002;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1rem;
+  border: 1px solid var(--ts-border-primary, rgba(0, 224, 255, 0.5));
+  border-radius: 12px;
+  background: rgba(16, 16, 24, 0.85);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 0 20px -5px var(--ts-shadow-glow, rgba(0, 224, 255, 0.5));
+  transition: all 0.4s ease;
+}
+
+.ts-byte-expanded {
+  width: 400px;
+}
+
+.ts-byte-with-simulation {
+  bottom: 100px;
+}
+
+/* --- CABECERA Y AVATAR --- */
+.ts-byte-header {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+
+.ts-byte-controls {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  display: flex;
+  gap: 0.5rem;
+}
+
+.ts-byte-control-btn {
+  background: rgba(20, 20, 30, 0.8);
+  border: 1px solid var(--ts-border-primary-alpha, rgba(0, 224, 255, 0.3));
+  color: var(--ts-text-secondary, #a0a0c0);
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  line-height: 1;
+}
+
+.ts-byte-control-btn:hover {
+  background: var(--ts-accent-primary, #00e0ff);
+  color: #101018;
+  box-shadow: 0 0 8px var(--ts-accent-primary, #00e0ff);
+}
+
+.ts-byte-hologram {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ts-byte-image-container {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.ts-byte-image {
+  width: 100px;
+  height: 100px;
+  object-fit: contain;
+  position: relative;
+  z-index: 2;
+  animation: ts-byteFloat 4s ease-in-out infinite;
+}
+
+body.ultra-mode .ts-byte-image {
+  animation: none !important;
+}
+
+.ts-byte-thinking {
+  animation: ts-byteThinking 1.5s ease-in-out infinite !important;
+}
+
+.ts-byte-glow {
+  position: absolute;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  z-index: 1;
+  opacity: 0.3;
+  animation: ts-neonPulse 2s infinite;
+  filter: blur(10px);
+}
+
+/* --- ÁREA DE MENSAJES --- */
+.ts-byte-messages {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+}
+
+.ts-message-container {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  /* Firefox scrollbar */
+  scrollbar-width: auto;
+  scrollbar-color: rgba(0, 224, 255, 0.6) rgba(0, 0, 0, 0.3);
+}
+
+/* Webkit scrollbar styles */
+.ts-message-container::-webkit-scrollbar {
+  width: 10px;
+}
+
+.ts-message-container::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 10px;
+}
+
+.ts-message-container::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 224, 255, 0.5);
+  border-radius: 10px;
+  border: 2px solid rgba(0, 224, 255, 0.7);
+  transition: all 0.3s ease;
+}
+
+.ts-message-container::-webkit-scrollbar-thumb:hover {
+  background-color: #00e0ff;
+  border-color: #00e0ff;
+  box-shadow: 0 0 5px #00e0ff;
+}
+
+.ts-message-bubble {
+  padding: 0.8rem 1rem;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  color: var(--ts-text-primary, #e0e0ff);
+  line-height: 1.5;
+  border: 1px solid;
+  animation: ts-messageFade 0.4s ease-out;
+  max-width: 90%;
+}
+
+.ts-message-user {
+  background: rgba(100, 80, 220, 0.2);
+  border-color: rgba(100, 80, 220, 0.8);
+  align-self: flex-end;
+  border-top-right-radius: 4px;
+}
+
+.ts-message-byte {
+  background: rgba(0, 150, 200, 0.15);
+  border-color: rgba(0, 150, 200, 0.6);
+  align-self: flex-start;
+  border-top-left-radius: 4px;
+}
+
+/* --- FORMULARIO DE ENTRADA --- */
+.ts-byte-form {
+  display: flex;
+  width: 100%;
+  gap: 0.75rem;
+  flex-shrink: 0;
+}
+
+.ts-byte-input {
+  flex: 1;
+  padding: 0.8rem;
+  border-radius: 6px;
+  border: 1px solid var(--ts-border-primary-alpha, rgba(0, 224, 255, 0.3));
+  background: rgba(0, 0, 0, 0.3);
+  color: var(--ts-text-primary, #e0e0ff);
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+}
+
+.ts-byte-input:focus {
+  outline: none;
+  border-color: var(--ts-accent-primary, #00e0ff);
+  background: rgba(0, 0, 0, 0.1);
+  box-shadow: 0 0 8px -2px var(--ts-accent-primary, #00e0ff);
+}
+
+.ts-byte-submit {
+  padding: 0.8rem 1.2rem;
+  border-radius: 6px;
+  border: 1px solid var(--ts-accent-primary, #00e0ff);
+  background: transparent;
+  color: var(--ts-accent-primary, #00e0ff);
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.ts-byte-submit:hover:not(:disabled) {
+  background: var(--ts-accent-primary, #00e0ff);
+  color: #101018;
+  box-shadow: 0 0 10px var(--ts-accent-primary, #00e0ff);
+}
+
+.ts-byte-submit:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* --- ESTADO MINIMIZADO --- */
+.ts-byte-minimized {
+  position: fixed;
+  bottom: 1rem;
+  right: 1rem;
+  width: 60px;
+  height: 60px;
+  cursor: pointer;
+  z-index: 1002;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  animation: ts-neonPulse 2.5s infinite;
+  border-radius: 50%;
+  background: rgba(16, 16, 24, 0.9);
+  border: 2px solid var(--ts-accent-primary, #00e0ff);
+  transition: all 0.3s ease;
+}
+
+.ts-byte-minimized:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 15px var(--ts-accent-primary, #00e0ff);
+}
+
+.ts-byte-icon-minimized {
+  width: 45px;
+  height: 45px;
+  object-fit: contain;
+  animation: ts-byteFloat 4s ease-in-out infinite;
+}
+
+/* --- ANIMACIONES --- */
+@keyframes ts-messageFade {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes ts-byteFloat {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes ts-byteThinking {
+  0% {
+    transform: rotate(0deg) scale(1);
+  }
+  25% {
+    transform: rotate(4deg) scale(1.02);
+  }
+  50% {
+    transform: rotate(0deg) scale(1);
+  }
+  75% {
+    transform: rotate(-4deg) scale(1.02);
+  }
+  100% {
+    transform: rotate(0deg) scale(1);
+  }
+}
+
+@keyframes ts-neonPulse {
+  0%,
+  100% {
+    box-shadow:
+      0 0 5px var(--ts-accent-primary, #00e0ff),
+      0 0 10px var(--ts-accent-primary, #00e0ff);
+    opacity: 0.8;
+  }
+  50% {
+    box-shadow:
+      0 0 10px var(--ts-accent-primary, #00e0ff),
+      0 0 20px var(--ts-accent-primary, #00e0ff);
+    opacity: 1;
+  }
+}

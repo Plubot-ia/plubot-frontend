@@ -1,0 +1,593 @@
+.ts-connection-editor-modal {
+  --editor-bg: rgba(18, 18, 40, 0.7);
+  --editor-border: 1px solid #00e0ff;
+  --editor-shadow: 0 0 15px rgba(0, 224, 255, 0.5);
+  --tooltip-bg: rgba(10, 10, 20, 0.95);
+  --danger-color: #ff2e5b;
+  --success-color: #00ff9d;
+  --warning-color: #ffb700;
+  --primary-color: #00e0ff;
+  --secondary-color: #ff00ff;
+  --alternative-color: #7700ff;
+  --text-color: #e0e0ff;
+  --bg-dark: #0a0a14;
+  --bg-medium: #171727;
+  --font-mono: "Rajdhani", monospace;
+  --transition-standard: all 0.2s ease;
+}
+
+.ts-connection-editor-modal .ts-modal-content {
+  max-width: 480px;
+  animation: ts-fadeIn 0.3s ease;
+  background: var(--editor-bg);
+  border: var(--editor-border);
+  box-shadow: var(--editor-shadow);
+  border-radius: 8px;
+  color: var(--text-color);
+}
+
+.ts-connection-editor-modal .ts-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--primary-color);
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+}
+
+.ts-connection-editor-modal .ts-modal-header h3 {
+  color: var(--primary-color);
+  text-shadow: 0 0 5px var(--primary-color);
+  margin: 0;
+  font-size: 1.2rem;
+  letter-spacing: 1px;
+}
+
+.ts-connection .ts-connection-editor-modal .ts-close-button {
+  background: transparent;
+  border: none;
+  color: var(--text-color);
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: var(--transition-standard);
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+.ts-connection-editor-modal .ts-close-button:hover {
+  color: var(--danger-color);
+  background: rgba(255, 46, 91, 0.2);
+}
+
+.ts-connection-editor-modal .ts-close-button:focus {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
+}
+
+.ts-connection-editor-modal .ts-connection-details {
+  position: relative;
+}
+
+.ts-connection-editor-modal .ts-connection-type-badge {
+  position: absolute;
+  top: -2.5rem;
+  right: 0;
+  background: var(--alternative-color);
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  box-shadow: 0 0 8px rgba(119, 0, 255, 0.5);
+}
+
+.ts-connection-editor-modal .ts-connection-nodes {
+  display: flex;
+  align-items: center;
+  background: var(--bg-medium);
+  border-radius: 6px;
+  padding: 0.75rem;
+  margin-bottom: 1.2rem;
+  border: 1px solid rgba(0, 224, 255, 0.3);
+  box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.3);
+}
+
+.ts-connection-editor-modal .ts-source-node,
+.ts-connection-editor-modal .ts-target-node {
+  flex: 1;
+  padding: 0.5rem;
+  background: var(--bg-dark);
+  border-radius: 4px;
+  font-size: 0.9rem;
+  border: 1px solid var(--primary-color);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ts-connection-editor-modal .ts-source-node {
+  border-color: var(--secondary-color);
+}
+
+.ts-connection-editor-modal .ts-connection-arrow {
+  margin: 0 0.5rem;
+  color: var(--primary-color);
+  font-size: 1.2rem;
+}
+
+.ts-connection-editor-modal .ts-connection-preview {
+  background: var(--bg-medium);
+  border-radius: 6px;
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border: 1px solid rgba(0, 224, 255, 0.3);
+  box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.3);
+}
+
+.ts-connection-editor-modal .ts-preview-label {
+  font-size: 0.8rem;
+  color: var(--text-color);
+  margin-bottom: 0.5rem;
+  opacity: 0.7;
+  align-self: flex-start;
+}
+
+.ts-connection-editor-modal .ts-preview-container {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 0;
+}
+
+.ts-connection-editor-modal .ts-preview-node {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--primary-color);
+  box-shadow: 0 0 5px var(--primary-color);
+}
+
+.ts-connection-editor-modal .ts-preview-node.ts-source {
+  background: var(--secondary-color);
+  box-shadow: 0 0 5px var(--secondary-color);
+}
+
+.ts-connection-editor-modal .ts-preview-animation-indicator {
+  display: flex;
+  align-items: center;
+  font-size: 0.8rem;
+  margin-top: 0.5rem;
+  color: var(--success-color);
+}
+
+.ts-connection-editor-modal .ts-animation-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  background: var(--success-color);
+  border-radius: 50%;
+  margin-right: 0.5rem;
+  animation: ts-pulseDot 1.5s infinite;
+}
+
+@keyframes ts-pulseDot {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.5);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.ts-connection-editor-modal .ts-style-presets {
+  margin-bottom: 1rem;
+}
+
+.ts-connection-editor-modal .ts-presets-label {
+  font-size: 0.8rem;
+  color: var(--text-color);
+  margin-bottom: 0.5rem;
+  opacity: 0.7;
+}
+
+.ts-connection-editor-modal .ts-presets-container {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  padding: 0.5rem;
+  background: var(--bg-dark);
+  border-radius: 4px;
+}
+
+.ts-connection-editor-modal .ts-style-preset-button {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: var(--transition-standard);
+  position: relative;
+}
+
+.ts-connection-editor-modal .ts-style-preset-button:hover {
+  transform: scale(1.2);
+  box-shadow: 0 0 5px currentColor;
+}
+
+.ts-connection-editor-modal .ts-style-preset-button:focus {
+  outline: 2px solid var(--text-color);
+  outline-offset: 2px;
+}
+
+.ts-connection-editor-modal .ts-style-preset-button.ts-active-preset {
+  transform: scale(1.2);
+  box-shadow:
+    0 0 8px currentColor,
+    0 0 16px currentColor;
+}
+
+.ts-connection-editor-modal .ts-editor-section {
+  background: var(--bg-medium);
+  border-radius: 6px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border: 1px solid rgba(0, 224, 255, 0.3);
+  box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.3);
+}
+
+.ts-connection-editor-modal .ts-form-group {
+  margin-bottom: 1rem;
+}
+
+.ts-connection-editor-modal .ts-form-group:last-child {
+  margin-bottom: 0;
+}
+
+.ts-connection-editor-modal .ts-form-group label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.3rem;
+  font-size: 0.9rem;
+}
+
+.ts-connection-editor-modal input[type="text"],
+.ts-connection-editor-modal input[type="number"],
+.ts-connection-editor-modal select {
+  width: 100%;
+  background: var(--bg-dark);
+  border: 1px solid var(--primary-color);
+  color: var(--text-color);
+  padding: 0.5rem;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  transition: var(--transition-standard);
+}
+
+.ts-connection-editor-modal input[type="text"]:focus,
+.ts-connection-editor-modal input[type="number"]:focus,
+.ts-connection-editor-modal select:focus,
+.ts-connection-editor-modal input[type="color"]:focus {
+  outline: none;
+  box-shadow: 0 0 5px var(--primary-color);
+  border-color: var(--primary-color);
+}
+
+.ts-connection-editor-modal input[type="color"] {
+  width: 50px;
+  height: 30px;
+  padding: 2px;
+  background: var(--bg-dark);
+  border: 1px solid var(--primary-color);
+  border-radius: 4px;
+}
+
+.ts-connection-editor-modal .ts-tooltip-container {
+  position: relative;
+  display: inline-block;
+}
+
+.ts-connection-editor-modal .ts-tooltip-icon {
+  color: var(--primary-color);
+  font-size: 0.8rem;
+  cursor: help;
+}
+
+.ts-connection-editor-modal .ts-tooltip-container:hover .ts-tooltip-text,
+.ts-connection-editor-modal .ts-tooltip-container:focus-within .ts-tooltip-text {
+  visibility: visible;
+  opacity: 1;
+}
+
+.ts-connection-editor-modal .ts-tooltip-text {
+  visibility: hidden;
+  position: absolute;
+  z-index: 1;
+  width: 220px;
+  background: var(--tooltip-bg);
+  color: var(--text-color);
+  text-align: center;
+  border-radius: 4px;
+  padding: 0.5rem;
+  bottom: 125%;
+  left: 50%;
+  transform: translateX(-50%);
+  opacity: 0;
+  transition:
+    opacity 0.3s,
+    visibility 0.3s;
+  font-size: 0.8rem;
+  border: 1px solid var(--primary-color);
+  pointer-events: none;
+  box-shadow: 0 0 10px rgba(0, 224, 255, 0.3);
+}
+
+.ts-connection-editor-modal .ts-tooltip-text::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: var(--primary-color) transparent transparent transparent;
+}
+
+.ts-connection-editor-modal .ts-input-with-suggestion {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.ts-connection-editor-modal .ts-input-with-suggestion input {
+  flex: 1;
+  padding-right: 110px;
+}
+
+.ts-connection-editor-modal .ts-suggestion-button {
+  position: absolute;
+  right: 0.5rem;
+  background: transparent;
+  color: var(--warning-color);
+  border: none;
+  font-size: 0.8rem;
+  cursor: pointer;
+  padding: 0.2rem 0.4rem;
+  transition: var(--transition-standard);
+  border-radius: 3px;
+}
+
+.ts-connection-editor-modal .ts-suggestion-button:hover {
+  color: var(--success-color);
+  background: rgba(0, 255, 157, 0.1);
+}
+
+.ts-connection-editor-modal .ts-suggestion-button:focus {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
+}
+
+.ts-connection-editor-modal .ts-range-with-value {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.ts-connection-editor-modal .ts-range-with-value input[type="range"] {
+  flex: 1;
+  -webkit-appearance: none;
+  background: var(--bg-dark);
+  height: 6px;
+  border-radius: 3px;
+  outline: none;
+  border: 1px solid var(--primary-color);
+}
+
+.ts-connection-editor-modal .ts-range-with-value input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  background: var(--primary-color);
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 0 5px var(--primary-color);
+  transition: var(--transition-standard);
+}
+
+.ts-connection-editor-modal .ts-range-with-value input[type="range"]::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  background: var(--primary-color);
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 0 5px var(--primary-color);
+  transition: var(--transition-standard);
+}
+
+.ts-connection-editor-modal .ts-range-with-value input[type="range"]:hover::-webkit-slider-thumb,
+.ts-connection-editor-modal .ts-range-with-value input[type="range"]:hover::-moz-range-thumb {
+  transform: scale(1.2);
+}
+
+.ts-connection-editor-modal .ts-range-value {
+  font-size: 0.8rem;
+  color: var(--text-color);
+  opacity: 0.9;
+}
+
+.ts-connection-editor-modal .ts-checkbox-group {
+  display: flex;
+  align-items: center;
+}
+
+.ts-connection-editor-modal .ts-checkbox-with-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.ts-connection-editor-modal input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--primary-color);
+  cursor: pointer;
+  border-radius: 3px;
+}
+
+.ts-connection-editor-modal input[type="checkbox"]:focus {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
+}
+
+.ts-connection-editor-modal .ts-editor-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  justify-content: space-between;
+}
+
+.ts-connection-editor-modal .ts-primary-button,
+.ts-connection-editor-modal .ts-secondary-button,
+.ts-connection-editor-modal .ts-confirm-delete-button,
+.ts-connection-editor-modal .ts-cancel-button {
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: var(--transition-standard);
+  border: none;
+}
+
+.ts-connection-editor-modal .ts-primary-button {
+  background: var(--primary-color);
+  color: var(--bg-dark);
+  box-shadow: 0 0 8px var(--primary-color);
+}
+
+.ts-connection-editor-modal .ts-primary-button.has-changes {
+  background: var(--success-color);
+  box-shadow: 0 0 8px var(--success-color);
+}
+
+.ts-connection-editor-modal .ts-primary-button:hover:not(:disabled) {
+  transform: scale(1.05);
+  box-shadow: 0 0 12px var(--primary-color);
+}
+
+.ts-connection-editor-modal .ts-primary-button.has-changes:hover {
+  box-shadow: 0 0 12px var(--success-color);
+}
+
+.ts-connection-editor-modal .ts-primary-button:disabled {
+  background: rgba(0, 224, 255, 0.3);
+  cursor: not-allowed;
+}
+
+.ts-connection-editor-modal .ts-primary-button:focus {
+  outline: 2px solid var(--text-color);
+  outline-offset: 2px;
+}
+
+.ts-connection-editor-modal .ts-secondary-button {
+  background: transparent;
+  color: var(--danger-color);
+  border: 1px solid var(--danger-color);
+}
+
+.ts-connection-editor-modal .ts-secondary-button:hover {
+  background: rgba(255, 46, 91, 0.1);
+  box-shadow: 0 0 8px var(--danger-color);
+}
+
+.ts-connection-editor-modal .ts-secondary-button:focus {
+  outline: 2px solid var(--danger-color);
+  outline-offset: 2px;
+}
+
+.ts-connection-editor-modal .ts-confirm-delete-button {
+  background: var(--danger-color);
+  color: var(--text-color);
+}
+
+.ts-connection-editor-modal .ts-confirm-delete-button:hover {
+  background: darken(var(--danger-color), 10%);
+  box-shadow: 0 0 8px var(--danger-color);
+}
+
+.ts-connection-editor-modal .ts-confirm-delete-button:focus {
+  outline: 2px solid var(--text-color);
+  outline-offset: 2px;
+}
+
+.ts-connection-editor-modal .ts-cancel-button {
+  background: transparent;
+  color: var(--text-color);
+  border: 1px solid var(--text-color);
+}
+
+.ts-connection-editor-modal .ts-cancel-button:hover {
+  background: rgba(224, 224, 255, 0.1);
+  box-shadow: 0 0 8px var(--text-color);
+}
+
+.ts-connection-editor-modal .ts-cancel-button:focus {
+  outline: 2px solid var(--text-color);
+  outline-offset: 2px;
+}
+
+.ts-connection-editor-modal .ts-delete-confirmation {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  color: var(--danger-color);
+}
+
+.ts-connection-editor-modal .ts-keyboard-shortcuts {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+  font-size: 0.8rem;
+  opacity: 0.7;
+  justify-content: flex-end;
+}
+
+.ts-connection-editor-modal .ts-shortcut {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.ts-connection-editor-modal .ts-shortcut kbd {
+  background: var(--bg-dark);
+  border: 1px solid var(--primary-color);
+  padding: 0.2rem 0.4rem;
+  border-radius: 3px;
+  font-size: 0.8rem;
+}
+
+@keyframes ts-fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

@@ -1,0 +1,62 @@
+.plb-power-node {
+  background-color: #ffffff;
+  border: 1px solid #b3b3b3;
+  border-radius: 8px;
+  padding: 10px 15px;
+  min-width: 200px;
+  max-width: 280px;
+  font-family: "Arial", sans-serif;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.plb-power-node-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.plb-power-node-icon {
+  font-size: 24px; /* Ajusta según el tamaño de tus emojis */
+  display: inline-block;
+}
+
+.plb-power-node-title {
+  color: #333;
+}
+
+.plb-power-node-description {
+  font-size: 12px;
+  color: #666;
+  margin-bottom: 10px;
+  white-space: pre-wrap; /* Para respetar saltos de línea en la descripción si los hubiera */
+}
+
+.plb-power-node-handle {
+  width: 10px;
+  height: 10px;
+  background-color: #777;
+  border-radius: 50%;
+}
+
+/* Puedes personalizar los handles si es necesario */
+.plb-power-node .react-flow__handle-top {
+  top: -5px;
+}
+
+.plb-power-node .react-flow__handle-bottom {
+  bottom: -5px;
+}
+
+/* Posibles estilos para un estado (ejemplo) */
+.plb-power-node-status {
+  font-size: 10px;
+  color: #888;
+  margin-top: 5px;
+  padding-top: 5px;
+  border-top: 1px dashed #eee;
+}

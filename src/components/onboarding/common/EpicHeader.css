@@ -1,0 +1,542 @@
+.epic-header {
+  position: relative;
+  width: 100%;
+  z-index: 1001;
+  background: linear-gradient(135deg, rgba(8, 10, 15, 0.98) 0%, rgba(20, 22, 28, 0.98) 100%);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(0, 195, 255, 0.3);
+  box-shadow:
+    0 2px 5px rgba(0, 0, 0, 0.6),
+    inset 0 0 8px rgba(0, 0, 0, 0.7);
+  padding: 0.75rem 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 60px;
+  overflow: visible; /* Cambiado de hidden a visible */
+  flex-shrink: 0;
+  grid-row: 1 / 2;
+  isolation: isolate; /* Contiene las animaciones dentro del encabezado */
+  contain: content; /* Cambiado de strict a content para permitir visibilidad */
+  clip-path: none; /* Eliminado para permitir que el encabezado sea visible */
+  transform: translateZ(0); /* Fuerza aceleración por hardware */
+  backface-visibility: hidden; /* Previene artefactos visuales */
+  perspective: 1000; /* Mejora el rendimiento 3D */
+}
+
+.epic-header::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(0, 195, 255, 0.4) 20%,
+    rgba(128, 255, 219, 0.4) 50%,
+    rgba(0, 195, 255, 0.4) 80%,
+    transparent 100%
+  );
+  animation: glowLine 4s ease-in-out infinite alternate;
+  box-shadow: 0 0 3px rgba(0, 195, 255, 0.2);
+  will-change: opacity; /* Optimización de rendimiento */
+  transform: translateZ(0); /* Fuerza la aceleración por hardware */
+}
+
+.epic-header-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.epic-header-title {
+  font-family: "Orbitron", sans-serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #fff;
+  text-shadow:
+    0 0 3px rgba(0, 195, 255, 0.5),
+    0 0 6px rgba(0, 195, 255, 0.3);
+  letter-spacing: 1px;
+  margin: 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.epic-header-title::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(0, 195, 255, 0.3),
+    rgba(128, 255, 219, 0.3),
+    rgba(0, 195, 255, 0.3),
+    transparent
+  );
+  animation: glowLine 4s ease-in-out infinite alternate;
+  will-change: opacity;
+  transform: translateZ(0);
+}
+
+.epic-header-subtitle {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0;
+  font-style: italic;
+}
+
+.epic-header-right {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.epic-header-stats {
+  display: flex;
+  gap: 1.5rem;
+  margin-right: 1rem;
+}
+
+.epic-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.epic-stat-value {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #00c3ff;
+  text-shadow: 0 0 5px rgba(0, 195, 255, 0.5);
+}
+
+.epic-stat-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.epic-header-logo {
+  width: 36px;
+  height: 36px;
+  margin-right: 0.5rem;
+  /* Eliminar el fondo cuadrado y hacer transparente el logo */
+  background: transparent;
+  object-fit: contain;
+  /* Sombra base */
+  filter: drop-shadow(0 0 2px rgba(0, 195, 255, 0.4));
+  /* Animación sutil y optimizada */
+  animation: logo-glow 3s cubic-bezier(0.4, 0, 0.2, 1) infinite alternate;
+  /* Optimizaciones de rendimiento */
+  will-change: filter;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+/* Efecto hover para el logo */
+.epic-header-logo:hover {
+  filter: drop-shadow(0 0 5px rgba(0, 195, 255, 0.7));
+  transition: filter 0.3s ease;
+}
+
+.epic-header-actions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.epic-header-button {
+  background-color: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(0, 224, 255, 0.5);
+  color: #00e0ff;
+  padding: 8px 12px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 14px;
+  font-weight: 500;
+  backdrop-filter: blur(5px);
+  position: relative;
+  overflow: hidden;
+}
+
+.epic-header-button:hover {
+  background-color: rgba(0, 224, 255, 0.2);
+  border-color: rgba(0, 224, 255, 0.8);
+}
+
+.epic-header-button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.epic-header-button.saving {
+  background-color: rgba(0, 224, 255, 0.15);
+  border-color: rgba(0, 224, 255, 0.6);
+  animation: pulse 1.5s infinite;
+}
+
+.epic-header-button.status-success {
+  background-color: rgba(0, 200, 83, 0.15);
+  border-color: rgba(0, 200, 83, 0.6);
+}
+
+.epic-header-button.status-error {
+  background-color: rgba(255, 77, 77, 0.15);
+  border-color: rgba(255, 77, 77, 0.6);
+}
+
+@keyframes pulse {
+  0% {
+    background-color: rgba(0, 195, 255, 0.15);
+  }
+  50% {
+    background-color: rgba(0, 195, 255, 0.25);
+  }
+  100% {
+    background-color: rgba(0, 195, 255, 0.15);
+  }
+}
+
+.epic-header-button.saving::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, transparent, rgba(0, 195, 255, 0.2), transparent);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+  0% {
+    background-position: -100% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.save-spinner {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, transparent, rgba(0, 195, 255, 0.2), transparent);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+  pointer-events: none;
+}
+
+.epic-header-button.saving::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(0, 195, 255, 0.2), transparent);
+  animation: saving-animation 1s infinite linear;
+}
+
+@keyframes saving-animation {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+.epic-header-button:hover {
+  background: linear-gradient(135deg, rgba(0, 195, 255, 0.15) 0%, rgba(128, 255, 219, 0.15) 100%);
+  border-color: rgba(0, 195, 255, 0.5);
+  box-shadow: 0 0 5px rgba(0, 195, 255, 0.3);
+}
+
+.epic-header-button.active {
+  background: linear-gradient(135deg, rgba(0, 195, 255, 0.2) 0%, rgba(128, 255, 219, 0.2) 100%);
+  border-color: rgba(0, 195, 255, 0.6);
+  box-shadow: 0 0 8px rgba(0, 195, 255, 0.4);
+}
+
+.epic-header-button:active {
+  transform: translateY(1px);
+}
+
+.epic-header-button-icon {
+  font-size: 1rem;
+}
+
+.epic-header-divider {
+  width: 1px;
+  height: 30px;
+  background: linear-gradient(to bottom, transparent, rgba(0, 195, 255, 0.5), transparent);
+  margin: 0 0.5rem;
+}
+
+/* Partículas de fondo */
+.epic-header-particles {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  z-index: -1;
+}
+
+.epic-particle {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  background-color: rgba(255, 255, 255, 0.5);
+  border-radius: 50%;
+  animation: particleFloat 15s infinite linear;
+}
+
+/* Menú desplegable de opciones */
+.epic-header-dropdown {
+  position: relative;
+}
+
+.epic-header-dropdown {
+  position: relative;
+}
+
+.epic-header-dropdown-menu {
+  position: fixed;
+  top: 60px; /* Posición fija desde la parte superior */
+  right: 20px;
+  width: 280px;
+  background: linear-gradient(135deg, rgba(8, 10, 15, 0.98) 0%, rgba(20, 22, 28, 0.98) 100%);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(0, 195, 255, 0.3);
+  border-radius: 8px;
+  box-shadow:
+    0 4px 15px rgba(0, 0, 0, 0.5),
+    0 0 8px rgba(0, 195, 255, 0.2);
+  z-index: 9999999; /* Valor extremadamente alto para asegurar que esté por encima de todo */
+  overflow: hidden;
+  animation: fadeIn 0.2s ease-out;
+  transform: translateZ(0); /* Forzar rendering en GPU */
+  will-change: transform; /* Optimizar para animaciones */
+  pointer-events: auto !important; /* Asegurar que los eventos del mouse funcionen */
+}
+
+.epic-header-dropdown-menu::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(0, 195, 255, 0.4) 20%,
+    rgba(128, 255, 219, 0.4) 50%,
+    rgba(0, 195, 255, 0.4) 80%,
+    transparent 100%
+  );
+}
+
+.epic-header-dropdown-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  position: relative;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.epic-header-dropdown-item.clickable {
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.epic-header-dropdown-item.clickable:hover {
+  background-color: rgba(0, 195, 255, 0.1);
+}
+
+.epic-header-dropdown-item:last-child {
+  border-bottom: none;
+}
+
+.epic-header-dropdown-item:hover {
+  background: rgba(0, 195, 255, 0.1);
+}
+
+.epic-header-dropdown-icon {
+  margin-right: 12px;
+  color: rgba(0, 195, 255, 0.8);
+}
+
+.epic-header-dropdown-action {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+}
+
+.performance-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+}
+
+.performance-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #4caf50;
+  box-shadow: 0 0 5px rgba(76, 175, 80, 0.5);
+}
+
+/* Estilos para las estadísticas de rendimiento en el menú desplegable */
+.epic-header-dropdown-content {
+  padding: 8px 0;
+  margin-top: 8px;
+  width: 100%;
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+}
+
+.performance-stats-mini {
+  padding: 8px 12px;
+  font-size: 0.85rem;
+}
+
+.performance-stats-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.performance-stats-row:last-child {
+  margin-bottom: 0;
+}
+
+.performance-stats-label {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.performance-stats-value {
+  color: rgba(0, 195, 255, 0.9);
+  font-weight: 500;
+  animation: pulse 2s infinite;
+}
+
+.database-status {
+  font-size: 0.75rem;
+  color: rgba(76, 175, 80, 0.9);
+  background: rgba(76, 175, 80, 0.1);
+  padding: 2px 6px;
+  border-radius: 4px;
+  border: 1px solid rgba(76, 175, 80, 0.3);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 5px rgba(76, 175, 80, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(76, 175, 80, 0);
+  }
+}
+
+/* Animaciones */
+@keyframes glowLine {
+  0% {
+    opacity: 0.15;
+    box-shadow: 0 0 2px rgba(0, 195, 255, 0.15);
+  }
+  100% {
+    opacity: 0.6;
+    box-shadow: 0 0 4px rgba(0, 195, 255, 0.25);
+  }
+}
+
+/* Animación original (mantenida para otros elementos) */
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    filter: drop-shadow(0 0 3px rgba(0, 195, 255, 0.3));
+  }
+  100% {
+    transform: scale(1.05);
+    filter: drop-shadow(0 0 8px rgba(0, 195, 255, 0.7));
+  }
+}
+
+/* Animación optimizada para el logo */
+@keyframes logo-glow {
+  0% {
+    filter: drop-shadow(0 0 2px rgba(0, 195, 255, 0.3));
+  }
+  50% {
+    filter: drop-shadow(0 0 4px rgba(0, 195, 255, 0.5));
+  }
+  100% {
+    filter: drop-shadow(0 0 2px rgba(0, 195, 255, 0.3));
+  }
+}
+
+@keyframes particleFloat {
+  0% {
+    transform: translateY(0) translateX(0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.8;
+  }
+  90% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateY(-60px) translateX(30px);
+    opacity: 0;
+  }
+}
+
+/* Efecto de escaneo - eliminado para mejorar el rendimiento */
+.epic-scan-line {
+  display: none; /* Ocultamos el elemento en lugar de eliminarlo por completo */
+}

@@ -1,0 +1,84 @@
+/* Aggressive override for React Flow handle positioning */
+
+/* Force all wait node handles to be correctly positioned */
+.wait-node-premium-expanded .react-flow__handle,
+.wait-node-premium-expanded .wait-node-handle-circular,
+.wait-node-premium-expanded .wait-node-handle-target,
+.wait-node-premium-expanded .wait-node-handle-source,
+.wait-node-premium-collapsed .react-flow__handle,
+.wait-node-premium-collapsed .wait-node-handle-circular,
+.wait-node-premium-collapsed .wait-node-handle-target,
+.wait-node-premium-collapsed .wait-node-handle-source,
+.wait-node .react-flow__handle,
+.wait-node .wait-node-handle-circular,
+.wait-node .wait-node-handle-target,
+.wait-node .wait-node-handle-source,
+.wait-node-expanded .react-flow__handle,
+.wait-node-expanded .wait-node-handle-circular,
+.wait-node-expanded .wait-node-handle-target,
+.wait-node-expanded .wait-node-handle-source,
+.wait-node-collapsed .react-flow__handle,
+.wait-node-collapsed .wait-node-handle-circular,
+.wait-node-collapsed .wait-node-handle-target,
+.wait-node-collapsed .wait-node-handle-source {
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  position: absolute !important;
+  width: 16px !important;
+  height: 16px !important;
+  border-radius: 50% !important;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+  border: 2px solid white !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+  cursor: pointer !important;
+  z-index: 1000 !important;
+}
+
+/* Specific positioning for left/right handles */
+.wait-node-premium-expanded .react-flow__handle-left,
+.wait-node-premium-expanded .wait-node-handle-target,
+.wait-node-premium-collapsed .react-flow__handle-left,
+.wait-node-premium-collapsed .wait-node-handle-target,
+.wait-node .react-flow__handle-left,
+.wait-node .wait-node-handle-target,
+.wait-node-expanded .react-flow__handle-left,
+.wait-node-expanded .wait-node-handle-target,
+.wait-node-collapsed .react-flow__handle-left,
+.wait-node-collapsed .wait-node-handle-target {
+  left: -8px !important;
+  right: auto !important;
+}
+
+.wait-node-premium-expanded .react-flow__handle-right,
+.wait-node-premium-expanded .wait-node-handle-source,
+.wait-node-premium-collapsed .react-flow__handle-right,
+.wait-node-premium-collapsed .wait-node-handle-source,
+.wait-node .react-flow__handle-right,
+.wait-node .wait-node-handle-source,
+.wait-node-expanded .react-flow__handle-right,
+.wait-node-expanded .wait-node-handle-source,
+.wait-node-collapsed .react-flow__handle-right,
+.wait-node-collapsed .wait-node-handle-source {
+  right: -8px !important;
+  left: auto !important;
+}
+
+/* Override any inline styles with attribute selectors */
+[class*="wait-node"] .react-flow__handle[style*="top"],
+[class*="wait-node"] [class*="handle"][style*="top"] {
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+}
+
+/* Ultra-specific override using ID and attribute selectors */
+#root [data-id] [class*="wait-node"] .react-flow__handle,
+#root [data-id] [class*="wait-node"] [class*="handle"] {
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+}
+
+/* Override transform matrix */
+[class*="wait-node"] .react-flow__handle[style*="matrix"],
+[class*="wait-node"] [class*="handle"][style*="matrix"] {
+  transform: translateY(-50%) !important;
+}

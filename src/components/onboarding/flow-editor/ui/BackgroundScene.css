@@ -1,0 +1,72 @@
+/* Estilos para el contenedor principal del fondo con partículas */
+.flow-editor-container .ts-background-scene-container,
+.flow-editor-wrapper .ts-background-scene-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -9999 !important; /* ABSOLUTAMENTE POR DETRÁS DE TODO */
+  overflow: visible !important;
+  /* Evitar que se pueda interactuar con el fondo */
+  pointer-events: none;
+  /* Solución crítica: sin restricciones de tamaño */
+  max-width: none !important;
+  max-height: none !important;
+  clip: auto !important;
+  clip-path: none !important;
+  background-color: transparent; /* Fondo transparente para no tapar el contenido */
+  display: block !important; /* Forzar visibilidad */
+  opacity: 1 !important; /* Opacidad completa */
+  visibility: visible !important; /* Forzar visibilidad */
+}
+
+/* Estilos para los canvas de partículas */
+.flow-editor-container .ts-background-scene,
+.flow-editor-wrapper .ts-background-scene {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.flow-editor-container .ts-static-layer,
+.flow-editor-wrapper .ts-static-layer {
+  z-index: -2;
+}
+
+.flow-editor-container .ts-dynamic-layer,
+.flow-editor-wrapper .ts-dynamic-layer {
+  z-index: -1;
+  filter: blur(0.5px);
+}
+
+/* Estilos para el modo Ultra Rendimiento */
+.flow-editor-container .simple-background,
+.flow-editor-wrapper .simple-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -10; /* Colocamos detrás de todo */
+  pointer-events: none;
+  background-color: transparent; /* Fondo transparente */
+  overflow: hidden;
+}
+
+/* Overlay de gradiente para el modo Ultra Rendimiento */
+.flow-editor-container .simple-gradient-overlay,
+.flow-editor-wrapper .simple-gradient-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background:
+    radial-gradient(circle at top left, rgba(0, 224, 255, 0.08), transparent 60%),
+    radial-gradient(circle at bottom right, rgba(255, 0, 255, 0.15), transparent 70%);
+  z-index: 0;
+}

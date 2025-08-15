@@ -1,0 +1,59 @@
+/* ==========================================================================
+   Testimonios (Encapsulado)
+   ========================================================================== */
+.plubot-chronicles {
+  padding: 4rem 1.5rem;
+}
+
+.plubot-chronicles .chronicles-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 2rem;
+}
+
+.plubot-chronicles .chronicle-card {
+  background: rgba(0, 0, 0, 0.2);
+  padding: 2rem;
+  border-radius: 10px;
+  border: 1px solid #00e0ff;
+  text-align: center;
+  box-shadow: 0 0 15px rgba(0, 224, 255, 0.4);
+  transition: transform 0.3s ease;
+}
+
+.plubot-chronicles .chronicle-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 0 25px rgba(0, 224, 255, 0.7);
+}
+
+.plubot-chronicles .chronicle-card p {
+  font-style: italic;
+  color: #e0e0e0;
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
+}
+
+.plubot-chronicles .chronicle-card span {
+  color: #00e0ff;
+  font-family: "Inter", sans-serif;
+  font-size: 1rem;
+}
+
+/* ==========================================================================
+     Media Queries (Encapsuladas)
+     ========================================================================== */
+@media (max-width: 768px) {
+  .plubot-chronicles .chronicles-container {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .plubot-chronicles .chronicle-card p {
+    font-size: 1rem;
+  }
+
+  .plubot-chronicles .chronicle-card span {
+    font-size: 0.9rem;
+  }
+}

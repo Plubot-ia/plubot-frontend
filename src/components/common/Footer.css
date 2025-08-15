@@ -1,0 +1,741 @@
+/* ==========================================================================
+   Quantum Footer - Estilo Galáctico (Encapsulado)
+   ========================================================================== */
+.quantum-footer {
+  background: #0a0e2f url("../assets/img/stars-bg.png") repeat;
+  padding: 6rem 2rem 3rem;
+  color: #e0e0e0;
+  position: relative;
+  z-index: 10;
+  overflow: hidden;
+}
+
+.quantum-footer::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at center, rgba(0, 224, 255, 0.1) 0%, transparent 70%);
+  z-index: -1;
+  animation: quantum-footer-pulse 10s infinite ease-in-out;
+}
+
+@keyframes quantum-footer-pulse {
+  0%,
+  100% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+.quantum-footer .footer-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5rem;
+  max-width: 1600px;
+  width: 95%;
+  margin: 0 auto;
+  justify-content: space-around;
+  position: relative;
+}
+
+/* Conexiones de nodos */
+.quantum-footer .footer-container::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: url("../assets/img/nodes-lines.svg") no-repeat center;
+  opacity: 0.2;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* ==========================================================================
+   Footer Brand
+   ========================================================================== */
+.quantum-footer .footer-brand {
+  flex: 1;
+  min-width: 200px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  position: relative;
+}
+
+.quantum-footer .footer-logo {
+  width: 60px;
+  height: 77px;
+  margin-bottom: 0.5rem;
+  transition: transform 0.3s ease;
+}
+
+.quantum-footer .footer-logo:hover {
+  transform: scale(1.1) rotate(5deg);
+}
+
+.quantum-footer .footer-tagline {
+  font-family: "Inter", sans-serif;
+  font-size: 1.1rem;
+  color: #b0b0b0;
+  line-height: 1.4;
+}
+
+.quantum-footer .footer-tagline span {
+  display: block;
+}
+
+/* ==========================================================================
+   Footer Links, Social, and Legal
+   ========================================================================== */
+.quantum-footer .footer-links,
+.quantum-footer .footer-social,
+.quantum-footer .footer-legal {
+  flex: 1;
+  min-width: 200px;
+  text-align: center;
+  position: relative;
+}
+
+.quantum-footer .footer-links h3,
+.quantum-footer .footer-social h3,
+.quantum-footer .footer-legal h3,
+.quantum-footer .footer-title {
+  font-family: "Orbitron", sans-serif;
+  font-size: 1.4rem;
+  color: #00e0ff;
+  text-shadow: 0 0 10px rgba(0, 224, 255, 0.7);
+  margin-bottom: 1.5rem;
+  width: 100%;
+  text-align: center;
+  position: relative;
+}
+
+.quantum-footer .footer-links h3::after,
+.quantum-footer .footer-social h3::after,
+.quantum-footer .footer-legal h3::after,
+.quantum-footer .footer-title::after {
+  content: "";
+  display: block;
+  width: 50px;
+  height: 2px;
+  background: linear-gradient(90deg, #00e0ff, #ff00ff);
+  margin: 0.5rem auto;
+  opacity: 0.8;
+}
+
+.quantum-footer .footer-links-columns {
+  display: flex;
+  gap: 2rem;
+  justify-content: center;
+  width: 100%;
+}
+
+.quantum-footer .footer-links-column {
+  list-style: none;
+  padding: 0;
+  text-align: center;
+  flex: 1;
+  min-width: 120px;
+}
+
+.quantum-footer .footer-links-column li {
+  margin-bottom: 1.2rem;
+}
+
+.quantum-footer .footer-links a,
+.quantum-footer .footer-social a,
+.quantum-footer .footer-legal a {
+  font-family: "Inter", sans-serif;
+  color: #ffffff;
+  font-size: 1rem;
+  transition:
+    color 0.3s ease,
+    text-shadow 0.3s ease,
+    transform 0.3s ease;
+  position: relative;
+}
+
+.quantum-footer .footer-links a:hover,
+.quantum-footer .footer-social a:hover,
+.quantum-footer .footer-legal a:hover {
+  color: #00e0ff;
+  text-shadow: 0 0 10px rgba(0, 224, 255, 0.7);
+  transform: translateY(-2px);
+}
+
+.quantum-footer .footer-links a::before,
+.quantum-footer .footer-social a::before,
+.quantum-footer .footer-legal a::before {
+  content: "";
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 1px;
+  background: #ff00ff;
+  transition: width 0.3s ease;
+}
+
+.quantum-footer .footer-links a:hover::before,
+.quantum-footer .footer-social a:hover::before,
+.quantum-footer .footer-legal a:hover::before {
+  width: 100%;
+}
+
+.quantum-footer .social-icons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.quantum-footer .social-icons a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 224, 255, 0.3);
+  background: rgba(18, 18, 18, 0.5);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.quantum-footer .social-icons a::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 60px;
+  height: 60px;
+  background: radial-gradient(circle, rgba(0, 224, 255, 0.3), transparent);
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.quantum-footer .social-icons a:hover::before {
+  opacity: 1;
+}
+
+.quantum-footer .social-icons a::after {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(0, 224, 255, 0.3), transparent);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.quantum-footer .social-icons a:hover::after {
+  opacity: 1;
+}
+
+.quantum-footer .social-icons img {
+  width: 24px;
+  height: 24px;
+  transition:
+    filter 0.3s ease,
+    transform 0.3s ease;
+  filter: brightness(0) invert(1) sepia(1) hue-rotate(180deg) saturate(2);
+}
+
+.quantum-footer .social-icons a:hover img {
+  filter: brightness(0) invert(1) sepia(1) hue-rotate(120deg) saturate(3);
+  transform: scale(1.1);
+}
+
+.quantum-footer .footer-legal ul {
+  list-style: none;
+  padding: 0;
+}
+
+.quantum-footer .footer-legal li {
+  margin-bottom: 1.2rem;
+}
+
+/* ==========================================================================
+   Footer Subscribe Section
+   ========================================================================== */
+.quantum-footer .footer-subscribe-section,
+.quantum-footer .footer-builder-section {
+  max-width: 1600px;
+  width: 95%;
+  margin: 5rem auto 0;
+  text-align: center;
+  padding: 3rem 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  position: relative;
+  background: url("../assets/img/particles-bg.png") no-repeat center;
+  background-size: cover;
+}
+
+.quantum-footer .footer-subscribe-section::before,
+.quantum-footer .footer-builder-section::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle, rgba(0, 224, 255, 0.2), transparent);
+  opacity: 0.3;
+  z-index: -1;
+}
+
+.quantum-footer .footer-title {
+  font-family: "Orbitron", sans-serif;
+  font-size: 1.8rem;
+  color: #ffffff;
+  margin-bottom: 2rem;
+}
+
+.quantum-footer .footer-description {
+  font-family: "Inter", sans-serif;
+  font-size: 1.1rem;
+  color: #b0b0b0;
+  margin-bottom: 3rem;
+}
+
+.quantum-footer .subscribe-form {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 2rem;
+}
+
+.quantum-footer .footer-subscribe {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  margin-top: 1rem;
+}
+
+.quantum-footer .subscribe-input-wrapper {
+  position: relative;
+  background: #121212;
+  border-radius: 8px;
+  padding: 2px;
+  width: 300px;
+  box-shadow: 0 0 15px rgba(0, 224, 255, 0.5);
+  transition: box-shadow 0.3s ease;
+}
+
+.quantum-footer .subscribe-input-wrapper:hover {
+  box-shadow: 0 0 20px rgba(0, 224, 255, 0.7);
+}
+
+.quantum-footer .subscribe-input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: transparent;
+  border: none;
+  color: #00e0ff;
+  font-family: "Inter", sans-serif;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+}
+
+.quantum-footer .subscribe-input-wrapper::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 8px;
+  border: 1px solid #00e0ff;
+  pointer-events: none;
+  transition:
+    border-color 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+.quantum-footer .subscribe-input-wrapper:focus-within::after {
+  border-color: #ff00ff;
+  box-shadow: 0 0 10px rgba(255, 0, 255, 0.7);
+}
+
+.quantum-footer .subscribe-input::placeholder {
+  font-family: "Inter", sans-serif;
+  color: #66ccff;
+  font-style: normal;
+}
+
+.quantum-footer .subscribe-btn {
+  padding: 0.75rem 2rem;
+  background: linear-gradient(90deg, #00e0ff, #00c4d6);
+  color: #121212;
+  border: none;
+  border-radius: 50px;
+  font-family: "Orbitron", sans-serif;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 0 15px rgba(0, 224, 255, 0.7);
+}
+
+.quantum-footer .subscribe-btn:hover {
+  background: linear-gradient(90deg, #ff00ff, #e600e6);
+  color: #fff;
+  box-shadow: 0 0 20px rgba(255, 0, 255, 0.9);
+}
+
+.quantum-footer .subscribe-btn::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transition: left 0.5s ease;
+  z-index: 1;
+}
+
+.quantum-footer .subscribe-btn:hover::before {
+  left: 100%;
+}
+
+.quantum-footer .subscribe-btn .btn-text {
+  position: relative;
+  z-index: 2;
+}
+
+.quantum-footer .btn-loader {
+  width: 20px;
+  height: 20px;
+  border: 3px solid #fff;
+  border-top: 3px solid transparent;
+  border-radius: 50%;
+  animation: quantum-footer-spin 1s linear infinite;
+  margin-left: 0.5rem;
+}
+
+.quantum-footer .btn-loader.hidden {
+  display: none;
+}
+
+@keyframes quantum-footer-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ==========================================================================
+   Footer Flash Message
+   ========================================================================== */
+.quantum-footer .form-message {
+  position: fixed;
+  left: 50%;
+  bottom: 60px;
+  transform: translateX(-50%);
+  padding: 1rem 2rem;
+  border-radius: 50px;
+  font-family: "Roboto Mono", monospace;
+  font-size: 1rem;
+  color: #ffffff;
+  z-index: 1000;
+  min-width: 300px;
+  max-width: 90%;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 0 15px rgba(0, 255, 234, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  will-change: transform, opacity;
+}
+
+.quantum-footer .form-message.success {
+  border: 1px solid rgba(0, 255, 136, 0.5);
+  background: rgba(5, 5, 20, 0.7);
+}
+
+.quantum-footer .form-message.error {
+  border: 1px solid rgba(255, 0, 0, 0.5);
+  background: rgba(5, 5, 20, 0.7);
+}
+
+.quantum-footer .message-background {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(0, 255, 234, 0.08) 0%, rgba(255, 0, 255, 0.08) 100%);
+  opacity: 0.4;
+  z-index: -1;
+}
+
+.quantum-footer .message-circle {
+  position: absolute;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(0, 255, 234, 0.25) 0%, transparent 70%);
+  top: -30px;
+  left: -30px;
+  animation: pulse-circle 4s infinite ease-in-out;
+}
+
+.quantum-footer .message-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  justify-content: space-between;
+}
+
+.quantum-footer .message-content p {
+  margin: 0;
+  flex: 1;
+  text-align: left;
+}
+
+.quantum-footer .message-icon {
+  font-size: 1.4rem;
+  font-weight: bold;
+  color: #00ffea;
+  text-shadow: 0 0 10px rgba(0, 255, 234, 0.7);
+}
+
+.quantum-footer .form-message.error .message-icon {
+  color: #ff0000;
+  text-shadow: 0 0 10px rgba(255, 0, 0, 0.7);
+}
+
+/* ==========================================================================
+   Footer Bottom
+   ========================================================================== */
+.quantum-footer .footer-bottom {
+  max-width: 1600px;
+  width: 95%;
+  margin: 3rem auto 0;
+  text-align: center;
+  font-family: "Inter", sans-serif;
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.6);
+  padding-top: 1.5rem;
+  position: relative;
+}
+
+.quantum-footer .footer-bottom::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 100px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #00e0ff, transparent);
+  transform: translateX(-50%);
+}
+
+/* ==========================================================================
+   Media Queries
+   ========================================================================== */
+@media (max-width: 768px) {
+  .quantum-footer {
+    padding: 4rem 1.5rem 2rem;
+  }
+
+  .quantum-footer .footer-container {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 3rem;
+  }
+
+  .quantum-footer .footer-links-columns {
+    flex-direction: column;
+    gap: 2rem;
+  }
+
+  .quantum-footer .footer-subscribe-section,
+  .quantum-footer .footer-builder-section {
+    width: 100%;
+    padding: 2rem 0;
+  }
+
+  .quantum-footer .footer-subscribe {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .quantum-footer .subscribe-input-wrapper {
+    width: 100%;
+    max-width: 300px;
+  }
+
+  .quantum-footer .subscribe-btn {
+    width: 100%;
+    max-width: 200px;
+  }
+
+  .quantum-footer .social-icons a {
+    width: 36px;
+    height: 36px;
+  }
+
+  .quantum-footer .social-icons img {
+    width: 20px;
+    height: 20px;
+  }
+
+  .quantum-footer .form-message {
+    min-width: 250px;
+    padding: 0.8rem 1.5rem;
+    font-size: 0.9rem;
+  }
+
+  .quantum-footer .message-circle {
+    width: 50px;
+    height: 50px;
+    top: -25px;
+    left: -25px;
+  }
+
+  .quantum-footer .message-icon {
+    font-size: 1.2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .quantum-footer {
+    padding: 3rem 1rem 1.5rem;
+  }
+
+  .quantum-footer .footer-title {
+    font-size: 1.5rem;
+  }
+
+  .quantum-footer .footer-description {
+    font-size: 1rem;
+  }
+
+  .quantum-footer .subscribe-input-wrapper {
+    width: 100%;
+    max-width: 250px;
+  }
+
+  .quantum-footer .subscribe-btn {
+    padding: 0.6rem 1.5rem;
+    font-size: 0.85rem;
+  }
+
+  .quantum-footer .social-icons a {
+    width: 32px;
+    height: 32px;
+  }
+
+  .quantum-footer .social-icons img {
+    width: 18px;
+    height: 18px;
+  }
+
+  .quantum-footer .form-message {
+    min-width: 200px;
+    padding: 0.7rem 1.2rem;
+    font-size: 0.85rem;
+  }
+
+  .quantum-footer .message-circle {
+    width: 40px;
+    height: 40px;
+    top: -20px;
+    left: -20px;
+  }
+
+  .quantum-footer .message-icon {
+    font-size: 1rem;
+  }
+}
+
+.quantum-footer::after {
+  content: "";
+  position: absolute;
+  bottom: -60px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 1111px;
+  height: 200px;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(0, 224, 255, 0.2) 0%,
+    rgba(0, 224, 255, 0.1) 40%,
+    transparent 80%
+  );
+  z-index: 0;
+  pointer-events: none;
+  filter: blur(40px);
+}
+
+/* ==========================================================================
+   Flash Message Animation
+   ========================================================================== */
+@keyframes pulse-circle {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.3;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 0.5;
+  }
+}
+
+/* Estilos previos de Footer.css se mantienen, solo se agrega lo siguiente al final */
+
+.quantum-footer .opinion-link {
+  background: linear-gradient(to right, #00e0ff, #ff00ff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: 0 0 10px rgba(0, 224, 255, 0.5);
+  font-family: "Orbitron", sans-serif;
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-top: 1.5rem;
+  display: inline-block;
+  transition:
+    text-shadow 0.3s ease,
+    transform 0.3s ease;
+  position: relative;
+  text-decoration: none;
+}
+
+.quantum-footer .opinion-link:hover {
+  text-shadow:
+    0 0 15px rgba(0, 224, 255, 0.7),
+    0 0 20px rgba(255, 0, 255, 0.5);
+  transform: translateY(-2px);
+}
+
+.quantum-footer .opinion-link::after {
+  content: "";
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 1px;
+  background: linear-gradient(90deg, #00e0ff, #ff00ff);
+  transition: width 0.3s ease;
+}
+
+.quantum-footer .opinion-link:hover::after {
+  width: 100%;
+}

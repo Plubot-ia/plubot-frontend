@@ -1,0 +1,90 @@
+.react-flow__attribution {
+  display: none !important;
+}
+
+/* Estilos para el Modal de Recuperación Pluniverse */
+.pluniverse-recovery-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(10, 25, 40, 0.85); /* Azul oscuro translúcido del Pluniverse */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1050; /* Asegurar que esté por encima de otros elementos */
+  backdrop-filter: blur(5px);
+}
+
+.pluniverse-recovery-modal-content {
+  background: linear-gradient(145deg, #1a2a3a, #0a1a2a); /* Gradiente oscuro futurista */
+  padding: 30px;
+  border-radius: 15px;
+  border: 1px solid #00e0ff; /* Borde neón característico */
+  box-shadow:
+    0 0 25px rgba(0, 224, 255, 0.3),
+    0 0 10px rgba(0, 224, 255, 0.2) inset; /* Sombra y brillo neón */
+  color: #e0f0ff; /* Texto claro azulado */
+  width: 90%;
+  max-width: 550px;
+  text-align: center;
+  font-family: "Arial", sans-serif; /* O la fuente principal de Plubot */
+}
+
+.pluniverse-recovery-modal-content h2 {
+  color: #00e0ff; /* Título en color neón */
+  font-size: 1.8em;
+  margin-bottom: 20px;
+  text-shadow: 0 0 8px #00e0ff;
+}
+
+.pluniverse-recovery-modal-content p {
+  font-size: 1.1em;
+  line-height: 1.6;
+  margin-bottom: 25px;
+  color: #c0d0e0; /* Texto un poco más suave */
+}
+
+.pluniverse-recovery-modal-actions {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+.pluniverse-button {
+  padding: 12px 25px;
+  border-radius: 8px;
+  font-size: 1em;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: none;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.pluniverse-button.primary {
+  background-color: #00e0ff; /* Color neón principal */
+  color: #05101a;
+  box-shadow: 0 0 15px rgba(0, 224, 255, 0.5);
+}
+
+.pluniverse-button.primary:hover {
+  background-color: #33ffff;
+  box-shadow: 0 0 20px rgba(0, 224, 255, 0.8);
+  transform: translateY(-2px);
+}
+
+.pluniverse-button.secondary {
+  background-color: transparent;
+  color: #00e0ff;
+  border: 2px solid #00e0ff;
+}
+
+.pluniverse-button.secondary:hover {
+  background-color: rgba(0, 224, 255, 0.1);
+  color: #33ffff;
+  border-color: #33ffff;
+  transform: translateY(-2px);
+}

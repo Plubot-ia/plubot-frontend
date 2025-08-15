@@ -1,0 +1,107 @@
+/**
+ * ensure-node-visibility.css
+ * 
+ * SOLUCIÓN DEFINITIVA para nodos invisibles en ReactFlow
+ * Este archivo aplica reglas CSS con prioridad máxima para garantizar
+ * que todos los nodos sean visibles en el editor de flujos y completamente interactivos.
+ * 
+ * Versión 2.0 - Incorpora correcciones específicas para ReactFlow 11.x
+ */
+
+/* Reglas para el viewport */
+.react-flow__viewport {
+  transform-origin: 0 0 !important;
+}
+
+/* FORZAR visibilidad de nodos */
+.react-flow__node {
+  visibility: visible !important;
+  display: block !important;
+  opacity: 1 !important;
+  z-index: 5 !important;
+  pointer-events: all !important;
+  position: absolute !important;
+  /* ELIMINADO: Esta regla estaba sobrescribiendo las transformaciones de ReactFlow */
+  /* transform: translate(var(--translate-x, 0px), var(--translate-y, 0px)) !important; */
+  min-width: 150px !important; /* Garantizar tamaño mínimo */
+  min-height: 40px !important;
+  user-select: none !important; /* Facilitar arrastre */
+  touch-action: none !important; /* Mejorar interacción táctil */
+}
+
+/* Garantizar que el contenedor sea visible */
+.react-flow,
+.react-flow__container,
+.react-flow__renderer,
+.reactflow-wrapper {
+  overflow: visible !important;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* Permitir panning */
+.react-flow__pane {
+  cursor: grab !important;
+}
+
+/* Asegurar que los tipos de nodos específicos sean visibles */
+.message-node,
+.decision-node,
+.start-node,
+.end-node,
+.action-node,
+.option-node,
+.httpRequest-node,
+.power-node {
+  visibility: visible !important;
+  display: block !important;
+  opacity: 1 !important;
+  z-index: 10 !important; /* Prioridad extra */
+  /* ELIMINADO: transform: none !important; - Esta regla interfiere con ReactFlow */
+}
+
+/* Garantizar que los handles de conexión sean visibles e interactivos */
+.react-flow__handle {
+  visibility: visible !important;
+  display: block !important;
+  opacity: 1 !important;
+  pointer-events: all !important;
+  z-index: 15 !important; /* Prioridad mayor que los nodos */
+}
+
+/* Garantizar que las etiquetas y textos dentro de los nodos sean visibles */
+.node-label,
+.node-content,
+.node-title,
+.node-text,
+.message-content,
+.decision-content,
+.option-content {
+  visibility: visible !important;
+  display: block !important;
+  opacity: 1 !important;
+}
+
+/* Solucionar problemas con la capa de selección */
+.react-flow__nodesselection {
+  z-index: 4 !important;
+  pointer-events: none !important;
+}
+
+/* Asegurar que los edges siempre sean visibles */
+.react-flow__edge {
+  visibility: visible !important;
+  display: block !important;
+  opacity: 1 !important;
+}
+
+/* Prevenir que ReactFlow oculte nodos fuera del viewport */
+.react-flow__viewport {
+  overflow: visible !important;
+}
+
+/* Asegurar que el contenido interno de los nodos sea visible, EXCEPTO los tooltips */
+.react-flow__node *:not(.tooltip-content) {
+  visibility: visible !important;
+  opacity: 1 !important;
+}

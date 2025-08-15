@@ -1,0 +1,400 @@
+/* FlowEditor.css fusionado - Encapsulado para evitar problemas de scroll */
+
+/* Estilos del archivo original FlowEditor.css */
+.flow-editor-wrapper .ts-flow-editor-container {
+  width: 100%;
+  height: 100%;
+  overflow: visible; /* Restaurado para visibilidad completa */
+  position: relative;
+
+  /* Cambiado a visible para permitir scroll */
+  background-color: var(--background-color, #0d1117);
+  font-family: var(--font-family, "Inter", sans-serif);
+  display: flex;
+  flex-direction: column;
+}
+
+/* Contenedor aislado para el encabezado u00e9pico */
+.flow-editor-wrapper .epic-header-container {
+  position: relative;
+  z-index: 101;
+
+  isolation: isolate; /* Contiene las animaciones dentro del contenedor */
+  contain: layout style; /* Modificado para permitir que el contenido sea visible */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5); /* Sombra para separar visualmente */
+  clip-path: none; /* Eliminado para permitir que el encabezado sea visible */
+
+  flex-shrink: 0;
+}
+
+.flow-editor-wrapper .ts-flow-editor-wrapper {
+  flex: 1;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  /* CORRECCIÓN CRÍTICA: Forzar visible para que los nodos no se recorten */
+  height: auto; /* Cambiado desde 100vh para evitar problemas de scroll */
+  clip-path: none !important;
+}
+
+.flow-editor-wrapper .ts-flow-editor {
+  flex: 1;
+  position: relative;
+  background: transparent;
+}
+
+.flow-editor-wrapper .ts-flow-editor .ts-flow-error-banner {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #ff4d4f;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  z-index: 100;
+}
+
+.flow-editor-wrapper .ts-flow-editor .ts-flow-error-banner button {
+  margin-left: 10px;
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+}
+
+.flow-editor-wrapper .ts-zoom-controls {
+  position: absolute;
+  top: 4.5rem;
+  right: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  z-index: 100;
+}
+
+.flow-editor-wrapper .ts-zoom-controls .ts-zoom-button {
+  background: rgba(18, 18, 46, 0.7);
+  border: 1px solid var(--primary-color);
+  color: var(--text-color);
+  width: 26px;
+  height: 26px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  position: relative;
+  margin-bottom: 4px;
+}
+
+.flow-editor-wrapper .ts-zoom-controls .ts-zoom-button:hover {
+  background: rgba(0, 224, 255, 0.2);
+  box-shadow: var(--neon-shadow);
+  transform: translateY(-2px);
+}
+
+.flow-editor-wrapper .ts-zoom-controls .ts-zoom-button .button-tooltip {
+  position: absolute;
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  white-space: nowrap;
+  left: -100%;
+  top: 50%;
+  transform: translate(-100%, -50%);
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.2s ease;
+  pointer-events: none;
+  z-index: 101;
+}
+
+.flow-editor-wrapper .ts-zoom-controls .ts-zoom-button:hover .button-tooltip {
+  opacity: 1;
+  visibility: visible;
+  left: 0;
+  transform: translate(-110%, -50%);
+}
+
+.flow-editor-wrapper .ts-zoom-controls .ts-zoom-button .button-icon {
+  font-size: 16px;
+}
+
+.flow-editor-wrapper .ts-flow-editor .start-node,
+.flow-editor-wrapper .ts-flow-editor .end-node,
+.flow-editor-wrapper .ts-flow-editor .message-node,
+.flow-editor-wrapper .ts-flow-editor .decision-node,
+.flow-editor-wrapper .ts-flow-editor .action-node,
+.flow-editor-wrapper .ts-flow-editor .option-node {
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  font-family: "Arial", sans-serif;
+
+  position: relative;
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  will-change: transform; /* Optimizaciu00f3n para animaciones de arrastre */
+}
+
+.flow-editor-wrapper .ts-flow-editor .start-node {
+  min-width: 80px;
+  min-height: 40px;
+}
+
+.flow-editor-wrapper .ts-flow-editor .end-node {
+  min-width: 80px;
+  min-height: 40px;
+}
+
+.flow-editor-wrapper .ts-flow-editor .message-node {
+  min-width: 180px;
+  min-height: 80px;
+}
+
+.flow-editor-wrapper .ts-flow-editor .decision-node {
+  min-width: 180px;
+  min-height: 100px;
+}
+
+.flow-editor-wrapper .ts-flow-editor .action-node {
+  min-width: 150px;
+  min-height: 50px;
+}
+
+.flow-editor-wrapper .ts-flow-editor .option-node {
+  min-width: 120px;
+  min-height: 40px;
+}
+
+/* Controles del editor */
+.flow-editor-wrapper .flow-controls {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.flow-editor-wrapper .control-group {
+  display: flex;
+  background: rgba(22, 27, 34, 0.9);
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+
+  border: 1px solid #30363d;
+}
+
+.flow-editor-wrapper .control-group button {
+  background: transparent;
+  border: none;
+  color: #c9d1d9;
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-right: 1px solid #30363d;
+}
+
+.flow-editor-wrapper .control-group button:last-child {
+  border-right: none;
+}
+
+.flow-editor-wrapper .control-group button:hover {
+  background: rgba(240, 246, 252, 0.1);
+  color: #58a6ff;
+}
+
+.flow-editor-wrapper .control-group button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Botu00f3n de modo ultra rendimiento */
+.flow-editor-wrapper .ultra-mode-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+  color: #8b949e;
+}
+
+.flow-editor-wrapper .ultra-mode-btn.active {
+  color: #58a6ff;
+}
+
+.flow-editor-wrapper .ultra-mode-btn .fa-bolt {
+  color: #f0b72f;
+}
+
+.flow-editor-wrapper .ultra-mode-btn.active .fa-bolt {
+  color: #ffd33d;
+  text-shadow: 0 0 8px rgba(240, 179, 47, 0.6);
+}
+
+/* Asegurar que los nodos sean visibles */
+.flow-editor-wrapper .react-flow__node {
+  background: #161b22;
+  border: 1px solid #30363d;
+  border-radius: 4px;
+  color: #c9d1d9;
+  padding: 10px;
+  font-size: 12px;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.flow-editor-wrapper .react-flow__handle {
+  background: #58a6ff;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+/* .flow-editor-wrapper .react-flow__handle-top {
+  top: -4px;
+} */ /* Comentado para diagnóstico de DecisionNode handles */
+
+/* .flow-editor-wrapper .react-flow__handle-bottom {
+  bottom: -4px; 
+} */ /* Comentado para diagnóstico de DecisionNode handles */
+
+.flow-editor-wrapper .react-flow__handle-left {
+  left: -4px;
+}
+
+.flow-editor-wrapper .react-flow__handle-right {
+  right: -4px;
+}
+
+.flow-editor-wrapper .ts-flow-editor .start-node.editing,
+.flow-editor-wrapper .ts-flow-editor .end-node.editing,
+.flow-editor-wrapper .ts-flow-editor .message-node.editing,
+.flow-editor-wrapper .ts-flow-editor .decision-node.editing,
+.flow-editor-wrapper .ts-flow-editor .action-node.editing,
+.flow-editor-wrapper .ts-flow-editor .option-node.editing {
+  border: 2px dashed #00e0ff;
+}
+
+.flow-editor-wrapper .ts-flow-editor .resize-handle {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 12px;
+  height: 12px;
+  background: #00e0ff;
+  cursor: nwse-resize;
+  border-radius: 0 0 8px 0;
+  z-index: 10;
+}
+
+/* Estilos especu00edficos para cada tipo de nodo */
+.flow-editor-wrapper .ts-flow-editor .start-node {
+  background: linear-gradient(135deg, #4facfe, #00f2fe);
+  color: white;
+  border: 1px solid #4facfe;
+}
+
+.flow-editor-wrapper .ts-flow-editor .end-node {
+  background: linear-gradient(135deg, #ff6b6b, #ff8787);
+  color: white;
+  border: 1px solid #ff6b6b;
+}
+
+.flow-editor-wrapper .ts-flow-editor .message-node {
+  background: linear-gradient(135deg, #54d7a3, #7de5b9);
+  color: white;
+  border: 1px solid #54d7a3;
+}
+
+.flow-editor-wrapper .ts-flow-editor .decision-node {
+  background: linear-gradient(135deg, #feca57, #ffd07b);
+  color: white;
+  border: 1px solid #feca57;
+}
+
+.flow-editor-wrapper .ts-flow-editor .action-node {
+  background: linear-gradient(135deg, #a55eea, #c17cee);
+  color: white;
+  border: 1px solid #a55eea;
+}
+
+.flow-editor-wrapper .ts-flow-editor .option-node {
+  background: linear-gradient(135deg, #48dbfb, #0abde3);
+  color: white;
+  border: 1px solid #48dbfb;
+}
+
+/* Estilos especu00edficos para el componente FlowEditor modularizado */
+
+/* Contenedor principal del editor */
+.flow-editor-wrapper {
+  width: 100%;
+  height: 100vh; /* Ocupar toda la altura de la ventana */
+  overflow: visible; /* Restaurado para visibilidad completa */
+
+  /* Cambiado desde 100vh para permitir scroll */
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  /* Cambiado a visible para permitir scroll */
+}
+
+/* Contenedor del editor de flujo */
+.flow-editor-container {
+  flex: 1;
+  position: relative;
+  display: flex;
+  /* Cambiado a visible para permitir scroll */
+}
+
+/* Estilos para asegurar que los controles de zoom se muestren correctamente */
+.flow-editor-wrapper .react-flow__controls {
+  bottom: 20px;
+  right: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 5;
+}
+
+/* Estilos para asegurar que el mini mapa se muestre correctamente */
+.flow-editor-wrapper .react-flow__panel.react-flow__panel-bottom-left {
+  margin: 0;
+  padding: 0;
+  z-index: 10;
+}
+
+/* Estilos para el menu00fa contextual */
+.flow-editor-wrapper .context-menu-container {
+  position: absolute;
+  z-index: 100;
+}
+
+/* Estilos para el fondo personalizado */
+.flow-editor-wrapper .background-scene-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+
+  z-index: 0;
+}
+
+/* Estilos para el cuerpo del documento - restaurar overflow */
+body {
+  margin: 0;
+  padding: 0;
+  overflow: hidden; /* Prevenir scroll a nivel de body */
+  height: auto !important;
+}

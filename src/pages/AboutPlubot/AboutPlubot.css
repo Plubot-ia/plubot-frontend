@@ -1,0 +1,231 @@
+.about-plubot-container {
+  padding: 6rem 1.5rem;
+  color: #ffffff;
+  font-family: "Inter", sans-serif;
+  background: linear-gradient(135deg, #050714 0%, #0a0a1a 100%);
+  min-height: 100vh;
+  position: relative;
+  overflow: hidden;
+}
+
+.about-plubot-container::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background:
+    radial-gradient(circle at 20% 30%, rgba(0, 224, 255, 0.12) 0%, transparent 70%),
+    radial-gradient(circle at 80% 70%, rgba(255, 0, 255, 0.08) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+.about-plubot-container .about-hero {
+  display: flex;
+  gap: 4rem;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 1200px;
+  margin: auto;
+  flex-wrap: wrap;
+  position: relative;
+}
+
+.about-plubot-container .image-container {
+  position: relative;
+  width: 100%;
+  max-width: 500px;
+  will-change: transform;
+}
+
+.about-plubot-container .about-image {
+  width: 100%;
+  border-radius: 16px;
+  box-shadow: 0 0 30px rgba(0, 224, 255, 0.3);
+  transition: transform 0.3s ease;
+  filter: contrast(1.1) brightness(1.05);
+  will-change: transform;
+}
+
+.about-plubot-container .image-glow {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  border-radius: 16px;
+  background: radial-gradient(circle at center, rgba(0, 224, 255, 0.4) 0%, transparent 70%);
+  opacity: 0;
+  transition:
+    opacity 0.5s ease,
+    transform 0.3s ease;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  filter: blur(20px);
+}
+
+.about-plubot-container .image-container:hover .image-glow {
+  opacity: 0.8;
+  transform: scale(1.1);
+}
+
+.about-plubot-container .image-container:hover .about-image {
+  transform: scale(1.02);
+}
+
+.about-plubot-container .about-text {
+  flex: 1;
+  max-width: 600px;
+  z-index: 2;
+}
+
+.about-plubot-container .about-text h1 {
+  font-size: 3.2rem;
+  font-family: "Orbitron", sans-serif;
+  color: #ffffff;
+  margin-bottom: 2rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+.about-plubot-container .text-gradient {
+  background: linear-gradient(to right, #00e0ff, #ff00ff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: 0 0 15px rgba(0, 224, 255, 0.4);
+  position: relative;
+  display: inline-block;
+}
+
+.about-plubot-container .about-text p {
+  font-size: 1.2rem;
+  margin-bottom: 1.8rem;
+  color: #e0e0e0;
+  line-height: 1.6;
+  font-weight: 400;
+}
+
+.about-plubot-container .about-text p:last-of-type {
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.about-plubot-container .chat-byte-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.8rem;
+  background: linear-gradient(90deg, #00e0ff 0%, #ff00ff 150%);
+  color: #ffffff;
+  padding: 1rem 2rem;
+  border-radius: 8px;
+  font-family: "Orbitron", sans-serif;
+  font-size: 1.1rem;
+  font-weight: bold;
+  text-decoration: none;
+  border: none;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 0 15px rgba(0, 224, 255, 0.6);
+  transition: all 0.3s ease;
+  margin-top: 1rem;
+  z-index: 2;
+}
+
+.about-plubot-container .chat-byte-btn::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, #ff00ff 0%, #00e0ff 150%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.about-plubot-container .chat-byte-btn:hover {
+  box-shadow: 0 0 25px rgba(255, 0, 255, 0.7);
+  transform: translateY(-2px);
+}
+
+.about-plubot-container .chat-byte-btn:hover::before {
+  opacity: 1;
+}
+
+.about-plubot-container .btn-text,
+.about-plubot-container .btn-icon {
+  position: relative;
+  z-index: 2;
+}
+
+.about-plubot-container .btn-icon {
+  font-size: 1.3rem;
+  transition: transform 0.3s ease;
+}
+
+.about-plubot-container .chat-byte-btn:hover .btn-icon {
+  transform: translateX(4px);
+}
+
+@media (max-width: 1024px) {
+  .about-plubot-container .about-hero {
+    flex-direction: column;
+    gap: 3rem;
+    text-align: center;
+  }
+
+  .about-plubot-container .image-container {
+    margin: 0 auto;
+  }
+
+  .about-plubot-container .about-text h1 {
+    font-size: 2.8rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .about-plubot-container {
+    padding: 4rem 1rem;
+  }
+
+  .about-plubot-container .about-text h1 {
+    font-size: 2.4rem;
+  }
+
+  .about-plubot-container .about-text p {
+    font-size: 1.1rem;
+  }
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.about-plubot-container .about-image,
+.about-plubot-container .image-container,
+.about-plubot-container .about-text {
+  will-change: transform, opacity;
+}
+
+@keyframes neonPulse {
+  0% {
+    box-shadow: 0 0 10px rgba(0, 224, 255, 0.6);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(255, 0, 255, 0.7);
+  }
+  100% {
+    box-shadow: 0 0 10px rgba(0, 224, 255, 0.6);
+  }
+}

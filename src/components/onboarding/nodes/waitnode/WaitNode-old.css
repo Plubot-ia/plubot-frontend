@@ -1,0 +1,426 @@
+/**
+ * @file WaitNode.css
+ * @description Elite styles for WaitNode - Minimalist & Professional
+ * @version 3.0.0
+ */
+
+/* CSS Variables - Elite Design System */
+:root {
+  --wait-node-bg: #ffffff;
+  --wait-node-border: #e5e7eb;
+  --wait-node-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  --wait-node-shadow-hover: 0 4px 12px rgba(0, 0, 0, 0.15);
+  --wait-node-primary: #6366f1;
+  --wait-node-primary-dark: #4f46e5;
+  --wait-node-text: #1f2937;
+  --wait-node-text-secondary: #6b7280;
+  --wait-node-radius: 8px;
+  --wait-node-transition: all 0.2s ease;
+}
+
+/* Base Node Container */
+.wait-node {
+  background: var(--wait-node-bg);
+  border: 1px solid var(--wait-node-border);
+  border-radius: var(--wait-node-radius);
+  box-shadow: var(--wait-node-shadow);
+  transition: var(--wait-node-transition);
+  position: relative;
+  cursor: pointer;
+  user-select: none;
+}
+
+/* Selected State */
+.wait-node.selected {
+  box-shadow: 0 0 0 2px var(--wait-node-primary);
+}
+
+/* Icon Container */
+.wait-node-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background: linear-gradient(135deg, var(--wait-node-primary) 0%, var(--wait-node-primary-dark) 100%);
+  border-radius: 8px;
+  color: white;
+  flex-shrink: 0;
+}
+
+/* Info Container */
+.wait-node-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.node-icon {
+  font-size: 18px;
+  animation: tick 2s infinite;
+}
+
+/* Dark mode support (if needed) */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --wait-node-bg: #1f2937;
+    --wait-node-border: #374151;
+    --wait-node-text: #f3f4f6;
+    --wait-node-text-secondary: #9ca3af;
+  }
+}
+
+@keyframes tick {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(10deg); }
+  75% { transform: rotate(-10deg); }
+}
+
+/* Node Title */
+.wait-node-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--wait-node-text);
+  margin-bottom: 2px;
+}
+
+/* Node Description */
+.wait-node-description {
+  font-size: 12px;
+  color: var(--wait-node-text-secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Expanded State - Editing Mode */
+.wait-node-expanded {
+  min-width: 420px;
+  max-width: 520px;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  overflow: hidden;
+}
+
+/* Header for Expanded Mode */
+.wait-node-expanded .wait-node-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background: linear-gradient(135deg, var(--wait-node-primary) 0%, var(--wait-node-primary-dark) 100%);
+  color: white;
+  border-radius: var(--wait-node-radius) var(--wait-node-radius) 0 0;
+}
+
+.wait-node-header .header-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.wait-node-header .header-icon {
+  width: 16px;
+  height: 16px;
+}
+
+.wait-node-header .close-button {
+  background: transparent;
+  border: none;
+  color: white;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: background 0.2s;
+}
+
+.wait-node-header .close-button:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* Collapsed State - Default */
+.wait-node-collapsed {
+  min-width: 220px;
+  max-width: 280px;
+  padding: 0;
+}
+
+.wait-node-collapsed:hover {
+  box-shadow: var(--wait-node-shadow-hover);
+  transform: translateY(-1px);
+}
+
+/* Content Container - Collapsed */
+.wait-node-content-collapsed {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  min-height: 56px;
+}
+
+/* Progress Container */
+.progress-container {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+/* React Flow Handles - Elite Style */
+.wait-node .react-flow__handle {
+  width: 14px;
+  height: 14px;
+  background: white;
+  border: 2px solid var(--wait-node-primary);
+  border-radius: 50%;
+  cursor: crosshair;
+  transition: all 0.2s;
+  z-index: 1001;
+}
+
+.wait-node .react-flow__handle:hover {
+  transform: scale(1.2);
+  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+}
+
+/* Handle positioning - half inside, half outside */
+.wait-node-handle-target {
+  left: -7px !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+}
+
+.wait-node-handle-source {
+  right: -7px !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+}
+
+/* Content for Expanded Mode */
+.wait-node-expanded .wait-node-content {
+  padding: 0;
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Prevent drag on interactive elements */
+.wait-node-expanded input,
+.wait-node-expanded select,
+.wait-node-expanded textarea,
+.wait-node-expanded button {
+  -webkit-user-select: auto;
+  -moz-user-select: auto;
+  -ms-user-select: auto;
+  user-select: auto;
+  pointer-events: auto !important;
+}
+
+/* Ensure handles are visible in expanded mode */
+.wait-node-expanded .react-flow__handle {
+  opacity: 1 !important;
+  pointer-events: all !important;
+}
+
+/* Invalid Node */
+.wait-node--invalid {
+  border-color: #ef4444;
+  box-shadow: 0 0 0 1px rgba(239, 68, 68, 0.2);
+}
+
+/* Preview Section */
+.preview-section {
+  margin-top: 8px;
+  padding: 12px;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border-radius: 8px;
+}
+
+.preview-section label {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  color: #6B7280;
+  margin-bottom: 8px;
+}
+
+.preview-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px;
+  background: white;
+  border: 1px solid #E5E7EB;
+  border-radius: 6px;
+}
+
+.preview-icon {
+  font-size: 24px;
+}
+
+.preview-text {
+  flex: 1;
+  font-size: 13px;
+  font-weight: 500;
+  color: #111827;
+}
+
+.preview-ms {
+  font-size: 11px;
+  color: #6B7280;
+}
+
+.preview.form-row {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 12px;
+}
+
+/* Error Message */
+.error-message {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px;
+  margin-top: 8px;
+  background: #FEE2E2;
+  border: 1px solid #FECACA;
+  border-radius: 6px;
+  color: #991B1B;
+  font-size: 12px;
+}
+
+.error-icon {
+  font-size: 14px;
+}
+
+/* Progress Preview */
+.progress-preview {
+  margin-top: 12px;
+  padding: 12px;
+  background: #f9fafb;
+  border-radius: 8px;
+}
+
+.progress-preview label {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  color: #6B7280;
+  margin-bottom: 6px;
+}
+
+.progress-bar-container {
+  height: 8px;
+  background: #E5E7EB;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #667eea, #764ba2);
+  animation: progressAnimation linear forwards;
+}
+
+@keyframes progressAnimation {
+  from { width: 0%; }
+  to { width: 100%; }
+}
+
+.progress-hint {
+  margin-top: 4px;
+  font-size: 10px;
+  color: #9CA3AF;
+  font-style: italic;
+}
+
+/* Config Footer */
+.wait-footer {
+  display: flex;
+  gap: 16px;
+  padding: 16px;
+  background: linear-gradient(to bottom, rgba(102, 126, 234, 0.05), rgba(102, 126, 234, 0.1));
+  border-radius: 0 0 var(--wait-node-border-radius) var(--wait-node-border-radius);
+  border-top: 1px solid rgba(102, 126, 234, 0.2);
+  min-height: 56px;
+  align-items: center;
+}
+
+.config-footer {
+  padding: 16px 20px;
+  background: linear-gradient(to top, #ffffff, #f9fafb);
+  border-top: 1px solid var(--wait-node-border);
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  flex-shrink: 0;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.btn-cancel,
+.btn-save {
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-cancel {
+  background: white;
+  color: #6B7280;
+}
+
+.btn-cancel:hover {
+  background: #F3F4F6;
+}
+
+.btn-save {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  color: white;
+  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);
+}
+
+.btn-save:hover:not(:disabled) {
+  background: linear-gradient(135deg, #059669, #047857);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+}
+
+.btn-save:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Ultra Mode Optimizations */
+.wait-node.ultra-mode {
+  animation: none;
+}
+
+.wait-node.ultra-mode * {
+  animation-duration: 0s !important;
+  transition-duration: 0s !important;
+}

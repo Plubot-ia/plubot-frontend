@@ -1,0 +1,291 @@
+:root {
+  --ainodepro-bg: #282c34;
+  --ainodepro-bg-light: #3a3f4b;
+  --ainodepro-border: #4f5666;
+  --ainodepro-shadow: rgba(0, 0, 0, 0.3);
+  --ainodepro-header-bg: #323842;
+  --ainodepro-text: #e6e6e6;
+  --ainodepro-text-secondary: #a0a8b5;
+  --ainodepro-accent: #61afef;
+  --ainodepro-accent-hover: #7bc3ff;
+  --ainodepro-slider-track: #4f5666;
+  --ainodepro-slider-thumb: #61afef;
+  --ainodepro-error: #e06c75;
+  --ainodepro-success: #98c379;
+  --ainodepro-transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.ai-node-pro {
+  background-color: var(--ainodepro-bg);
+  border: 1px solid var(--ainodepro-border);
+  border-radius: 10px;
+  width: 300px;
+  box-shadow: 0 5px 15px var(--ainodepro-shadow);
+  transition: var(--ainodepro-transition);
+  font-family:
+    "Inter",
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    Helvetica,
+    Arial,
+    sans-serif;
+  color: var(--ainodepro-text);
+  box-sizing: border-box;
+}
+
+.ai-node-pro.selected {
+  border-color: var(--ainodepro-accent);
+  box-shadow:
+    0 0 0 2px var(--ainodepro-accent),
+    0 8px 20px rgba(97, 175, 239, 0.25);
+}
+
+/* --- Handles --- */
+.ai-node-pro .react-flow__handle.ainodepro-handle {
+  width: 15px;
+  height: 15px;
+  background-color: rgb(59, 130, 246);
+  border: 2px solid rgb(255, 255, 255);
+  border-radius: 50%;
+  cursor: pointer !important;
+  box-shadow: rgba(0, 0, 0, 0.1) 0px 1px 3px 0px;
+  filter: brightness(1.2);
+  transition:
+    background 0.3s ease,
+    transform 0.2s ease;
+  z-index: 10;
+}
+
+.ai-node-pro .react-flow__handle.ainodepro-handle:hover {
+  transform: scale(1.1);
+  background-color: var(--start-node-handle-hover, #00aaff);
+}
+
+/* --- Header --- */
+.ainodepro-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 14px;
+  background-color: var(--ainodepro-header-bg);
+  border-top-left-radius: 9px;
+  border-top-right-radius: 9px;
+  cursor: pointer;
+  border-bottom: 1px solid var(--ainodepro-border);
+}
+
+.ai-node-pro.collapsed .ainodepro-header {
+  border-bottom: none;
+}
+
+.ainodepro-header-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 600;
+}
+
+.ainodepro-header-title .ainodepro-icon {
+  color: var(--ainodepro-accent);
+}
+
+.ainodepro-header-title h3 {
+  margin: 0;
+  font-size: 15px;
+}
+
+.ainodepro-header-controls {
+  color: var(--ainodepro-text-secondary);
+}
+
+/* --- Content --- */
+.ainodepro-content {
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  overflow: hidden;
+}
+
+.ainodepro-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.ainodepro-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ainodepro-text-secondary);
+}
+
+.ainodepro-textarea {
+  width: 100%;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid var(--ainodepro-border);
+  background-color: var(--ainodepro-bg-light);
+  color: var(--ainodepro-text);
+  font-size: 14px;
+  resize: none;
+  overflow: hidden; /* Ocultar el scrollbar para la auto-expansión */
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s,
+    height 0.1s ease-out;
+  box-sizing: border-box;
+  min-height: 40px; /* Altura mínima */
+}
+
+.ainodepro-textarea:focus {
+  outline: none;
+  border-color: var(--ainodepro-accent);
+  box-shadow: 0 0 0 2px rgba(97, 175, 239, 0.3);
+}
+
+/* --- Sliders --- */
+.ainodepro-sliders {
+  flex-direction: column;
+  gap: 16px;
+}
+
+.ainodepro-slider-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ainodepro-slider-container .ainodepro-label {
+  font-size: 12px;
+}
+
+.ainodepro-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 8px;
+  background: var(--ainodepro-slider-track);
+  border-radius: 4px;
+  outline: none;
+  transition: opacity 0.2s;
+  cursor: pointer;
+}
+
+.ainodepro-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  background: var(--ainodepro-slider-thumb);
+  border-radius: 50%;
+  cursor: pointer;
+  border: 3px solid var(--ainodepro-bg);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+  transition: transform 0.2s ease;
+}
+
+.ainodepro-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.1);
+}
+
+.ainodepro-slider::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  background: var(--ainodepro-slider-thumb);
+  border-radius: 50%;
+  cursor: pointer;
+  border: 3px solid var(--ainodepro-bg);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+}
+
+/* --- Footer & Button --- */
+.ainodepro-footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 8px;
+}
+
+.ainodepro-execute-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  background-color: var(--ainodepro-accent);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--ainodepro-transition);
+}
+
+.ainodepro-execute-btn:hover:not(:disabled) {
+  background-color: var(--ainodepro-accent-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(97, 175, 239, 0.2);
+}
+
+.ainodepro-execute-btn:disabled {
+  background-color: #4f5666;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+/* --- Status & Collapsed --- */
+.ainodepro-status,
+.ainodepro-collapsed-summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px;
+  border-radius: 6px;
+  font-size: 13px;
+}
+
+.ainodepro-status.error {
+  background-color: rgba(224, 108, 117, 0.15);
+  color: var(--ainodepro-error);
+}
+
+.ainodepro-status.success {
+  background-color: rgba(152, 195, 121, 0.1);
+  color: var(--ainodepro-success);
+}
+
+.ainodepro-status p {
+  margin: 0;
+  word-break: break-word;
+}
+
+.ainodepro-collapsed-summary {
+  padding: 10px 14px;
+  color: var(--ainodepro-text-secondary);
+}
+
+.ainodepro-collapsed-summary p {
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* --- Animations --- */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.spin {
+  animation: spin 1s linear infinite;
+}

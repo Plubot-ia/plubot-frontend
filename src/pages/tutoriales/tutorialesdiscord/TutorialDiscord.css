@@ -1,0 +1,252 @@
+/* TutorialDiscord.css - Cyber-Tech Moderno Redesign */
+
+/* Variables de color para fácil mantenimiento y consistencia */
+:root {
+  --tutorial-bg: #0a0f1a; /* Azul oscuro profundo */
+  --tutorial-card-bg: #101a2b; /* Azul ligeramente más claro para tarjetas */
+  --tutorial-text-primary: #cdd5e0; /* Gris claro para texto principal */
+  --tutorial-text-secondary: #a0aec0; /* Gris medio para texto secundario */
+  --tutorial-accent-cyan: #00e0ff;
+  --tutorial-accent-magenta: #ff00ff;
+  --tutorial-accent-yellow: #ffd700; /* Amarillo neón para alertas */
+  --tutorial-border-color: rgba(0, 224, 255, 0.2);
+  --tutorial-header-font: "Orbitron", sans-serif; /* O la fuente cyber que uses */
+  --tutorial-body-font: "Inter", sans-serif; /* O una fuente legible */
+}
+
+.tutorial-discord-container {
+  padding-top: 90px; /* 80px for header height + 10px margin */
+  padding-left: 20px; /* Outer padding for content against screen edges */
+  padding-right: 20px; /* Outer padding for content against screen edges */
+  padding-bottom: 40px; /* Espacio al final */
+  box-sizing: border-box; /* Ensures padding is included in width calculation */
+  width: 100%; /* Make container full-width */
+  background-color: #0a0f1a; /* Predominantly dark background */
+  background-image:
+    radial-gradient(circle at top right, rgba(255, 0, 255, 0.12) 0%, transparent 50%),
+    radial-gradient(circle at bottom left, rgba(255, 0, 255, 0.12) 0%, transparent 50%);
+  background-repeat: no-repeat;
+  background-attachment: fixed; /* Enhances depth effect */
+  color: var(--tutorial-text-primary);
+  font-family: var(--tutorial-body-font);
+  line-height: 1.7;
+  min-height: calc(
+    100vh - 80px
+  ); /* Asegurar que ocupe al menos la altura de la ventana menos el header */
+}
+
+/* Constrain and center direct content blocks within the full-width container */
+.tutorial-discord-container > h1,
+.tutorial-discord-container > p:first-of-type, /* Target only the first intro paragraph if needed */
+.tutorial-discord-container > section,
+.tutorial-discord-container > .tutorial-footer {
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.tutorial-discord-container h1 {
+  font-family: var(--tutorial-header-font);
+  color: var(--tutorial-accent-cyan);
+  text-align: center;
+  font-size: 2.5em; /* Más grande */
+  margin-top: 30px; /* Espacio después del padding del header */
+  margin-bottom: 40px;
+  text-shadow:
+    0 0 8px var(--tutorial-accent-cyan),
+    0 0 12px rgba(0, 224, 255, 0.5);
+  letter-spacing: 1px;
+}
+
+/* If there are other direct p children that should not be centered, adjust selector above or add specific classes */
+
+.tutorial-discord-container section {
+  background-color: rgba(
+    16,
+    26,
+    43,
+    0.75
+  ); /* Dark, slightly translucent card background from var(--tutorial-card-bg) with alpha */
+  border: 1px solid rgba(255, 0, 255, 0.2); /* More subtle magenta border */
+  border-radius: 8px;
+  padding: 25px;
+  margin-bottom: 30px;
+  box-shadow: 0 0 15px rgba(255, 0, 255, 0.08); /* Very subtle magenta glow */
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease,
+    border-color 0.3s ease;
+}
+
+.tutorial-discord-container section:hover {
+  transform: translateY(-3px);
+  border-color: rgba(255, 0, 255, 0.35); /* Slightly brighter magenta border on hover */
+  box-shadow: 0 0 20px rgba(255, 0, 255, 0.15); /* Enhanced subtle magenta glow on hover */
+}
+
+.tutorial-discord-container h2 {
+  font-family: var(--tutorial-header-font);
+  color: var(--tutorial-accent-magenta);
+  font-size: 1.8em;
+  margin-top: 0; /* Quitar margen superior si está dentro de section */
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid var(--tutorial-accent-magenta);
+  text-shadow: 0 0 5px var(--tutorial-accent-magenta);
+}
+
+.tutorial-discord-container p,
+.tutorial-discord-container li {
+  margin-bottom: 12px;
+  font-size: 1.05em; /* Ligeramente más grande para legibilidad */
+  color: var(--tutorial-text-secondary);
+}
+
+.tutorial-discord-container strong {
+  color: var(--tutorial-text-primary);
+  font-weight: 600; /* Un poco más de peso */
+}
+
+.tutorial-discord-container em {
+  color: var(--tutorial-accent-cyan);
+  font-style: normal; /* Quitar itálica si se prefiere color para énfasis */
+  text-shadow: 0 0 3px var(--tutorial-accent-cyan);
+}
+
+.tutorial-discord-container p strong em, /* Casos especiales de anidamiento */
+.tutorial-discord-container li strong em {
+  color: var(--tutorial-accent-yellow);
+  text-shadow: 0 0 4px var(--tutorial-accent-yellow);
+}
+
+/* Estilo para la advertencia del token */
+.tutorial-discord-container section p:has(strong > em) {
+  /* Si el p contiene '¡Este token es secreto!' */
+  background-color: rgba(255, 215, 0, 0.05); /* Fondo amarillo muy sutil */
+  border-left: 4px solid var(--tutorial-accent-yellow);
+  padding: 10px 15px;
+  margin-left: -15px; /* Alinear con el padding de la sección */
+  margin-right: -15px;
+  border-radius: 4px;
+}
+
+.tutorial-discord-container a {
+  color: var(--tutorial-accent-cyan);
+  text-decoration: none;
+  font-weight: 500;
+  transition:
+    color 0.3s ease,
+    text-shadow 0.3s ease;
+}
+
+.tutorial-discord-container a:hover {
+  color: #80f8ff; /* Cian más claro */
+  text-decoration: none;
+  text-shadow: 0 0 5px var(--tutorial-accent-cyan);
+}
+
+.tutorial-discord-container ul {
+  list-style: none; /* Quitar bullets por defecto */
+  padding-left: 0;
+}
+
+.tutorial-discord-container ul li {
+  padding-left: 25px; /* Espacio para el marcador personalizado */
+  position: relative;
+}
+
+.tutorial-discord-container ul li::before {
+  content: "»"; /* Marcador cyber */
+  position: absolute;
+  left: 0;
+  top: 0;
+  color: var(--tutorial-accent-magenta);
+  font-weight: bold;
+  font-size: 1.2em;
+  text-shadow: 0 0 3px var(--tutorial-accent-magenta);
+}
+
+.tutorial-discord-container .tutorial-footer {
+  margin-top: 40px;
+  text-align: center;
+  padding: 20px;
+  border-top: 1px solid var(--tutorial-border-color);
+}
+
+/* Botón 'Volver a Integraciones' - Estilo Cyber-Button */
+.cyber-link-button.tutorial-link-back {
+  display: inline-block;
+  padding: 8px 18px; /* Reducido */
+  margin-top: 10px;
+  margin-bottom: 20px;
+  font-family: var(--tutorial-header-font);
+  font-size: 0.9em;
+  color: var(--tutorial-accent-cyan);
+  background: linear-gradient(45deg, #0a1128, #101a2b);
+  border: 2px solid var(--tutorial-accent-cyan);
+  border-radius: 5px;
+  text-align: center;
+  text-decoration: none;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow:
+    0 0 8px var(--tutorial-accent-cyan),
+    inset 0 0 5px rgba(0, 224, 255, 0.3);
+}
+
+.cyber-link-button.tutorial-link-back:hover {
+  background: var(--tutorial-accent-cyan);
+  color: var(--tutorial-bg);
+  box-shadow:
+    0 0 20px var(--tutorial-accent-cyan),
+    inset 0 0 10px rgba(10, 15, 26, 0.5);
+  transform: translateY(-2px);
+}
+
+/* Media Queries para responsividad (opcional, pero recomendado) */
+@media (max-width: 768px) {
+  .tutorial-discord-container > h1,
+  .tutorial-discord-container > p:first-of-type,
+  .tutorial-discord-container > section,
+  .tutorial-discord-container > .tutorial-footer {
+    max-width: 100%; /* Allow content to be full width within padding on smaller screens */
+  }
+
+  .tutorial-discord-container h1 {
+    font-size: 2em;
+  }
+  .tutorial-discord-container h2 {
+    font-size: 1.5em;
+  }
+  .tutorial-discord-container section {
+    padding: 20px;
+  }
+  .cyber-link-button.tutorial-link-back {
+    padding: 6px 15px;
+    font-size: 0.8em;
+  }
+}
+
+@media (max-width: 480px) {
+  .tutorial-discord-container {
+    padding-top: 80px; /* Menos padding si el header es más pequeño en móvil */
+    padding-left: 15px;
+    padding-right: 15px;
+  }
+  .tutorial-discord-container h1 {
+    font-size: 1.8em;
+    margin-bottom: 30px;
+  }
+  .tutorial-discord-container h2 {
+    font-size: 1.3em;
+  }
+  .tutorial-discord-container section {
+    padding: 15px;
+  }
+  .cyber-link-button.tutorial-link-back {
+    width: 100%; /* Botón de ancho completo en móviles */
+    box-sizing: border-box;
+  }
+}

@@ -1,0 +1,260 @@
+/* Base container styling */
+.resend-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background-color: #0c0a1a; /* Dark space blue */
+  color: #e0e0e0; /* Light grey for text */
+  font-family: "Orbitron", sans-serif;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Card styling */
+.resend-card {
+  background: rgba(18, 16, 38, 0.85); /* Slightly transparent dark card */
+  border-radius: 20px;
+  padding: 2.5rem;
+  width: 100%;
+  max-width: 450px;
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.5),
+    0 0 25px rgba(76, 175, 80, 0.2);
+  border: 1px solid rgba(76, 175, 80, 0.3);
+  position: relative;
+  z-index: 2;
+  backdrop-filter: blur(10px);
+}
+
+/* Header styling */
+.resend-card-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.resend-logo img {
+  width: 100px;
+  margin-bottom: 1rem;
+}
+
+.resend-card-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 0.5rem;
+}
+
+.resend-card-subtitle {
+  color: #a0a0a0;
+  font-size: 1rem;
+}
+
+/* Form elements */
+.resend-form-group {
+  margin-bottom: 1.5rem;
+}
+
+.resend-form-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #a0a0a0;
+}
+
+.resend-form-input {
+  width: 100%;
+  padding: 0.8rem 1rem;
+  background-color: rgba(0, 0, 0, 0.3);
+  border: 1px solid #4caf50;
+  border-radius: 8px;
+  color: #e0e0e0;
+  font-family: "Roboto Mono", monospace;
+  transition: all 0.3s ease;
+}
+
+.resend-form-input:focus {
+  outline: none;
+  border-color: #81c784;
+  box-shadow: 0 0 15px rgba(76, 175, 80, 0.5);
+}
+
+/* Button styling */
+.resend-btn {
+  width: 100%;
+  padding: 1rem;
+  background: linear-gradient(45deg, #4caf50, #2e7d32);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-family: "Orbitron", sans-serif;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(76, 175, 80, 0.4);
+}
+
+.resend-btn:hover {
+  background: linear-gradient(45deg, #66bb6a, #388e3c);
+  box-shadow: 0 6px 20px rgba(102, 187, 106, 0.6);
+}
+
+.resend-btn:disabled {
+  background: #555;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+/* Footer links */
+.resend-form-footer {
+  margin-top: 2rem;
+  text-align: center;
+  font-size: 0.9rem;
+}
+
+.text-plubot-accent {
+  color: #4caf50;
+}
+
+/* Message styling */
+.resend-message {
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  border-radius: 8px;
+  text-align: center;
+  opacity: 0;
+  transform: translateY(-10px);
+  transition:
+    opacity 0.5s ease,
+    transform 0.5s ease;
+}
+
+.resend-show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.resend-message-success {
+  background-color: rgba(76, 175, 80, 0.2);
+  border: 1px solid #4caf50;
+  color: #a5d6a7;
+}
+
+.resend-message-error {
+  background-color: rgba(211, 47, 47, 0.2);
+  border: 1px solid #f44336;
+  color: #ef9a9a;
+}
+
+/* Cosmic background effects */
+.resend-cosmic-lights {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  z-index: 0;
+}
+
+.resend-light-beam {
+  position: absolute;
+  width: 2px;
+  height: 200%;
+  background: linear-gradient(to bottom, rgba(76, 175, 80, 0), #4caf50, rgba(76, 175, 80, 0));
+  animation: fall 20s linear infinite;
+}
+
+.resend-light-beam-1 {
+  top: -100%;
+  left: 10%;
+  animation-delay: 0s;
+}
+.resend-light-beam-2 {
+  top: -100%;
+  left: 50%;
+  animation-delay: 7s;
+}
+.resend-light-beam-3 {
+  top: -100%;
+  left: 90%;
+  animation-delay: 14s;
+}
+
+@keyframes fall {
+  to {
+    transform: translateY(100vh);
+  }
+}
+
+.resend-particles {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  overflow: hidden;
+  z-index: 0;
+}
+
+.resend-particle {
+  position: absolute;
+  background: #4caf50;
+  border-radius: 50%;
+  opacity: 0;
+  animation: rise 15s infinite;
+}
+
+@keyframes rise {
+  0% {
+    transform: translateY(100vh) scale(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-10vh) scale(1);
+    opacity: 0;
+  }
+}
+
+/* Particle variations */
+.resend-particle-1 {
+  width: 2px;
+  height: 2px;
+  left: 15%;
+  animation-duration: 12s;
+  animation-delay: 1s;
+}
+.resend-particle-2 {
+  width: 4px;
+  height: 4px;
+  left: 45%;
+  animation-duration: 18s;
+  animation-delay: 3s;
+}
+.resend-particle-3 {
+  width: 3px;
+  height: 3px;
+  left: 75%;
+  animation-duration: 10s;
+  animation-delay: 5s;
+}
+.resend-particle-4 {
+  width: 2px;
+  height: 2px;
+  left: 85%;
+  animation-duration: 15s;
+  animation-delay: 7s;
+}
+.resend-particle-5 {
+  width: 3px;
+  height: 3px;
+  left: 5%;
+  animation-duration: 20s;
+  animation-delay: 9s;
+}
+.resend-particle-6 {
+  width: 4px;
+  height: 4px;
+  left: 60%;
+  animation-duration: 13s;
+  animation-delay: 11s;
+}

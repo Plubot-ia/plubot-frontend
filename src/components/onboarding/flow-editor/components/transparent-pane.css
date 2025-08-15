@@ -1,0 +1,11 @@
+/**
+ * transparent-pane.css
+ * 
+ * Solución minimalista para eliminar el color azulado del pane
+ * sin afectar la estabilidad del editor.
+ */
+
+/* Solo una regla: hacer el pane transparente */
+.react-flow__pane {
+  background-color: transparent !important;
+}
