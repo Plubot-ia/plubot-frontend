@@ -73,33 +73,12 @@
         (async function() {
             const params = new URLSearchParams(window.location.search);
             const code = params.get('code');
+            const state = params.get('state'); // Este es el plubotId
             const error = params.get('error');
             const errorDescription = params.get('error_description');
             
-            // Obtener plubotId del localStorage o de la ventana que abrió esta
-            let plubotId = null;
-            
-            try {
-                // Intentar obtener del opener
-                if (window.opener && window.opener.localStorage) {
-                    const storeData = window.opener.localStorage.getItem('flow-store');
-                    if (storeData) {
-                        const store = JSON.parse(storeData);
-                        plubotId = store?.state?.plubotId;
-                    }
-                }
-                
-                // Si no se pudo obtener del opener, intentar del propio localStorage
-                if (!plubotId) {
-                    const storeData = localStorage.getItem('flow-store');
-                    if (storeData) {
-                        const store = JSON.parse(storeData);
-                        plubotId = store?.state?.plubotId;
-                    }
-                }
-            } catch (e) {
-                console.error('Error obteniendo plubotId:', e);
-            }
+            // Usar el state como plubotId
+            const plubotId = state ? parseInt(state) : null;
 
             const showError = (msg) => {
                 document.getElementById('spinner').style.display = 'none';
@@ -165,9 +144,7 @@
                     },
                     body: JSON.stringify({
                         code: code,
-                        plubot_id: plubotId,
-                        error: error,
-                        error_description: errorDescription
+                        plubot_id: plubotId
                     })
                 });
 
