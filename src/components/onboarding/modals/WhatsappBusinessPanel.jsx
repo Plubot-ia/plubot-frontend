@@ -167,67 +167,104 @@ const WhatsappBusinessPanel = ({ plubotId }) => {
             connectionData?.waba_id === 'pending_configuration') && (
             <div className="manual-config-notice">
               <p className="warning-text">⚠️ La configuración automática no pudo completarse.</p>
+              <p className="info-text">Necesitas ingresar los datos de tu WhatsApp Business API manualmente.</p>
               <button 
                 onClick={() => setShowManualConfig(!showManualConfig)}
                 className="btn-manual-config"
               >
-                🔧 Configurar Manualmente
+                🔧 {showManualConfig ? 'Ocultar Formulario' : 'Configurar Manualmente'}
               </button>
             </div>
           )}
 
           {showManualConfig && (
             <div className="manual-config-form">
-              <h4>Configuración Manual de WhatsApp Business</h4>
-              <p className="help-text">Obtén estos valores desde tu Facebook Business Manager</p>
+              <div className="form-header">
+                <h4>📋 Configuración Manual de WhatsApp Business</h4>
+                <p className="help-text">Copia estos valores desde la configuración de tu API de WhatsApp Business</p>
+              </div>
+              
+              <div className="form-instructions">
+                <p className="step-text">📍 Estos valores los encuentras en:</p>
+                <ol>
+                  <li>Ve a <a href="https://developers.facebook.com" target="_blank" rel="noopener noreferrer">Facebook Developers</a></li>
+                  <li>Selecciona tu aplicación</li>
+                  <li>Ve a WhatsApp → Configuración de la API</li>
+                  <li>Copia los valores que se muestran ahí</li>
+                </ol>
+              </div>
               
               <div className="form-group">
-                <label>Phone Number ID:</label>
+                <label>
+                  <span className="label-title">📱 Phone Number ID</span>
+                  <span className="label-help">Identificador del número de teléfono (ver imagen 2, campo "Identificador de número de teléfono")</span>
+                </label>
                 <input
                   type="text"
                   value={manualConfig.phone_number_id}
                   onChange={(e) => setManualConfig({...manualConfig, phone_number_id: e.target.value})}
-                  placeholder="Ej: 123456789012345"
+                  placeholder="Ejemplo: 783440158177520"
+                  className="config-input"
                 />
               </div>
               
               <div className="form-group">
-                <label>WABA ID:</label>
+                <label>
+                  <span className="label-title">🏢 WABA ID</span>
+                  <span className="label-help">Identificador de la cuenta de WhatsApp Business (ver imagen 2, campo "Identificador de la cuenta de WhatsApp Business")</span>
+                </label>
                 <input
                   type="text"
                   value={manualConfig.waba_id}
                   onChange={(e) => setManualConfig({...manualConfig, waba_id: e.target.value})}
-                  placeholder="Ej: 987654321098765"
+                  placeholder="Ejemplo: 728280003377275"
+                  className="config-input"
                 />
               </div>
               
               <div className="form-group">
-                <label>Número de Teléfono:</label>
+                <label>
+                  <span className="label-title">☎️ Número de Teléfono</span>
+                  <span className="label-help">Tu número de WhatsApp Business con código de país (ver imagen 2, campo "Para")</span>
+                </label>
                 <input
                   type="text"
                   value={manualConfig.phone_number}
                   onChange={(e) => setManualConfig({...manualConfig, phone_number: e.target.value})}
-                  placeholder="Ej: +5491123456789"
+                  placeholder="Ejemplo: +54 221 699-6564"
+                  className="config-input"
                 />
               </div>
               
               <div className="form-group">
-                <label>Nombre del Negocio:</label>
+                <label>
+                  <span className="label-title">🏪 Nombre del Negocio</span>
+                  <span className="label-help">El nombre de tu empresa o negocio</span>
+                </label>
                 <input
                   type="text"
                   value={manualConfig.business_name}
                   onChange={(e) => setManualConfig({...manualConfig, business_name: e.target.value})}
-                  placeholder="Ej: Mi Empresa"
+                  placeholder="Ejemplo: Mi Empresa"
+                  className="config-input"
                 />
               </div>
               
-              <button 
-                onClick={handleManualConfig}
-                className="btn-save-config"
-                disabled={isApiLoading}
-              >
-                💾 Guardar Configuración
-              </button>
+              <div className="form-actions">
+                <button 
+                  onClick={handleManualConfig}
+                  className="btn-save-config"
+                  disabled={isApiLoading || !manualConfig.phone_number_id || !manualConfig.waba_id || !manualConfig.phone_number}
+                >
+                  💾 Guardar Configuración
+                </button>
+                <button 
+                  onClick={() => setShowManualConfig(false)}
+                  className="btn-cancel-config"
+                >
+                  ❌ Cancelar
+                </button>
+              </div>
             </div>
           )}
 
