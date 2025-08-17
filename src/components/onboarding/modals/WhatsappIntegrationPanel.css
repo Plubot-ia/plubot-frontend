@@ -166,3 +166,142 @@
   color: #666;
   font-size: 12px;
 }
+
+/* Manual Configuration Form */
+.manual-config-notice {
+  margin: 20px 0;
+  padding: 15px;
+  background-color: #fff3cd;
+  border: 1px solid #ffc107;
+  border-radius: 8px;
+}
+
+.warning-text {
+  color: #856404;
+  margin-bottom: 10px;
+  font-weight: 500;
+}
+
+.btn-manual-config {
+  background-color: #ffc107;
+  color: #212529;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.btn-manual-config:hover {
+  background-color: #e0a800;
+}
+
+.manual-config-form {
+  margin-top: 20px;
+  padding: 20px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #dee2e6;
+}
+
+.manual-config-form h4 {
+  color: #212529;
+  margin-bottom: 10px;
+}
+
+.manual-config-form .help-text {
+  color: #6c757d;
+  font-size: 14px;
+  margin-bottom: 20px;
+}
+
+.manual-config-form .form-group {
+  margin-bottom: 15px;
+}
+
+.manual-config-form label {
+  display: block;
+  color: #495057;
+  font-weight: 500;
+  margin-bottom: 5px;
+  font-size: 14px;
+}
+
+.manual-config-form input {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  font-size: 14px;
+  color: #495057;
+  background-color: white;
+}
+
+.manual-config-form input:focus {
+  outline: none;
+  border-color: #80bdff;
+  box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
+}
+
+.btn-save-config {
+  background-color: #28a745;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.2s;
+  margin-top: 10px;
+}
+
+.btn-save-config:hover:not(:disabled) {
+  background-color: #218838;
+}
+
+.btn-save-config:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-test-message {
+  background-color: #17a2b8;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.2s;
+  margin-right: 10px;
+}
+
+.btn-test-message:hover:not(:disabled) {
+  background-color: #138496;
+}
+
+.btn-test-message:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-disconnect {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.btn-disconnect:hover:not(:disabled) {
+  background-color: #c82333;
+}
+
+.btn-disconnect:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

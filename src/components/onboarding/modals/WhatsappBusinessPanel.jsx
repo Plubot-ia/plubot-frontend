@@ -11,15 +11,24 @@ const WhatsappBusinessPanel = ({ plubotId }) => {
   const { showNotification } = useByteMessageContext();
   const { request, isLoading: isApiLoading } = useAPI();
 
-  const [connection, setConnection] = useState(null);
+  const [isConnected, setIsConnected] = useState(false);
+  const [connectionData, setConnectionData] = useState(null);
   const [isConnecting, setIsConnecting] = useState(false);
+  const [showManualConfig, setShowManualConfig] = useState(false);
+  const [manualConfig, setManualConfig] = useState({
+    phone_number_id: '',
+    waba_id: '',
+    phone_number: '',
+    business_name: ''
+  });
 
   // Verificar estado de conexión
   const checkStatus = useCallback(async () => {
     try {
       const response = await request('GET', `wa/status/${plubotId}`);
       if (response) {
-        setConnection(response.data);
+        setConnectionData(response.data);
+        setIsConnected(response.data.is_active);
       }
     } catch (error) {
       console.error('Error checking WhatsApp status:', error);
@@ -48,7 +57,7 @@ const WhatsappBusinessPanel = ({ plubotId }) => {
     return () => {
       window.removeEventListener('message', handleMessage);
     };
-  }, [plubotId, checkStatus]);
+  }, [plubotId, checkStatus, showNotification]);
 
   // Iniciar proceso de conexión OAuth
   const handleConnect = async () => {
@@ -88,7 +97,8 @@ const WhatsappBusinessPanel = ({ plubotId }) => {
   const handleDisconnect = async () => {
     try {
       await request('POST', `wa/disconnect/${plubotId}`);
-      setConnection(null);
+      setConnectionData(null);
+      setIsConnected(false);
       showNotification('WhatsApp Business desconectado correctamente', 'success');
     } catch (error) {
       showNotification(error.message || 'Error al desconectar', 'error');
@@ -97,65 +107,151 @@ const WhatsappBusinessPanel = ({ plubotId }) => {
 
   // Enviar mensaje de prueba
   const handleTestMessage = async () => {
-    try {
-      const testNumber = prompt('Ingresa el número de WhatsApp para enviar mensaje de prueba (con código de país, ej: 5491123456789):');
-      if (!testNumber) return;
+    const phoneNumber = prompt('Ingresa el número de WhatsApp para enviar mensaje de prueba (con código de país, ej: 5491123456789):');
+    if (!phoneNumber) return;
 
+    try {
       const response = await request('POST', `wa/send/${plubotId}`, {
-        to: testNumber,
-        message: '¡Hola! Este es un mensaje de prueba desde Plubot 🤖'
+        to: phoneNumber,
+        message: 'Este es un mensaje de prueba desde tu Plubot. ¡La conexión funciona correctamente!'
       });
 
-      if (response.status === 'success') {
-        showNotification('Mensaje de prueba enviado correctamente', 'success');
+      if (response?.status === 'success') {
+        showNotification('Mensaje de prueba enviado exitosamente', 'success');
+      } else {
+        showNotification('Error al enviar mensaje de prueba', 'error');
       }
     } catch (error) {
-      showNotification(error.message || 'Error al enviar mensaje de prueba', 'error');
+      console.error('Error sending test message:', error);
+      showNotification('Error al enviar mensaje de prueba', 'error');
+    }
+  };
+
+  const handleManualConfig = async () => {
+    try {
+      const response = await request('POST', `wa/configure/${plubotId}`, manualConfig);
+      if (response?.status === 'success') {
+        showNotification('Configuración actualizada exitosamente', 'success');
+        setShowManualConfig(false);
+        await checkStatus();
+      } else {
+        showNotification('Error al actualizar configuración', 'error');
+      }
+    } catch (error) {
+      console.error('Error updating configuration:', error);
+      showNotification('Error al actualizar configuración', 'error');
     }
   };
 
   // Renderizar contenido según estado
   const renderContent = () => {
-    if (isApiLoading && !connection) {
+    if (isApiLoading && !connectionData) {
       return <div className='loading-spinner'>Cargando estado...</div>;
     }
 
-    if (connection && connection.is_active) {
+    if (connectionData && connectionData.is_active) {
       return (
-        <div className='connection-status connected'>
-          <CheckCircle size={40} color='#25D366' />
-          <h4>¡Conectado a WhatsApp Business!</h4>
-          <div className='connection-details'>
-            <p><strong>Número:</strong> {connection.phone_number || 'Configurando...'}</p>
-            <p><strong>Nombre del negocio:</strong> {connection.business_name || 'Configurando...'}</p>
-            {connection.waba_id && (
-              <p className='connection-id'><strong>WABA ID:</strong> {connection.waba_id}</p>
-            )}
+        <div className="whatsapp-connected">
+          <div className="connection-status">
+            <span className="status-icon">✅</span>
+            <span>WhatsApp Business conectado</span>
           </div>
           
-          <div className='connection-actions'>
-            <button
-              className='whatsapp-button test'
+          <div className="connection-details">
+            <p><strong>Número:</strong> {connectionData?.phone_number || 'pending_configuration'}</p>
+            <p><strong>Nombre del negocio:</strong> {connectionData?.business_name || 'WhatsApp Business'}</p>
+            <p><strong>WABA ID:</strong> {connectionData?.waba_id || 'pending_configuration'}</p>
+          </div>
+
+          {(connectionData?.phone_number_id === 'pending_configuration' || 
+            connectionData?.waba_id === 'pending_configuration') && (
+            <div className="manual-config-notice">
+              <p className="warning-text">⚠️ La configuración automática no pudo completarse.</p>
+              <button 
+                onClick={() => setShowManualConfig(!showManualConfig)}
+                className="btn-manual-config"
+              >
+                🔧 Configurar Manualmente
+              </button>
+            </div>
+          )}
+
+          {showManualConfig && (
+            <div className="manual-config-form">
+              <h4>Configuración Manual de WhatsApp Business</h4>
+              <p className="help-text">Obtén estos valores desde tu Facebook Business Manager</p>
+              
+              <div className="form-group">
+                <label>Phone Number ID:</label>
+                <input
+                  type="text"
+                  value={manualConfig.phone_number_id}
+                  onChange={(e) => setManualConfig({...manualConfig, phone_number_id: e.target.value})}
+                  placeholder="Ej: 123456789012345"
+                />
+              </div>
+              
+              <div className="form-group">
+                <label>WABA ID:</label>
+                <input
+                  type="text"
+                  value={manualConfig.waba_id}
+                  onChange={(e) => setManualConfig({...manualConfig, waba_id: e.target.value})}
+                  placeholder="Ej: 987654321098765"
+                />
+              </div>
+              
+              <div className="form-group">
+                <label>Número de Teléfono:</label>
+                <input
+                  type="text"
+                  value={manualConfig.phone_number}
+                  onChange={(e) => setManualConfig({...manualConfig, phone_number: e.target.value})}
+                  placeholder="Ej: +5491123456789"
+                />
+              </div>
+              
+              <div className="form-group">
+                <label>Nombre del Negocio:</label>
+                <input
+                  type="text"
+                  value={manualConfig.business_name}
+                  onChange={(e) => setManualConfig({...manualConfig, business_name: e.target.value})}
+                  placeholder="Ej: Mi Empresa"
+                />
+              </div>
+              
+              <button 
+                onClick={handleManualConfig}
+                className="btn-save-config"
+                disabled={isApiLoading}
+              >
+                💾 Guardar Configuración
+              </button>
+            </div>
+          )}
+
+          <div className="connection-actions">
+            <button 
               onClick={handleTestMessage}
-              disabled={isApiLoading}
+              className="btn-test-message"
+              disabled={connectionData?.phone_number_id === 'pending_configuration'}
             >
-              <MessageCircle size={18} />
-              Enviar Mensaje de Prueba
+              📱 Enviar Mensaje de Prueba
             </button>
-            
             <button
-              className='whatsapp-button disconnect'
+              className='btn-disconnect'
               onClick={handleDisconnect}
               disabled={isApiLoading}
             >
-              <XCircle size={18} />
-              Desconectar
+              ❌ Desconectar
             </button>
           </div>
         </div>
       );
     }
 
+    // Renderizar estado no conectado
     return (
       <div className='initiate-connection'>
         <MessageCircle size={40} color='#6c757d' />
