@@ -128,18 +128,27 @@ const WhatsappBusinessPanel = ({ plubotId }) => {
   };
 
   const handleManualConfig = async () => {
+    if (!manualConfig.phone_number_id || !manualConfig.waba_id || !manualConfig.phone_number) {
+      showNotification('Por favor completa todos los campos requeridos', 'error');
+      return;
+    }
+
     try {
+      setIsApiLoading(true);
       const response = await request('POST', `wa/configure/${plubotId}`, manualConfig);
       if (response?.status === 'success') {
-        showNotification('Configuración actualizada exitosamente', 'success');
+        showNotification('Configuración guardada exitosamente', 'success');
         setShowManualConfig(false);
-        await checkStatus();
+        // Actualizar el estado de conexión
+        checkConnectionStatus();
       } else {
-        showNotification('Error al actualizar configuración', 'error');
+        showNotification(response?.message || 'Error al guardar configuración', 'error');
       }
     } catch (error) {
-      console.error('Error updating configuration:', error);
-      showNotification('Error al actualizar configuración', 'error');
+      console.error('Error saving manual config:', error);
+      showNotification(error?.message || 'Error al guardar configuración', 'error');
+    } finally {
+      setIsApiLoading(false);
     }
   };
 
@@ -197,7 +206,7 @@ const WhatsappBusinessPanel = ({ plubotId }) => {
               <div className="form-group">
                 <label>
                   <span className="label-title">📱 Phone Number ID</span>
-                  <span className="label-help">Identificador del número de teléfono (ver imagen 2, campo "Identificador de número de teléfono")</span>
+                  <span className="label-help">Identificador del número de teléfono (campo "Identificador de número de teléfono" en Facebook Developers)</span>
                 </label>
                 <input
                   type="text"
@@ -211,7 +220,7 @@ const WhatsappBusinessPanel = ({ plubotId }) => {
               <div className="form-group">
                 <label>
                   <span className="label-title">🏢 WABA ID</span>
-                  <span className="label-help">Identificador de la cuenta de WhatsApp Business (ver imagen 2, campo "Identificador de la cuenta de WhatsApp Business")</span>
+                  <span className="label-help">Identificador de la cuenta de WhatsApp Business (campo "Identificador de la cuenta de WhatsApp Business" en Facebook Developers)</span>
                 </label>
                 <input
                   type="text"
@@ -225,7 +234,7 @@ const WhatsappBusinessPanel = ({ plubotId }) => {
               <div className="form-group">
                 <label>
                   <span className="label-title">☎️ Número de Teléfono</span>
-                  <span className="label-help">Tu número de WhatsApp Business con código de país (ver imagen 2, campo "Para")</span>
+                  <span className="label-help">Tu número de WhatsApp Business con código de país (campo "Para" en Facebook Developers)</span>
                 </label>
                 <input
                   type="text"
