@@ -90,3 +90,79 @@
     transform: rotate(360deg);
   }
 }
+
+.connection-details {
+  margin: 20px 0;
+  padding: 15px;
+  background-color: rgba(0, 0, 0, 0.05);
+  border-radius: 8px;
+  text-align: left;
+}
+
+.connection-details p {
+  margin: 8px 0;
+  color: #333;
+  font-size: 14px;
+}
+
+.connection-details strong {
+  color: #000;
+  font-weight: 600;
+}
+
+.connection-id {
+  font-size: 12px;
+  color: #666;
+  word-break: break-all;
+}
+
+.connection-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.whatsapp-button.test {
+  background-color: #007bff;
+}
+
+.whatsapp-button.test:hover {
+  background-color: #0056b3;
+}
+
+.requirements-list {
+  text-align: left;
+  margin: 20px auto;
+  max-width: 300px;
+}
+
+.requirements-list h5 {
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.requirements-list ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.requirements-list li {
+  padding: 5px 0;
+  color: #555;
+  position: relative;
+  padding-left: 20px;
+}
+
+.requirements-list li:before {
+  content: "✓";
+  position: absolute;
+  left: 0;
+  color: #25d366;
+}
+
+.privacy-note {
+  margin-top: 20px;
+  color: #666;
+  font-size: 12px;
+}
