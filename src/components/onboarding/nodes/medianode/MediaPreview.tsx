@@ -18,7 +18,7 @@ import {
 } from 'lucide-react';
 import React, { memo, useState, useCallback, useMemo } from 'react';
 
-import { COLORS } from './constants';
+// import { COLORS } from './constants'; // No se usa
 import type { MediaPreviewProps } from './types';
 import './MediaPreview.css';
 
@@ -268,7 +268,8 @@ const MediaPreview: React.FC<MediaPreviewProps> = memo(
       case 'file':
       default: {
         const fileName = url?.split('/').pop() ?? caption ?? 'archivo';
-        const truncatedFileName = fileName.length > 30 ? `${fileName.substring(0, 27)}...` : fileName;
+        const truncatedFileName =
+          fileName.length > 30 ? `${fileName.substring(0, 27)}...` : fileName;
 
         return (
           <div className='media-preview media-preview-file'>

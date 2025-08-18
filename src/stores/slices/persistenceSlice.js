@@ -121,9 +121,10 @@ export const createPersistenceSlice = (set, get) => ({
     // Hacer el guardado asíncrono y esperar respuesta
     try {
       await get()._saveFlowToServer(flowState);
-      // Flujo guardado exitosamente
+      set({ isSaving: false, lastSaved: Date.now() });
+      return true;
     } catch (error) {
-      // Save failed
+      set({ isSaving: false });
       throw error;
     }
   },
@@ -153,7 +154,7 @@ export const createPersistenceSlice = (set, get) => ({
 
       // 5. Actualización atómica del estado
       // DEBUG: Log de carga de aristas (temporalmente deshabilitado)
-       // Loading flowEdges:', {
+      // Loading flowEdges:', {
       //   count: validEdges.length,
       //   uniqueIds: [...new Set(validEdges.map((edge) => edge.id))].length,
       //   edges: validEdges.map((edge) => ({ id: edge.id, source: edge.source, target: edge.target })),

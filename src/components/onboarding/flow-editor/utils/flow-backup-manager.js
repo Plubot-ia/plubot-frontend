@@ -98,11 +98,11 @@ const IntegrityValidator = {
    * @returns {string} Checksum
    */
   generateChecksum(data) {
-    const str = JSON.stringify(data);
+    const string_ = JSON.stringify(data);
     let hash = 0;
-    for (let i = 0; i < str.length; i++) {
-      const char = str.charCodeAt(i);
-      hash = ((hash << 5) - hash) + char;
+    for (let index = 0; index < string_.length; index++) {
+      const char = string_.charCodeAt(index);
+      hash = (hash << 5) - hash + char;
       hash = hash & hash; // Convert to 32-bit integer
     }
     return hash.toString(16);
@@ -126,26 +126,26 @@ const IntegrityValidator = {
    */
   validateStructure(flowData) {
     if (!flowData) return false;
-    
+
     const { nodes, edges } = flowData;
-    
+
     // Validate nodes
     if (!Array.isArray(nodes)) return false;
-    
+
     for (const node of nodes) {
       if (!node.id || !node.type || !node.position) return false;
       if (typeof node.position.x !== 'number' || typeof node.position.y !== 'number') return false;
     }
-    
+
     // Validate edges
     if (!Array.isArray(edges)) return false;
-    
-    const nodeIds = new Set(nodes.map(n => n.id));
+
+    const nodeIds = new Set(nodes.map((n) => n.id));
     for (const edge of edges) {
       if (!edge.id || !edge.source || !edge.target) return false;
       if (!nodeIds.has(edge.source) || !nodeIds.has(edge.target)) return false;
     }
-    
+
     return true;
   },
 };
@@ -153,7 +153,7 @@ const IntegrityValidator = {
 /**
  * Compression utility for backup data
  */
-const CompressionUtil = {
+const CompressionUtility = {
   /**
    * Compresses flow data using LZ-string algorithm simulation
    * @param {Object} data - Data to compress
@@ -163,16 +163,16 @@ const CompressionUtil = {
     if (!CONFIG.COMPRESSION_ENABLED) {
       return JSON.stringify(data);
     }
-    
+
     // Simple compression: Remove redundant whitespace and use shorter keys
     const compressed = JSON.stringify(data, (key, value) => {
       // Skip null/undefined values
-      if (value === null || value === undefined) return undefined;
+      if (value === null || value === undefined) return;
       // Round numbers to reduce size
       if (typeof value === 'number') return Math.round(value * 100) / 100;
       return value;
     });
-    
+
     return btoa(compressed); // Base64 encode for safety
   },
 
@@ -185,7 +185,7 @@ const CompressionUtil = {
     if (!CONFIG.COMPRESSION_ENABLED) {
       return JSON.parse(compressed);
     }
-    
+
     try {
       const decompressed = atob(compressed);
       return JSON.parse(decompressed);
@@ -264,7 +264,7 @@ export class FlowBackupManager {
 
     metadata.checksum = IntegrityValidator.generateChecksum(flowData);
 
-    const compressed = CompressionUtil.compress(flowData);
+    const compressed = CompressionUtility.compress(flowData);
     metadata.compressed = CONFIG.COMPRESSION_ENABLED;
 
     const backupId = this.generateBackupId();
@@ -299,7 +299,7 @@ export class FlowBackupManager {
     }
 
     try {
-      const flowData = CompressionUtil.decompress(backup.data);
+      const flowData = CompressionUtility.decompress(backup.data);
 
       // Validate integrity
       if (!IntegrityValidator.validate(flowData, backup.metadata.checksum)) {
@@ -340,7 +340,7 @@ export class FlowBackupManager {
 
     for (const [id, backup] of sortedBackups) {
       try {
-        const flowData = CompressionUtil.decompress(backup.data);
+        const flowData = CompressionUtility.decompress(backup.data);
         if (IntegrityValidator.validateStructure(flowData) && flowData.nodes.length > 0) {
           return { id, ...backup };
         }
@@ -559,7 +559,10 @@ export class FlowBackupManager {
       totalBackups: this.backups.size,
       oldestBackup: Math.min(...[...this.backups.values()].map((b) => b.metadata.timestamp)),
       newestBackup: Math.max(...[...this.backups.values()].map((b) => b.metadata.timestamp)),
-      totalSize: [...this.backups.values()].reduce((accumulator, b) => accumulator + b.data.length, 0),
+      totalSize: [...this.backups.values()].reduce(
+        (accumulator, b) => accumulator + b.data.length,
+        0,
+      ),
     };
   }
 }
