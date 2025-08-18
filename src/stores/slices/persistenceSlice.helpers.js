@@ -49,16 +49,11 @@ export const prepareLoadingState = () => ({
  */
 export const prepareLoadedState = (sanitizedData, plubotId, flowData) => {
   // Calcular contadores iniciales para evitar re-renders innecesarios
-  const visibleNodeCount = sanitizedData.nodes.filter((n) => !n.hidden && !n.deleted).length;
-  const visibleEdgeCount = sanitizedData.edges.filter(
-    (edge) => !edge.hidden && !edge.deleted,
-  ).length;
-
   return {
     nodes: sanitizedData.nodes,
     viewport: sanitizedData.viewport,
-    nodeCount: visibleNodeCount, // Inicializar contador de nodos
-    edgeCount: visibleEdgeCount, // Inicializar contador de edges
+    nodeCount: sanitizedData.nodes.length, // Inicializar contador de nodos
+    edgeCount: sanitizedData.edges.length, // Inicializar contador de edges
     plubotId,
     isLoaded: true,
     hasChanges: false,

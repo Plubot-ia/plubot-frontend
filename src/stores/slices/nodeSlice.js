@@ -38,6 +38,13 @@ const ALLOWED_NODE_DATA_PROPERTIES = [
   'systemMessage',
   'lastResponse',
   'lastPrompt',
+  // MediaNode specific
+  'type',
+  'url',
+  'caption',
+  'altText',
+  'description',
+  'config',
   // WaitNode specific
   'duration',
   'unit',
@@ -63,8 +70,7 @@ function _addNodeHelper(params, get, set) {
     const newNodes = [...nodes, newNode];
 
     // Actualizar contador al agregar nodo
-    const visibleNodeCount = newNodes.filter((n) => !n.hidden && !n.deleted).length;
-    set({ nodeCount: visibleNodeCount });
+    set({ nodeCount: newNodes.length });
 
     get()._createHistoryEntry({ nodes: newNodes });
   }
@@ -166,8 +172,7 @@ function _deleteNodeHelper(nodeIdToDelete, get, set) {
   const remainingEdges = edges.filter((edge) => !edgesToDelete.has(edge.id));
 
   // Actualizar contador al eliminar nodos
-  const visibleNodeCount = remainingNodes.filter((n) => !n.hidden && !n.deleted).length;
-  set({ nodeCount: visibleNodeCount });
+  set({ nodeCount: remainingNodes.length });
 
   _createHistoryEntry({ nodes: remainingNodes, edges: remainingEdges });
 }
@@ -216,11 +221,10 @@ export const createNodeSlice = (set, get) => ({
 
     // Solo actualizar el contador si realmente cambia la cantidad
     if (hasRemovalOrAddition) {
-      const visibleNodeCount = newNodes.filter((n) => !n.hidden && !n.deleted).length;
-      const currentVisibleCount = get().nodeCount || 0;
+      const currentCount = get().nodeCount || 0;
 
-      if (visibleNodeCount !== currentVisibleCount) {
-        set({ nodeCount: visibleNodeCount });
+      if (newNodes.length !== currentCount) {
+        set({ nodeCount: newNodes.length });
       }
     }
 
@@ -241,8 +245,7 @@ export const createNodeSlice = (set, get) => ({
     }
 
     // Actualizar contador de nodos
-    const visibleNodeCount = processedNodes.filter((n) => !n.hidden && !n.deleted).length;
-    set({ nodeCount: visibleNodeCount });
+    set({ nodeCount: processedNodes.length });
 
     _createHistoryEntry({ nodes: processedNodes, edges });
   },
@@ -309,8 +312,7 @@ export const createNodeSlice = (set, get) => ({
       const newNodes = [...nodes, newNode];
 
       // Actualizar contador al agregar nodo desde paleta
-      const visibleNodeCount = newNodes.filter((n) => !n.hidden && !n.deleted).length;
-      set({ nodeCount: visibleNodeCount });
+      set({ nodeCount: newNodes.length });
 
       _createHistoryEntry({ nodes: newNodes });
     }

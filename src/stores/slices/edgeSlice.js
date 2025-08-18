@@ -88,11 +88,10 @@ export const createEdgeSlice = (set, get) => ({
 
       // Solo actualizar el contador si hay cambios que afecten la cantidad
       if (hasRemovalOrAddition) {
-        const visibleEdgeCount = newEdges.filter((edge) => !edge.hidden && !edge.deleted).length;
-        const shouldUpdateCount = visibleEdgeCount !== state.edgeCount;
+        const shouldUpdateCount = newEdges.length !== state.edgeCount;
 
         if (shouldUpdateCount) {
-          updateObject.edgeCount = visibleEdgeCount;
+          updateObject.edgeCount = newEdges.length;
         }
       }
 
@@ -175,8 +174,7 @@ export const createEdgeSlice = (set, get) => ({
       const newEdges = addEdge(connection, edges);
 
       // Actualizar contador al agregar edge
-      const visibleEdgeCount = newEdges.filter((edge) => !edge.hidden && !edge.deleted).length;
-      set({ edgeCount: visibleEdgeCount });
+      set({ edgeCount: newEdges.length });
 
       _createHistoryEntry({ edges: newEdges });
     } catch {

@@ -1,271 +1,403 @@
 /**
  * @file MediaNode.tsx
- * @description Nodo para mostrar contenido multimedia en el flujo
+ * @description MediaNode Ultra-Optimizado - Estética Apple Premium
+ * @version 4.0.0 - Reconstrucción completa con optimización extrema
  */
 
-import React, { memo, useState, useCallback, useMemo, Suspense, lazy } from 'react';
+// Iconos importados desde lucide-react
+import { motion, AnimatePresence } from 'framer-motion';
+import {
+  Image,
+  Film,
+  Music,
+  FileImage,
+  Upload,
+  Save,
+  X,
+  Settings,
+  Sparkles,
+  ChevronDown,
+  ChevronUp,
+  Loader2,
+} from 'lucide-react';
+import React, { memo, useState, useCallback, useMemo, lazy, Suspense } from 'react';
 import { Handle, Position } from 'reactflow';
 
-import { useRenderTracker } from '@/utils/renderTracker';
+import useFlowStore from '../../../../stores/use-flow-store';
+import { useRenderTracker } from '../../../../utils/renderTracker';
 
-import { COLORS, NODE_CONFIG } from './constants';
-import type { MediaNodeProps, MediaNodeData } from './types';
-import { validateNodeData, getNodeSummary, getMediaIcon } from './utils';
+import type { MediaType } from './types';
 import './MediaNode.css';
 
-// Lazy loading de componentes pesados
-const MediaNodeConfig = lazy(async () => import('./MediaNodeConfig'));
-const MediaPreview = lazy(async () => import('./MediaPreview'));
+// ==================== CONFIGURACIÓN CENTRALIZADA ====================
+const NODE_CONFIG = {
+  COLORS: {
+    image: '#60a5fa', // Azul cielo vibrante
+    video: '#c084fc', // Púrpura elegante
+    audio: '#f472b6', // Rosa coral
+    file: '#fbbf24', // Amarillo dorado
+    default: '#94a3b8', // Gris azulado
+    glass: 'rgba(255, 255, 255, 0.08)',
+    border: 'rgba(255, 255, 255, 0.12)',
+    text: '#ffffff',
+    textMuted: 'rgba(255, 255, 255, 0.7)',
+    success: '#10b981',
+    error: '#ef4444',
+  },
+  ANIMATIONS: {
+    HOVER_SCALE: 1.02,
+    TRANSITION: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+  },
+  DEFAULTS: {
+    TYPE: 'image' as MediaType,
+    LABEL: 'Media',
+  },
+  icons: {
+    image: Image,
+    video: Film,
+    audio: Music,
+    file: FileImage,
+  },
+  labels: {
+    image: 'Imagen',
+    video: 'Video',
+    audio: 'Audio',
+    file: 'Archivo',
+  },
+  colors: {
+    image: '#60a5fa',
+    video: '#c084fc',
+    audio: '#f472b6',
+    file: '#fbbf24',
+  },
+  colorsRGB: {
+    image: '96, 165, 250',
+    video: '192, 132, 252',
+    audio: '244, 112, 182',
+    file: '251, 191, 36',
+  },
+};
+
+// ==================== COMPONENTES MEMOIZADOS ====================
 
 /**
- * Header del nodo
+ * Header del nodo - Completamente memoizado
  */
 interface MediaNodeHeaderProps {
-  title: string;
-  icon: string;
-  isEditing: boolean;
+  type?: string;
   isConfigured: boolean;
-  mediaType?: string;
+  displayText: string;
+  id: string;
 }
 
 const MediaNodeHeader: React.FC<MediaNodeHeaderProps> = memo(
-  ({ title, icon, isEditing, isConfigured, mediaType }) => {
+  ({ type = 'image', isConfigured, displayText, id }) => {
+    const IconComponent = NODE_CONFIG.icons[type as keyof typeof NODE_CONFIG.icons] || FileImage;
+
     return (
-      <div className='media-node-header'>
+      <motion.div
+        className='media-node-header'
+        initial={{ y: -10, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.1, duration: 0.3 }}
+      >
         <div className='header-left'>
-          <span className='node-icon'>{icon}</span>
-          <span className='node-title'>{title}</span>
+          <motion.div
+            className='media-icon'
+            whileHover={{ rotate: 360 }}
+            transition={{ duration: 0.5 }}
+          >
+            <IconComponent size={20} />
+          </motion.div>
+          <div className='header-info'>
+            <span className='node-type'>
+              {NODE_CONFIG.labels[type as keyof typeof NODE_CONFIG.labels] || 'Media'}
+            </span>
+            <span className='node-id'>#{id.slice(-4)}</span>
+          </div>
         </div>
-        <div className='header-right'>
-          {isConfigured && mediaType && <span className='type-badge'>{mediaType}</span>}
-          {isEditing && <span className='editing-indicator'>✏️</span>}
-        </div>
-      </div>
+        <span className='media-label'>{displayText}</span>
+        {isConfigured && <div className='media-status-dot' />}
+      </motion.div>
     );
   },
 );
-
 MediaNodeHeader.displayName = 'MediaNodeHeader';
 
 /**
- * Contenido del nodo en modo contraído
+ * Content del nodo - Memoizado para preview
  */
-interface MediaNodeSummaryProps {
-  data: MediaNodeData;
-  onEdit: () => void;
+interface MediaNodeContentProps {
+  type?: string;
+  url?: string;
+  caption?: string;
+  isConfigured: boolean;
 }
 
-const MediaNodeSummary: React.FC<MediaNodeSummaryProps> = memo(({ data, onEdit }) => {
-  const summary = useMemo(() => getNodeSummary(data), [data]);
-  const validation = useMemo(() => validateNodeData(data), [data]);
-  const icon = useMemo(() => getMediaIcon(data.type), [data.type]);
+const MediaNodeContent = memo<MediaNodeContentProps>(({ type, url, caption, isConfigured }) => {
+  if (!isConfigured) {
+    return (
+      <div className='media-node-hint'>
+        <Sparkles size={12} className='hint-icon' />
+        <span>Doble clic para configurar</span>
+      </div>
+    );
+  }
 
   return (
-    <div className='media-node-summary' onDoubleClick={onEdit}>
-      <div className='summary-content'>
-        {validation.isValid ? (
-          <>
-            <span className='status-icon success'>✅</span>
-            <span className='media-icon'>{icon}</span>
-            <span className='summary-text'>{summary}</span>
-          </>
-        ) : (
-          <>
-            <span className='status-icon warning'>⚠️</span>
-            <span className='summary-text'>
-              {data.url ? 'Configuración incompleta' : 'Doble clic para configurar'}
-            </span>
-          </>
-        )}
-      </div>
-      {data.description && <div className='summary-description'>{data.description}</div>}
-    </div>
+    <AnimatePresence>
+      {isConfigured && (
+        <motion.div
+          className='media-node-content'
+          initial={{ height: 0, opacity: 0 }}
+          animate={{ height: 'auto', opacity: 1 }}
+          exit={{ height: 0, opacity: 0 }}
+          transition={{ duration: 0.3, ease: 'easeInOut' }}
+        >
+          {type === 'image' && url && (
+            <img
+              src={url}
+              alt={caption || 'Preview'}
+              className='media-preview-img'
+              loading='lazy'
+            />
+          )}
+          {type === 'video' && (
+            <div className='media-preview-video'>
+              <Film size={14} />
+              <span>Video</span>
+            </div>
+          )}
+          {type === 'audio' && (
+            <div className='media-preview-audio'>
+              <Music size={14} />
+              <span>Audio</span>
+            </div>
+          )}
+          {caption && <p className='media-caption-preview'>{caption}</p>}
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 });
+MediaNodeContent.displayName = 'MediaNodeContent';
 
-MediaNodeSummary.displayName = 'MediaNodeSummary';
+// ==================== COMPONENTE PRINCIPAL ====================
 
-/**
- * Componente principal MediaNode
- */
-const MediaNodeComponent: React.FC<MediaNodeProps> = ({ id, data, selected }) => {
-  // Render tracking
-  useRenderTracker('MediaNode');
+interface MediaNodeProps {
+  id: string;
+  data: {
+    type?: string;
+    url?: string;
+    caption?: string;
+    altText?: string;
+    description?: string;
+    config?: Record<string, any>;
+  };
+  selected?: boolean;
+}
 
-  // Estado local
-  const [isEditing, setIsEditing] = useState(data.isEditing ?? false);
-  const [nodeData, setNodeData] = useState<MediaNodeData>(data);
-  const [isLoading, setIsLoading] = useState(false);
-  const [hasError, setHasError] = useState(false);
+// Lazy load del configurador
+const MediaNodeConfig = lazy(async () => import('./MediaNodeConfig'));
 
-  // Validación
-  const validation = useMemo(() => validateNodeData(nodeData), [nodeData]);
-  const isConfigured = validation.isValid;
+const MediaNodeComponent: React.FC<MediaNodeProps> = ({ id, data, selected = false }) => {
+  // Extract data with defaults
+  const {
+    type = 'image' as MediaType,
+    url = '',
+    caption = '',
+    altText = '',
+    description = '',
+    config = {},
+  } = data || {};
 
-  // Manejadores
-  const handleEdit = useCallback(() => {
+  // Estado mínimo - Solo modo edición
+  const [isEditing, setIsEditing] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [showConfig, setShowConfig] = useState(false);
+
+  // RenderTracker para verificación de rendimiento
+  useRenderTracker('MediaNode', [id, type, url]);
+
+  // Store hooks optimizados
+  const updateNodeData = useFlowStore((state: any) => state.updateNode);
+  const showContextMenu = useFlowStore((state: any) => state.showContextMenu);
+
+  // Valores computados memoizados
+  const isConfigured = useMemo(() => {
+    return !!url && !!type;
+  }, [url, type]);
+
+  const displayText = useMemo(() => {
+    if (caption) return caption;
+    if (type === 'image') return 'Imagen';
+    if (type === 'video') return 'Video';
+    if (type === 'audio') return 'Audio';
+    return NODE_CONFIG.DEFAULTS.LABEL;
+  }, [caption, type]);
+
+  const accentColor = useMemo(() => {
+    return NODE_CONFIG.colors[type as keyof typeof NODE_CONFIG.colors] || '#94a3b8';
+  }, [type]);
+
+  // Handlers optimizados
+  const handleDoubleClick = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
     setIsEditing(true);
   }, []);
 
   const handleSave = useCallback(
-    (newData: MediaNodeData) => {
-      setNodeData(newData);
+    (newData: any) => {
+      updateNodeData(id, newData);
       setIsEditing(false);
-      // Aquí se actualizaría el estado global del flujo
-      const windowWithUpdate = window as Window & {
-        updateNodeData?: (id: string, data: MediaNodeData) => void;
-      };
-      if (windowWithUpdate.updateNodeData) {
-        windowWithUpdate.updateNodeData(id, newData);
-      }
     },
-    [id],
+    [id, updateNodeData],
   );
 
   const handleCancel = useCallback(() => {
     setIsEditing(false);
   }, []);
 
-  const handleMediaLoad = useCallback(() => {
-    setIsLoading(false);
-    setHasError(false);
+  const handleContextMenu = useCallback(
+    (e: React.MouseEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      showContextMenu(e.clientX, e.clientY, id);
+    },
+    [id, showContextMenu],
+  );
+
+  const handleToggleExpand = useCallback(() => {
+    setIsExpanded((prev) => !prev);
   }, []);
 
-  const handleMediaError = useCallback(() => {
-    setIsLoading(false);
-    setHasError(true);
+  const handleOpenConfig = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+    setShowConfig(true);
   }, []);
 
-  // Determinar qué mostrar
-  const showPreview = isConfigured && !isEditing && nodeData.url && nodeData.type;
+  const handleCloseConfig = useCallback(() => {
+    setShowConfig(false);
+  }, []);
 
-  return (
-    <Suspense fallback={<div className='node-loading'>Cargando MediaNode...</div>}>
-      <div
-        className={`media-node ${selected ? 'selected' : ''} ${isEditing ? 'editing' : ''} ${
-          isConfigured ? 'configured' : 'unconfigured'
-        }`}
-        style={{
-          minWidth: NODE_CONFIG.WIDTH,
-          minHeight: showPreview ? NODE_CONFIG.MIN_HEIGHT : NODE_CONFIG.HEIGHT,
-          maxHeight: showPreview ? NODE_CONFIG.MAX_HEIGHT : 'auto',
-          borderRadius: NODE_CONFIG.BORDER_RADIUS,
-          background: isEditing
-            ? NODE_CONFIG.EXPANDED_BACKGROUND
-            : NODE_CONFIG.COLLAPSED_BACKGROUND,
-          border: `${NODE_CONFIG.BORDER_WIDTH}px solid ${
-            selected ? COLORS.PRIMARY : COLORS.BORDER
-          }`,
-          boxShadow: selected ? NODE_CONFIG.HOVER_SHADOW : NODE_CONFIG.SHADOW,
-        }}
-      >
-        {/* Handle de entrada */}
-        <Handle
-          type='target'
-          position={Position.Left}
-          id='input'
-          className='media-node-handle handle-target'
-          style={{
-            background: COLORS.HANDLE_FILL,
-            border: `2px solid ${COLORS.HANDLE_BORDER}`,
-            width: '12px',
-            height: '12px',
-            left: '-6px',
-          }}
-        />
+  // Render expanded mode - Premium Design
+  if (isEditing) {
+    return (
+      <div className='media-node-expanded' onContextMenu={handleContextMenu}>
+        <div className='media-node-glass-panel'>
+          {/* Handles con clases CSS, no estilos inline */}
+          <Handle
+            type='target'
+            position={Position.Left}
+            id='target'
+            className='media-node-handle media-node-handle-target'
+          />
 
-        {/* Header */}
-        <MediaNodeHeader
-          title='Media'
-          icon='🎬'
-          isEditing={isEditing}
-          isConfigured={isConfigured}
-          mediaType={nodeData.type}
-        />
+          <MediaNodeConfig
+            data={{
+              type: type as MediaType,
+              url: url || '',
+              caption: caption || '',
+              altText: altText || '',
+              description: description || '',
+              config: config || {},
+            }}
+            onSave={handleSave}
+            onCancel={handleCancel}
+          />
 
-        {/* Contenido */}
-        <div className='media-node-content'>
-          {isEditing ? (
-            <MediaNodeConfig data={nodeData} onSave={handleSave} onCancel={handleCancel} />
-          ) : showPreview ? (
-            <div className='media-preview-wrapper'>
-              {isLoading && (
-                <div className='media-loading'>
-                  <span className='loading-spinner'>⏳</span>
-                  <p>Cargando media...</p>
-                </div>
-              )}
-              {hasError && (
-                <div className='media-error'>
-                  <span className='error-icon'>❌</span>
-                  <p>Error al cargar el media</p>
-                </div>
-              )}
-              {!isLoading && !hasError && (
-                <MediaPreview
-                  type={nodeData.type}
-                  url={nodeData.url}
-                  caption={nodeData.caption}
-                  altText={nodeData.altText}
-                  config={nodeData.config}
-                  onLoad={handleMediaLoad}
-                  onError={handleMediaError}
-                />
-              )}
-            </div>
-          ) : (
-            <MediaNodeSummary data={nodeData} onEdit={handleEdit} />
-          )}
+          <AnimatePresence>
+            {showConfig && (
+              <motion.div
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.8, opacity: 0 }}
+                transition={{ duration: 0.2 }}
+              >
+                <Suspense
+                  fallback={
+                    <div className='config-loading'>
+                      <Loader2 className='animate-spin' size={24} />
+                    </div>
+                  }
+                >
+                  <MediaNodeConfig
+                    data={{
+                      type: (data.type || 'image') as MediaType,
+                      url: data.url || '',
+                      caption: data.caption || '',
+                      altText: data.altText || '',
+                      description: data.description || '',
+                      config: data.config || {},
+                    }}
+                    onSave={handleSave}
+                    onCancel={handleCloseConfig}
+                  />
+                </Suspense>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          <Handle
+            type='source'
+            position={Position.Right}
+            id='source'
+            className='media-node-handle media-node-handle-source'
+          />
         </div>
-
-        {/* Handle de salida */}
-        <Handle
-          type='source'
-          position={Position.Right}
-          id='output'
-          className='media-node-handle handle-source'
-          style={{
-            background: COLORS.HANDLE_FILL,
-            border: `2px solid ${COLORS.HANDLE_BORDER}`,
-            width: '12px',
-            height: '12px',
-            right: '-6px',
-          }}
-        />
       </div>
-    </Suspense>
+    );
+  }
+
+  // Render collapsed mode - Minimalist Design
+  return (
+    <motion.div
+      className={`media-node ${isExpanded ? 'expanded' : 'collapsed'} ${selected ? 'selected' : ''}`}
+      style={
+        {
+          '--accent-color': NODE_CONFIG.colors[type as keyof typeof NODE_CONFIG.colors],
+          '--accent-rgb': NODE_CONFIG.colorsRGB[type as keyof typeof NODE_CONFIG.colorsRGB],
+        } as React.CSSProperties
+      }
+      onDoubleClick={handleDoubleClick}
+      onContextMenu={handleContextMenu}
+      initial={{ scale: 0.9, opacity: 0 }}
+      animate={{ scale: 1, opacity: 1 }}
+      transition={{ duration: 0.3, ease: 'easeOut' }}
+      whileHover={{ scale: 1.02 }}
+      whileTap={{ scale: 0.98 }}
+    >
+      {/* Handles con clases CSS */}
+      <Handle
+        type='target'
+        position={Position.Left}
+        id='target'
+        className='media-node-handle media-node-handle-target'
+      />
+
+      {/* Header */}
+      <MediaNodeHeader type={type} isConfigured={isConfigured} displayText={displayText} id={id} />
+
+      {/* Content */}
+      <MediaNodeContent type={type} url={url} caption={caption} isConfigured={isConfigured} />
+
+      <Handle
+        type='source'
+        position={Position.Right}
+        id='source'
+        className='media-node-handle media-node-handle-source'
+      />
+    </motion.div>
   );
 };
 
-// Función de comparación para memo
-const areMediaNodePropsEqual = (
-  prevProps: Readonly<MediaNodeProps>,
-  nextProps: Readonly<MediaNodeProps>,
-): boolean => {
-  // Comparar propiedades básicas
-  if (prevProps.id !== nextProps.id) return false;
-  if (prevProps.selected !== nextProps.selected) return false;
-
-  // Comparar datos del nodo
-  const prevData = prevProps.data;
-  const nextData = nextProps.data;
-
-  if (prevData.type !== nextData.type) return false;
-  if (prevData.url !== nextData.url) return false;
-  if (prevData.caption !== nextData.caption) return false;
-  if (prevData.altText !== nextData.altText) return false;
-  if (prevData.description !== nextData.description) return false;
-  if (prevData.isEditing !== nextData.isEditing) return false;
-  if (prevData.isLoading !== nextData.isLoading) return false;
-  if (prevData.hasError !== nextData.hasError) return false;
-
-  // Comparar configuración
-  if (JSON.stringify(prevData.config) !== JSON.stringify(nextData.config)) return false;
-
-  return true;
-};
-
-const MemoizedMediaNode = memo(MediaNodeComponent, areMediaNodePropsEqual);
-MemoizedMediaNode.displayName = 'MediaNode';
-
-export default MemoizedMediaNode;
+// Export con memo optimizado - comparación superficial
+export default memo(MediaNodeComponent, (prevProps, nextProps) => {
+  return (
+    prevProps.id === nextProps.id &&
+    prevProps.selected === nextProps.selected &&
+    prevProps.data?.type === nextProps.data?.type &&
+    prevProps.data?.url === nextProps.data?.url &&
+    prevProps.data?.caption === nextProps.data?.caption
+  );
+});

@@ -487,6 +487,7 @@ const FlowEditor = ({
         hideHeader={hideHeader}
         hideContextMenu={hideContextMenu}
       />
+
       {/* Global Context Menu Renderer */}
       {contextMenuVisible &&
         contextMenuPosition &&

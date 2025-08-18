@@ -1,238 +1,282 @@
 /**
  * prevent-flow-reset.js
  *
- * SOLUCIÓN DEFINITIVA que previene que el flujo se resetee automáticamente
- * y evita la pérdida de nodos en el editor de flujos.
+ * Enterprise-grade flow protection system that prevents unintended data loss
+ * while respecting user intentions for flow modifications.
  */
 
-// Importar directamente el store (importación estática)
 import useFlowStore from '@/stores/use-flow-store';
 
+import { getBackupManager } from './flow-backup-manager';
+
+// Configuration
+const CONFIG = {
+  PROTECTION_ENABLED: true,
+  ALLOW_EMPTY_FLOW_SAVE: true, // Allow users to intentionally save empty flows
+  DEBUG_MODE: false,
+};
+
 /**
- * Previene el reseteo automático del flujo y la pérdida de nodos
- * @returns {Function} Función de limpieza
+ * Intelligent flow reset protection
+ * Only prevents resets that would cause unintended data loss
  */
-// Función para guardar nodos en localStorage como respaldo
-const backupNodesToLocalStorage = (nodes) => {
-  const flowStoreState = useFlowStore.getState();
-  const { plubotId } = flowStoreState;
-
-  if (!nodes || !Array.isArray(nodes) || nodes.length === 0) return;
-
-  try {
-    const backupKey = `plubot-nodes-emergency-backup-${plubotId}`;
-    localStorage.setItem(backupKey, JSON.stringify(nodes));
-  } catch {}
-};
-
-// Función para recuperar nodos de respaldo
-const restoreNodesFromBackup = () => {
-  const flowStoreState = useFlowStore.getState();
-  const { plubotId } = flowStoreState;
-
-  if (!plubotId) {
-    return;
-  }
-  try {
-    const backupKey = `plubot-nodes-emergency-backup-${plubotId}`;
-
-    const backup = localStorage.getItem(backupKey);
-    if (backup) {
-      try {
-        const nodes = JSON.parse(backup);
-        if (Array.isArray(nodes) && nodes.length > 0) {
-          return nodes;
-        }
-      } catch {}
-    }
-  } catch {}
-};
-
-// Helper function to create resetFlow protection
 const _createResetFlowProtection = (flowStore, originalResetFlow) => {
   return (...arguments_) => {
-    const previousState = flowStore.getState();
+    const state = flowStore.getState();
     const options = arguments_[2] ?? {};
-    const nodes = previousState.nodes ?? [];
 
-    // Caso 1: Se permite el reseteo explícitamente a través de una opción.
-    if (options.allowResetFromLoader === true) {
+    // Always allow explicit resets
+    if (options.allowResetFromLoader === true || options.userInitiated === true) {
+      if (CONFIG.DEBUG_MODE) console.log('[FlowProtection] Allowing explicit reset');
       return originalResetFlow(...arguments_);
     }
 
-    // Caso 2: El reseteo no es forzado, se aplican las protecciones.
-    if (nodes.length > 0) {
-      return previousState; // Bloquear el reseteo
+    // Allow reset if flow is already empty
+    if (!state.nodes || state.nodes.length === 0) {
+      return originalResetFlow(...arguments_);
     }
 
-    // Caso 3: No hay nodos, por lo que el reseteo es seguro.
-    return originalResetFlow(...arguments_);
+    // Block unexpected resets of non-empty flows
+    if (CONFIG.DEBUG_MODE) {
+      console.warn('[FlowProtection] Blocked unexpected reset of non-empty flow');
+    }
+    return state;
   };
 };
 
 /**
- * Determina si se debe activar la protección contra reseteo de nodos.
- * @param {Array} currentNodes - Nodos actuales del store
- * @param {Array} newNodes - Nuevos nodos a establecer
- * @param {string} callStack - Stack trace de la llamada
- * @returns {boolean} true si se debe activar la protección
+ * Smart protection logic that respects user intentions
  */
 const _shouldActivateProtection = (currentNodes, newNodes, callStack) => {
+  // Never protect if explicitly disabled
+  if (!CONFIG.PROTECTION_ENABLED) return false;
+
+  // Allow empty flows if user is intentionally clearing
+  if (CONFIG.ALLOW_EMPTY_FLOW_SAVE && callStack.includes('saveFlow')) {
+    return false;
+  }
+
+  // Allow deletions from user actions
+  const userActions = [
+    'deleteNode',
+    'deleteElements',
+    'onNodesDelete',
+    'handleDelete',
+    'clearFlow',
+  ];
+  if (userActions.some((action) => callStack.includes(action))) {
+    return false;
+  }
+
+  // Only protect against unexpected clearing of non-empty flows
   return (
     currentNodes.length > 0 &&
     (!newNodes || (Array.isArray(newNodes) && newNodes.length === 0)) &&
-    !callStack.includes('TrainingScreen') &&
-    !callStack.includes('deleteNode')
+    !callStack.includes('TrainingScreen')
   );
 };
 
 /**
- * Procesa nuevos nodos válidos actualizando memoria y backup.
- * @param {Array} newNodes - Nuevos nodos a procesar
- * @param {Array} lastNodes - Array de referencia para la memoria
+ * Process valid nodes with intelligent backup
  */
-const _processValidNodes = (newNodes, lastNodes) => {
-  if (Array.isArray(newNodes) && newNodes.length > 0) {
-    lastNodes.splice(0, lastNodes.length, ...newNodes);
-    if (newNodes.length > 3) {
-      backupNodesToLocalStorage(newNodes);
-    }
+const _processValidNodes = (newNodes, backupManager) => {
+  if (!Array.isArray(newNodes)) return;
+
+  // Create backup for significant changes
+  if (newNodes.length > 0) {
+    backupManager.createBackup({
+      reason: 'node_update',
+      forceSave: false,
+    });
   }
 };
 
-// Helper function to create setNodes protection
-const _createSetNodesProtection = (flowStore, originalSetNodes, lastNodes) => {
+/**
+ * Intelligent setNodes protection
+ */
+const _createSetNodesProtection = (flowStore, originalSetNodes, backupManager) => {
   return (newNodes) => {
-    const callStack = new Error('Getting call stack').stack ?? '';
-    const storeState = flowStore.getState();
-    const currentNodes = storeState.nodes ?? [];
+    const callStack = new Error('Stack trace').stack ?? '';
+    const state = flowStore.getState();
+    const currentNodes = state.nodes ?? [];
 
-    if (_shouldActivateProtection(currentNodes, newNodes, callStack)) {
-      backupNodesToLocalStorage(currentNodes);
-      return;
+    // Check if this is a user-initiated deletion of all nodes
+    const isUserDeletingAll =
+      callStack.includes('deleteElements') ||
+      callStack.includes('onNodesDelete') ||
+      callStack.includes('clearFlow');
+
+    if (isUserDeletingAll && (!newNodes || newNodes.length === 0)) {
+      // User is intentionally clearing the flow
+      if (CONFIG.DEBUG_MODE) {
+        console.log('[FlowProtection] User intentionally clearing flow');
+      }
+      // Don't create backup for intentional clear
+      return originalSetNodes(newNodes);
     }
 
-    _processValidNodes(newNodes, lastNodes);
+    if (_shouldActivateProtection(currentNodes, newNodes, callStack)) {
+      // Create emergency backup before potential data loss
+      backupManager.createBackup({
+        reason: 'emergency',
+        forceSave: true,
+      });
 
+      if (CONFIG.DEBUG_MODE) {
+        console.warn('[FlowProtection] Blocked unexpected node clearing');
+      }
+      return; // Block the change
+    }
+
+    // Process valid changes
+    _processValidNodes(newNodes, backupManager);
     return originalSetNodes(newNodes);
   };
 };
 
-// Helper function to create emergency recovery
-const _createEmergencyRecovery = (originalSetNodes, lastNodes) => {
-  return () => {
-    const flowStore = useFlowStore;
-    const currentNodes = flowStore.getState().nodes ?? [];
+/**
+ * Smart recovery that respects user intentions
+ */
+const _createSmartRecovery = (backupManager) => {
+  return (options = {}) => {
+    const { forceRecover = false } = options;
+    const state = useFlowStore.getState();
 
-    // Solo recuperar si no hay nodos actualmente
-    if (currentNodes.length === 0) {
-      // Intentar recuperar de la memoria primero
-      if (lastNodes.length > 0) {
-        originalSetNodes(lastNodes);
-        return true;
-      }
+    // Don't recover if there are already nodes
+    if (state.nodes && state.nodes.length > 0 && !forceRecover) {
+      return false;
+    }
 
-      // Si no hay en memoria, intentar desde localStorage
-      const backupNodes = restoreNodesFromBackup();
-      if (backupNodes) {
-        originalSetNodes(backupNodes);
-        return true;
-      }
+    // Only attempt recovery if requested or after unexpected data loss
+    if (forceRecover || options.afterCrash) {
+      return backupManager.attemptIntelligentRecovery();
     }
 
     return false;
   };
 };
 
-// Helper function to setup interval checker
-const _setupIntervalChecker = (flowStore, lastNodes) => {
-  return setInterval(() => {
-    try {
-      const currentState = flowStore.getState();
-      const currentNodes = currentState.nodes ?? [];
-      const currentPlubotId = currentState.plubotId;
+/**
+ * Cleanup old emergency backups
+ */
+const _cleanupOldBackups = (plubotId) => {
+  if (!plubotId) return;
 
-      let emergencyBackupForThisFlowExists = false;
-      if (currentPlubotId) {
-        const emergencyBackupKey = `plubot-nodes-emergency-backup-${currentPlubotId}`;
-        emergencyBackupForThisFlowExists = Boolean(localStorage.getItem(emergencyBackupKey));
+  try {
+    // Remove old emergency backup keys (deprecated)
+    const oldBackupKey = `plubot-nodes-emergency-backup-${plubotId}`;
+    if (localStorage.getItem(oldBackupKey)) {
+      localStorage.removeItem(oldBackupKey);
+      if (CONFIG.DEBUG_MODE) {
+        console.log('[FlowProtection] Cleaned up old emergency backup');
       }
-
-      if (currentNodes.length === 0 && lastNodes.length > 0 && !emergencyBackupForThisFlowExists) {
-        // Restauración automática comentada para evitar conflictos
-      }
-    } catch {}
-  }, 5000);
+    }
+  } catch (error) {
+    console.error('[FlowProtection] Cleanup error:', error);
+  }
 };
 
-// Helper function to create cleanup function
+/**
+ * Cleanup function
+ */
 const _createCleanupFunction = ({
-  checkInterval,
   flowStore,
   originalResetFlow,
   originalSetNodes,
+  backupManager,
 }) => {
   return () => {
     try {
-      clearInterval(checkInterval);
-
+      // Restore original functions
       if (originalResetFlow) {
         flowStore.setState({ resetFlow: originalResetFlow });
       }
       if (originalSetNodes) {
         flowStore.setState({ setNodes: originalSetNodes });
       }
-    } catch {}
+
+      // Stop backup manager
+      if (backupManager) {
+        backupManager.stopAutoBackup();
+      }
+    } catch (error) {
+      console.error('[FlowProtection] Cleanup error:', error);
+    }
   };
 };
 
+/**
+ * Main flow protection system
+ */
 export const preventFlowReset = () => {
-  // Referencias originales a las funciones
   let originalResetFlow;
   let originalSetNodes;
-  const lastNodes = [];
+  let backupManager;
 
   try {
-    // Accedemos directamente al store
     const flowStore = useFlowStore;
+    if (!flowStore || !flowStore.getState) return;
 
-    if (flowStore && flowStore.getState) {
-      const state = flowStore.getState();
+    const state = flowStore.getState();
+    const { plubotId } = state;
 
-      // 1. Proteger la función resetFlow
-      if (typeof state.resetFlow === 'function') {
-        originalResetFlow = state.resetFlow;
-        const resetFlowProtection = _createResetFlowProtection(flowStore, originalResetFlow);
-        flowStore.setState({ resetFlow: resetFlowProtection });
-      }
-
-      // 2. Proteger la función setNodes
-      if (typeof state.setNodes === 'function') {
-        originalSetNodes = state.setNodes;
-        const setNodesProtection = _createSetNodesProtection(
-          flowStore,
-          originalSetNodes,
-          lastNodes,
-        );
-        flowStore.setState({ setNodes: setNodesProtection });
-      }
-
-      // 3. Añadir función de recuperación de emergencia al store
-      const emergencyRecovery = _createEmergencyRecovery(originalSetNodes, lastNodes);
-      flowStore.setState({ recoverNodesEmergency: emergencyRecovery });
-
-      // 4. Configurar un intervalo para verificar si los nodos desaparecieron
-      const checkInterval = _setupIntervalChecker(flowStore, lastNodes);
-
-      // Devolver función de limpieza
-      return _createCleanupFunction({
-        checkInterval,
-        flowStore,
-        originalResetFlow,
-        originalSetNodes,
-      });
+    // Initialize backup manager
+    backupManager = getBackupManager();
+    if (plubotId) {
+      backupManager.initialize(plubotId);
+      _cleanupOldBackups(plubotId);
     }
-  } catch {}
+
+    // 1. Protect resetFlow function
+    if (typeof state.resetFlow === 'function') {
+      originalResetFlow = state.resetFlow;
+      const protectedReset = _createResetFlowProtection(flowStore, originalResetFlow);
+      flowStore.setState({ resetFlow: protectedReset });
+    }
+
+    // 2. Protect setNodes function
+    if (typeof state.setNodes === 'function') {
+      originalSetNodes = state.setNodes;
+      const protectedSetNodes = _createSetNodesProtection(
+        flowStore,
+        originalSetNodes,
+        backupManager,
+      );
+      flowStore.setState({ setNodes: protectedSetNodes });
+    }
+
+    // 3. Add smart recovery function
+    const smartRecovery = _createSmartRecovery(backupManager);
+    flowStore.setState({ smartRecovery });
+
+    // 4. Add explicit save handler for empty flows
+    flowStore.setState({
+      saveEmptyFlow: () => {
+        // Allow saving empty flow when user explicitly wants to
+        const state = flowStore.getState();
+        if (state.nodes?.length === 0) {
+          backupManager.createBackup({
+            reason: 'user_delete_all',
+            forceSave: false,
+          });
+        }
+      },
+    });
+
+    if (CONFIG.DEBUG_MODE) {
+      console.log('[FlowProtection] Protection system initialized');
+    }
+
+    // Return cleanup function
+    return _createCleanupFunction({
+      flowStore,
+      originalResetFlow,
+      originalSetNodes,
+      backupManager,
+    });
+  } catch (error) {
+    console.error('[FlowProtection] Initialization error:', error);
+  }
 };
 
 export default preventFlowReset;

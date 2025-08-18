@@ -1,32 +1,32 @@
-export const useModalHandlers = ({
-  setOptionsMenuOpen,
-  showOptionsModal,
-  closeAllModals,
-  finalSettingsModal,
-}) => {
+export const useModalHandlers = (
+  _showOptionsModal,
+  showVersionHistory,
+  showShareModal,
+  _openModal,
+  closeModal,
+  plubotId,
+) => {
   const handleOpenVersionHistory = () => {
-    setOptionsMenuOpen(false);
+    // Close options menu if it exists
+    globalThis.dispatchEvent(new CustomEvent('close-options-menu'));
     globalThis.dispatchEvent(new CustomEvent('open-version-history'));
   };
 
   const handleOpenImportExport = () => {
-    setOptionsMenuOpen(false);
-    if (showOptionsModal) showOptionsModal();
+    // Close options menu if it exists
+    globalThis.dispatchEvent(new CustomEvent('close-options-menu'));
+    globalThis.dispatchEvent(new CustomEvent('open-import-export'));
   };
 
   const handleOpenSettingsModal = () => {
-    setOptionsMenuOpen(false);
-    if (closeAllModals) closeAllModals();
+    // Close options menu if it exists
+    globalThis.dispatchEvent(new CustomEvent('close-options-menu'));
     globalThis.dispatchEvent(new CustomEvent('open-settings-modal'));
-    if (typeof finalSettingsModal === 'function') {
-      try {
-        finalSettingsModal();
-      } catch {}
-    }
   };
 
   const handleOpenPathAnalysis = () => {
-    setOptionsMenuOpen(false);
+    // Close options menu if it exists
+    globalThis.dispatchEvent(new CustomEvent('close-options-menu'));
     globalThis.dispatchEvent(new CustomEvent('open-route-analysis'));
   };
 

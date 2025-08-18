@@ -31,11 +31,17 @@ export const createPersistenceSlice = (set, get) => ({
 
   _saveFlowToServer: async (flowState) => {
     try {
-      await flowService.saveFlow(flowState.plubotId, flowState);
-      set({ lastSaved: new Date(), isSaving: false });
+      const response = await flowService.saveFlow(flowState.plubotId, flowState);
+      set({ lastSaved: new Date(), isSaving: false, hasChanges: false });
+
+      // Log de éxito
+      // Flow saved successfully, response);
+
+      return response;
     } catch (error) {
       logger.error('Error saving flow:', error);
       set({ isSaving: false });
+      throw error; // Re-lanzar el error para que se maneje en el nivel superior
     }
   },
 
@@ -91,17 +97,35 @@ export const createPersistenceSlice = (set, get) => ({
       });
   },
 
-  saveFlow: () => {
-    const { plubotId, nodes, edges, viewport, flowName } = get();
-    if (!plubotId) return;
+  saveFlow: async () => {
+    const state = get();
+    const { plubotId, nodes, edges, viewport, flowName } = state;
+
+    if (!plubotId) {
+      throw new Error('No se puede guardar sin un plubotId');
+    }
 
     set({ isSaving: true });
 
     // 🔧 SANITIZACIÓN CRÍTICA: Limpiar edges antes de enviar al backend
     const sanitizedEdges = get()._sanitizeEdgesForBackend(edges);
 
-    const flowState = { plubotId, flowName, nodes, edges: sanitizedEdges, viewport };
-    get()._saveFlowToServer(flowState);
+    const flowState = {
+      plubotId,
+      flowName,
+      nodes: [...nodes], // Crear copia para evitar mutaciones
+      edges: sanitizedEdges,
+      viewport,
+    };
+
+    // Hacer el guardado asíncrono y esperar respuesta
+    try {
+      await get()._saveFlowToServer(flowState);
+      // Flujo guardado exitosamente
+    } catch (error) {
+      // Save failed
+      throw error;
+    }
   },
 
   loadFlow: async (plubotId) => {
@@ -129,7 +153,7 @@ export const createPersistenceSlice = (set, get) => ({
 
       // 5. Actualización atómica del estado
       // DEBUG: Log de carga de aristas (temporalmente deshabilitado)
-      // console.log('🔍 Loading flow - validEdges:', {
+       // Loading flowEdges:', {
       //   count: validEdges.length,
       //   uniqueIds: [...new Set(validEdges.map((edge) => edge.id))].length,
       //   edges: validEdges.map((edge) => ({ id: edge.id, source: edge.source, target: edge.target })),

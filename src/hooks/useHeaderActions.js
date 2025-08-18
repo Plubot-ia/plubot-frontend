@@ -1,5 +1,6 @@
 import { useCallback } from 'react';
 
+import { getBackupManager } from '@/components/onboarding/flow-editor/utils/flow-backup-manager';
 import useFlowStore from '@/stores/use-flow-store';
 import { validateRequiredNodes } from '@/utils/node-validators';
 
@@ -33,13 +34,34 @@ export const useHeaderActions = ({
       setSavingIndicator(true);
       setSaveStatus(undefined); // Limpiar estado anterior
 
-      // Obtener los nodos reales SOLO cuando se necesitan para validación
-      const actualNodes = useFlowStore.getState().nodes;
-      const nodesToValidate = actualNodes || [];
-      const validation = validateRequiredNodes(nodesToValidate);
+      // Obtener el estado actual completo del store
+      const currentState = useFlowStore.getState();
+      const actualNodes = currentState.nodes;
+      const actualEdges = currentState.edges;
 
-      if (!validation.valid) {
-        throw new Error(validation.message);
+      // Estado actual antes de guardar
+
+      // Allow saving empty flows if user intentionally deleted all nodes
+      const isEmptyFlow = actualNodes.length === 0 && actualEdges.length === 0;
+
+      if (isEmptyFlow) {
+        // Guardando flujo vacío (usuario eliminó todos los nodos)
+        // Mark this as intentional empty save in backup system
+        const backupManager = getBackupManager();
+        if (backupManager && backupManager.isInitialized) {
+          backupManager.createBackup({
+            reason: 'user_delete_all',
+            forceSave: false,
+          });
+        }
+      } else {
+        // Only validate if not empty
+        const nodesToValidate = actualNodes || [];
+        const validation = validateRequiredNodes(nodesToValidate);
+
+        if (!validation.valid) {
+          throw new Error(validation.message);
+        }
       }
 
       // Usar la función de guardado proporcionada o la del store
@@ -53,8 +75,11 @@ export const useHeaderActions = ({
 
       // Indicar éxito con el estado visual y notificación
       setSaveStatus('success');
+      const notificationMessage = isEmptyFlow
+        ? '✅ Flujo vacío guardado exitosamente'
+        : '✅ Flujo guardado exitosamente';
       setNotification({
-        text: '✅ Flujo guardado exitosamente',
+        text: notificationMessage,
         id: Date.now(),
       });
 

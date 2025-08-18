@@ -1,220 +1,318 @@
 /**
  * @file MediaPreview.tsx
- * @description Componente para renderizar el contenido multimedia
+ * @description Ultra-optimized media preview component with Apple-inspired design
+ * @version 2.0.0 - Complete optimization with memoization and premium aesthetics
  */
 
-import React, { memo, useState, useCallback } from 'react';
+import {
+  Film,
+  Music,
+  FileImage,
+  AlertCircle,
+  Play,
+  Pause,
+  Volume2,
+  VolumeX,
+  Download,
+  Maximize2,
+} from 'lucide-react';
+import React, { memo, useState, useCallback, useMemo } from 'react';
 
 import { COLORS } from './constants';
 import type { MediaPreviewProps } from './types';
-import { getFileNameFromUrl } from './utils';
+import './MediaPreview.css';
+
+// Mapeo de colores por tipo de media
+const MEDIA_COLORS = {
+  image: '#667eea',
+  video: '#764ba2',
+  audio: '#ec4899',
+  file: '#f59e0b',
+};
 
 /**
- * Componente de preview de imagen
+ * MediaPreview principal con renderizado optimizado por tipo
  */
-const ImagePreview: React.FC<MediaPreviewProps> = memo(
-  ({ url, altText, caption, onLoad, onError }) => {
+const MediaPreview: React.FC<MediaPreviewProps> = memo(
+  ({ type, url, caption, altText, config }) => {
+    // Estado mínimo optimizado
     const [imageError, setImageError] = useState(false);
-
-    const handleError = useCallback(() => {
-      setImageError(true);
-      onError?.();
-    }, [onError]);
-
-    if (imageError) {
-      return (
-        <div className='media-error'>
-          <span className='error-icon'>🖼️❌</span>
-          <p>No se pudo cargar la imagen</p>
-          <small>{url}</small>
-        </div>
-      );
-    }
-
-    return (
-      <div className='media-image-container'>
-        <img
-          src={url}
-          alt={altText ?? caption ?? 'Imagen'}
-          onLoad={onLoad}
-          onError={handleError}
-          className='media-image'
-        />
-        {caption && <p className='media-caption'>{caption}</p>}
-      </div>
-    );
-  },
-);
-
-ImagePreview.displayName = 'ImagePreview';
-
-/**
- * Componente de preview de video
- */
-const VideoPreview: React.FC<MediaPreviewProps> = memo(
-  ({ url, caption, config, onLoad, onError }) => {
     const [videoError, setVideoError] = useState(false);
-    const videoSettings = config?.videoSettings;
-
-    const handleError = useCallback(() => {
-      setVideoError(true);
-      onError?.();
-    }, [onError]);
-
-    if (videoError) {
-      return (
-        <div className='media-error'>
-          <span className='error-icon'>🎥❌</span>
-          <p>No se pudo cargar el video</p>
-          <small>{url}</small>
-        </div>
-      );
-    }
-
-    return (
-      <div className='media-video-container'>
-        <video
-          src={url}
-          controls={videoSettings?.controls ?? true}
-          autoPlay={videoSettings?.autoplay ?? false}
-          loop={videoSettings?.loop ?? false}
-          muted={videoSettings?.muted ?? false}
-          poster={videoSettings?.thumbnail}
-          onLoadedData={onLoad}
-          onError={handleError}
-          className='media-video'
-        >
-          <track kind='captions' />
-        </video>
-        {caption && <p className='media-caption'>{caption}</p>}
-      </div>
-    );
-  },
-);
-
-VideoPreview.displayName = 'VideoPreview';
-
-/**
- * Componente de preview de audio
- */
-const AudioPreview: React.FC<MediaPreviewProps> = memo(
-  ({ url, caption, config, onLoad, onError }) => {
     const [audioError, setAudioError] = useState(false);
-    const audioSettings = config?.audioSettings;
+    const [isPlaying, setIsPlaying] = useState(false);
+    const [isMuted, setIsMuted] = useState(config?.videoSettings?.muted ?? false);
+    const [isLoading, setIsLoading] = useState(true);
 
-    const handleError = useCallback(() => {
+    // Colores memoizados por tipo
+    const mediaColor = useMemo(() => MEDIA_COLORS[type] ?? MEDIA_COLORS.file, [type]);
+
+    // Callbacks optimizados
+    const handleImageLoad = useCallback(() => {
+      setIsLoading(false);
+    }, []);
+
+    const handleImageError = useCallback(() => {
+      setImageError(true);
+      setIsLoading(false);
+    }, []);
+
+    const handleVideoLoad = useCallback(() => {
+      setIsLoading(false);
+    }, []);
+
+    const handleVideoError = useCallback(() => {
+      setVideoError(true);
+      setIsLoading(false);
+    }, []);
+
+    const handleAudioLoad = useCallback(() => {
+      setIsLoading(false);
+    }, []);
+
+    const handleAudioError = useCallback(() => {
       setAudioError(true);
-      onError?.();
-    }, [onError]);
+      setIsLoading(false);
+    }, []);
 
-    if (audioError) {
+    const handlePlayPause = useCallback(() => {
+      setIsPlaying((prev) => !prev);
+    }, []);
+
+    const handleToggleMute = useCallback(() => {
+      setIsMuted((prev) => !prev);
+    }, []);
+
+    // Render vacío optimizado
+    if (!url) {
       return (
-        <div className='media-error'>
-          <span className='error-icon'>🎵❌</span>
-          <p>No se pudo cargar el audio</p>
-          <small>{url}</small>
+        <div className='media-preview-empty'>
+          <div className='empty-icon-wrapper' style={{ backgroundColor: `${mediaColor}15` }}>
+            <FileImage size={24} color={mediaColor} />
+          </div>
+          <p className='empty-text'>Sin contenido multimedia</p>
         </div>
       );
     }
 
+    // Render optimizado por tipo
+    switch (type) {
+      case 'image':
+        if (imageError) {
+          return (
+            <div className='media-preview media-preview-error'>
+              <div className='error-content'>
+                <AlertCircle size={24} color={mediaColor} />
+                <p>Error al cargar imagen</p>
+                <small>{url}</small>
+              </div>
+            </div>
+          );
+        }
+        return (
+          <div className='media-preview media-preview-image'>
+            {isLoading && (
+              <div className='preview-loading'>
+                <div className='loading-shimmer' />
+              </div>
+            )}
+            <div className='preview-image-container'>
+              <img
+                src={url}
+                alt={altText || caption || 'Media preview'}
+                onLoad={handleImageLoad}
+                onError={handleImageError}
+                className='preview-image'
+                style={{
+                  objectFit: config?.imageSettings?.objectFit || 'cover',
+                  display: isLoading ? 'none' : 'block',
+                }}
+                loading='lazy'
+              />
+              <div className='preview-overlay'>
+                <button className='preview-action-btn' aria-label='Expandir'>
+                  <Maximize2 size={16} />
+                </button>
+              </div>
+            </div>
+            {caption && (
+              <div className='preview-caption'>
+                <p>{caption}</p>
+              </div>
+            )}
+          </div>
+        );
+
+      case 'video':
+        if (videoError) {
+          return (
+            <div className='media-preview media-preview-error'>
+              <div className='error-content'>
+                <AlertCircle size={24} color={mediaColor} />
+                <p>Error al cargar video</p>
+                <small>{url}</small>
+              </div>
+            </div>
+          );
+        }
+        return (
+          <div className='media-preview media-preview-video'>
+            {isLoading && (
+              <div className='preview-loading'>
+                <div className='loading-shimmer' />
+              </div>
+            )}
+            <div className='video-container'>
+              <video
+                aria-label={altText ?? 'Video content'}
+                src={url}
+                autoPlay={config?.videoSettings?.autoplay}
+                controls={config?.videoSettings?.controls}
+                loop={config?.videoSettings?.loop}
+                muted={isMuted}
+                className='preview-video'
+                playsInline
+                onLoadedData={handleVideoLoad}
+                onError={handleVideoError}
+              />
+              {!config?.videoSettings?.controls && (
+                <div className='video-custom-controls'>
+                  <button
+                    onClick={handlePlayPause}
+                    className='control-btn control-btn-primary'
+                    aria-label={isPlaying ? 'Pausar' : 'Reproducir'}
+                    style={{ backgroundColor: mediaColor }}
+                  >
+                    {isPlaying ? <Pause size={18} /> : <Play size={18} />}
+                  </button>
+                  <button
+                    onClick={handleToggleMute}
+                    className='control-btn'
+                    aria-label={isMuted ? 'Activar sonido' : 'Silenciar'}
+                  >
+                    {isMuted ? <VolumeX size={18} /> : <Volume2 size={18} />}
+                  </button>
+                </div>
+              )}
+              <div
+                className='video-badge'
+                style={{ backgroundColor: `${mediaColor}20`, color: mediaColor }}
+              >
+                <Film size={14} />
+                <span>Video</span>
+              </div>
+            </div>
+            {caption && (
+              <div className='preview-caption'>
+                <p>{caption}</p>
+              </div>
+            )}
+          </div>
+        );
+
+      case 'audio':
+        if (audioError) {
+          return (
+            <div className='media-preview media-preview-error'>
+              <div className='error-content'>
+                <AlertCircle size={24} color={mediaColor} />
+                <p>Error al cargar audio</p>
+                <small>{url}</small>
+              </div>
+            </div>
+          );
+        }
+        return (
+          <div className='media-preview media-preview-audio'>
+            {isLoading && (
+              <div className='preview-loading'>
+                <div className='loading-shimmer' />
+              </div>
+            )}
+            <div className='audio-container'>
+              <div className='audio-visualization'>
+                <div className='audio-icon-wrapper' style={{ backgroundColor: `${mediaColor}15` }}>
+                  <Music size={32} color={mediaColor} />
+                </div>
+                <div className='audio-waves'>
+                  {[...Array(5)].map((_, i) => (
+                    <div
+                      key={i}
+                      className='audio-wave'
+                      style={{
+                        backgroundColor: mediaColor,
+                        animationDelay: `${i * 0.1}s`,
+                      }}
+                    />
+                  ))}
+                </div>
+              </div>
+              <audio
+                aria-label={altText ?? 'Audio content'}
+                src={url}
+                autoPlay={config?.audioSettings?.autoplay}
+                controls
+                loop={config?.audioSettings?.loop}
+                className='preview-audio'
+                onLoadedData={handleAudioLoad}
+                onError={handleAudioError}
+              />
+            </div>
+            {caption && (
+              <div className='preview-caption'>
+                <p>{caption}</p>
+              </div>
+            )}
+          </div>
+        );
+
+      case 'file':
+      default: {
+        const fileName = url?.split('/').pop() ?? caption ?? 'archivo';
+        const truncatedFileName = fileName.length > 30 ? `${fileName.substring(0, 27)}...` : fileName;
+
+        return (
+          <div className='media-preview media-preview-file'>
+            <div className='file-container'>
+              <div className='file-icon-wrapper' style={{ backgroundColor: `${mediaColor}15` }}>
+                <FileImage size={32} color={mediaColor} />
+              </div>
+              <div className='file-info'>
+                <p className='file-name'>{truncatedFileName}</p>
+                <div className='file-actions'>
+                  <a
+                    href={url}
+                    target='_blank'
+                    rel='noopener noreferrer'
+                    className='file-download-btn'
+                    style={{ backgroundColor: mediaColor }}
+                  >
+                    <Download size={14} />
+                    <span>Descargar</span>
+                  </a>
+                </div>
+              </div>
+            </div>
+            {caption && (
+              <div className='preview-caption'>
+                <p>{caption}</p>
+              </div>
+            )}
+          </div>
+        );
+      }
+    }
+  },
+  (prevProps, nextProps) => {
+    // Comparación superficial optimizada
     return (
-      <div className='media-audio-container'>
-        <div className='audio-player'>
-          <span className='audio-icon'>🎵</span>
-          <audio
-            src={url}
-            controls={audioSettings?.controls ?? true}
-            autoPlay={audioSettings?.autoplay ?? false}
-            loop={audioSettings?.loop ?? false}
-            onLoadedData={onLoad}
-            onError={handleError}
-            className='media-audio'
-          >
-            <track kind='captions' />
-          </audio>
-        </div>
-        {caption && <p className='media-caption'>{caption}</p>}
-      </div>
+      prevProps.type === nextProps.type &&
+      prevProps.url === nextProps.url &&
+      prevProps.caption === nextProps.caption &&
+      prevProps.altText === nextProps.altText &&
+      JSON.stringify(prevProps.config) === JSON.stringify(nextProps.config)
     );
   },
 );
-
-AudioPreview.displayName = 'AudioPreview';
-
-/**
- * Componente de preview de archivo
- */
-const FilePreview: React.FC<MediaPreviewProps> = memo(({ url, caption, config }) => {
-  const fileName = config?.fileSettings?.fileName ?? getFileNameFromUrl(url);
-  const fileSize = config?.fileSettings?.fileSize;
-
-  const handleDownload = useCallback(() => {
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = fileName;
-    link.target = '_blank';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  }, [url, fileName]);
-
-  return (
-    <div className='media-file-container'>
-      <div className='file-info'>
-        <span className='file-icon'>📎</span>
-        <div className='file-details'>
-          <p className='file-name'>{fileName}</p>
-          {fileSize && <small className='file-size'>{fileSize}</small>}
-        </div>
-        <button
-          onClick={handleDownload}
-          className='download-button'
-          style={{
-            backgroundColor: COLORS.PRIMARY,
-            color: 'white',
-            border: 'none',
-            borderRadius: '6px',
-            padding: '8px 16px',
-            cursor: 'pointer',
-            fontSize: '14px',
-            fontWeight: '500',
-            transition: 'all 0.2s',
-          }}
-        >
-          Descargar
-        </button>
-      </div>
-      {caption && <p className='media-caption'>{caption}</p>}
-    </div>
-  );
-});
-
-FilePreview.displayName = 'FilePreview';
-
-/**
- * Componente principal de preview
- */
-const MediaPreview: React.FC<MediaPreviewProps> = memo((props) => {
-  const { type } = props;
-
-  switch (type) {
-    case 'image':
-      return <ImagePreview {...props} />;
-    case 'video':
-      return <VideoPreview {...props} />;
-    case 'audio':
-      return <AudioPreview {...props} />;
-    case 'file':
-      return <FilePreview {...props} />;
-    default:
-      return (
-        <div className='media-unsupported'>
-          <span className='unsupported-icon'>❓</span>
-          <p>Tipo de media no soportado: {type}</p>
-        </div>
-      );
-  }
-});
 
 MediaPreview.displayName = 'MediaPreview';
 

@@ -7,7 +7,7 @@ import '@fontsource/orbitron/400.css';
 import useEpicHeader from '@/hooks/useEpicHeader';
 import { useRenderTracker } from '@/utils/renderTracker';
 
-import OptionsMenu from './OptionsMenu';
+import OptionsMenuAdvanced from './OptionsMenuAdvanced';
 import StatusBubble from './StatusBubble';
 import './EpicHeader.css';
 
@@ -293,47 +293,61 @@ const _renderActionButtons = ({
 };
 
 /**
+ * Helper para renderizar el dropdown menu
+ */
+const _renderDropdownMenu = (props) => {
+  return _renderOptionsMenu(props);
+};
+
+/**
  * Helper para renderizar el menú dropdown del header.
  * @param {Object} params - Parámetros de renderizado
  * @returns {JSX.Element} - Menú dropdown renderizado
  */
-const _renderDropdownMenu = ({
+const _renderOptionsMenu = ({
+  optionsMenuRef,
   optionsMenuOpen,
   setOptionsMenuOpen,
-  optionsMenuRef,
   plubotId,
-  handleOpenVersionHistory,
-  handleOpenImportExport,
-  handleOpenSettingsModal,
-  handleOpenPathAnalysis,
+  onOpenVersionHistory,
+  onOpenImportExport,
+  onOpenSettingsModal,
+  onOpenPathAnalysis,
   nodes,
   edges,
   lastSaved,
 }) => {
   return (
-    <div className='epic-header-dropdown' ref={optionsMenuRef}>
+    <div className='epic-header-more-container' ref={optionsMenuRef}>
       <button
         className='epic-header-button'
-        onClick={() => setOptionsMenuOpen((previous) => !previous)}
+        onClick={(e) => {
+          e.stopPropagation();
+          e.preventDefault();
+          console.log('🔵 Más button clicked - dispatching toggle event');
+          globalThis.dispatchEvent(
+            new CustomEvent('epic-menu-toggle', {
+              detail: { action: 'toggle-menu' },
+            }),
+          );
+        }}
+        onMouseDown={(e) => {
+          e.stopPropagation();
+          e.preventDefault();
+        }}
         title='Más opciones'
       >
         <MoreHorizontal size={16} className='epic-header-button-icon' />
         <span>Más</span>
       </button>
 
-      {optionsMenuOpen && (
-        <OptionsMenu
-          ref={optionsMenuRef}
-          plubotId={plubotId}
-          onOpenVersionHistory={handleOpenVersionHistory}
-          onOpenImportExport={handleOpenImportExport}
-          onOpenSettingsModal={handleOpenSettingsModal}
-          onOpenPathAnalysis={handleOpenPathAnalysis}
-          nodes={nodes}
-          edges={edges}
-          lastSaved={lastSaved}
-        />
-      )}
+      <OptionsMenuAdvanced
+        anchorRef={optionsMenuRef}
+        plubotId={plubotId}
+        nodes={nodes}
+        edges={edges}
+        lastSaved={lastSaved}
+      />
     </div>
   );
 };
@@ -463,34 +477,34 @@ const EpicHeaderComponent = React.memo(
       ],
     );
 
-    const dropdownMenuProps = useMemo(
-      () => ({
+    const dropdownMenuProps = useMemo(() => {
+      const props = {
         optionsMenuOpen,
         setOptionsMenuOpen,
         optionsMenuRef,
         plubotId,
-        handleOpenVersionHistory,
-        handleOpenImportExport,
-        handleOpenSettingsModal,
-        handleOpenPathAnalysis,
+        onOpenVersionHistory: handleOpenVersionHistory,
+        onOpenImportExport: handleOpenImportExport,
+        onOpenSettingsModal: handleOpenSettingsModal,
+        onOpenPathAnalysis: handleOpenPathAnalysis,
         nodes,
         edges,
         lastSaved,
-      }),
-      [
-        optionsMenuOpen,
-        setOptionsMenuOpen,
-        optionsMenuRef,
-        plubotId,
-        handleOpenVersionHistory,
-        handleOpenImportExport,
-        handleOpenSettingsModal,
-        handleOpenPathAnalysis,
-        nodes,
-        edges,
-        lastSaved,
-      ],
-    );
+      };
+      return props;
+    }, [
+      optionsMenuOpen,
+      setOptionsMenuOpen,
+      optionsMenuRef,
+      plubotId,
+      handleOpenVersionHistory,
+      handleOpenImportExport,
+      handleOpenSettingsModal,
+      handleOpenPathAnalysis,
+      nodes,
+      edges,
+      lastSaved,
+    ]);
 
     // OPTIMIZED: Memoize main header props
     const mainHeaderProps = useMemo(

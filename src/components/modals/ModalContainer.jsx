@@ -31,7 +31,11 @@ const _renderSyncModal = (closeModal, handleSync) => (
 );
 
 const _renderEmbedModal = (closeModal, plubotId) => (
-  <EmbedModal onClose={() => closeModal('embedModal')} plubotId={plubotId || '1'} plubotName='Mi Plubot' />
+  <EmbedModal
+    onClose={() => closeModal('embedModal')}
+    plubotId={plubotId || '1'}
+    plubotName='Mi Plubot'
+  />
 );
 
 const _renderImportExportModal = (closeModal, setByteMessage) => (

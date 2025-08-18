@@ -28,7 +28,19 @@ export const useHeaderReturn = (props) => {
     nodes,
     edges,
     plubotId,
+    handleOpenVersionHistory,
+    handleOpenImportExport,
+    handleOpenSettingsModal,
+    handleOpenPathAnalysis,
   } = props;
+
+  // Los handlers vienen en modalActions, no directamente en props
+  const handlers = {
+    handleOpenVersionHistory: modalActions?.handleOpenVersionHistory || handleOpenVersionHistory,
+    handleOpenImportExport: modalActions?.handleOpenImportExport || handleOpenImportExport,
+    handleOpenSettingsModal: modalActions?.handleOpenSettingsModal || handleOpenSettingsModal,
+    handleOpenPathAnalysis: modalActions?.handleOpenPathAnalysis || handleOpenPathAnalysis,
+  };
 
   return {
     isAuthenticated,
@@ -44,7 +56,7 @@ export const useHeaderReturn = (props) => {
     time,
     handleSaveFlow,
     ...actions,
-    ...modalActions,
+    ...handlers,
     formatLastSaved: () => formatLastSaved(lastSaved),
     formatTime: () => formatTime(time),
     finalTemplatesModal: openTemplatesModal ?? storeTemplatesModal,

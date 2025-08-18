@@ -27,8 +27,8 @@ import useByteMessageContext from '../../../hooks/useByteMessageContext';
 import useModalContext from '../../../hooks/useModalContext';
 
 import CustomizeSection from './CustomizeSection';
-import WhatsappIntegrationPanel from './WhatsappIntegrationPanel';
 import WhatsappBusinessPanel from './WhatsappBusinessPanel';
+import WhatsappIntegrationPanel from './WhatsappIntegrationPanel';
 // Si no tienes canvas-confetti, puedes instalarlo con: npm install canvas-confetti
 
 // Custom hook para manejar achievements y gamificación
@@ -620,7 +620,7 @@ const EmbedModal = ({ plubotId, plubotName, onClose, onExport, _flowData }) => {
               {activeTab === 'qr' && <QRSection />}
 
               {activeTab === 'whatsapp' && <WhatsappIntegrationPanel plubotId={plubotId} />}
-              
+
               {activeTab === 'whatsapp-business' && <WhatsappBusinessPanel plubotId={plubotId} />}
 
               {activeTab === 'export' && <ExportSection />}

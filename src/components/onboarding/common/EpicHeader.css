@@ -17,7 +17,7 @@
   overflow: visible; /* Cambiado de hidden a visible */
   flex-shrink: 0;
   grid-row: 1 / 2;
-  isolation: isolate; /* Contiene las animaciones dentro del encabezado */
+  isolation: isolate; /* Animación para el menú dropdown */
   contain: content; /* Cambiado de strict a content para permitir visibilidad */
   clip-path: none; /* Eliminado para permitir que el encabezado sea visible */
   transform: translateZ(0); /* Fuerza aceleración por hardware */
@@ -50,6 +50,14 @@
   display: flex;
   align-items: center;
   gap: 1rem;
+}
+
+.epic-header-more-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+  z-index: 9999999;
 }
 
 .epic-header-title {
@@ -320,24 +328,20 @@
 }
 
 .epic-header-dropdown-menu {
-  position: fixed;
-  top: 60px; /* Posición fija desde la parte superior */
-  right: 20px;
-  width: 280px;
-  background: linear-gradient(135deg, rgba(8, 10, 15, 0.98) 0%, rgba(20, 22, 28, 0.98) 100%);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(0, 30, 60, 0.95) 100%);
   border: 1px solid rgba(0, 195, 255, 0.3);
-  border-radius: 8px;
-  box-shadow:
-    0 4px 15px rgba(0, 0, 0, 0.5),
-    0 0 8px rgba(0, 195, 255, 0.2);
-  z-index: 9999999; /* Valor extremadamente alto para asegurar que esté por encima de todo */
-  overflow: hidden;
-  animation: fadeIn 0.2s ease-out;
-  transform: translateZ(0); /* Forzar rendering en GPU */
-  will-change: transform; /* Optimizar para animaciones */
-  pointer-events: auto !important; /* Asegurar que los eventos del mouse funcionen */
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5), 0 0 20px rgba(0, 195, 255, 0.2);
+  min-width: 250px;
+  max-width: 300px;
+  backdrop-filter: blur(10px);
+  animation: fadeInDown 0.3s ease;
+  overflow: visible;
+  pointer-events: all !important;
+  display: block !important;
+  transform: translateZ(0);
+  will-change: transform;
+  isolation: isolate;
 }
 
 .epic-header-dropdown-menu::before {
@@ -539,4 +543,16 @@
 /* Efecto de escaneo - eliminado para mejorar el rendimiento */
 .epic-scan-line {
   display: none; /* Ocultamos el elemento en lugar de eliminarlo por completo */
+}
+
+/* Animación para el menú dropdown */
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

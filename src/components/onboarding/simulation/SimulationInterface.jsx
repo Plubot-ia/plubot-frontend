@@ -626,7 +626,7 @@ const SimulationInterface = ({
     (node) => {
       if (node.data.label) {
         addMessageToHistory({
-          id: node.id,
+          id: `end-${node.id}-${Date.now()}`,
           type: 'system',
           content: node.data.label,
           timestamp: new Date().toISOString(),
@@ -641,7 +641,7 @@ const SimulationInterface = ({
   const processDefaultNode = useCallback(
     async (node, currentResponses, currentMessageForNode) => {
       addMessageToHistory({
-        id: `system-non-interactive-${node.id}`,
+        id: `system-non-interactive-${node.id}-${Date.now()}`,
         type: 'system',
         content: t(
           'simulation.nonInteractiveNode',
@@ -682,7 +682,7 @@ const SimulationInterface = ({
 
       // Mostrar la pregunta al usuario
       addMessageToHistory({
-        id: `input-question-${node.id}`,
+        id: `input-question-${node.id}-${Date.now()}`,
         type: 'bot',
         content: question,
         timestamp: new Date().toISOString(),
@@ -703,27 +703,40 @@ const SimulationInterface = ({
 
   // Función auxiliar para procesar nodos de mensaje
   const processMessageNode = useCallback(
-    (node, currentResponses) => {
-      // Combine variable sources: node's own variables array and accumulated responses
-      const combinedVariables = { ...currentResponses };
-      if (Array.isArray(node.data.variables)) {
-        for (const variable of node.data.variables) {
-          if (variable && variable.name) {
-            combinedVariables[variable.name] = variable.value ?? '';
+    (node, currentResponses, currentMessageForNode) => {
+      // Reemplazar variables en el contenido del mensaje
+      // MessageNode usa 'message' no 'content'
+      const messageContent = node.data.message || node.data.content || '';
+      const interpolatedContent = messageContent.replaceAll(
+        /\{\{(\w+)\}\}/g,
+        (match, variableName) => {
+          const variableValue = currentResponses[variableName];
+          if (variableValue !== undefined) {
+            return variableValue;
           }
-        }
-      }
-
-      const interpolatedContent = interpolatePrompt(
-        node.data.message || t('simulation.undefinedMessage', 'Mensaje no definido'),
-        combinedVariables,
-        '',
+          // Si la variable no está definida, devolver el placeholder original
+          return match;
+        },
       );
 
+      // Si el contenido está vacío, usar un mensaje por defecto
+      const finalContent =
+        interpolatedContent.trim() || t('simulation.emptyMessage', '[Mensaje vacío]');
+
+      const sender = node.data.sender || 'bot';
+      const finalMessage = sender === 'user' ? currentMessageForNode || finalContent : finalContent;
+
+      const processedContent = finalMessage
+        .replaceAll(
+          /\{\{(\w+)\}\}/g,
+          (match, variableName) => currentResponses[variableName] || match,
+        )
+        .replaceAll('{{user_message}}', '');
+
       addMessageToHistory({
-        id: node.id,
+        id: `message-${node.id}-${Date.now()}`,
         type: node.data.sender || 'bot',
-        content: interpolatedContent,
+        content: processedContent || finalContent,
         timestamp: new Date().toISOString(),
       });
       setFlowStatus('waiting_input');
@@ -734,10 +747,10 @@ const SimulationInterface = ({
   // Función auxiliar para procesar nodos de opción
   const processOptionNode = useCallback(
     async (node, currentResponses, currentMessageForNode) => {
-      const nextEdgeFromOption = safeEdges.find((edge) => edge.source === node.id);
-      if (nextEdgeFromOption) {
+      const nextEdge = safeEdges.find((edge) => edge.source === node.id);
+      if (nextEdge) {
         await processNodeReference.current(
-          nextEdgeFromOption.target,
+          nextEdge.target,
           currentResponses,
           currentMessageForNode,
         );
@@ -758,20 +771,29 @@ const SimulationInterface = ({
   const processDecisionNode = useCallback(
     (node) => {
       addMessageToHistory({
-        id: node.id,
+        id: `decision-${node.id}-${Date.now()}`,
         type: 'bot',
-        content:
-          node.data.question || t('simulation.undefinedQuestion', '¿Qué opción deseas tomar?'),
+        content: node.data.question || t('simulation.decisionQuestion', '¿Qué opción eliges?'),
         timestamp: new Date().toISOString(),
       });
       const optionEdges = safeEdges.filter((edge) => edge.source === node.id);
-      const options = optionEdges.map((edge) => {
+
+      // Create a Map to store unique options by targetNodeId
+      const uniqueOptionsMap = new Map();
+
+      for (const edge of optionEdges) {
         const optionNode = safeNodes.find((n) => n.id === edge.target && n.type === 'option');
-        return {
-          targetNodeId: edge.target,
-          label: optionNode?.data?.text || edge.label || `Opción ${optionNode?.id}`,
-        };
-      });
+        // Only add if we haven't seen this targetNodeId before
+        if (!uniqueOptionsMap.has(edge.target)) {
+          uniqueOptionsMap.set(edge.target, {
+            targetNodeId: edge.target,
+            label: optionNode?.data?.text || edge.label || `Opción ${optionNode?.id}`,
+          });
+        }
+      }
+
+      // Convert Map values to array
+      const options = [...uniqueOptionsMap.values()];
       setCurrentDecisionOptions(options);
       setFlowStatus('waiting_input');
     },
@@ -782,7 +804,7 @@ const SimulationInterface = ({
   const processDiscordNode = useCallback(
     async (node, currentResponses, currentMessageForNode) => {
       addMessageToHistory({
-        id: `action-status-${node.id}`,
+        id: `action-status-${node.id}-${Date.now()}`,
         type: 'system',
         content: t('simulation.executingDiscord', 'Ejecutando acción de Discord...'),
         timestamp: new Date().toISOString(),
@@ -791,7 +813,7 @@ const SimulationInterface = ({
       setFlowStatus('executing_action');
       const result = await executeDiscordAction(node.data, t);
       addMessageToHistory({
-        id: `action-result-${node.id}`,
+        id: `action-result-${node.id}-${Date.now()}`,
         type: result.success ? 'system' : 'error',
         content: result.message,
         timestamp: new Date().toISOString(),
@@ -909,7 +931,7 @@ const SimulationInterface = ({
 
       // Mostrar mensaje de evaluación
       addMessageToHistory({
-        id: `condition-${node.id}`,
+        id: `condition-${node.id}-${Date.now()}`,
         type: 'system',
         content: t(
           'simulation.evaluatingCondition',
@@ -964,7 +986,7 @@ const SimulationInterface = ({
     async (node, currentResponses, currentMessageForNode) => {
       setFlowStatus('executing_action');
       addMessageToHistory({
-        id: `system-executing-emotion-${node.id}`,
+        id: `system-executing-emotion-${node.id}-${Date.now()}`,
         type: 'system',
         content: t(
           'simulation.executingEmotionDetection',
@@ -1006,7 +1028,7 @@ const SimulationInterface = ({
       } else {
         setFlowStatus('error');
         addMessageToHistory({
-          id: `error-emotion-${node.id}`,
+          id: `error-emotion-${node.id}-${Date.now()}`,
           type: 'error',
           content:
             t('simulation.errorEmotionDetection', 'Error al detectar la emoción: ') +
@@ -1025,7 +1047,7 @@ const SimulationInterface = ({
 
       // Mostrar mensaje de estado
       addMessageToHistory({
-        id: `api-executing-${node.id}`,
+        id: `api-executing-${node.id}-${Date.now()}`,
         type: 'system',
         content: t(
           'simulation.executingApiNode',
@@ -1051,7 +1073,7 @@ const SimulationInterface = ({
 
         // Mostrar mensaje de éxito
         addMessageToHistory({
-          id: `api-success-${node.id}`,
+          id: `api-success-${node.id}-${Date.now()}`,
           type: 'system',
           content: t(
             'simulation.apiNodeSuccess',
@@ -1081,7 +1103,7 @@ const SimulationInterface = ({
       } else {
         // Mostrar mensaje de error
         addMessageToHistory({
-          id: `api-error-${node.id}`,
+          id: `api-error-${node.id}-${Date.now()}`,
           type: 'error',
           content: apiResult.error,
           timestamp: new Date().toISOString(),
@@ -1098,7 +1120,7 @@ const SimulationInterface = ({
     async (node, currentResponses, currentMessageForNode) => {
       if (!validateNodeHasPrompt(node)) {
         addMessageToHistory({
-          id: `error-ai-prompt-${node.id}`,
+          id: `error-ai-prompt-${node.id}-${Date.now()}`,
           type: 'error',
           content: t(
             'simulation.errorAiNodeNoPrompt',
@@ -1111,7 +1133,7 @@ const SimulationInterface = ({
       }
       setFlowStatus('executing_action');
       addMessageToHistory({
-        id: `system-executing-ai-${node.id}`,
+        id: `system-executing-ai-${node.id}-${Date.now()}`,
         type: 'system',
         content: t('simulation.executingAi', 'Ejecutando Nodo IA...'),
         isActionStatus: true,
@@ -1137,7 +1159,7 @@ const SimulationInterface = ({
           [responseVariableName]: aiResponse,
         };
         addMessageToHistory({
-          id: `ai-response-${node.id}`,
+          id: `ai-response-${node.id}-${Date.now()}`,
           type: 'bot',
           content: aiResponse,
           timestamp: new Date().toISOString(),
@@ -1160,7 +1182,7 @@ const SimulationInterface = ({
         }
       } else {
         addMessageToHistory({
-          id: `ai-error-${node.id}`,
+          id: `ai-error-${node.id}-${Date.now()}`,
           type: 'error',
           content: aiResult.error,
           timestamp: new Date().toISOString(),
@@ -1239,7 +1261,7 @@ const SimulationInterface = ({
 
       if (!url) {
         addMessageToHistory({
-          id: `media-error-${node.id}`,
+          id: `media-error-${node.id}-${Date.now()}`,
           type: 'error',
           content: t('simulation.mediaUrlMissing', 'URL del contenido multimedia no especificada'),
           timestamp: new Date().toISOString(),
@@ -1254,7 +1276,7 @@ const SimulationInterface = ({
 
       // Mostrar el contenido multimedia
       addMessageToHistory({
-        id: `media-${node.id}`,
+        id: `media-${node.id}-${Date.now()}`,
         type: 'bot',
         content: mediaContent,
         timestamp: new Date().toISOString(),
@@ -1353,7 +1375,7 @@ const SimulationInterface = ({
         }
       } catch (error) {
         addMessageToHistory({
-          id: `wait-error-${node.id}`,
+          id: `wait-error-${node.id}-${Date.now()}`,
           type: 'error',
           content: `Error en el nodo de espera: ${error.message}`,
           timestamp: new Date().toISOString(),
@@ -1414,7 +1436,7 @@ const SimulationInterface = ({
   const handleMemoryError = useCallback(
     (nodeId, message) => {
       addMessageToHistory({
-        id: `memory-error-${nodeId}`,
+        id: `memory-error-${nodeId}-${Date.now()}`,
         type: 'error',
         content: message,
         timestamp: new Date().toISOString(),
@@ -1498,7 +1520,7 @@ const SimulationInterface = ({
 
       // Mostrar el resultado de la operación
       addMessageToHistory({
-        id: `memory-${node.id}`,
+        id: `memory-${node.id}-${Date.now()}`,
         type: success ? 'system' : 'error',
         content: resultMessage,
         timestamp: new Date().toISOString(),
@@ -1814,7 +1836,11 @@ const SimulationInterface = ({
                 <div className='ts-bot-avatar' />
               )}
               <div className='ts-message-content'>
-                <ReactMarkdown>{message.content}</ReactMarkdown>
+                {message.isHtml ? (
+                  <div dangerouslySetInnerHTML={{ __html: message.content }} />
+                ) : (
+                  <ReactMarkdown>{message.content}</ReactMarkdown>
+                )}
                 {message.timestamp && (
                   <div className='ts-timestamp'>
                     {new Date(message.timestamp).toLocaleTimeString()}

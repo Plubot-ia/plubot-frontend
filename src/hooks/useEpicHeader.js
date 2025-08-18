@@ -1,5 +1,7 @@
 import { useRef } from 'react';
 
+import useFlowStore from '@/stores/use-flow-store';
+
 import { useClickOutside } from './useClickOutside';
 import { useFlowInfo } from './useFlowInfo';
 import { useHeaderActions } from './useHeaderActions';
@@ -37,34 +39,38 @@ const buildHeaderProps = ({
   nodes,
   edges,
   plubotId,
-}) => ({
-  isAuthenticated,
-  displayFlowName,
-  nodeCount,
-  edgeCount,
-  optionsMenuOpen,
-  setOptionsMenuOpen,
-  optionsMenuRef,
-  isSaving,
-  saveStatus,
-  notification,
-  time,
-  handleSaveFlow,
-  actions,
-  modalActions,
-  lastSaved,
-  openTemplatesModal,
-  storeTemplatesModal,
-  openSimulateModal,
-  storeSimulateModal,
-  openShareModal,
-  storeShareModal,
-  openModal,
-  showNotification,
-  nodes,
-  edges,
-  plubotId,
-});
+}) => {
+  const result = {
+    isAuthenticated,
+    displayFlowName,
+    nodeCount,
+    edgeCount,
+    optionsMenuOpen,
+    setOptionsMenuOpen,
+    optionsMenuRef,
+    isSaving,
+    saveStatus,
+    notification,
+    time,
+    handleSaveFlow,
+    ...actions,
+    modalActions, // Pasar modalActions como objeto completo
+    ...modalActions, // También desestructurar para compatibilidad
+    lastSaved,
+    openTemplatesModal,
+    storeTemplatesModal,
+    openSimulateModal,
+    storeSimulateModal,
+    openShareModal,
+    storeShareModal,
+    openModal,
+    showNotification,
+    nodes,
+    edges,
+    plubotId,
+  };
+  return result;
+};
 
 const useEpicHeader = ({
   onCloseModals: _onCloseModals,
@@ -84,6 +90,10 @@ const useEpicHeader = ({
     propertiesFlowName,
     getVisibleNodeCount,
   });
+
+  // Obtener los datos reales de nodes y edges del store para el menú desplegable
+  const actualNodes = useFlowStore((state) => state.nodes);
+  const actualEdges = useFlowStore((state) => state.edges);
   const {
     optionsMenuOpen,
     setOptionsMenuOpen,
@@ -97,16 +107,26 @@ const useEpicHeader = ({
   } = useHeaderState();
 
   const optionsMenuRef = useRef(null);
-  useClickOutside(optionsMenuRef, () => setOptionsMenuOpen(false));
+
+  useClickOutside(
+    optionsMenuRef,
+    () => {
+      setOptionsMenuOpen(false);
+    },
+    optionsMenuOpen,
+  ); // Solo activar cuando el menú esté abierto
 
   const { storeShareModal, storeSimulateModal, storeTemplatesModal, storeSettingsModal } =
     useTrainingModals();
+
   const modalActions = useModalHandlers({
     setOptionsMenuOpen,
     showOptionsModal,
     closeAllModals,
     finalSettingsModal: openSettingsModal ?? storeSettingsModal,
+    openModal,
   });
+
   const { handleSaveFlow, ...actions } = useHeaderActions({
     openModal,
     closeAllModals,
@@ -147,8 +167,8 @@ const useEpicHeader = ({
       storeShareModal,
       openModal,
       showNotification,
-      nodes,
-      edges,
+      nodes: actualNodes, // Usar los datos reales para el menú
+      edges: actualEdges, // Usar los datos reales para el menú
       plubotId,
     }),
   );

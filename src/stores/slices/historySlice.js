@@ -33,12 +33,10 @@ export const historySlice = (set, get) => ({
     // Actualizar contadores si se incluyen nodos o edges
     const finalUpdates = { ...updates };
     if (updates.nodes) {
-      const visibleNodeCount = updates.nodes.filter((n) => !n.hidden && !n.deleted).length;
-      finalUpdates.nodeCount = visibleNodeCount;
+      finalUpdates.nodeCount = updates.nodes.length;
     }
     if (updates.edges) {
-      const visibleEdgeCount = updates.edges.filter((edge) => !edge.hidden && !edge.deleted).length;
-      finalUpdates.edgeCount = visibleEdgeCount;
+      finalUpdates.edgeCount = updates.edges.length;
     }
 
     set({ history: { ...history, past: newPast, future: [] }, ...finalUpdates });
@@ -54,12 +52,10 @@ export const historySlice = (set, get) => ({
     // Actualizar contadores al hacer undo
     const finalPresent = { ...present };
     if (present.nodes) {
-      const visibleNodeCount = present.nodes.filter((n) => !n.hidden && !n.deleted).length;
-      finalPresent.nodeCount = visibleNodeCount;
+      finalPresent.nodeCount = present.nodes.length;
     }
     if (present.edges) {
-      const visibleEdgeCount = present.edges.filter((edge) => !edge.hidden && !edge.deleted).length;
-      finalPresent.edgeCount = visibleEdgeCount;
+      finalPresent.edgeCount = present.edges.length;
     }
 
     set({
@@ -80,12 +76,10 @@ export const historySlice = (set, get) => ({
     // Actualizar contadores al hacer redo
     const finalPresent = { ...present };
     if (present.nodes) {
-      const visibleNodeCount = present.nodes.filter((n) => !n.hidden && !n.deleted).length;
-      finalPresent.nodeCount = visibleNodeCount;
+      finalPresent.nodeCount = present.nodes.length;
     }
     if (present.edges) {
-      const visibleEdgeCount = present.edges.filter((edge) => !edge.hidden && !edge.deleted).length;
-      finalPresent.edgeCount = visibleEdgeCount;
+      finalPresent.edgeCount = present.edges.length;
     }
 
     set({
