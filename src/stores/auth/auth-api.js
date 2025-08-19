@@ -16,7 +16,7 @@ export const logoutUser = async (accessToken) => {
       Authorization: `Bearer ${accessToken}`,
     },
   };
-  const response = await instance.post('/auth/logout', {}, config);
+  const response = await instance.post('auth/logout', {}, config);
   return response.data;
 };
 
