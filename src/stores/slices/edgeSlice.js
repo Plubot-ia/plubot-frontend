@@ -33,25 +33,19 @@ function _requiresEliteEdge(nodeType) {
 function _sanitizeEdge(edge, nodeTypes) {
   const newEdge = { ...edge };
 
-  // REGLA 1: Eliminar handles inválidos en todas sus formas.
-  if (_isInvalidHandle(newEdge.sourceHandle)) {
-    delete newEdge.sourceHandle;
-  }
-  if (_isInvalidHandle(newEdge.targetHandle)) {
-    delete newEdge.targetHandle;
-  }
+  // REGLA 1: Eliminar handles inválidos
+  if (_isInvalidHandle(newEdge.sourceHandle)) delete newEdge.sourceHandle;
+  if (_isInvalidHandle(newEdge.targetHandle)) delete newEdge.targetHandle;
 
-  // REGLA 2: Forzar el tipo de arista a 'eliteEdge' para nodos complejos.
+  // REGLA 2: Forzar tipo para nodos complejos
   const sourceType = nodeTypes.get(edge.source);
   const targetType = nodeTypes.get(edge.target);
   if (_requiresEliteEdge(sourceType) || _requiresEliteEdge(targetType)) {
     newEdge.type = 'eliteEdge';
   }
 
-  // IMPORTANTE: Si no tiene tipo, usar 'default' que mapea a EliteEdge
-  if (!newEdge.type) {
-    newEdge.type = 'default';
-  }
+  // Si no tiene tipo, usar 'default'
+  if (!newEdge.type) newEdge.type = 'default';
 
   return newEdge;
 }
@@ -98,87 +92,59 @@ export const createEdgeSlice = (set, get) => ({
       return updateObject;
     });
   },
-  setEdges: (newEdges) => {
-    const { edges: currentEdges, nodes, _createHistoryEntry } = get();
-
-    // Validación preventiva: filtrar edges con handles undefined antes de sanitización
-    if (!newEdges || !Array.isArray(newEdges)) {
-      return;
-    }
-
-    // DEBUG: Log para rastrear duplicación de aristas (temporalmente deshabilitado)
-    // console.log('🔍 setEdges called with:', {
-    //   newEdgesCount: newEdges.length,
-    //   currentEdgesCount: currentEdges.length,
-    //   uniqueNewEdgeIds: [...new Set(newEdges.map(edge => edge.id))].length,
-    //   duplicateIds: newEdges.filter((edge, i, arr) => arr.findIndex(x => x.id === edge.id) !== i).map(edge => edge.id)
-    // });
-
-    // Logging limpio para edges problemáticos (solo si hay handles undefined)
-    const problematicEdges = newEdges.filter(
-      (edge) => edge.sourceHandle === undefined || edge.targetHandle === undefined,
-    );
-
-    if (problematicEdges.length > 0) {
-      // Problematic edges detected
-    }
-
-    // Deduplicar aristas por ID antes de sanitizar
+  // Función auxiliar para deduplicar edges
+  _deduplicateEdges: (edges) => {
     const edgeMap = new Map();
-    for (const edge of newEdges) {
-      if (edge && edge.id) {
-        edgeMap.set(edge.id, edge);
-      }
+    for (const edge of edges) {
+      if (edge?.id) edgeMap.set(edge.id, edge);
     }
-    const deduplicatedEdges = [...edgeMap.values()];
+    return [...edgeMap.values()];
+  },
 
-    // DEBUG: Log de deduplicación (temporalmente deshabilitado)
-    // console.log('🔍 After deduplication:', {
-    //   originalCount: newEdges.length,
-    //   deduplicatedCount: deduplicatedEdges.length,
-    //   removedDuplicates: newEdges.length - deduplicatedEdges.length
-    // });
+  // Función auxiliar para procesar y sanitizar edges
+  _processEdges: (newEdges, nodes) => {
+    const nodeTypes = new Map(nodes.map((n) => [n.id, n.type]));
+    return newEdges.map((edge) => _sanitizeEdge(edge, nodeTypes));
+  },
 
-    // Sanear las aristas después de deduplicar
-    const nodeTypes = new Map(nodes.map((node) => [node.id, node.type]));
-    const sanitizedEdges = deduplicatedEdges.map((edge) => _sanitizeEdge(edge, nodeTypes));
+  setEdges: (newEdges) => {
+    const {
+      edges: currentEdges,
+      nodes,
+      _createHistoryEntry,
+      _deduplicateEdges,
+      _processEdges,
+    } = get();
 
-    if (JSON.stringify(currentEdges) === JSON.stringify(sanitizedEdges)) {
-      return;
-    }
+    if (!newEdges || !Array.isArray(newEdges)) return;
 
+    // Deduplicar y sanitizar
+    const deduplicatedEdges = _deduplicateEdges(newEdges);
+    const sanitizedEdges = _processEdges(deduplicatedEdges, nodes);
+
+    if (JSON.stringify(currentEdges) === JSON.stringify(sanitizedEdges)) return;
+
+    set({ edges: sanitizedEdges, edgeCount: sanitizedEdges.length });
     _createHistoryEntry({ edges: sanitizedEdges });
   },
   onConnect: (connection) => {
     const { edges, nodes, _createHistoryEntry } = get();
 
-    // VALIDACIÓN PREVENTIVA: Verificar que la conexión tenga handles válidos
-    if (!connection || !connection.source || !connection.target) {
-      return;
-    }
+    // Validar conexión
+    if (!connection?.source || !connection?.target) return;
+    if (connection.sourceHandle === undefined || connection.targetHandle === undefined) return;
 
-    // Verificar que los handles no sean undefined
-    if (connection.sourceHandle === undefined || connection.targetHandle === undefined) {
-      return;
-    }
-
-    // Verificar que los nodos fuente y destino existan
-    const sourceNode = nodes.find((node) => node.id === connection.source);
-    const targetNode = nodes.find((node) => node.id === connection.target);
-
-    if (!sourceNode || !targetNode) {
-      return;
-    }
+    // Verificar nodos
+    const sourceExists = nodes.some((n) => n.id === connection.source);
+    const targetExists = nodes.some((n) => n.id === connection.target);
+    if (!sourceExists || !targetExists) return;
 
     try {
       const newEdges = addEdge(connection, edges);
-
-      // Actualizar contador al agregar edge
-      set({ edgeCount: newEdges.length });
-
+      set({ edges: newEdges, edgeCount: newEdges.length });
       _createHistoryEntry({ edges: newEdges });
     } catch {
-      // Error in onConnect - logged for debugging
+      // Error handled silently
     }
   },
   updateEdge: (id, data) => {
@@ -191,48 +157,48 @@ export const createEdgeSlice = (set, get) => ({
       }
       return edge;
     });
+
+    // Actualizar las aristas en el estado
+    set({ edges: newEdges });
+
     _createHistoryEntry({ edges: newEdges });
   },
   removeEdge: (edgeId) => {
     const { edges, _createHistoryEntry } = get();
     const newEdges = edges.filter((edge) => edge.id !== edgeId);
+
+    // Actualizar tanto las aristas como el contador
+    set({
+      edges: newEdges,
+      edgeCount: newEdges.length,
+    });
+
     _createHistoryEntry({ edges: newEdges });
   },
   cleanUpEdges: () => {
     const { nodes, edges, _createHistoryEntry } = get();
     const nodeIds = new Set(nodes.map((n) => n.id));
 
-    // Filtrar edges que tienen nodos válidos Y handles válidos
     const validEdges = edges.filter((edge) => {
-      // Verificar que los nodos existan
       const hasValidNodes = nodeIds.has(edge.source) && nodeIds.has(edge.target);
-
-      // Verificar que los handles no sean undefined
       const hasValidHandles = edge.sourceHandle !== undefined && edge.targetHandle !== undefined;
-
       return hasValidNodes && hasValidHandles;
     });
 
     if (validEdges.length !== edges.length) {
+      set({ edges: validEdges, edgeCount: validEdges.length });
       _createHistoryEntry({ edges: validEdges });
     }
   },
 
-  // Nueva función para limpiar edges con handles undefined específicamente
   cleanUpInvalidHandleEdges: () => {
     const { edges, _createHistoryEntry } = get();
-
-    const validEdges = edges.filter((edge) => {
-      const isValid = edge.sourceHandle !== undefined && edge.targetHandle !== undefined;
-
-      if (!isValid) {
-        // Edge will be filtered out
-      }
-
-      return isValid;
-    });
+    const validEdges = edges.filter(
+      (edge) => edge.sourceHandle !== undefined && edge.targetHandle !== undefined,
+    );
 
     if (validEdges.length !== edges.length) {
+      set({ edges: validEdges, edgeCount: validEdges.length });
       _createHistoryEntry({ edges: validEdges });
     }
   },

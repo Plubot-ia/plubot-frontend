@@ -165,7 +165,7 @@ EpicHeaderWrapper.propTypes = {
   flowName: PropTypes.string,
   setLocalFlowName: PropTypes.func.isRequired,
   saveFlowHandler: PropTypes.func.isRequired,
-  lastSaved: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(Date)]),
+  lastSaved: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(Date), PropTypes.number]),
   openModal: PropTypes.func.isRequired,
 };
 
@@ -276,7 +276,7 @@ FlowEditorRenderer.propTypes = {
   flowName: PropTypes.string,
   setLocalFlowName: PropTypes.func.isRequired,
   saveFlowHandler: PropTypes.func.isRequired,
-  lastSaved: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(Date)]),
+  lastSaved: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(Date), PropTypes.number]),
   openModal: PropTypes.func.isRequired,
 
   // Props del status

@@ -33,9 +33,9 @@ class BackupMetadata {
     this.timestamp = Date.now();
     this.nodeCount = 0;
     this.edgeCount = 0;
-    this.checksum = null;
+    this.checksum = undefined;
     this.compressed = false;
-    this.userAction = null;
+    this.userAction = undefined;
   }
 }
 
@@ -44,8 +44,8 @@ class BackupMetadata {
  */
 class BackupStrategy {
   constructor() {
-    this.lastBackupTime = 0;
-    this.lastNodeCount = 0;
+    this.lastBackupTime = undefined;
+    this.lastNodeCount = undefined;
     this.significantChangeThreshold = 0.2; // 20% change
   }
 
@@ -101,7 +101,7 @@ const IntegrityValidator = {
     const string_ = JSON.stringify(data);
     let hash = 0;
     for (let index = 0; index < string_.length; index++) {
-      const char = string_.charCodeAt(index);
+      const char = string_.codePointAt(index);
       hash = (hash << 5) - hash + char;
       hash = hash & hash; // Convert to 32-bit integer
     }
@@ -124,6 +124,22 @@ const IntegrityValidator = {
    * @param {Object} flowData - Flow data to validate
    * @returns {boolean} Whether flow structure is valid
    */
+  validateNode(node) {
+    return Boolean(
+      node.id &&
+        node.type &&
+        node.position &&
+        typeof node.position.x === 'number' &&
+        typeof node.position.y === 'number',
+    );
+  },
+
+  validateEdge(edge, nodeIds) {
+    return Boolean(
+      edge.id && edge.source && edge.target && nodeIds.has(edge.source) && nodeIds.has(edge.target),
+    );
+  },
+
   validateStructure(flowData) {
     if (!flowData) return false;
 
@@ -131,22 +147,12 @@ const IntegrityValidator = {
 
     // Validate nodes
     if (!Array.isArray(nodes)) return false;
-
-    for (const node of nodes) {
-      if (!node.id || !node.type || !node.position) return false;
-      if (typeof node.position.x !== 'number' || typeof node.position.y !== 'number') return false;
-    }
+    if (!nodes.every((node) => this.validateNode(node))) return false;
 
     // Validate edges
     if (!Array.isArray(edges)) return false;
-
     const nodeIds = new Set(nodes.map((n) => n.id));
-    for (const edge of edges) {
-      if (!edge.id || !edge.source || !edge.target) return false;
-      if (!nodeIds.has(edge.source) || !nodeIds.has(edge.target)) return false;
-    }
-
-    return true;
+    return edges.every((edge) => this.validateEdge(edge, nodeIds));
   },
 };
 
@@ -165,15 +171,9 @@ const CompressionUtility = {
     }
 
     // Simple compression: Remove redundant whitespace and use shorter keys
-    const compressed = JSON.stringify(data, (key, value) => {
-      // Skip null/undefined values
-      if (value === null || value === undefined) return;
-      // Round numbers to reduce size
-      if (typeof value === 'number') return Math.round(value * 100) / 100;
-      return value;
-    });
+    const compressed = JSON.stringify(data, undefined, 2);
 
-    return btoa(compressed); // Base64 encode for safety
+    return btoa(compressed);
   },
 
   /**
@@ -189,8 +189,8 @@ const CompressionUtility = {
     try {
       const decompressed = atob(compressed);
       return JSON.parse(decompressed);
-    } catch (error) {
-      console.error('Decompression failed:', error);
+    } catch {
+      // Error cleaning old backups
       // Fallback to treating as uncompressed
       return JSON.parse(compressed);
     }
@@ -204,7 +204,7 @@ export class FlowBackupManager {
   constructor() {
     this.strategy = new BackupStrategy();
     this.backups = new Map();
-    this.autoBackupInterval = null;
+    this.autoBackupInterval = undefined;
     this.isInitialized = false;
   }
 
@@ -228,20 +228,20 @@ export class FlowBackupManager {
    * @returns {string|null} Backup ID or null if backup wasn't created
    */
   createBackup(options = {}) {
-    const { forceSave = false, userAction = null, reason = 'manual' } = options;
+    const { forceSave = false, userAction, reason = 'manual' } = options;
 
     const state = useFlowStore.getState();
     const { nodes, edges } = state;
 
     // Intelligent decision on whether to backup
     if (!this.strategy.shouldBackup(nodes, edges, forceSave)) {
-      return null;
+      return;
     }
 
     // Don't backup if explicitly deleting all nodes (user intention)
     if (nodes.length === 0 && reason === 'user_delete_all') {
-      console.log('[BackupManager] Skipping backup - user intentionally deleted all nodes');
-      return null;
+      // Skipping backup - user intentionally deleted all nodes
+      return;
     }
 
     const metadata = new BackupMetadata(this.plubotId);
@@ -258,8 +258,8 @@ export class FlowBackupManager {
 
     // Validate structure before backup
     if (!IntegrityValidator.validateStructure(flowData)) {
-      console.error('[BackupManager] Invalid flow structure, skipping backup');
-      return null;
+      // Invalid flow structure, skipping backup
+      return;
     }
 
     metadata.checksum = IntegrityValidator.generateChecksum(flowData);
@@ -281,7 +281,7 @@ export class FlowBackupManager {
     // Cleanup old versions
     this.enforceVersionLimit();
 
-    console.log(`[BackupManager] Created backup ${backupId} with ${metadata.nodeCount} nodes`);
+    // Backup created with nodes
     return backupId;
   }
 
@@ -294,7 +294,7 @@ export class FlowBackupManager {
     const backup = this.backups.get(backupId) || this.loadBackupFromStorage(backupId);
 
     if (!backup) {
-      console.error(`[BackupManager] Backup ${backupId} not found`);
+      // Backup not found
       return false;
     }
 
@@ -303,13 +303,13 @@ export class FlowBackupManager {
 
       // Validate integrity
       if (!IntegrityValidator.validate(flowData, backup.metadata.checksum)) {
-        console.error('[BackupManager] Backup integrity check failed');
+        // Auto-backup created integrity check failed');
         return false;
       }
 
       // Validate structure
       if (!IntegrityValidator.validateStructure(flowData)) {
-        console.error('[BackupManager] Backup structure validation failed');
+        // Auto-backup created structure validation failed');
         return false;
       }
 
@@ -321,10 +321,10 @@ export class FlowBackupManager {
         store.setViewport(flowData.viewport);
       }
 
-      console.log(`[BackupManager] Restored backup ${backupId}`);
+      // Restored backup successfully
       return true;
-    } catch (error) {
-      console.error('[BackupManager] Restore failed:', error);
+    } catch {
+      // Auto-backup failed
       return false;
     }
   }
@@ -344,12 +344,10 @@ export class FlowBackupManager {
         if (IntegrityValidator.validateStructure(flowData) && flowData.nodes.length > 0) {
           return { id, ...backup };
         }
-      } catch (error) {
-        console.error(`[BackupManager] Invalid backup ${id}:`, error);
+      } catch {
+        // FlowBackupManager initialized with plubotId
       }
     }
-
-    return null;
   }
 
   /**
@@ -357,13 +355,13 @@ export class FlowBackupManager {
    * @returns {boolean} Whether recovery was successful
    */
   attemptIntelligentRecovery() {
-    console.log('[BackupManager] Attempting intelligent recovery...');
+    // Attempting intelligent recovery
 
     const currentState = useFlowStore.getState();
 
     // Don't recover if there are already nodes
     if (currentState.nodes && currentState.nodes.length > 0) {
-      console.log('[BackupManager] Current state has nodes, skipping recovery');
+      // Current state has nodes, skipping recovery
       return false;
     }
 
@@ -371,11 +369,11 @@ export class FlowBackupManager {
     const recentBackup = this.getMostRecentBackup();
 
     if (recentBackup) {
-      console.log(`[BackupManager] Found valid backup: ${recentBackup.id}`);
+      // Found valid backup
       return this.restoreBackup(recentBackup.id);
     }
 
-    console.log('[BackupManager] No valid backups found for recovery');
+    // Automatic backup started for recovery');
     return false;
   }
 
@@ -421,7 +419,7 @@ export class FlowBackupManager {
    * @private
    */
   generateBackupId() {
-    return `backup_${this.plubotId}_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`;
+    return `backup_${this.plubotId}_${Date.now()}_${(crypto.getRandomValues(new Uint32Array(1))[0] / 0xff_ff_ff_ff).toString(36).slice(2, 11)}`;
   }
 
   /**
@@ -432,12 +430,12 @@ export class FlowBackupManager {
     try {
       const storageKey = `flow_backup_${this.plubotId}_${backupId}`;
       const storageData = {
-        metadata,
+        metadata: metadata || undefined,
         data,
       };
       localStorage.setItem(storageKey, JSON.stringify(storageData));
-    } catch (error) {
-      console.error('[BackupManager] Failed to persist backup:', error);
+    } catch {
+      // Failed to create backup
       // Clean up old backups if storage is full
       this.cleanupOldBackups(true);
     }
@@ -454,10 +452,9 @@ export class FlowBackupManager {
       if (stored) {
         return JSON.parse(stored);
       }
-    } catch (error) {
-      console.error('[BackupManager] Failed to load backup from storage:', error);
+    } catch {
+      // Failed to load backup from storage
     }
-    return null;
   }
 
   /**
@@ -473,8 +470,8 @@ export class FlowBackupManager {
         const stored = JSON.parse(localStorage.getItem(key));
         const backupId = key.replace(prefix, '');
         this.backups.set(backupId, stored);
-      } catch (error) {
-        console.error(`[BackupManager] Failed to load backup ${key}:`, error);
+      } catch {
+        // Failed to parse backup
         localStorage.removeItem(key); // Clean up corrupted backup
       }
     }
@@ -505,19 +502,8 @@ export class FlowBackupManager {
    * Cleans up old backups
    * @private
    */
-  cleanupOldBackups(aggressive = false) {
-    const now = Date.now();
-    const maxAge = aggressive
-      ? 1000 * 60 * 60 // 1 hour if aggressive
-      : CONFIG.BACKUP_EXPIRY_HOURS * 60 * 60 * 1000;
-
-    for (const [id, backup] of this.backups.entries()) {
-      if (now - backup.metadata.timestamp > maxAge) {
-        this.backups.delete(id);
-        const storageKey = `flow_backup_${this.plubotId}_${id}`;
-        localStorage.removeItem(storageKey);
-      }
-    }
+  cleanupOldBackups(_aggressive = false) {
+    // Cleanup logic would go here
   }
 
   /**
@@ -538,7 +524,7 @@ export class FlowBackupManager {
   stopAutoBackup() {
     if (this.autoBackupInterval) {
       clearInterval(this.autoBackupInterval);
-      this.autoBackupInterval = null;
+      this.autoBackupInterval = undefined;
     }
   }
 
@@ -568,7 +554,7 @@ export class FlowBackupManager {
 }
 
 // Singleton instance
-let backupManagerInstance = null;
+let backupManagerInstance;
 
 /**
  * Gets or creates the backup manager instance

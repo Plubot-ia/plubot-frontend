@@ -15,8 +15,9 @@ export const useHeaderActions = ({
   isAuthenticated: _isAuthenticated,
   setSaveStatus,
   setSavingIndicator,
-  setNotification,
+  setNotification: _setNotification,
   isSaving,
+  flowName,
 }) => {
   // NO suscribirse a los nodos aquí - esto causa re-renders excesivos
   // En su lugar, obtenerlos solo cuando se necesiten en handleSaveFlow
@@ -25,88 +26,88 @@ export const useHeaderActions = ({
     if (closeAllModals) closeAllModals();
   };
 
+  // Función auxiliar para validar y preparar el flujo
+  const prepareFlowForSave = useCallback(() => {
+    const currentState = useFlowStore.getState();
+    const actualNodes = currentState.nodes;
+    const actualEdges = currentState.edges;
+    const isEmptyFlow = actualNodes.length === 0 && actualEdges.length === 0;
+
+    if (isEmptyFlow) {
+      const backupManager = getBackupManager();
+      if (backupManager?.isInitialized) {
+        backupManager.createBackup({
+          reason: 'user_delete_all',
+          forceSave: false,
+        });
+      }
+    } else {
+      const validation = validateRequiredNodes(actualNodes || []);
+      if (!validation.valid) {
+        throw new Error(validation.message);
+      }
+    }
+
+    return isEmptyFlow;
+  }, []);
+
   const handleSaveFlow = useCallback(async () => {
-    // Evitar múltiples guardados simultáneos
     if (isSaving) return;
 
     try {
-      // Indicar que se está guardando
       setSavingIndicator(true);
-      setSaveStatus(undefined); // Limpiar estado anterior
+      setSaveStatus(undefined);
 
-      // Obtener el estado actual completo del store
-      const currentState = useFlowStore.getState();
-      const actualNodes = currentState.nodes;
-      const actualEdges = currentState.edges;
+      prepareFlowForSave();
 
-      // Estado actual antes de guardar
-
-      // Allow saving empty flows if user intentionally deleted all nodes
-      const isEmptyFlow = actualNodes.length === 0 && actualEdges.length === 0;
-
-      if (isEmptyFlow) {
-        // Guardando flujo vacío (usuario eliminó todos los nodos)
-        // Mark this as intentional empty save in backup system
-        const backupManager = getBackupManager();
-        if (backupManager && backupManager.isInitialized) {
-          backupManager.createBackup({
-            reason: 'user_delete_all',
-            forceSave: false,
-          });
-        }
-      } else {
-        // Only validate if not empty
-        const nodesToValidate = actualNodes || [];
-        const validation = validateRequiredNodes(nodesToValidate);
-
-        if (!validation.valid) {
-          throw new Error(validation.message);
-        }
-      }
-
-      // Usar la función de guardado proporcionada o la del store
       const saveFunction = propertiesSaveFlow || saveFlow;
       if (!saveFunction) {
         throw new Error('No se encontró función de guardado');
       }
 
-      // Ejecutar el guardado
       await saveFunction();
 
-      // Indicar éxito con el estado visual y notificación
-      setSaveStatus('success');
-      const notificationMessage = isEmptyFlow
-        ? '✅ Flujo vacío guardado exitosamente'
-        : '✅ Flujo guardado exitosamente';
-      setNotification({
-        text: notificationMessage,
-        id: Date.now(),
-      });
+      // Crear backup automático después de guardar exitosamente
+      const currentState = useFlowStore.getState();
+      const actualNodes = currentState.nodes;
+      const actualEdges = currentState.edges;
+      
+      // Crear backup en localStorage
+      const backupKey = 'flow_backups';
+      const existingBackups = JSON.parse(localStorage.getItem(backupKey) || '[]');
+      
+      const newBackup = {
+        id: Date.now().toString(),
+        name: flowName || `Backup ${new Date().toLocaleDateString('es-ES')}`,
+        timestamp: Date.now(),
+        nodes: actualNodes,
+        edges: actualEdges,
+        type: 'auto',
+        nodeCount: actualNodes.length,
+        edgeCount: actualEdges.length,
+        size: JSON.stringify({ nodes: actualNodes, edges: actualEdges }).length,
+        reason: 'Guardado automático'
+      };
+      
+      // Mantener máximo 10 backups
+      const updatedBackups = [newBackup, ...existingBackups].slice(0, 10);
+      localStorage.setItem(backupKey, JSON.stringify(updatedBackups));
+      
+      // Disparar evento para actualizar el modal de backups si está abierto
+      window.dispatchEvent(new Event('backup-created'));
+      
+      const successMessage = flowName
+        ? `Flujo guardado exitosamente como "${flowName}" y backup creado`
+        : 'Flujo guardado exitosamente y backup creado';
 
-      // También mostrar notificación si la función existe
-      if (showNotification) {
-        showNotification({
-          type: 'success',
-          message: '✅ Flujo guardado exitosamente',
-        });
-      }
+      // Usar showNotification del ByteMessageProvider que tiene mejor estilo
+      showNotification(successMessage, 'success');
     } catch (error) {
-      // Indicar error con el estado visual y notificación
-      setSaveStatus('error');
-      setNotification({
-        text: `❌ Error al guardar flujo: ${error.message || 'Error desconocido'}`,
-        id: Date.now(),
-      });
+      const errorMessage = `Error al guardar flujo: ${error.message || 'Error desconocido'}`;
 
-      // También mostrar notificación si la función existe
-      if (showNotification) {
-        showNotification({
-          type: 'error',
-          message: `❌ Error al guardar flujo: ${error.message || 'Error desconocido'}`,
-        });
-      }
+      // Usar showNotification del ByteMessageProvider que tiene mejor estilo
+      showNotification(errorMessage, 'error');
     } finally {
-      // Dejar de mostrar el indicador de guardando
       setSavingIndicator(false);
     }
   }, [
@@ -116,7 +117,8 @@ export const useHeaderActions = ({
     isSaving,
     setSavingIndicator,
     setSaveStatus,
-    setNotification,
+    prepareFlowForSave,
+    flowName,
   ]);
 
   return {

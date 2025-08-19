@@ -3,12 +3,14 @@ import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react'
 import { useTranslation } from 'react-i18next';
 import ReactMarkdown from 'react-markdown';
 
-import useFlowStore from '@/stores/use-flow-store';
-
 // Removed non-existent useStore import - using useFlowStore instead
 import { DEFAULT_SOURCE_HANDLE } from '../../../config/handleConfig';
 import useWindowSize from '../../../hooks/useWindowSize';
+import useFlowStore from '../../../stores/use-flow-store';
+// Removed unused import getNodeById
 import { escapeRegex } from '../../../utils/regex-utilities';
+
+import { prepareMediaItems, extractMediaProperties } from './mediaProcessor';
 import './SimulationInterface.css';
 
 // Helper para obtener el token JWT (DEBES IMPLEMENTAR ESTO SEGÚN TU APP)
@@ -435,8 +437,12 @@ const SimulationInterface = ({
   _isUltraMode = false,
 }) => {
   const { t } = useTranslation();
-  const safeNodes = useMemo(() => (Array.isArray(nodes) ? nodes : []), [nodes]);
-  const safeEdges = useMemo(() => (Array.isArray(edges) ? edges : []), [edges]);
+  const { nodes: flowNodes, edges: flowEdges } = useFlowStore((state) => ({
+    nodes: state.nodes,
+    edges: state.edges,
+  }));
+  const safeNodes = useMemo(() => (Array.isArray(flowNodes) ? flowNodes : []), [flowNodes]);
+  const safeEdges = useMemo(() => (Array.isArray(flowEdges) ? flowEdges : []), [flowEdges]);
 
   const [simulationHistory, setSimulationHistory] = useState([]);
   const [userInput, setUserInput] = useState('');
@@ -710,7 +716,15 @@ const SimulationInterface = ({
       const interpolatedContent = messageContent.replaceAll(
         /\{\{(\w+)\}\}/g,
         (match, variableName) => {
-          const variableValue = currentResponses[variableName];
+          // Validate variableName to prevent object injection
+          if (!/^[a-zA-Z_]\w*$/.test(variableName)) {
+            return match;
+          }
+          // Use safe property access to prevent object injection
+          const responseKeys = Object.keys(currentResponses);
+          const variableValue = responseKeys.includes(variableName)
+            ? String(Reflect.get(currentResponses, variableName))
+            : undefined;
           if (variableValue !== undefined) {
             return variableValue;
           }
@@ -727,10 +741,17 @@ const SimulationInterface = ({
       const finalMessage = sender === 'user' ? currentMessageForNode || finalContent : finalContent;
 
       const processedContent = finalMessage
-        .replaceAll(
-          /\{\{(\w+)\}\}/g,
-          (match, variableName) => currentResponses[variableName] || match,
-        )
+        .replaceAll(/\{\{(\w+)\}\}/g, (match, variableName) => {
+          // Validate variableName to prevent object injection
+          if (!/^[a-zA-Z_]\w*$/.test(variableName)) {
+            return match;
+          }
+          // Use safe property access to prevent object injection
+          const responseKeys = Object.keys(currentResponses);
+          return responseKeys.includes(variableName)
+            ? String(Reflect.get(currentResponses, variableName))
+            : match;
+        })
         .replaceAll('{{user_message}}', '');
 
       addMessageToHistory({
@@ -1257,31 +1278,37 @@ const SimulationInterface = ({
   // Función auxiliar para procesar nodos multimedia (MediaNode)
   const processMediaNode = useCallback(
     async (node, currentResponses, currentMessageForNode) => {
-      const { type, url, caption, altText } = node.data ?? {};
+      const nodeData = node.data ?? {};
+      const mediaItems = prepareMediaItems(nodeData);
 
-      if (!url) {
+      if (mediaItems.length === 0) {
         addMessageToHistory({
           id: `media-error-${node.id}-${Date.now()}`,
           type: 'error',
-          content: t('simulation.mediaUrlMissing', 'URL del contenido multimedia no especificada'),
+          content: t('simulation.mediaUrlMissing', 'No se ha configurado contenido multimedia'),
           timestamp: new Date().toISOString(),
         });
         setFlowStatus('error');
         return;
       }
 
-      // Crear el contenido HTML según el tipo de media
-      const mediaType = type || 'image';
-      const mediaContent = generateMediaContent(mediaType, url, caption, altText);
+      // Procesar cada elemento multimedia
+      for (const [index, item] of mediaItems.entries()) {
+        const { mediaUrl, mediaCaption, mediaAltText, mediaType } = extractMediaProperties(item);
 
-      // Mostrar el contenido multimedia
-      addMessageToHistory({
-        id: `media-${node.id}-${Date.now()}`,
-        type: 'bot',
-        content: mediaContent,
-        timestamp: new Date().toISOString(),
-        isHtml: true,
-      });
+        if (!mediaUrl) continue;
+
+        const mediaContent = generateMediaContent(mediaType, mediaUrl, mediaCaption, mediaAltText);
+
+        // Mostrar el contenido multimedia
+        addMessageToHistory({
+          id: `media-${node.id}-${Date.now()}-${index}`,
+          type: 'bot',
+          content: mediaContent,
+          timestamp: new Date().toISOString(),
+          isHtml: true,
+        });
+      }
 
       // Continuar con el siguiente nodo
       const nextEdge = safeEdges.find((edge) => edge.source === node.id);
@@ -1837,6 +1864,7 @@ const SimulationInterface = ({
               )}
               <div className='ts-message-content'>
                 {message.isHtml ? (
+                  // eslint-disable-next-line react/no-danger
                   <div dangerouslySetInnerHTML={{ __html: message.content }} />
                 ) : (
                   <ReactMarkdown>{message.content}</ReactMarkdown>

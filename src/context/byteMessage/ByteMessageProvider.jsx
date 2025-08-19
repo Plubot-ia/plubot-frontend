@@ -1,23 +1,33 @@
 import PropTypes from 'prop-types';
 import { useState, useCallback, useMemo, useEffect } from 'react';
 
+import useTrainingStore from '@/stores/use-training-store';
+
 import { ByteMessageContext } from './ByteMessageContext';
 
 const ByteMessageProvider = ({ children }) => {
   const [byteMessage, setByteMessage] = useState('');
   const [byteMessageType, setByteMessageType] = useState('info');
+  const setTrainingByteMessage = useTrainingStore((state) => state.setByteMessage);
 
-  const setGlobalByteMessage = useCallback((message, type = 'info') => {
-    setByteMessage(message);
-    setByteMessageType(type);
-    try {
-      globalThis.dispatchEvent(
-        new CustomEvent('plubot-byte-message', {
-          detail: { message, type, timestamp: Date.now() },
-        }),
-      );
-    } catch {}
-  }, []);
+  const setGlobalByteMessage = useCallback(
+    (message, type = 'info') => {
+      setByteMessage(message);
+      setByteMessageType(type);
+
+      // Actualizar también el store de training para que se muestre en la UI
+      setTrainingByteMessage(message, type);
+
+      try {
+        globalThis.dispatchEvent(
+          new CustomEvent('plubot-byte-message', {
+            detail: { message, type, timestamp: Date.now() },
+          }),
+        );
+      } catch {}
+    },
+    [setTrainingByteMessage],
+  );
 
   useEffect(() => {
     const handleByteMessage = (event) => {
@@ -25,6 +35,8 @@ const ByteMessageProvider = ({ children }) => {
       if (message) {
         setByteMessage(message);
         setByteMessageType(type || 'info');
+        // Actualizar también el store de training
+        setTrainingByteMessage(message);
       }
     };
 
@@ -33,7 +45,7 @@ const ByteMessageProvider = ({ children }) => {
     return () => {
       globalThis.removeEventListener('plubot-byte-message', handleByteMessage);
     };
-  }, []);
+  }, [setTrainingByteMessage]);
 
   const contextValue = useMemo(
     () => ({

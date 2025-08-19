@@ -53,6 +53,7 @@ const initialState = {
 
   // Mensajes y notificaciones
   byteMessage: '',
+  byteMessageType: 'info',
   lastSavedTimestamp: undefined,
 };
 
@@ -123,20 +124,21 @@ const createModalActions = (set) => ({
 });
 
 const createMessageActions = (set) => ({
-  setByteMessage: (message) => {
+  setByteMessage: (message, type = 'info') => {
     // Determinar si el mensaje debe ir a StatusBubble o ByteAssistant
     // Los mensajes de operaciones, confirmaciones y errores van a StatusBubble
     if (STATUS_MESSAGE_REGEX.test(message)) {
       set({
         byteMessage: message,
+        byteMessageType: type,
         lastSavedTimestamp: new Date().toISOString(),
       });
     } else {
       // Otros mensajes van a ByteAssistant
-      set({ byteMessage: message });
+      set({ byteMessage: message, byteMessageType: type });
     }
   },
-  clearByteMessage: () => set({ byteMessage: '' }),
+  clearByteMessage: () => set({ byteMessage: '', byteMessageType: 'info' }),
   setLastSavedTimestamp: () => set({ lastSavedTimestamp: new Date().toISOString() }),
 });
 

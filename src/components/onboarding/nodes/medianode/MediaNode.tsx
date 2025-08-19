@@ -6,27 +6,21 @@
 
 // Iconos importados desde lucide-react
 import { motion, AnimatePresence } from 'framer-motion';
-import {
-  Image,
-  Film,
-  Music,
-  FileImage,
-  Upload,
-  Save,
-  X,
-  Settings,
-  Sparkles,
-  ChevronDown,
-  ChevronUp,
-  Loader2,
-} from 'lucide-react';
+import { Image, Film, Music, FileImage, Sparkles, Loader2 } from 'lucide-react';
 import React, { memo, useState, useCallback, useMemo, lazy, Suspense } from 'react';
 import { Handle, Position } from 'reactflow';
+import type { NodeProps } from 'reactflow';
 
 import useFlowStore from '../../../../stores/use-flow-store';
-import { useRenderTracker } from '../../../../utils/renderTracker';
+// Removed useRenderTracker - not needed
 
-import type { MediaType } from './types';
+import type { MediaType, MediaNodeData } from './types';
+
+// Type for the flow store
+interface FlowStore {
+  updateNode: (id: string, data: Partial<MediaNodeData>) => void;
+  showContextMenu: (event: React.MouseEvent, nodeId: string) => void;
+}
 import './MediaNode.css';
 
 // ==================== CONFIGURACIÓN CENTRALIZADA ====================
@@ -157,7 +151,7 @@ const MediaNodeContent = memo<MediaNodeContentProps>(({ type, url, caption, isCo
           {type === 'image' && url && (
             <img
               src={url}
-              alt={caption || 'Preview'}
+              alt={caption ?? 'Preview'}
               className='media-preview-img'
               loading='lazy'
             />
@@ -184,23 +178,14 @@ MediaNodeContent.displayName = 'MediaNodeContent';
 
 // ==================== COMPONENTE PRINCIPAL ====================
 
-interface MediaNodeProps {
-  id: string;
-  data: {
-    type?: string;
-    url?: string;
-    caption?: string;
-    altText?: string;
-    description?: string;
-    config?: Record<string, any>;
-  };
-  selected?: boolean;
-}
+// MediaNodeProps interface removed - using NodeProps from reactflow instead
 
 // Lazy load del configurador
 const MediaNodeConfig = lazy(async () => import('./MediaNodeConfig'));
 
-const MediaNodeComponent: React.FC<MediaNodeProps> = ({ id, data, selected = false }) => {
+const MediaNodeComponent = (props: NodeProps<MediaNodeData>) => {
+  const { id, data, selected } = props;
+
   // Extract data with defaults
   const {
     type = 'image' as MediaType,
@@ -209,19 +194,23 @@ const MediaNodeComponent: React.FC<MediaNodeProps> = ({ id, data, selected = fal
     altText = '',
     description = '',
     config = {},
+    // accentColor = '#00c3ff', // Currently unused
   } = data || {};
 
   // Estado mínimo - Solo modo edición
   const [isEditing, setIsEditing] = useState(false);
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [isExpanded, _setIsExpanded] = useState(false);
   const [showConfig, setShowConfig] = useState(false);
 
-  // RenderTracker para verificación de rendimiento
-  useRenderTracker('MediaNode', [id, type, url]);
+  // Rendimiento optimizado sin tracker
 
   // Store hooks optimizados
-  const updateNodeData = useFlowStore((state: any) => state.updateNode);
-  const showContextMenu = useFlowStore((state: any) => state.showContextMenu);
+  // Default values from config if needed
+  // const _defaultUrl = (config as any)?.defaultUrl ?? '';
+  // const _defaultCaption = (config as any)?.defaultCaption ?? '';
+  // const _defaultAltText = (config as any)?.defaultAltText ?? '';
+  const updateNodeData = useFlowStore((state) => (state as FlowStore).updateNode);
+  const showContextMenu = useFlowStore((state) => (state as FlowStore).showContextMenu);
 
   // Valores computados memoizados
   const isConfigured = useMemo(() => {
@@ -233,12 +222,8 @@ const MediaNodeComponent: React.FC<MediaNodeProps> = ({ id, data, selected = fal
     if (type === 'image') return 'Imagen';
     if (type === 'video') return 'Video';
     if (type === 'audio') return 'Audio';
-    return NODE_CONFIG.DEFAULTS.LABEL;
+    return 'Archivo';
   }, [caption, type]);
-
-  const accentColor = useMemo(() => {
-    return NODE_CONFIG.colors[type as keyof typeof NODE_CONFIG.colors] || '#94a3b8';
-  }, [type]);
 
   // Handlers optimizados
   const handleDoubleClick = useCallback((e: React.MouseEvent) => {
@@ -247,11 +232,13 @@ const MediaNodeComponent: React.FC<MediaNodeProps> = ({ id, data, selected = fal
   }, []);
 
   const handleSave = useCallback(
-    (newData: any) => {
-      updateNodeData(id, newData);
-      setIsEditing(false);
+    (newData: Partial<MediaNodeData>) => {
+      updateNodeData(id, {
+        ...data,
+        ...newData,
+      } as Partial<MediaNodeData>);
     },
-    [id, updateNodeData],
+    [id, updateNodeData, data],
   );
 
   const handleCancel = useCallback(() => {
@@ -262,19 +249,12 @@ const MediaNodeComponent: React.FC<MediaNodeProps> = ({ id, data, selected = fal
     (e: React.MouseEvent) => {
       e.preventDefault();
       e.stopPropagation();
-      showContextMenu(e.clientX, e.clientY, id);
+      if (showContextMenu) {
+        showContextMenu(e, id);
+      }
     },
     [id, showContextMenu],
   );
-
-  const handleToggleExpand = useCallback(() => {
-    setIsExpanded((prev) => !prev);
-  }, []);
-
-  const handleOpenConfig = useCallback((e: React.MouseEvent) => {
-    e.stopPropagation();
-    setShowConfig(true);
-  }, []);
 
   const handleCloseConfig = useCallback(() => {
     setShowConfig(false);
@@ -295,12 +275,12 @@ const MediaNodeComponent: React.FC<MediaNodeProps> = ({ id, data, selected = fal
 
           <MediaNodeConfig
             data={{
-              type: type as MediaType,
-              url: url || '',
-              caption: caption || '',
-              altText: altText || '',
-              description: description || '',
-              config: config || {},
+              type: type,
+              url: url ?? '',
+              caption: caption ?? '',
+              altText: altText ?? '',
+              description: description ?? '',
+              config: config ?? {},
             }}
             onSave={handleSave}
             onCancel={handleCancel}
@@ -323,12 +303,12 @@ const MediaNodeComponent: React.FC<MediaNodeProps> = ({ id, data, selected = fal
                 >
                   <MediaNodeConfig
                     data={{
-                      type: (data.type || 'image') as MediaType,
-                      url: data.url || '',
-                      caption: data.caption || '',
-                      altText: data.altText || '',
-                      description: data.description || '',
-                      config: data.config || {},
+                      type: type ?? 'image',
+                      url: url ?? '',
+                      accentColor: data?.accentColor ?? '#00c3ff',
+                      altText: altText ?? '',
+                      description: description ?? '',
+                      config: config ?? {},
                     }}
                     onSave={handleSave}
                     onCancel={handleCloseConfig}
@@ -391,13 +371,8 @@ const MediaNodeComponent: React.FC<MediaNodeProps> = ({ id, data, selected = fal
   );
 };
 
+MediaNodeComponent.displayName = 'MediaNode';
+
 // Export con memo optimizado - comparación superficial
-export default memo(MediaNodeComponent, (prevProps, nextProps) => {
-  return (
-    prevProps.id === nextProps.id &&
-    prevProps.selected === nextProps.selected &&
-    prevProps.data?.type === nextProps.data?.type &&
-    prevProps.data?.url === nextProps.data?.url &&
-    prevProps.data?.caption === nextProps.data?.caption
-  );
-});
+export const MediaNode = memo(MediaNodeComponent);
+export default MediaNode;

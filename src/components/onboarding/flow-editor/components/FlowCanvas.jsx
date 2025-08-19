@@ -5,7 +5,7 @@
  */
 
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import ReactFlow, { Controls } from 'reactflow';
 import 'reactflow/dist/style.css';
 
@@ -22,9 +22,11 @@ const createOnInitHandler = (
   reactFlowInstanceReference,
   setReactFlowInstanceFromStore,
   externalSetReactFlowInstance,
+  reactFlowInstanceRef,
 ) => {
   return (instance) => {
     reactFlowInstanceReference.current = instance;
+    reactFlowInstanceRef.current = instance;
     if (globalThis.window !== undefined) {
       globalThis.reactFlowInstance = instance;
     }
@@ -73,7 +75,7 @@ const getReactFlowProps = (options) => {
 
   return {
     nodes: nodesWithLOD,
-    edges: handlesReady ? edgesWithLOD : [], // Suprimir edges hasta que handles estén listos
+    edges: handlesReady || edgesWithLOD.length === 0 ? edgesWithLOD : [], // Solo suprimir edges si hay edges y handles no están listos
     nodeTypes,
     edgeTypes,
     onPaneClick: handlePaneClick,
@@ -143,6 +145,78 @@ const getReactFlowProps = (options) => {
   };
 };
 
+// Helper component for Performance Monitor
+const PerformanceMonitor = ({ fpsRef, isUltraMode }) => {
+  if (typeof process === 'undefined' || import.meta.env.MODE !== 'development') {
+    return;
+  }
+
+  return (
+    <div className='perf-monitor'>
+      FPS: {fpsRef.current.toFixed(1)}
+      {fpsRef.current < 30 && !isUltraMode && (
+        <span className='perf-warning'> | Activar Ultra</span>
+      )}
+    </div>
+  );
+};
+
+PerformanceMonitor.propTypes = {
+  fpsRef: PropTypes.shape({
+    current: PropTypes.number,
+  }).isRequired,
+  isUltraMode: PropTypes.bool.isRequired,
+};
+
+// Helper component for Context Menus
+const ContextMenus = ({ menu, closeContextMenu, eventHandlers }) => {
+  if (!menu) return;
+
+  const { handleNodesDelete, handleEdgesDelete, handleDuplicateNode, handleEditNode } =
+    eventHandlers;
+
+  if (menu.type === 'node') {
+    return (
+      <NodeContextMenu
+        nodeId={menu.id}
+        position={{ x: menu.left, y: menu.top }}
+        onClose={closeContextMenu}
+        onDelete={handleNodesDelete}
+        onDuplicate={handleDuplicateNode}
+        onEdit={handleEditNode}
+      />
+    );
+  }
+
+  if (menu.type === 'edge') {
+    return (
+      <EdgeContextMenu
+        edgeId={menu.id}
+        position={{ x: menu.left, y: menu.top }}
+        onClose={closeContextMenu}
+        onDelete={handleEdgesDelete}
+      />
+    );
+  }
+};
+
+ContextMenus.propTypes = {
+  menu: PropTypes.shape({
+    type: PropTypes.string,
+    id: PropTypes.string,
+    left: PropTypes.number,
+    top: PropTypes.number,
+    data: PropTypes.any,
+  }),
+  closeContextMenu: PropTypes.func.isRequired,
+  eventHandlers: PropTypes.shape({
+    handleNodesDelete: PropTypes.func,
+    handleEdgesDelete: PropTypes.func,
+    handleDuplicateNode: PropTypes.func,
+    handleEditNode: PropTypes.func,
+  }).isRequired,
+};
+
 /**
  * FlowCanvas component - handles ReactFlow rendering and UI
  */
@@ -176,20 +250,26 @@ const FlowCanvas = ({
   // Container references
   flowWrapperReference,
 }) => {
-  // Hook para timing fix de handles
   const { handlesReady } = useEdgeTimingFix();
+  const previousEdgesLengthRef = useRef(0);
+  const reactFlowInstanceRef = useRef(null);
 
-  // Create handlers using helper functions
   const onInitHandler = createOnInitHandler(
     reactFlowInstanceReference,
     setReactFlowInstanceFromStore,
     externalSetReactFlowInstance,
+    reactFlowInstanceRef,
   );
 
-  // DEBUG: Log edges data (disabled for performance)
-  React.useEffect(() => {
-    // Edges data tracking effect
-  }, [visibleEdges, edgesWithLOD, handlesReady]);
+  useEffect(() => {
+    if (reactFlowInstanceRef.current && edgesWithLOD.length !== previousEdgesLengthRef.current) {
+      const instance = reactFlowInstanceRef.current;
+      if (edgesWithLOD.length > previousEdgesLengthRef.current) {
+        instance.setEdges(edgesWithLOD);
+      }
+      previousEdgesLengthRef.current = edgesWithLOD.length;
+    }
+  }, [edgesWithLOD]);
 
   const reactFlowProps = getReactFlowProps({
     nodesWithLOD,
@@ -202,10 +282,6 @@ const FlowCanvas = ({
     handlesReady,
   });
 
-  // Extract unused handlers for potential context menu functionality
-  const { handleNodesDelete, handleEdgesDelete, handleDuplicateNode, handleEditNode } =
-    eventHandlers;
-
   return (
     <div
       className='flow-main-container'
@@ -213,7 +289,6 @@ const FlowCanvas = ({
       style={{ width: '100%', height: '100%' }}
     >
       <ReactFlow {...reactFlowProps}>
-        {/* Background Scene */}
         <div
           className='ts-background-scene-container'
           style={{
@@ -228,7 +303,6 @@ const FlowCanvas = ({
           <BackgroundScene isUltraMode={isUltraMode} />
         </div>
 
-        {/* Mini Map */}
         <div className='flow-minimap-container bottom-left'>
           <MiniMapWrapper
             nodes={visibleNodes}
@@ -237,12 +311,11 @@ const FlowCanvas = ({
             isUltraMode={isUltraMode}
             viewport={{}}
             setByteMessage={() => {
-              /* No-op for FlowCanvas */
+              // Placeholder for byte message handler
             }}
           />
         </div>
 
-        {/* Controls */}
         <Controls
           showInteractive={false}
           showFitView={false}
@@ -250,36 +323,12 @@ const FlowCanvas = ({
           style={{ zIndex: 9999 }}
         />
 
-        {/* Performance Monitor */}
-        {typeof process !== 'undefined' && import.meta.env.MODE === 'development' && (
-          <div className='perf-monitor'>
-            FPS: {fpsRef.current.toFixed(1)}
-            {fpsRef.current < 30 && !isUltraMode && (
-              <span className='perf-warning'> | Activar Ultra</span>
-            )}
-          </div>
-        )}
-
-        {/* Context Menus */}
-        {menu && menu.type === 'node' && (
-          <NodeContextMenu
-            nodeId={menu.id}
-            position={{ x: menu.left, y: menu.top }}
-            onClose={closeContextMenu}
-            onDelete={handleNodesDelete}
-            onDuplicate={handleDuplicateNode}
-            onEdit={handleEditNode}
-            nodeData={menu.data}
-          />
-        )}
-        {menu && menu.type === 'edge' && (
-          <EdgeContextMenu
-            edgeId={menu.id}
-            position={{ x: menu.left, y: menu.top }}
-            onClose={closeContextMenu}
-            onDelete={handleEdgesDelete}
-          />
-        )}
+        <PerformanceMonitor fpsRef={fpsRef} isUltraMode={isUltraMode} />
+        <ContextMenus
+          menu={menu}
+          closeContextMenu={closeContextMenu}
+          eventHandlers={eventHandlers}
+        />
 
         {/* Optimization Indicator */}
         {optimizationLevel !== 'none' && (

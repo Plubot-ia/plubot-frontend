@@ -293,47 +293,30 @@ const _renderActionButtons = ({
 };
 
 /**
- * Helper para renderizar el dropdown menu
- */
-const _renderDropdownMenu = (props) => {
-  return _renderOptionsMenu(props);
-};
-
-/**
- * Helper para renderizar el menú dropdown del header.
+ * Helper para renderizar el botón del menú de opciones.
  * @param {Object} params - Parámetros de renderizado
- * @returns {JSX.Element} - Menú dropdown renderizado
+ * @returns {JSX.Element} - Botón del menú renderizado
  */
-const _renderOptionsMenu = ({
-  optionsMenuRef,
-  optionsMenuOpen,
-  setOptionsMenuOpen,
-  plubotId,
-  onOpenVersionHistory,
-  onOpenImportExport,
-  onOpenSettingsModal,
-  onOpenPathAnalysis,
-  nodes,
-  edges,
-  lastSaved,
-}) => {
+const _renderOptionsMenuButton = ({ optionsMenuRef, nodes, edges, plubotId }) => {
+  const [isMenuOpen, setIsMenuOpen] = React.useState(false);
+  
   return (
-    <div className='epic-header-more-container' ref={optionsMenuRef}>
+    <div className='epic-header-right'>
       <button
+        ref={optionsMenuRef}
         className='epic-header-button'
-        onClick={(e) => {
-          e.stopPropagation();
-          e.preventDefault();
-          console.log('🔵 Más button clicked - dispatching toggle event');
+        onClick={(event) => {
+          event.stopPropagation();
+          setIsMenuOpen(true);
           globalThis.dispatchEvent(
             new CustomEvent('epic-menu-toggle', {
               detail: { action: 'toggle-menu' },
             }),
           );
         }}
-        onMouseDown={(e) => {
-          e.stopPropagation();
-          e.preventDefault();
+        onMouseDown={(event) => {
+          event.stopPropagation();
+          event.preventDefault();
         }}
         title='Más opciones'
       >
@@ -346,7 +329,8 @@ const _renderOptionsMenu = ({
         plubotId={plubotId}
         nodes={nodes}
         edges={edges}
-        lastSaved={lastSaved}
+        isOpen={isMenuOpen}
+        onClose={() => setIsMenuOpen(false)}
       />
     </div>
   );
@@ -381,7 +365,7 @@ const _renderMainHeader = ({
 
       {_renderActionButtons(actionButtonsProps)}
 
-      {_renderDropdownMenu(dropdownMenuProps)}
+      {_renderOptionsMenuButton(dropdownMenuProps)}
     </header>
   );
 };
@@ -477,8 +461,8 @@ const EpicHeaderComponent = React.memo(
       ],
     );
 
-    const dropdownMenuProps = useMemo(() => {
-      const props = {
+    const dropdownMenuProps = useMemo(
+      () => ({
         optionsMenuOpen,
         setOptionsMenuOpen,
         optionsMenuRef,
@@ -490,21 +474,23 @@ const EpicHeaderComponent = React.memo(
         nodes,
         edges,
         lastSaved,
-      };
-      return props;
-    }, [
-      optionsMenuOpen,
-      setOptionsMenuOpen,
-      optionsMenuRef,
-      plubotId,
-      handleOpenVersionHistory,
-      handleOpenImportExport,
-      handleOpenSettingsModal,
-      handleOpenPathAnalysis,
-      nodes,
-      edges,
-      lastSaved,
-    ]);
+        notification,
+      }),
+      [
+        optionsMenuOpen,
+        setOptionsMenuOpen,
+        optionsMenuRef,
+        plubotId,
+        handleOpenVersionHistory,
+        handleOpenImportExport,
+        handleOpenSettingsModal,
+        handleOpenPathAnalysis,
+        nodes,
+        edges,
+        lastSaved,
+        notification,
+      ],
+    );
 
     // OPTIMIZED: Memoize main header props
     const mainHeaderProps = useMemo(

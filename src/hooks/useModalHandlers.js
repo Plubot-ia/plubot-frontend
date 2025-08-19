@@ -1,3 +1,19 @@
+// Funciones movidas fuera del hook para cumplir con unicorn/consistent-function-scoping
+const openVersionHistory = () => {
+  globalThis.dispatchEvent(new CustomEvent('closeOptionsMenu'));
+  globalThis.dispatchEvent(new CustomEvent('openVersionHistory'));
+};
+
+const openSettingsModal = () => {
+  globalThis.dispatchEvent(new CustomEvent('closeOptionsMenu'));
+  globalThis.dispatchEvent(new CustomEvent('openSettingsModal'));
+};
+
+const openPathAnalysis = () => {
+  globalThis.dispatchEvent(new CustomEvent('closeOptionsMenu'));
+  globalThis.dispatchEvent(new CustomEvent('openPathAnalysis'));
+};
+
 export const useModalHandlers = ({
   showVersionHistory: _showVersionHistory,
   showShareModal: _showShareModal,
@@ -5,32 +21,16 @@ export const useModalHandlers = ({
   closeModal: _closeModal,
   plubotId: _plubotId,
 }) => {
-  // Funciones movidas fuera del scope para evitar recreación
-  const openVersionHistory = () => {
-    window.dispatchEvent(new CustomEvent('closeOptionsMenu'));
-    window.dispatchEvent(new CustomEvent('openVersionHistory'));
-  };
-
   const handleOpenVersionHistory = openVersionHistory;
 
   const openImportExport = () => {
-    window.dispatchEvent(new CustomEvent('closeOptionsMenu'));
+    globalThis.dispatchEvent(new CustomEvent('closeOptionsMenu'));
     showImportExport();
   };
 
   const handleOpenImportExport = openImportExport;
 
-  const openSettingsModal = () => {
-    window.dispatchEvent(new CustomEvent('closeOptionsMenu'));
-    window.dispatchEvent(new CustomEvent('openSettingsModal'));
-  };
-
   const handleOpenSettingsModal = openSettingsModal;
-
-  const openPathAnalysis = () => {
-    window.dispatchEvent(new CustomEvent('closeOptionsMenu'));
-    window.dispatchEvent(new CustomEvent('openPathAnalysis'));
-  };
 
   const handleOpenPathAnalysis = openPathAnalysis;
 

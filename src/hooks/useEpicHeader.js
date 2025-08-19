@@ -140,6 +140,7 @@ const useEpicHeader = ({
     setSavingIndicator,
     setNotification,
     isSaving,
+    flowName: displayFlowName,
   });
 
   return useHeaderReturn(

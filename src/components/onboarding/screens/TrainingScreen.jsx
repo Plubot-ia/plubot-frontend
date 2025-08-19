@@ -318,7 +318,10 @@ const useTrainingScreenData = () => {
   const { flowName, loadFlow, isLoaded } = useFlowMeta();
   const { nodes, edges, onNodesChange, onEdgesChange, onConnect, setSelectedNode } =
     useFlowNodesEdges();
-  const { isLoading, byteMessage, setByteMessage } = useTrainingStore();
+  const byteMessage = useTrainingStore((state) => state.byteMessage);
+  const byteMessageType = useTrainingStore((state) => state.byteMessageType);
+  const setByteMessage = useTrainingStore((state) => state.setByteMessage);
+  const { isLoading } = useTrainingStore();
 
   const [emergencyBackupData, setEmergencyBackupData] = useState();
   const [hadBackup, setHadBackup] = useState(false);
@@ -360,6 +363,7 @@ const useTrainingScreenData = () => {
     setSelectedNode,
     isLoading,
     byteMessage,
+    byteMessageType,
     setByteMessage,
     emergencyBackupData,
     setEmergencyBackupData,
@@ -467,13 +471,13 @@ const _createSaveFlowHandler = ({
   return async () => {
     if (!checkSavePrerequisites()) return false;
     setIsSaving(true);
-    setByteMessage('💾 Guardando flujo...');
+    setByteMessage('💾 Guardando flujo...', 'info');
     try {
       const { uniqueNodes, validEdges, backupId } = await backupAndPreprocessingFn();
       const response = await backendSaveFn(uniqueNodes, validEdges);
       return handleSaveResponse(response, backupId);
     } catch (error) {
-      setByteMessage(`❌ Error al guardar: ${error.message || 'Error desconocido'}`);
+      setByteMessage(`❌ Error al guardar: ${error.message || 'Error desconocido'}`, 'error');
       return false;
     } finally {
       setIsSaving(false);
@@ -497,6 +501,7 @@ const _renderTrainingScreenApp = ({
   plubotId,
   plubotData,
   byteMessage,
+  byteMessageType,
   setByteMessage,
   handleSaveFlow,
   onNodeDrop,
@@ -539,7 +544,9 @@ const _renderTrainingScreenApp = ({
     <Suspense fallback={undefined}>
       <ByteAssistant simulationMode={activeModals.has('simulation')} />
     </Suspense>
-    {byteMessage && !activeModals.has('simulation') && <StatusBubble message={byteMessage} />}
+    {byteMessage && !activeModals.has('simulation') && (
+      <StatusBubble notification={{ text: byteMessage, type: byteMessageType }} />
+    )}
     {activeModals.has('recovery') && (
       <Suspense fallback={undefined}>
         <EmergencyRecovery
@@ -597,6 +604,7 @@ const useMainAppProps = ({
   plubotId,
   plubotData,
   byteMessage,
+  byteMessageType,
   setByteMessage,
   handleSaveFlow,
   setConnectionProperties,
@@ -617,6 +625,7 @@ const useMainAppProps = ({
     plubotId,
     plubotData,
     byteMessage,
+    byteMessageType,
     setByteMessage,
     handleSaveFlow,
     onNodeDrop: handleNodeDrop,
@@ -727,17 +736,14 @@ const useTrainingScreenHelpers = ({
 
   const handleError = useCallback(
     (error) => {
-      setByteMessage({
-        type: 'error',
-        message: error.message || 'Error desconocido',
-      });
+      setByteMessage(error.message || 'Error desconocido', 'error');
     },
     [setByteMessage],
   );
 
   const handleSaveFlow = useCallback(async () => {
     if (nodes.length === 0) {
-      setByteMessage({ type: 'error', message: 'No hay nodos para guardar' });
+      setByteMessage('No hay nodos para guardar', 'error');
       return;
     }
 
@@ -745,7 +751,7 @@ const useTrainingScreenHelpers = ({
     try {
       await performBackupAndPreprocessing();
       await performBackendSave();
-      setByteMessage({ type: 'success', message: 'Guardado exitoso' });
+      setByteMessage('✅ Flujo guardado exitosamente', 'success');
     } catch (error) {
       handleError(error);
     } finally {
@@ -803,6 +809,7 @@ const TrainingScreenComponent = React.memo(
       setSelectedNode,
       isLoading,
       byteMessage,
+      byteMessageType,
       setByteMessage,
       setEmergencyBackupData,
       hadBackup,
@@ -853,6 +860,7 @@ const TrainingScreenComponent = React.memo(
       plubotId,
       plubotData,
       byteMessage,
+      byteMessageType,
       setByteMessage,
       handleSaveFlow,
       setConnectionProperties,

@@ -98,27 +98,37 @@ const MediaNodeConfig: React.FC<MediaNodeConfigProps> = memo(({ data, onSave, on
 
   // Actualizar configuración específica del tipo
   const updateTypeConfig = useCallback((key: string, value: string | number | boolean) => {
-    setFormData((prev) => ({
-      ...prev,
-      config: {
-        ...prev.config,
-        [`${prev.type}Settings`]: {
-          ...prev.config?.[`${prev.type}Settings` as keyof typeof prev.config],
-          [key]: value,
+    setFormData((prev) => {
+      const settingsKey = `${prev.type}Settings` as keyof typeof prev.config;
+      const currentSettings = prev.config ? (Reflect.get(prev.config, settingsKey) ?? {}) : {};
+
+      return {
+        ...prev,
+        config: {
+          ...prev.config,
+          [settingsKey]: {
+            ...currentSettings,
+            [key]: value,
+          },
         },
-      },
-    }));
+      };
+    });
   }, []);
 
   // Get icon for media type
   const getMediaIcon = (type: MediaType) => {
-    const icons = {
-      image: Image,
-      video: Film,
-      audio: Music,
-      file: FileImage,
-    };
-    return icons[type] || FileImage;
+    switch (type) {
+      case 'image':
+        return Image;
+      case 'video':
+        return Film;
+      case 'audio':
+        return Music;
+      case 'file':
+        return FileImage;
+      default:
+        return FileImage;
+    }
   };
 
   return (
@@ -166,7 +176,7 @@ const MediaNodeConfig: React.FC<MediaNodeConfigProps> = memo(({ data, onSave, on
       <div className='config-premium-body'>
         {/* Media Type Selector */}
         <div className='config-section'>
-          <label className='config-label'>
+          <label htmlFor='media-url-input' className='config-label'>
             <span className='label-text'>Tipo de Media</span>
             <Info size={14} className='label-info' />
           </label>

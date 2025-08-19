@@ -1,40 +1,71 @@
 /* StatusBubble.css */
 
-/*
-  NOTA DE REFACTORIZACIÓN:
-  Se han aplicado cambios de estilo para abordar las solicitudes del usuario:
-  1.  Ancho dinámico: Se usa `width: max-content` para que la burbuja se ajuste al texto, haciéndola más angosta.
-  2.  Paleta de colores: Se ha adoptado un tema más oscuro y profesional (#1A363F) con texto claro (#E0F2F1) para mejorar el contraste y la estética, basándose en la captura de pantalla.
-  3.  Consistencia visual: Se ha añadido un borde sutil y se ha ajustado la sombra para una mejor integración con la UI.
-  4.  Alineación: El texto ahora se alinea a la izquierda para una lectura más natural.
-*/
-
 .status-bubble {
   position: fixed;
   bottom: 30px;
   right: 100px;
-  /* El color de fondo se ha oscurecido para que coincida con la captura de pantalla del usuario y mejorar el contraste. */
-  background-color: #1a363f; /* Un verde azulado oscuro y profesional */
-  /* El color del texto se cambia a blanco para una legibilidad óptima sobre el nuevo fondo. */
+  background: linear-gradient(135deg, #1a363f 0%, #0f2027 100%);
   color: #e0f2f1;
-  /* El padding horizontal se ha reducido para que la burbuja sea más angosta, como se solicitó. */
-  padding: 10px 15px;
-  border-radius: 15px;
+  padding: 12px 20px;
+  border-radius: 18px;
   box-shadow:
-    0 4px 20px rgba(0, 0, 0, 0.4),
-    0 0 15px rgba(0, 224, 255, 0.2);
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    0 2px 8px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
   z-index: 10000;
   opacity: 0;
-  transform: translateY(20px) scale(0.9);
-  animation: fadeInGrow 0.5s forwards;
-  /* El ancho máximo se ajusta automáticamente al contenido para evitar un espacio vacío excesivo. */
+  transform: translateY(20px) scale(0.95);
+  animation: fadeInBounce 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
   width: max-content;
-  max-width: 280px; /* Se establece un máximo por si el texto es muy largo. */
-  text-align: left; /* El texto se alinea a la izquierda para una apariencia más limpia. */
-  font-size: 0.9rem;
+  max-width: 320px;
+  min-width: 200px;
+  font-size: 0.95rem;
   pointer-events: auto;
-  border: 1px solid rgba(0, 224, 255, 0.3); /* Borde sutil para definir la forma. */
+  border: 2px solid rgba(0, 224, 255, 0.3);
   isolation: isolate;
+  backdrop-filter: blur(10px);
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Variantes según el tipo de mensaje */
+.status-bubble--success {
+  border-color: #4ade80;
+  background: linear-gradient(135deg, #0f2e1f 0%, #0a1f14 100%);
+  box-shadow:
+    0 8px 32px rgba(74, 222, 128, 0.2),
+    0 2px 8px rgba(0, 0, 0, 0.2),
+    0 0 20px rgba(74, 222, 128, 0.15),
+    inset 0 1px 0 rgba(74, 222, 128, 0.1);
+}
+
+.status-bubble--error {
+  border-color: #f87171;
+  background: linear-gradient(135deg, #2e0f0f 0%, #1f0a0a 100%);
+  box-shadow:
+    0 8px 32px rgba(248, 113, 113, 0.2),
+    0 2px 8px rgba(0, 0, 0, 0.2),
+    0 0 20px rgba(248, 113, 113, 0.15),
+    inset 0 1px 0 rgba(248, 113, 113, 0.1);
+}
+
+.status-bubble--warning {
+  border-color: #fbbf24;
+  background: linear-gradient(135deg, #2e2a0f 0%, #1f1a0a 100%);
+  box-shadow:
+    0 8px 32px rgba(251, 191, 36, 0.2),
+    0 2px 8px rgba(0, 0, 0, 0.2),
+    0 0 20px rgba(251, 191, 36, 0.15),
+    inset 0 1px 0 rgba(251, 191, 36, 0.1);
+}
+
+.status-bubble--info {
+  border-color: #60a5fa;
+  background: linear-gradient(135deg, #0f1e2e 0%, #0a141f 100%);
+  box-shadow:
+    0 8px 32px rgba(96, 165, 250, 0.2),
+    0 2px 8px rgba(0, 0, 0, 0.2),
+    0 0 20px rgba(96, 165, 250, 0.15),
+    inset 0 1px 0 rgba(96, 165, 250, 0.1);
 }
 
 .status-bubble-content {
@@ -42,28 +73,67 @@
   z-index: 1;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 15px; /* Aumentado ligeramente para dar más espacio entre el texto y el botón de cierre. */
+  gap: 12px;
+}
+
+/* Icono del mensaje */
+.status-bubble-icon {
+  font-size: 1.2rem;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+}
+
+.status-bubble--success .status-bubble-icon {
+  color: #4ade80;
+  text-shadow: 0 0 10px rgba(74, 222, 128, 0.5);
+}
+
+.status-bubble--error .status-bubble-icon {
+  color: #f87171;
+  text-shadow: 0 0 10px rgba(248, 113, 113, 0.5);
+}
+
+.status-bubble--warning .status-bubble-icon {
+  color: #fbbf24;
+  text-shadow: 0 0 10px rgba(251, 191, 36, 0.5);
+}
+
+.status-bubble--info .status-bubble-icon {
+  color: #60a5fa;
+  text-shadow: 0 0 10px rgba(96, 165, 250, 0.5);
+}
+
+/* Texto del mensaje */
+.status-bubble-text {
+  flex: 1;
+  line-height: 1.4;
+  font-weight: 500;
+  letter-spacing: 0.3px;
 }
 
 .status-bubble-close {
-  background: rgba(255, 255, 255, 0.1);
-  border: none;
-  /* El color del icono 'X' se cambia a blanco para que coincida con el texto. */
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   color: #e0f2f1;
-  font-size: 18px;
-  font-weight: bold;
+  font-size: 20px;
+  font-weight: 300;
   cursor: pointer !important;
-  padding: 0 5px;
+  padding: 0;
   line-height: 1;
-  opacity: 0.7;
-  transition: all 0.2s ease;
+  opacity: 0.6;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  min-width: 24px;
-  min-height: 24px;
+  width: 26px;
+  height: 26px;
+  flex-shrink: 0;
   z-index: 10001;
   position: relative;
   pointer-events: auto !important;
@@ -71,30 +141,88 @@
 
 .status-bubble-close:hover {
   opacity: 1;
-  background-color: rgba(255, 255, 255, 0.2);
-  transform: scale(1.1);
+  background: rgba(255, 255, 255, 0.15);
+  transform: scale(1.1) rotate(90deg);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.status-bubble-close:active {
+  transform: scale(0.95);
 }
 
 .status-bubble-arrow {
   content: "";
   position: absolute;
   top: 50%;
-  right: -8px;
+  right: -7px;
   transform: translateY(-50%) rotate(45deg);
-  width: 16px;
-  height: 16px;
-  /* El color de la flecha se actualiza para que coincida con el nuevo color de fondo de la burbuja. */
-  background-color: #1a363f;
-  z-index: 0;
-  border-radius: 2px;
-  /* Se añade un borde para que coincida con el estilo de la burbuja principal. */
-  border-top: 1px solid rgba(0, 224, 255, 0.3);
-  border-right: 1px solid rgba(0, 224, 255, 0.3);
+  width: 14px;
+  height: 14px;
+  background: inherit;
+  z-index: -1;
+  border-radius: 3px;
+  border-top: 2px solid;
+  border-right: 2px solid;
+  border-color: inherit;
 }
 
-@keyframes fadeInGrow {
-  to {
+/* Animaciones mejoradas */
+@keyframes fadeInBounce {
+  0% {
+    opacity: 0;
+    transform: translateY(20px) scale(0.9);
+  }
+  60% {
+    opacity: 1;
+    transform: translateY(-5px) scale(1.02);
+  }
+  100% {
     opacity: 1;
     transform: translateY(0) scale(1);
+  }
+}
+
+/* Efecto de pulso para mensajes importantes */
+.status-bubble--error {
+  animation: fadeInBounce 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards,
+             pulse-error 2s ease-in-out infinite;
+}
+
+.status-bubble--success {
+  animation: fadeInBounce 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards,
+             pulse-success 3s ease-in-out infinite;
+}
+
+@keyframes pulse-error {
+  0%, 100% {
+    box-shadow:
+      0 8px 32px rgba(248, 113, 113, 0.2),
+      0 2px 8px rgba(0, 0, 0, 0.2),
+      0 0 20px rgba(248, 113, 113, 0.15),
+      inset 0 1px 0 rgba(248, 113, 113, 0.1);
+  }
+  50% {
+    box-shadow:
+      0 8px 32px rgba(248, 113, 113, 0.3),
+      0 2px 8px rgba(0, 0, 0, 0.2),
+      0 0 30px rgba(248, 113, 113, 0.25),
+      inset 0 1px 0 rgba(248, 113, 113, 0.15);
+  }
+}
+
+@keyframes pulse-success {
+  0%, 100% {
+    box-shadow:
+      0 8px 32px rgba(74, 222, 128, 0.2),
+      0 2px 8px rgba(0, 0, 0, 0.2),
+      0 0 20px rgba(74, 222, 128, 0.15),
+      inset 0 1px 0 rgba(74, 222, 128, 0.1);
+  }
+  50% {
+    box-shadow:
+      0 8px 32px rgba(74, 222, 128, 0.25),
+      0 2px 8px rgba(0, 0, 0, 0.2),
+      0 0 25px rgba(74, 222, 128, 0.2),
+      inset 0 1px 0 rgba(74, 222, 128, 0.12);
   }
 }

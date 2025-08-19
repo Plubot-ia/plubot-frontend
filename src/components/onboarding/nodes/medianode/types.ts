@@ -24,6 +24,8 @@ export interface MediaNodeData {
   altText?: string;
   /** Descripción adicional del nodo */
   description?: string;
+  /** Color de acento para el nodo */
+  accentColor?: string;
   /** Si está en modo edición */
   isEditing?: boolean;
   /** Si el media está cargando */
@@ -72,8 +74,8 @@ export interface MediaConfig {
 export interface MediaNodeProps extends NodeProps<MediaNodeData> {
   id: string;
   data: MediaNodeData;
-  selected?: boolean;
-  isConnectable?: boolean;
+  selected: boolean;
+  isConnectable: boolean;
 }
 
 /**

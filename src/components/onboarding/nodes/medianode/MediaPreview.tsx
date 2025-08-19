@@ -16,7 +16,7 @@ import {
   Download,
   Maximize2,
 } from 'lucide-react';
-import React, { memo, useState, useCallback, useMemo } from 'react';
+import React, { memo, useState, useCallback, useMemo, useRef } from 'react';
 
 // import { COLORS } from './constants'; // No se usa
 import type { MediaPreviewProps } from './types';
@@ -35,6 +35,10 @@ const MEDIA_COLORS = {
  */
 const MediaPreview: React.FC<MediaPreviewProps> = memo(
   ({ type, url, caption, altText, config }) => {
+    // Referencias para elementos multimedia
+    const videoRef = useRef<HTMLVideoElement>(null);
+    const audioRef = useRef<HTMLAudioElement>(null);
+
     // Estado mínimo optimizado
     const [imageError, setImageError] = useState(false);
     const [videoError, setVideoError] = useState(false);
@@ -44,7 +48,20 @@ const MediaPreview: React.FC<MediaPreviewProps> = memo(
     const [isLoading, setIsLoading] = useState(true);
 
     // Colores memoizados por tipo
-    const mediaColor = useMemo(() => MEDIA_COLORS[type] ?? MEDIA_COLORS.file, [type]);
+    const mediaColor = useMemo(() => {
+      switch (type) {
+        case 'image':
+          return MEDIA_COLORS.image;
+        case 'video':
+          return MEDIA_COLORS.video;
+        case 'audio':
+          return MEDIA_COLORS.audio;
+        case 'file':
+          return MEDIA_COLORS.file;
+        default:
+          return MEDIA_COLORS.file;
+      }
+    }, [type]);
 
     // Callbacks optimizados
     const handleImageLoad = useCallback(() => {
@@ -118,12 +135,12 @@ const MediaPreview: React.FC<MediaPreviewProps> = memo(
             <div className='preview-image-container'>
               <img
                 src={url}
-                alt={altText || caption || 'Media preview'}
+                alt={altText ?? caption ?? 'Media preview'}
                 onLoad={handleImageLoad}
                 onError={handleImageError}
                 className='preview-image'
                 style={{
-                  objectFit: config?.imageSettings?.objectFit || 'cover',
+                  objectFit: config?.imageSettings?.objectFit ?? 'cover',
                   display: isLoading ? 'none' : 'block',
                 }}
                 loading='lazy'
@@ -163,17 +180,19 @@ const MediaPreview: React.FC<MediaPreviewProps> = memo(
             )}
             <div className='video-container'>
               <video
-                aria-label={altText ?? 'Video content'}
+                ref={videoRef}
                 src={url}
+                controls={config?.videoSettings?.controls !== false}
                 autoPlay={config?.videoSettings?.autoplay}
-                controls={config?.videoSettings?.controls}
                 loop={config?.videoSettings?.loop}
-                muted={isMuted}
+                muted={config?.videoSettings?.muted}
                 className='preview-video'
-                playsInline
                 onLoadedData={handleVideoLoad}
                 onError={handleVideoError}
-              />
+                poster={config?.videoSettings?.thumbnail}
+              >
+                <track kind='captions' />
+              </video>
               {!config?.videoSettings?.controls && (
                 <div className='video-custom-controls'>
                   <button
@@ -209,7 +228,7 @@ const MediaPreview: React.FC<MediaPreviewProps> = memo(
           </div>
         );
 
-      case 'audio':
+      case 'audio': {
         if (audioError) {
           return (
             <div className='media-preview media-preview-error'>
@@ -221,6 +240,8 @@ const MediaPreview: React.FC<MediaPreviewProps> = memo(
             </div>
           );
         }
+        // Generate audio visualization bars
+        const bars = Array.from({ length: 5 }, () => 30 + Math.random() * 40);
         return (
           <div className='media-preview media-preview-audio'>
             {isLoading && (
@@ -234,28 +255,33 @@ const MediaPreview: React.FC<MediaPreviewProps> = memo(
                   <Music size={32} color={mediaColor} />
                 </div>
                 <div className='audio-waves'>
-                  {[...Array(5)].map((_, i) => (
-                    <div
-                      key={i}
-                      className='audio-wave'
-                      style={{
-                        backgroundColor: mediaColor,
-                        animationDelay: `${i * 0.1}s`,
-                      }}
-                    />
-                  ))}
+                  {bars.map((height, index) => {
+                    const uniqueKey = `audio-bar-${url}-${height}-${index}`;
+                    return (
+                      <div
+                        key={uniqueKey}
+                        className='audio-bar'
+                        style={{
+                          height: `${height}%`,
+                          animationDelay: `${index * 0.1}s`,
+                        }}
+                      />
+                    );
+                  })}
                 </div>
               </div>
               <audio
-                aria-label={altText ?? 'Audio content'}
+                ref={audioRef}
                 src={url}
+                controls={config?.audioSettings?.controls !== false}
                 autoPlay={config?.audioSettings?.autoplay}
-                controls
                 loop={config?.audioSettings?.loop}
                 className='preview-audio'
                 onLoadedData={handleAudioLoad}
                 onError={handleAudioError}
-              />
+              >
+                <track kind='captions' />
+              </audio>
             </div>
             {caption && (
               <div className='preview-caption'>
@@ -264,6 +290,7 @@ const MediaPreview: React.FC<MediaPreviewProps> = memo(
             )}
           </div>
         );
+      }
 
       case 'file':
       default: {

@@ -189,7 +189,7 @@ export const createNodeSlice = (set, get) => ({
   // =================================================================================================
 
   onNodesChange: (changes) => {
-    const { nodes: currentNodes, _createHistoryEntry } = get();
+    const { nodes: currentNodes, edges: currentEdges, _createHistoryEntry } = get();
 
     const isSelectionChange = changes.every((c) => c.type === 'select');
     const isPositionChange = changes.some((c) => c.type === 'position');
@@ -219,17 +219,40 @@ export const createNodeSlice = (set, get) => ({
       (c) => c.type === 'remove' || c.type === 'add' || (c.type === 'reset' && c.item),
     );
 
+    // Si se eliminaron nodos, también eliminar las aristas conectadas
+    const removedNodeIds = changes.filter((c) => c.type === 'remove').map((c) => c.id);
+
+    let newEdges = currentEdges;
+    if (removedNodeIds.length > 0) {
+      // Filtrar aristas que estén conectadas a nodos eliminados
+      newEdges = currentEdges.filter(
+        (edge) => !removedNodeIds.includes(edge.source) && !removedNodeIds.includes(edge.target),
+      );
+    }
+
     // Solo actualizar el contador si realmente cambia la cantidad
     if (hasRemovalOrAddition) {
-      const currentCount = get().nodeCount || 0;
+      const currentNodeCount = get().nodeCount || 0;
+      const currentEdgeCount = get().edgeCount || 0;
 
-      if (newNodes.length !== currentCount) {
-        set({ nodeCount: newNodes.length });
+      const updateObject = {};
+
+      if (newNodes.length !== currentNodeCount) {
+        updateObject.nodeCount = newNodes.length;
+      }
+
+      if (newEdges.length !== currentEdgeCount) {
+        updateObject.edgeCount = newEdges.length;
+      }
+
+      if (Object.keys(updateObject).length > 0) {
+        set(updateObject);
       }
     }
 
     _createHistoryEntry({
       nodes: newNodes,
+      edges: newEdges,
       isUndoing: false,
       isRedoing: false,
     });

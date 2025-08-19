@@ -22,9 +22,12 @@ export const useEdgeTimingFix = () => {
   const [handlesReady, setHandlesReady] = useState(false);
   const checkAttempts = useRef(0);
   const maxAttempts = 5;
+  const hasInitializedRef = useRef(false);
 
   // OPTIMIZED: Only subscribe to isLoaded to avoid re-renders on node/edge changes
   const isLoaded = useFlowStore((state) => state.isLoaded);
+  // Subscribe to edges length to detect when edges are added dynamically
+  const edgesLength = useFlowStore((state) => state.edges.length);
 
   // Función para verificar si todos los handles críticos están en el DOM
   const checkHandlesInDOM = useCallback(() => {
@@ -76,8 +79,15 @@ export const useEdgeTimingFix = () => {
   // Efecto principal para verificar handles y forzar actualización
   useEffect(() => {
     // OPTIMIZED: Get nodes from store only when needed
-    const { nodes } = useFlowStore.getState();
-    if (!isLoaded || nodes.length === 0 || handlesReady || checkAttempts.current >= maxAttempts) {
+    const { nodes, edges } = useFlowStore.getState();
+
+    // Si no hay nodos pero hay edges, permitir que se rendericen cuando lleguen los nodos
+    if (!isLoaded || (nodes.length === 0 && edges.length === 0)) {
+      return;
+    }
+
+    // Si ya está listo o excedimos intentos, no hacer nada más
+    if (handlesReady || checkAttempts.current >= maxAttempts) {
       return;
     }
 
@@ -112,8 +122,47 @@ export const useEdgeTimingFix = () => {
     if (!isLoaded) {
       checkAttempts.current = 0;
       setHandlesReady(false);
+      hasInitializedRef.current = false;
     }
   }, [isLoaded]);
+
+  // Efecto para manejar edges agregados dinámicamente
+  useEffect(() => {
+    const { nodes, edges } = useFlowStore.getState();
+
+    // Si hay edges y nodos, pero handles no están listos, verificar inmediatamente
+    if (edges.length > 0 && nodes.length > 0 && !handlesReady && !hasInitializedRef.current) {
+      hasInitializedRef.current = true;
+
+      // Verificar handles inmediatamente para edges dinámicos
+      if (checkHandlesInDOM()) {
+        const criticalNodes = nodes.filter((node) =>
+          ['start', 'message', 'decision', 'end'].includes(node.type),
+        );
+
+        for (const node of criticalNodes) {
+          updateNodeInternals(node.id);
+        }
+
+        setHandlesReady(true);
+      } else {
+        // Si los handles no están listos, dar un pequeño tiempo para que se monten
+        setTimeout(() => {
+          if (checkHandlesInDOM()) {
+            const criticalNodes = nodes.filter((node) =>
+              ['start', 'message', 'decision', 'end'].includes(node.type),
+            );
+
+            for (const node of criticalNodes) {
+              updateNodeInternals(node.id);
+            }
+
+            setHandlesReady(true);
+          }
+        }, 50);
+      }
+    }
+  }, [edgesLength, handlesReady, checkHandlesInDOM, updateNodeInternals]);
 
   return { handlesReady };
 };

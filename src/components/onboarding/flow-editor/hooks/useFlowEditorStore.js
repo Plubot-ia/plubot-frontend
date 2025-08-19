@@ -37,8 +37,11 @@ const useFlowEditorStore = () => {
   const rawEdges = useFlowStore((state) => state.edges);
 
   // Migrar edges automáticamente para corregir sourceHandle inconsistentes
+  // IMPORTANTE: Crear siempre un nuevo array para forzar re-render en React Flow
   const edges = useMemo(() => {
-    return migrateEdgeHandles(rawEdges, nodes);
+    const migrated = migrateEdgeHandles(rawEdges, nodes);
+    // Forzar nueva referencia para que React Flow detecte el cambio
+    return [...migrated];
   }, [rawEdges, nodes]);
 
   return {

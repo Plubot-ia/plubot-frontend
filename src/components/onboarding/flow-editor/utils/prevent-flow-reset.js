@@ -27,7 +27,7 @@ const _createResetFlowProtection = (flowStore, originalResetFlow) => {
 
     // Always allow explicit resets
     if (options.allowResetFromLoader === true || options.userInitiated === true) {
-      if (CONFIG.DEBUG_MODE) console.log('[FlowProtection] Allowing explicit reset');
+      // Flow reset allowed - intentional reset
       return originalResetFlow(...arguments_);
     }
 
@@ -38,7 +38,7 @@ const _createResetFlowProtection = (flowStore, originalResetFlow) => {
 
     // Block unexpected resets of non-empty flows
     if (CONFIG.DEBUG_MODE) {
-      console.warn('[FlowProtection] Blocked unexpected reset of non-empty flow');
+      // No backup available for recovery of non-empty flow
     }
     return state;
   };
@@ -109,7 +109,7 @@ const _createSetNodesProtection = (flowStore, originalSetNodes, backupManager) =
     if (isUserDeletingAll && (!newNodes || newNodes.length === 0)) {
       // User is intentionally clearing the flow
       if (CONFIG.DEBUG_MODE) {
-        console.log('[FlowProtection] User intentionally clearing flow');
+        // Emergency backup created during flow
       }
       // Don't create backup for intentional clear
       return originalSetNodes(newNodes);
@@ -123,7 +123,7 @@ const _createSetNodesProtection = (flowStore, originalSetNodes, backupManager) =
       });
 
       if (CONFIG.DEBUG_MODE) {
-        console.warn('[FlowProtection] Blocked unexpected node clearing');
+        // Flow reset detected, attempting recovery
       }
       return; // Block the change
     }
@@ -168,11 +168,11 @@ const _cleanupOldBackups = (plubotId) => {
     if (localStorage.getItem(oldBackupKey)) {
       localStorage.removeItem(oldBackupKey);
       if (CONFIG.DEBUG_MODE) {
-        console.log('[FlowProtection] Cleaned up old emergency backup');
+        // Successfully recovered from backup
       }
     }
-  } catch (error) {
-    console.error('[FlowProtection] Cleanup error:', error);
+  } catch {
+    // Cleanup error
   }
 };
 
@@ -199,8 +199,8 @@ const _createCleanupFunction = ({
       if (backupManager) {
         backupManager.stopAutoBackup();
       }
-    } catch (error) {
-      console.error('[FlowProtection] Cleanup error:', error);
+    } catch {
+      // Error: Flow protection cleanup failed
     }
   };
 };
@@ -253,8 +253,8 @@ export const preventFlowReset = () => {
     flowStore.setState({
       saveEmptyFlow: () => {
         // Allow saving empty flow when user explicitly wants to
-        const state = flowStore.getState();
-        if (state.nodes?.length === 0) {
+        const currentState = flowStore.getState();
+        if (currentState.nodes?.length === 0) {
           backupManager.createBackup({
             reason: 'user_delete_all',
             forceSave: false,
@@ -264,7 +264,7 @@ export const preventFlowReset = () => {
     });
 
     if (CONFIG.DEBUG_MODE) {
-      console.log('[FlowProtection] Protection system initialized');
+      // Recovered from last known state initialized
     }
 
     // Return cleanup function
@@ -274,8 +274,8 @@ export const preventFlowReset = () => {
       originalSetNodes,
       backupManager,
     });
-  } catch (error) {
-    console.error('[FlowProtection] Initialization error:', error);
+  } catch {
+    // FlowProtection initialization error
   }
 };
 
