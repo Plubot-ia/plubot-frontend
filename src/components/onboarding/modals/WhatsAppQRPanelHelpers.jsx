@@ -1,6 +1,3 @@
-import PropTypes from 'prop-types';
-import React, { useEffect, useState } from 'react';
-
 import {
   Activity,
   AlertCircle,
@@ -12,15 +9,19 @@ import {
   Phone,
   Plus,
   RefreshCw,
+  Shield,
   Smartphone,
-  UserX,
+  Users,
   Wifi,
   WifiOff,
+  Zap,
 } from 'lucide-react';
+import PropTypes from 'prop-types';
 import QRCode from 'qrcode';
+import React, { useEffect, useState } from 'react';
 
 // Status indicator component
-export const StatusIndicator = ({ status }) => {
+const StatusIndicator = ({ status }) => {
   const statusConfig = {
     initializing: { icon: Loader2, text: 'Inicializando...', color: 'blue', spin: true },
     waiting_qr: { icon: Loader2, text: 'Esperando escaneo...', color: 'blue', spin: true },
@@ -31,7 +32,36 @@ export const StatusIndicator = ({ status }) => {
     error: { icon: AlertCircle, text: 'Error de conexión', color: 'red' },
   };
 
-  const config = status in statusConfig ? statusConfig[status] : statusConfig.error;
+  const getConfig = () => {
+    switch (status) {
+      case 'initializing': {
+        return statusConfig.initializing;
+      }
+      case 'waiting_qr': {
+        return statusConfig.waiting_qr;
+      }
+      case 'scanning': {
+        return statusConfig.scanning;
+      }
+      case 'authenticated': {
+        return statusConfig.authenticated;
+      }
+      case 'ready': {
+        return statusConfig.ready;
+      }
+      case 'disconnected': {
+        return statusConfig.disconnected;
+      }
+      case 'error': {
+        return statusConfig.error;
+      }
+      default: {
+        return statusConfig.initializing;
+      }
+    }
+  };
+
+  const config = getConfig();
   const Icon = config.icon;
 
   return (
@@ -47,8 +77,8 @@ StatusIndicator.propTypes = {
 };
 
 // QR Code display component
-export const QRCodeDisplay = ({ qrCode, status }) => {
-  const [qrDataUrl, setQrDataUrl] = useState(null);
+const QRDisplay = ({ qrCode, status }) => {
+  const [qrDataUrl, setQrDataUrl] = useState();
 
   useEffect(() => {
     if (qrCode && !qrCode.startsWith('data:image')) {
@@ -58,11 +88,13 @@ export const QRCodeDisplay = ({ qrCode, status }) => {
         margin: 2,
         color: {
           dark: '#000000',
-          light: '#FFFFFF'
-        }
+          light: '#FFFFFF',
+        },
       })
-        .then(url => setQrDataUrl(url))
-        .catch(err => console.error('Error generating QR:', err));
+        .then((url) => setQrDataUrl(url))
+        .catch(() => {
+          // Error generating QR silently
+        });
     } else if (qrCode && qrCode.startsWith('data:image')) {
       setQrDataUrl(qrCode);
     }
@@ -89,18 +121,13 @@ export const QRCodeDisplay = ({ qrCode, status }) => {
   );
 };
 
-QRCodeDisplay.propTypes = {
+QRDisplay.propTypes = {
   qrCode: PropTypes.string,
   status: PropTypes.string.isRequired,
 };
 
 // Connected view component
-export const ConnectedView = ({
-  phoneNumber,
-  handleDisconnect,
-  handleCreateNewSession,
-  isLoading,
-}) => (
+const ConnectedView = ({ phoneNumber, handleDisconnect, handleCreateNewSession, isLoading }) => (
   <div className='whatsapp-connected-container'>
     <div className='whatsapp-connected'>
       <div className='connected-header'>
@@ -124,16 +151,20 @@ export const ConnectedView = ({
       </div>
 
       <div className='connected-features'>
-        <div className='feature-item'>
-          <Bot size={20} />
-          <div>
+        <div className='feature-item active'>
+          <div className='feature-icon-wrapper'>
+            <Bot size={24} />
+          </div>
+          <div className='feature-content'>
             <strong>Bot Activo</strong>
             <span>Respondiendo mensajes automáticamente</span>
           </div>
         </div>
-        <div className='feature-item'>
-          <Activity size={20} />
-          <div>
+        <div className='feature-item active'>
+          <div className='feature-icon-wrapper'>
+            <Activity size={24} />
+          </div>
+          <div className='feature-content'>
             <strong>Flujo Sincronizado</strong>
             <span>Ejecutando el flujo configurado</span>
           </div>
@@ -179,53 +210,130 @@ ConnectedView.propTypes = {
 };
 
 // QR Instructions component
-export const QRInstructions = ({
-  qrCode,
-  handleRefreshQR,
-  handleRetry,
-  error,
-  retryCount,
-  isLoading,
-}) => (
-  <div className='whatsapp-qr-right'>
-    <div className='share-qr-instructions'>
-      <h4>Cómo conectar:</h4>
-      <ol>
-        <li>Abre WhatsApp en tu teléfono</li>
-        <li>
-          Toca <strong>Menú</strong> o <strong>Configuración</strong>
-        </li>
-        <li>
-          Selecciona <strong>Dispositivos vinculados</strong>
-        </li>
-        <li>
-          Toca <strong>Vincular dispositivo</strong>
-        </li>
-        <li>Escanea este código QR con tu teléfono</li>
-      </ol>
-      {qrCode && (
-        <div className='qr-actions'>
-          <button
-            className='share-button refresh-btn'
-            onClick={handleRefreshQR}
-            disabled={isLoading}
-            type='button'
-          >
-            <RefreshCw size={16} />
-            <span>Actualizar QR</span>
-          </button>
-        </div>
-      )}
-      {/* Error message removed from here - shown only in parent component */}
+const QRInstructions = ({ qrCode, handleRefreshQR, isLoading }) => {
+  const [isRefreshing, setIsRefreshing] = React.useState(false);
+
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    await handleRefreshQR();
+    setIsRefreshing(false);
+  };
+
+  return (
+    <div className='whatsapp-qr-right'>
+      <div className='share-qr-instructions'>
+        <h4>Cómo conectar:</h4>
+        <ol>
+          <li>Abre WhatsApp en tu teléfono</li>
+          <li>
+            Toca <strong>Menú</strong> o <strong>Configuración</strong>
+          </li>
+          <li>
+            Selecciona <strong>Dispositivos vinculados</strong>
+          </li>
+          <li>
+            Toca <strong>Vincular dispositivo</strong>
+          </li>
+          <li>Escanea este código QR con tu teléfono</li>
+        </ol>
+        {qrCode && (
+          <div className='qr-actions'>
+            <button
+              className={`whatsapp-refresh-button ${isRefreshing ? 'refreshing' : ''}`}
+              onClick={handleRefresh}
+              disabled={isRefreshing}
+              type='button'
+            >
+              <RefreshCw size={16} className={isRefreshing ? 'spin' : ''} />
+              <span>{isRefreshing ? 'Actualizando...' : 'Actualizar QR'}</span>
+            </button>
+          </div>
+        )}
+        {/* Error message removed from here - shown only in parent component */}
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 QRInstructions.propTypes = {
   qrCode: PropTypes.string,
   handleRefreshQR: PropTypes.func.isRequired,
-  handleRetry: PropTypes.func.isRequired,
-  error: PropTypes.string,
-  retryCount: PropTypes.number.isRequired,
   isLoading: PropTypes.bool.isRequired,
+};
+
+// Error display component
+const ErrorDisplay = ({ error, handleRetry }) => {
+  if (!error) return;
+
+  return (
+    <div className='share-qr-error'>
+      <AlertCircle size={32} />
+      <p>{error}</p>
+      <button className='share-button secondary' onClick={handleRetry} type='button'>
+        <RefreshCw size={16} />
+        <span>Reintentar</span>
+      </button>
+    </div>
+  );
+};
+
+ErrorDisplay.propTypes = {
+  error: PropTypes.string,
+  handleRetry: PropTypes.func.isRequired,
+};
+
+// Features section component
+const FeaturesSection = () => (
+  <div className='share-features'>
+    <div className='share-feature'>
+      <Shield size={20} />
+      <div>
+        <strong>Seguro y Privado</strong>
+        <span>Encriptación de extremo a extremo</span>
+      </div>
+    </div>
+    <div className='share-feature'>
+      <Users size={20} />
+      <div>
+        <strong>Multiagente</strong>
+        <span>Atiende múltiples conversaciones</span>
+      </div>
+    </div>
+    <div className='share-feature'>
+      <Zap size={20} />
+      <div>
+        <strong>Respuestas Instantáneas</strong>
+        <span>Disponible 24/7 sin interrupciones</span>
+      </div>
+    </div>
+  </div>
+);
+
+// WhatsApp info component
+const WhatsAppInfo = ({ status }) => {
+  if (status !== 'ready') return;
+
+  return (
+    <div className='share-whatsapp-info'>
+      <h4>✅ Tu Plubot está activo en WhatsApp</h4>
+      <p>
+        Los mensajes que recibas en WhatsApp serán procesados automáticamente por tu Plubot usando
+        el flujo configurado.
+      </p>
+    </div>
+  );
+};
+
+WhatsAppInfo.propTypes = {
+  status: PropTypes.string.isRequired,
+};
+
+export {
+  StatusIndicator,
+  QRDisplay,
+  QRInstructions,
+  ConnectedView,
+  ErrorDisplay,
+  FeaturesSection,
+  WhatsAppInfo,
 };

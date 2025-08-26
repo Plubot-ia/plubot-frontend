@@ -25,7 +25,7 @@ const getSyncStatusText = (details) => {
 const useSyncButtonLogic = () => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [syncDetails, setSyncDetails] = useState();
-  const [statusBubble, setStatusBubble] = useState(); // StatusBubble removed - centralized in EpicHeader for performance
+  const [, setStatusBubble] = useState(); // StatusBubble removed - centralized in EpicHeader for performance
 
   const { syncAllPlubots } = useSyncService();
 
@@ -72,7 +72,6 @@ const useSyncButtonLogic = () => {
   return {
     isExpanded,
     syncDetails,
-    statusBubble,
     handleClick,
     handleSync,
     getStatusIcon,
@@ -80,8 +79,7 @@ const useSyncButtonLogic = () => {
 };
 
 const SyncButton = () => {
-  const { isExpanded, syncDetails, statusBubble, handleClick, handleSync, getStatusIcon } =
-    useSyncButtonLogic();
+  const { isExpanded, syncDetails, handleClick, handleSync, getStatusIcon } = useSyncButtonLogic();
 
   // Componente helper para estado de carga
   const LoadingButton = () => (
@@ -116,21 +114,7 @@ const SyncButton = () => {
     return <LoadingButton />;
   }
 
-  // Componente helper para burbuja de notificación
-  const StatusBubble = () => (
-    <AnimatePresence>
-      {statusBubble && (
-        <motion.div
-          className='status-bubble'
-          initial={{ opacity: 0, y: 50 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: 50 }}
-        >
-          <div className='status-bubble-content'>{statusBubble.message}</div>
-        </motion.div>
-      )}
-    </AnimatePresence>
-  );
+  // StatusBubble removed - now handled by EpicHeader
 
   // Componente helper para lista de errores
   const SyncErrorsList = () => (

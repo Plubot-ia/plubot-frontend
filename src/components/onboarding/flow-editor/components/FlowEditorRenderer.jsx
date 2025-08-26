@@ -15,7 +15,7 @@ import EmergencyRecovery from './EmergencyRecovery';
 import FlowMain from './FlowMain';
 
 // Componente helper para la sección de estado y controles
-const StatusSection = ({ showSaveStatus, saveStatus, saveMessage, ultraModeController }) => (
+const StatusSection = ({ ultraModeController }) => (
   <>
     {/* StatusBubble removed - now handled by EpicHeader only */}
     {ultraModeController}
@@ -24,9 +24,6 @@ const StatusSection = ({ showSaveStatus, saveStatus, saveMessage, ultraModeContr
 
 // PropTypes para StatusSection
 StatusSection.propTypes = {
-  showSaveStatus: PropTypes.bool,
-  saveStatus: PropTypes.string,
-  saveMessage: PropTypes.string,
   ultraModeController: PropTypes.node,
 };
 

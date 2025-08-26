@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 
 // StatusBubble removed - centralized in EpicHeader for performance
 // This component is deprecated and will be removed in future refactoring
@@ -6,7 +6,6 @@ import React, { useState } from 'react';
 const FlowStatusNotifier = () => {
   // Component functionality moved to ByteMessageContext
   // All status notifications now handled centrally through EpicHeader
-  return undefined;
 };
 
 export default FlowStatusNotifier;

@@ -9,20 +9,17 @@ import {
   Check,
   Loader2,
   Share2,
-  QrCode,
   Key,
   ExternalLink,
   ChevronRight,
-  Zap,
   Shield,
-  Users,
   Bot,
 } from 'lucide-react';
 import PropTypes from 'prop-types';
 import QRCode from 'qrcode';
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 
-import useAPI from '@/hooks/useAPI';
+// useAPI hook removed - not needed
 import useByteMessageContext from '@/hooks/useByteMessageContext';
 import useModalContext from '@/hooks/useModalContext';
 
@@ -128,7 +125,7 @@ const response = await fetch('https://api.plubot.com/v1/chat', {
 });
 
 const data = await response.json();
-console.log(data.response);`,
+// Response: data.response`,
     python: `# Python
 import requests
 
@@ -173,7 +170,7 @@ curl -X POST https://api.plubot.com/v1/chat \\
       <div className='share-api-content'>
         <CopyField
           label='API Key'
-          value={apiKey || `pk_live_${Math.random().toString(36).slice(2, 11)}`}
+          value={apiKey || `pk_live_${Date.now().toString(36).slice(-9)}`}
           icon={Key}
         />
 
@@ -181,7 +178,7 @@ curl -X POST https://api.plubot.com/v1/chat \\
 
         <div className='share-code-section'>
           <div className='share-code-header'>
-            <label>Ejemplo de Integración</label>
+            <div className='share-code-label'>Ejemplo de Integración</div>
             <div className='share-language-selector'>
               {Object.keys(codeExamples).map((lang) => (
                 <button
@@ -189,13 +186,23 @@ curl -X POST https://api.plubot.com/v1/chat \\
                   className={`share-lang-btn ${selectedLanguage === lang ? 'active' : ''}`}
                   onClick={() => setSelectedLanguage(lang)}
                 >
-                  {lang === 'javascript' ? 'JS' : lang === 'python' ? 'Python' : 'cURL'}
+                  {(() => {
+                    if (lang === 'javascript') return 'JS';
+                    if (lang === 'python') return 'Python';
+                    return 'cURL';
+                  })()}
                 </button>
               ))}
             </div>
           </div>
           <pre className='share-code-block'>
-            <code>{codeExamples[selectedLanguage]}</code>
+            <code>
+              {(() => {
+                if (selectedLanguage === 'javascript') return codeExamples.javascript;
+                if (selectedLanguage === 'python') return codeExamples.python;
+                return codeExamples.curl;
+              })()}
+            </code>
           </pre>
         </div>
 
@@ -246,7 +253,7 @@ const EmbedPanel = ({ plubotId, customization, onCustomizationChange }) => {
           <h4>Personalización</h4>
 
           <div className='share-custom-group'>
-            <label>Posición</label>
+            <div className='share-custom-label'>Posición</div>
             <div className='share-button-group'>
               {['right', 'left'].map((pos) => (
                 <button
@@ -261,7 +268,7 @@ const EmbedPanel = ({ plubotId, customization, onCustomizationChange }) => {
           </div>
 
           <div className='share-custom-group'>
-            <label>Tema</label>
+            <div className='share-custom-label'>Tema</div>
             <div className='share-button-group'>
               {['light', 'dark', 'auto'].map((theme) => (
                 <button
@@ -269,26 +276,30 @@ const EmbedPanel = ({ plubotId, customization, onCustomizationChange }) => {
                   className={`share-option-btn ${customization.theme === theme ? 'active' : ''}`}
                   onClick={() => onCustomizationChange('theme', theme)}
                 >
-                  {theme === 'light' ? '☀️ Claro' : theme === 'dark' ? '🌙 Oscuro' : '🎨 Auto'}
+                  {(() => {
+                    if (theme === 'light') return '☀️ Claro';
+                    if (theme === 'dark') return '🌙 Oscuro';
+                    return '🎨 Auto';
+                  })()}
                 </button>
               ))}
             </div>
           </div>
 
           <div className='share-custom-group'>
-            <label>Color Principal</label>
+            <div className='share-custom-label'>Color Principal</div>
             <div className='share-color-picker'>
               <input
                 type='color'
                 value={customization.primaryColor}
-                onChange={(e) => onCustomizationChange('primaryColor', e.target.value)}
+                onChange={(event) => onCustomizationChange('primaryColor', event.target.value)}
               />
               <span>{customization.primaryColor}</span>
             </div>
           </div>
 
           <div className='share-custom-group'>
-            <label>Tamaño</label>
+            <div className='share-custom-label'>Tamaño</div>
             <div className='share-button-group'>
               {['small', 'medium', 'large'].map((size) => (
                 <button
@@ -296,7 +307,11 @@ const EmbedPanel = ({ plubotId, customization, onCustomizationChange }) => {
                   className={`share-option-btn ${customization.size === size ? 'active' : ''}`}
                   onClick={() => onCustomizationChange('size', size)}
                 >
-                  {size === 'small' ? 'Pequeño' : size === 'medium' ? 'Mediano' : 'Grande'}
+                  {(() => {
+                    if (size === 'small') return 'Pequeño';
+                    if (size === 'medium') return 'Mediano';
+                    return 'Grande';
+                  })()}
                 </button>
               ))}
             </div>
@@ -327,7 +342,7 @@ const EmbedPanel = ({ plubotId, customization, onCustomizationChange }) => {
         </div>
 
         <div className='share-code-section'>
-          <label>Código de Integración</label>
+          <div className='share-code-label'>Código de Integración</div>
           <pre className='share-code-block'>
             <code>{embedCode}</code>
           </pre>
@@ -365,8 +380,8 @@ const LinkPanel = ({ plubotId }) => {
           },
         });
         setQrCodeUrl(qr);
-      } catch (error) {
-        console.error('Error generating QR:', error);
+      } catch {
+        // Error generating QR
       }
     };
 
@@ -510,9 +525,7 @@ const ShareModal = ({ plubotId, plubotName, onClose, nodes, edges }) => {
       case 'link': {
         return <LinkPanel plubotId={plubotId} />;
       }
-      default: {
-        return undefined;
-      }
+      default:
     }
   };
 

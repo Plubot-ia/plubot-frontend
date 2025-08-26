@@ -3,9 +3,11 @@ import { io } from 'socket.io-client';
 
 // API_BASE_URL is defined in authService
 const WHATSAPP_SERVICE_URL = import.meta.env.VITE_WHATSAPP_SERVICE_URL || 'http://localhost:3001';
+const WHATSAPP_API_KEY = import.meta.env.VITE_WHATSAPP_API_KEY || 'internal-api-key';
 
 class WhatsAppService {
   constructor() {
+    this.baseURL = WHATSAPP_SERVICE_URL;
     this.socket = undefined;
     this.qrUpdateCallbacks = new Set();
     this.statusUpdateCallbacks = new Set();
@@ -19,27 +21,30 @@ class WhatsAppService {
       return this.socket;
     }
 
-    console.log(`🌐 Initializing WebSocket connection to: ${WHATSAPP_SERVICE_URL}`);
+    // Socket initialization with authentication
     this.socket = io(WHATSAPP_SERVICE_URL, {
       transports: ['websocket', 'polling'],
       reconnection: true,
       reconnectionAttempts: 5,
       reconnectionDelay: 1000,
+      auth: {
+        token: WHATSAPP_API_KEY, // Add authentication token
+      },
     });
 
     // Listen for QR updates
     this.socket.on('connect', () => {
-      console.log('✅ Connected to WhatsApp service with socket ID:', this.socket.id);
+      console.log('[WhatsApp Service] WebSocket connected');
     });
 
-    this.socket.on('qr-update', (data) => {
-      console.log('Socket: QR update received', data);
+    this.socket.on('qr', (data) => {
+      console.log('[WhatsApp Service] QR event received:', data);
       for (const callback of this.qrUpdateCallbacks) callback(data);
     });
 
     // Listen for authentication
     this.socket.on('session-authenticated', (data) => {
-      console.log('🔐 Global authentication event received:', data);
+      console.log('[WhatsApp Service] Session authenticated event:', data);
       for (const callback of this.statusUpdateCallbacks)
         callback({
           status: 'authenticated',
@@ -47,9 +52,9 @@ class WhatsAppService {
         });
     });
 
-    // Listen for ready status
-    this.socket.on('session-ready', (data) => {
-      console.log('✅ Global ready event received:', data);
+    // Listen for ready event (not used by backend currently)
+    this.socket.on('ready', (data) => {
+      console.log('[WhatsApp Service] Session ready event:', data);
       for (const callback of this.statusUpdateCallbacks)
         callback({
           status: 'ready',
@@ -57,9 +62,19 @@ class WhatsAppService {
         });
     });
 
-    // Listen for disconnection
-    // WhatsApp session disconnected
-    this.socket.on('disconnected', (data) => {
+    // Listen for ready status
+    this.socket.on('session-ready', (data) => {
+      // Global ready event received
+      for (const callback of this.statusUpdateCallbacks)
+        callback({
+          status: 'ready',
+          ...data,
+        });
+    });
+
+    // Listen for session disconnection
+    this.socket.on('session-disconnected', (data) => {
+      console.log('[WhatsApp Service] Session disconnected event:', data);
       for (const callback of this.statusUpdateCallbacks)
         callback({
           status: 'disconnected',
@@ -95,7 +110,7 @@ class WhatsAppService {
       },
       {
         headers: {
-          'x-api-key': 'internal-api-key',
+          'x-api-key': WHATSAPP_API_KEY,
           ...(token && { Authorization: `Bearer ${token}` }),
         },
       },
@@ -121,7 +136,7 @@ class WhatsAppService {
       },
       {
         headers: {
-          'x-api-key': 'internal-api-key',
+          'x-api-key': WHATSAPP_API_KEY,
           ...(token && { Authorization: `Bearer ${token}` }),
         },
       },
@@ -160,13 +175,12 @@ class WhatsAppService {
     try {
       const response = await axios.get(`${WHATSAPP_SERVICE_URL}/api/qr/${sessionId}`, {
         headers: {
-          'x-api-key': 'internal-api-key',
+          'x-api-key': WHATSAPP_API_KEY,
         },
       });
       return response.data.qr;
-    } catch (error) {
-      console.error('Error getting QR:', error);
-      return null;
+    } catch {
+      // Error getting QR
     }
   }
 
@@ -180,13 +194,38 @@ class WhatsAppService {
       {},
       {
         headers: {
-          'x-api-key': 'internal-api-key',
+          'x-api-key': WHATSAPP_API_KEY,
         },
       },
     );
     return response.data;
   }
 
+  /**
+   * Subscribe to QR updates for a specific session
+   */
+  subscribeToQRUpdates(userId, plubotId, callback) {
+    if (!this.socket) {
+      this.initializeSocket();
+    }
+    
+    const roomId = `qr-${userId}:${plubotId}`;
+    console.log('[WhatsApp Service] Joining room:', roomId);
+    this.socket.emit('join-room', roomId);
+    
+    this.qrUpdateCallbacks.add(callback);
+    return () => {
+      this.qrUpdateCallbacks.delete(callback);
+    };
+  }
+  
+  /**
+   * Unsubscribe from QR updates
+   */
+  unsubscribeFromQRUpdates(callback) {
+    this.qrUpdateCallbacks.delete(callback);
+  }
+  
   /**
    * Subscribe to QR updates
    */
@@ -198,6 +237,29 @@ class WhatsAppService {
   }
 
   /**
+   * Refresh QR code for a session
+   */
+  async refreshQR(userId, plubotId) {
+    try {
+      const response = await axios.post(
+        `${this.baseURL}/api/sessions/refresh-qr`,
+        { userId, plubotId },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'x-api-key': this.apiKey,
+          },
+        },
+      );
+
+      return response.data.data || response.data;
+    } catch (error) {
+      console.error('[WhatsAppService] Error refreshing QR:', error);
+      throw error;
+    }
+  }
+
+  /**
    * Subscribe to status updates
    */
   onStatusUpdate(callback) {
@@ -206,98 +268,77 @@ class WhatsAppService {
       this.statusUpdateCallbacks.delete(callback);
     };
   }
+  
+  /**
+   * Unsubscribe from status updates
+   */
+  offStatusUpdate(callback) {
+    this.statusUpdateCallbacks.delete(callback);
+  }
 
   /**
    * Subscribe to all status updates with multiple callbacks
    */
   subscribeToStatusUpdates(callbacks) {
-    const sessionId = callbacks.sessionId;
-    const unsubscribers = [];
+    const { sessionId } = callbacks;
 
     // Subscribe to socket events
     if (!this.socket) {
       this.initializeSocket();
     }
 
-    // Subscribe to QR room if sessionId provided
+    // Subscribe to session room if sessionId provided
     if (sessionId) {
-      // Parse sessionId to get userId and plubotId
-      const parts = sessionId.split('-');
-      const plubotId = parts.pop(); // Last part is plubotId
-      const userId = parts.join('-'); // Rest is userId
-      
-      console.log('Subscribing to QR updates:', { userId, plubotId, sessionId });
-      this.socket.emit('subscribe-qr', { userId, plubotId });
+      console.log('[WhatsApp Service] Subscribing to session:', sessionId);
+      this.socket.emit('subscribe:session', sessionId);
     }
 
     // QR updates
     const qrHandler = (data) => {
-      console.log('Socket: QR update received', data);
+      console.log('[WhatsApp Service] QR update handler:', data);
       if (callbacks.onQRUpdate) {
         callbacks.onQRUpdate(data);
       }
     };
-    this.socket.on('qr-update', qrHandler);
-
-    // QR limit reached
-    const qrLimitHandler = (data) => {
-      console.log('Socket: QR limit reached', data);
-      if (callbacks.onQRLimitReached) {
-        callbacks.onQRLimitReached(data);
-      }
-    };
-    this.socket.on('qr-limit-reached', qrLimitHandler);
+    this.socket.on('qr', qrHandler);
 
     // Session authenticated
     const authHandler = (data) => {
-      console.log('Socket: Session authenticated', data);
-      if (callbacks.onStatusUpdate) {
-        callbacks.onStatusUpdate({ status: 'authenticated', ...data });
+      console.log('[WhatsApp Service] Auth handler:', data);
+      if (callbacks.onAuthenticated) {
+        callbacks.onAuthenticated(data);
       }
     };
     this.socket.on('session-authenticated', authHandler);
 
     // Session ready
     const readyHandler = (data) => {
-      console.log('Socket: Session ready', data);
-      if (callbacks.onStatusUpdate) {
-        callbacks.onStatusUpdate({ status: 'ready', ...data });
+      console.log('[WhatsApp Service] Ready handler:', data);
+      if (callbacks.onReady) {
+        callbacks.onReady(data);
       }
     };
-    this.socket.on('session-ready', readyHandler);
+    this.socket.on('ready', readyHandler);
 
-    // Disconnected
+    // Session disconnected
     const disconnectHandler = (data) => {
-      console.log('Socket: Disconnected', data);
-      if (callbacks.onStatusUpdate) {
-        callbacks.onStatusUpdate({ status: 'disconnected', ...data });
+      console.log('[WhatsApp Service] Disconnect handler:', data);
+      if (callbacks.onDisconnected) {
+        callbacks.onDisconnected(data);
       }
     };
     this.socket.on('disconnected', disconnectHandler);
 
-    // Auth failed
-    const authFailHandler = (data) => {
-      console.log('Socket: Auth failed', data);
-      if (callbacks.onAuthFailed) {
-        callbacks.onAuthFailed(data);
-      }
-      if (callbacks.onStatusUpdate) {
-        callbacks.onStatusUpdate({ status: 'auth_failed', ...data });
-      }
-    };
-    this.socket.on('auth-failed', authFailHandler);
-
     // Return cleanup function
     return () => {
-      this.socket.off('qr-update', qrHandler);
-      this.socket.off('qr-limit-reached', qrLimitHandler);
-      this.socket.off('session-authenticated', authHandler);
-      this.socket.off('session-ready', readyHandler);
-      this.socket.off('disconnected', disconnectHandler);
-      this.socket.off('auth-failed', authFailHandler);
+      console.log('[WhatsApp Service] Unsubscribing from session:', sessionId);
       if (sessionId) {
-        this.socket.emit('unsubscribe-qr', sessionId);
+        this.socket.emit('unsubscribe:session', sessionId);
       }
+      this.socket.off('qr', qrHandler);
+      this.socket.off('authenticated', authHandler);
+      this.socket.off('ready', readyHandler);
+      this.socket.off('disconnected', disconnectHandler);
     };
   }
 
@@ -311,7 +352,7 @@ class WhatsAppService {
       {},
       {
         headers: {
-          'x-api-key': 'internal-api-key',
+          'x-api-key': WHATSAPP_API_KEY,
         },
       },
     );
@@ -324,7 +365,7 @@ class WhatsAppService {
   async createSession(sessionIdOrUserId, plubotId) {
     // Handle both sessionId string and userId/plubotId params
     let userId, finalPlubotId;
-    
+
     if (plubotId) {
       // Called with userId and plubotId
       userId = sessionIdOrUserId;
@@ -332,23 +373,41 @@ class WhatsAppService {
     } else {
       // Called with sessionId string
       const parts = sessionIdOrUserId.split('-');
-      userId = parts[0];
+      [userId] = parts;
       finalPlubotId = parts.slice(1).join('-');
     }
-    
-    const response = await axios.post(
-      `${WHATSAPP_SERVICE_URL}/api/sessions/create`,
-      {
+
+    try {
+      console.log('[WhatsApp Service] Creating session:', {
         userId,
         plubotId: finalPlubotId,
-      },
-      {
-        headers: {
-          'x-api-key': 'internal-api-key',
+        url: WHATSAPP_SERVICE_URL,
+      });
+
+      const response = await axios.post(
+        `${this.baseURL}/api/sessions/create`,
+        { userId, plubotId: finalPlubotId },
+        {
+          headers: {
+            'x-api-key': 'internal-api-key',
+          },
         },
-      },
-    );
-    return response.data;
+      );
+
+      console.log('[WhatsApp Service] Session created successfully:', response.data);
+
+      // Handle the nested data structure from the API
+      if (response.data && response.data.data) {
+        return response.data.data;
+      }
+      return response.data;
+    } catch (error) {
+      console.error(
+        '[WhatsApp Service] Error creating session:',
+        error.response?.data || error.message,
+      );
+      throw error;
+    }
   }
 
   /**
@@ -356,24 +415,13 @@ class WhatsAppService {
    */
   async destroySession(sessionIdOrUserId, plubotId) {
     // Handle both sessionId string and userId/plubotId params
-    let sessionId;
-    
-    if (plubotId) {
-      // Called with userId and plubotId
-      sessionId = `${sessionIdOrUserId}-${plubotId}`;
-    } else {
-      // Called with sessionId string
-      sessionId = sessionIdOrUserId;
-    }
-    
-    const response = await axios.delete(
-      `${WHATSAPP_SERVICE_URL}/api/sessions/${sessionId}`,
-      {
-        headers: {
-          'x-api-key': 'internal-api-key',
-        },
+    const sessionId = plubotId ? `${sessionIdOrUserId}-${plubotId}` : sessionIdOrUserId;
+
+    const response = await axios.delete(`${WHATSAPP_SERVICE_URL}/api/sessions/${sessionId}`, {
+      headers: {
+        'x-api-key': 'internal-api-key',
       },
-    );
+    });
     return response.data;
   }
 
@@ -390,7 +438,7 @@ class WhatsAppService {
       },
       {
         headers: {
-          'x-api-key': 'internal-api-key',
+          'x-api-key': WHATSAPP_API_KEY,
         },
       },
     );

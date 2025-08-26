@@ -342,12 +342,6 @@ RenderOptionsMenuButton.propTypes = {
   plubotId: PropTypes.string,
   nodes: PropTypes.array,
   edges: PropTypes.array,
-  optionsMenuRef: PropTypes.object,
-  onOpenVersionHistory: PropTypes.func,
-  onOpenImportExport: PropTypes.func,
-  onOpenSettingsModal: PropTypes.func,
-  onOpenPathAnalysis: PropTypes.func,
-  lastSaved: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(Date)]),
 };
 
 /**
@@ -442,7 +436,7 @@ const EpicHeaderComponent = React.memo(
       showNotification,
       nodes,
       edges,
-      lastSaved,
+      // lastSaved not used in render
       plubotId,
     } = useEpicHeader(props);
 
@@ -486,7 +480,6 @@ const EpicHeaderComponent = React.memo(
         onOpenPathAnalysis: handleOpenPathAnalysis,
         nodes,
         edges,
-        lastSaved,
       }),
       [
         optionsMenuOpen,
@@ -499,7 +492,6 @@ const EpicHeaderComponent = React.memo(
         handleOpenPathAnalysis,
         nodes,
         edges,
-        lastSaved,
       ],
     );
 

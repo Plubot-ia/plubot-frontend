@@ -9,8 +9,29 @@ import {
   useRecentActions,
   useNodeSearch,
   useMenuPosition,
+  useMenuHandlers,
 } from './OptionsMenuAdvancedHooks';
 import { OptionsMenuAdvancedModal } from './OptionsMenuAdvancedModal';
+
+// Helper function to export flow
+const exportFlowToFile = (nodes, edges, plubotId) => {
+  const exportData = {
+    nodes,
+    edges,
+    timestamp: Date.now(),
+    plubotId,
+    version: '1.0',
+  };
+  const blob = new Blob([JSON.stringify(exportData, undefined, 2)], {
+    type: 'application/json',
+  });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `flow-${plubotId}-${Date.now()}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+};
 
 import './OptionsMenuAdvanced.css';
 
@@ -56,22 +77,7 @@ const OptionsMenuAdvanced = ({
   }, [onClose]);
 
   const handleExportFlow = useCallback(() => {
-    const exportData = {
-      nodes,
-      edges,
-      timestamp: Date.now(),
-      plubotId,
-      version: '1.0',
-    };
-    const blob = new Blob([JSON.stringify(exportData, undefined, 2)], {
-      type: 'application/json',
-    });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `flow-${plubotId}-${Date.now()}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
+    exportFlowToFile(nodes, edges, plubotId);
     addRecentAction('Flujo exportado');
   }, [nodes, edges, plubotId, addRecentAction]);
 
@@ -86,65 +92,17 @@ const OptionsMenuAdvanced = ({
     }
   }, [plubotId, addRecentAction]);
 
-  const handleClear = useCallback(() => {
-    const shouldClear =
-      globalThis.window?.confirm?.('¿Estás seguro de que quieres limpiar todo el flujo?') ?? false;
-    if (shouldClear && clearFlow) {
-      clearFlow();
-      addRecentAction('Flujo limpiado');
-    }
-  }, [clearFlow, addRecentAction]);
+  const handlers = useMenuHandlers({
+    clearFlow,
+    addRecentAction,
+    setShowBackupManager,
+    reactFlowInstance,
+    handleExportFlow,
+  });
 
-  const handleDuplicate = useCallback(() => {
-    // Implement node duplication logic when needed
-    addRecentAction('Nodos duplicados');
-  }, [addRecentAction]);
-
-  const handleExport = useCallback(() => {
-    handleExportFlow();
-  }, [handleExportFlow]);
-
-  const handleUndo = useCallback(() => {
-    // Implement undo logic when needed
-    addRecentAction('Deshacer acción');
-  }, [addRecentAction]);
-
-  const handleRedo = useCallback(() => {
-    // Implement redo logic when needed
-    addRecentAction('Rehacer acción');
-  }, [addRecentAction]);
-
-  const handleBackup = useCallback(() => {
-    setShowBackupManager(true);
-    addRecentAction('Gestor de backups abierto');
-  }, [addRecentAction]);
-
-  const handleRefresh = useCallback(() => {
-    if (reactFlowInstance) {
-      reactFlowInstance.fitView();
-      addRecentAction('Vista actualizada');
-    }
-  }, [reactFlowInstance, addRecentAction]);
-
-  const handleAutoLayout = useCallback(() => {
-    // Implement auto layout logic when needed
-    if (reactFlowInstance) {
-      reactFlowInstance.fitView({ padding: 0.2 });
-      addRecentAction('Auto layout aplicado');
-    }
-  }, [reactFlowInstance, addRecentAction]);
-
-  // Listen for menu toggle event
+  // Menu toggle handled by parent
   useEffect(() => {
-    const handleMenuToggle = () => {
-      // This component receives isOpen as a prop, doesn't manage it internally
-      // The toggle is handled by the parent component
-    };
-
-    globalThis.addEventListener('epic-menu-toggle', handleMenuToggle);
-    return () => {
-      globalThis.removeEventListener('epic-menu-toggle', handleMenuToggle);
-    };
+    // Component receives isOpen as prop
   }, []);
 
   if (!isOpen) return;
@@ -171,15 +129,15 @@ const OptionsMenuAdvanced = ({
       setShowAdvancedMetrics={setShowAdvancedMetrics}
       handleExportFlow={handleExportFlow}
       handleCopyId={handleCopyId}
-      handleClear={handleClear}
-      handleDuplicate={handleDuplicate}
-      handleExport={handleExport}
-      handleUndo={handleUndo}
-      handleRedo={handleRedo}
-      handleBackup={handleBackup}
-      handleRefresh={handleRefresh}
+      handleClear={handlers.handleClear}
+      handleDuplicate={handlers.handleDuplicate}
+      handleExport={handlers.handleExport}
+      handleUndo={handlers.handleUndo}
+      handleRedo={handlers.handleRedo}
+      handleBackup={handlers.handleBackup}
+      handleRefresh={handlers.handleRefresh}
+      handleAutoLayout={handlers.handleAutoLayout}
       handleNodeSearch={handleNodeSearch}
-      handleAutoLayout={handleAutoLayout}
       searchInputRef={searchInputRef}
       plubotId={plubotId}
     />

@@ -3,6 +3,70 @@
  */
 import { useState, useCallback, useEffect, useMemo } from 'react';
 
+// Hook for menu handlers
+export const useMenuHandlers = ({
+  clearFlow,
+  addRecentAction,
+  setShowBackupManager,
+  reactFlowInstance,
+  handleExportFlow,
+}) => {
+  const handleClear = useCallback(() => {
+    const shouldClear =
+      globalThis.window?.confirm?.('¿Estás seguro de que quieres limpiar todo el flujo?') ?? false;
+    if (shouldClear && clearFlow) {
+      clearFlow();
+      addRecentAction('Flujo limpiado');
+    }
+  }, [clearFlow, addRecentAction]);
+
+  const handleDuplicate = useCallback(() => {
+    addRecentAction('Nodos duplicados');
+  }, [addRecentAction]);
+
+  const handleExport = useCallback(() => {
+    handleExportFlow();
+  }, [handleExportFlow]);
+
+  const handleUndo = useCallback(() => {
+    addRecentAction('Deshacer acción');
+  }, [addRecentAction]);
+
+  const handleRedo = useCallback(() => {
+    addRecentAction('Rehacer acción');
+  }, [addRecentAction]);
+
+  const handleBackup = useCallback(() => {
+    setShowBackupManager(true);
+    addRecentAction('Gestor de backups abierto');
+  }, [addRecentAction, setShowBackupManager]);
+
+  const handleRefresh = useCallback(() => {
+    if (reactFlowInstance) {
+      reactFlowInstance.fitView();
+      addRecentAction('Vista actualizada');
+    }
+  }, [reactFlowInstance, addRecentAction]);
+
+  const handleAutoLayout = useCallback(() => {
+    if (reactFlowInstance) {
+      reactFlowInstance.fitView({ padding: 0.2 });
+      addRecentAction('Auto layout aplicado');
+    }
+  }, [reactFlowInstance, addRecentAction]);
+
+  return {
+    handleClear,
+    handleDuplicate,
+    handleExport,
+    handleUndo,
+    handleRedo,
+    handleBackup,
+    handleRefresh,
+    handleAutoLayout,
+  };
+};
+
 // Hook for flow analytics
 export const useFlowAnalytics = (nodes, edges) => {
   return useMemo(() => {

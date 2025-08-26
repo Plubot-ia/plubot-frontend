@@ -6,6 +6,32 @@ import { useState, useCallback, useEffect } from 'react';
 import useFlowStore from '@/stores/use-flow-store';
 
 // Helper functions
+const createBackupObject = (nodes, edges) => ({
+  id: Date.now().toString(),
+  name: `Copia manual`,
+  timestamp: Date.now(),
+  type: 'manual',
+  nodes: nodes || [],
+  edges: edges || [],
+  nodeCount: nodes?.length || 0,
+  edgeCount: edges?.length || 0,
+  size: JSON.stringify({ nodes, edges }).length,
+  reason: 'Creado manualmente por el usuario',
+});
+
+const exportBackupToFile = (backup) => {
+  const blob = new Blob([JSON.stringify(backup, undefined, 2)], {
+    type: 'application/json',
+  });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `backup-${backup.id}-${backup.timestamp}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+};
+
+// Helper functions
 export const formatDate = (timestamp) => {
   const date = new Date(timestamp);
   return date.toLocaleDateString('es-ES', {
@@ -28,7 +54,7 @@ export const useBackupManager = () => {
   const [backups, setBackups] = useState([]);
   const [selectedBackup, setSelectedBackup] = useState();
   const [message, setMessage] = useState();
-  const [error, setError] = useState();
+  const [, _setError] = useState();
 
   const { nodes, edges, setNodes, setEdges } = useFlowStore();
 
@@ -42,8 +68,8 @@ export const useBackupManager = () => {
       } else {
         setBackups([]);
       }
-    } catch (error) {
-      setError(`Error al cargar backups: ${error.message}`);
+    } catch {
+      // Error loading backups
       setBackups([]);
     }
   }, []);
@@ -60,16 +86,13 @@ export const useBackupManager = () => {
 
     globalThis.addEventListener('storage', handleStorageChange);
 
-    // Also listen for custom event when backup is created in same tab
-    const handleBackupCreated = () => {
-      loadBackups();
-    };
-
-    globalThis.addEventListener('backup-created', handleBackupCreated);
+    // Custom event listener
+    const handleBackupCreated = () => loadBackups();
+    globalThis.addEventListener('backupCreated', handleBackupCreated);
 
     return () => {
       globalThis.removeEventListener('storage', handleStorageChange);
-      globalThis.removeEventListener('backup-created', handleBackupCreated);
+      globalThis.removeEventListener('backupCreated', handleBackupCreated);
     };
   }, [loadBackups]);
 
@@ -81,20 +104,8 @@ export const useBackupManager = () => {
 
   // Create new backup
   const handleCreate = useCallback(() => {
-    const newBackup = {
-      id: Date.now().toString(),
-      name: `Copia manual`,
-      timestamp: Date.now(),
-      type: 'manual',
-      nodes: nodes || [],
-      edges: edges || [],
-      nodeCount: nodes?.length || 0,
-      edgeCount: edges?.length || 0,
-      size: JSON.stringify({ nodes, edges }).length,
-      reason: 'Creado manualmente por el usuario',
-    };
-
-    const updatedBackups = [newBackup, ...backups].slice(0, 10); // Keep max 10 backups
+    const newBackup = createBackupObject(nodes, edges);
+    const updatedBackups = [newBackup, ...backups].slice(0, 10);
     saveBackups(updatedBackups);
     setMessage({ type: 'success', text: 'Copia de seguridad creada exitosamente' });
     setTimeout(() => setMessage(), 3000);
@@ -132,16 +143,7 @@ export const useBackupManager = () => {
   // Export backup
   const handleExport = useCallback(() => {
     if (!selectedBackup) return;
-
-    const blob = new Blob([JSON.stringify(selectedBackup, undefined, 2)], {
-      type: 'application/json',
-    });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `backup-${selectedBackup.id}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
+    exportBackupToFile(selectedBackup);
     setMessage({ type: 'success', text: 'Copia exportada correctamente' });
     setTimeout(() => setMessage(), 3000);
   }, [selectedBackup]);
@@ -178,7 +180,7 @@ export const useBackupManager = () => {
   const stats = {
     totalBackups: backups.length,
     totalSize: backups.reduce((accumulator, b) => accumulator + (b.size || 0), 0),
-    lastBackup: backups[0]?.timestamp || null,
+    lastBackup: backups[0]?.timestamp || undefined,
   };
 
   return {

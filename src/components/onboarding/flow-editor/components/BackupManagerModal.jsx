@@ -7,21 +7,169 @@ import {
   HardDrive,
   Clock,
   Save,
-  Download,
-  Upload,
   Archive,
   Trash2,
   RotateCcw,
-  Plus,
   AlertCircle,
   CheckCircle,
   Info,
-  FolderOpen,
 } from 'lucide-react';
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { BackupItem, StatsCard, Message } from './BackupManagerHelpers.jsx';
+// Stats and message components imported inline when needed
+
+// Helper functions moved to outer scope
+const formatTimestamp = (timestamp) => {
+  if (!timestamp) return 'Nunca';
+  const date = new Date(timestamp);
+  return new Intl.DateTimeFormat('es-ES', {
+    dateStyle: 'short',
+    timeStyle: 'short',
+  }).format(date);
+};
+
+const formatFileSize = (bytes) => {
+  if (!bytes) return '0 B';
+  const k = 1024;
+  const index = Math.floor(Math.log(bytes) / Math.log(k));
+  const safeIndex = Math.max(0, Math.min(index, 3));
+
+  let sizeUnit;
+  switch (safeIndex) {
+    case 0: {
+      sizeUnit = 'B';
+      break;
+    }
+    case 1: {
+      sizeUnit = 'KB';
+      break;
+    }
+    case 2: {
+      sizeUnit = 'MB';
+      break;
+    }
+    case 3: {
+      sizeUnit = 'GB';
+      break;
+    }
+    default: {
+      sizeUnit = 'B';
+    }
+  }
+
+  return `${Math.round(bytes / k ** safeIndex)} ${sizeUnit}`;
+};
+
+// Backup Item Component
+const BackupItem = ({
+  backup,
+  selectedBackup,
+  setSelectedBackup,
+  handleRestore,
+  handleDelete,
+  formatTimestampProp,
+  formatFileSizeProp,
+}) => (
+  <div
+    key={backup.id}
+    className={`backup-item compact ${selectedBackup?.id === backup.id ? 'selected' : ''}`}
+    onClick={() => setSelectedBackup(backup)}
+    onKeyDown={(event) => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        setSelectedBackup(backup);
+      }
+    }}
+    role='button'
+    tabIndex={0}
+    style={{
+      display: 'flex',
+      alignItems: 'center',
+      padding: '8px 12px',
+      gap: '10px',
+      minHeight: 'auto',
+    }}
+  >
+    {backup.type === 'auto' ? (
+      <Save size={16} className='backup-icon auto' style={{ flexShrink: 0 }} />
+    ) : (
+      <Archive size={16} className='backup-icon' style={{ flexShrink: 0 }} />
+    )}
+
+    <div style={{ flex: 1, minWidth: 0 }}>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '6px',
+          marginBottom: '1px',
+        }}
+      >
+        <span
+          className='backup-name'
+          style={{ fontWeight: '600', fontSize: '13px', lineHeight: '1.2' }}
+        >
+          {backup.name}
+        </span>
+        <span style={{ fontSize: '11px', color: '#888', lineHeight: '1' }}>
+          {formatTimestampProp(backup.timestamp)}
+        </span>
+      </div>
+      <div
+        style={{
+          display: 'flex',
+          gap: '8px',
+          fontSize: '11px',
+          color: '#666',
+          lineHeight: '1.2',
+        }}
+      >
+        <span>{formatFileSizeProp(backup.size)}</span>
+        {backup.nodeCount !== undefined && <span>{backup.nodeCount} nodos</span>}
+        {backup.edgeCount !== undefined && <span>{backup.edgeCount} conexiones</span>}
+        {backup.type === 'auto' && <span style={{ fontSize: '10px', color: '#999' }}>• Auto</span>}
+      </div>
+    </div>
+
+    <div style={{ display: 'flex', gap: '3px', flexShrink: 0 }}>
+      <button
+        className='backup-action-btn restore'
+        onClick={(event) => {
+          event.stopPropagation();
+          handleRestore(backup);
+        }}
+        title='Restaurar backup'
+        type='button'
+        style={{ padding: '4px', fontSize: '12px' }}
+      >
+        <RotateCcw size={14} />
+      </button>
+      <button
+        className='backup-action-btn delete'
+        onClick={(event) => {
+          event.stopPropagation();
+          handleDelete(backup.id);
+        }}
+        title='Eliminar backup'
+        type='button'
+        style={{ padding: '4px', fontSize: '12px' }}
+      >
+        <Trash2 size={14} />
+      </button>
+    </div>
+  </div>
+);
+
+BackupItem.propTypes = {
+  backup: PropTypes.object.isRequired,
+  selectedBackup: PropTypes.object,
+  setSelectedBackup: PropTypes.func.isRequired,
+  handleRestore: PropTypes.func.isRequired,
+  handleDelete: PropTypes.func.isRequired,
+  formatTimestampProp: PropTypes.func.isRequired,
+  formatFileSizeProp: PropTypes.func.isRequired,
+};
 
 export const BackupManagerModal = ({
   backups,
@@ -31,46 +179,16 @@ export const BackupManagerModal = ({
   setSelectedBackup,
   handleRestore,
   handleDelete,
-  handleExport,
-  handleImport,
-  handleCreate,
+  _handleExport,
+  _handleImport,
+  _handleCreate,
   onClose,
 }) => {
-  const formatTimestamp = (timestamp) => {
-    if (!timestamp) return 'Nunca';
-    const date = new Date(timestamp);
-    const now = new Date();
-    const diff = now - date;
-    const minutes = Math.floor(diff / 60_000);
-    const hours = Math.floor(diff / 3_600_000);
-    const days = Math.floor(diff / 86_400_000);
-
-    if (minutes < 1) return 'Hace un momento';
-    if (minutes < 60) return `Hace ${minutes} minuto${minutes > 1 ? 's' : ''}`;
-    if (hours < 24) return `Hace ${hours} hora${hours > 1 ? 's' : ''}`;
-    if (days < 7) return `Hace ${days} día${days > 1 ? 's' : ''}`;
-
-    return date.toLocaleDateString('es-ES', {
-      day: '2-digit',
-      month: 'short',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    });
-  };
-
-  const formatFileSize = (bytes) => {
-    if (!bytes) return '0 B';
-    if (bytes < 1024) return `${bytes} B`;
-    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
-  };
-
   return (
     <div className='backup-manager-overlay'>
       <div className='backup-manager-modal'>
         <div className='backup-header'>
-          <h2>💾 Historial de Backups</h2>
+          <h2> Historial de Backups</h2>
           <button type='button' onClick={onClose} className='close-button' aria-label='Cerrar'>
             <X size={20} />
           </button>
@@ -104,13 +222,11 @@ export const BackupManagerModal = ({
 
         {message && (
           <div className={`backup-message ${message.type || ''}`}>
-            {message.type === 'error' ? (
-              <AlertCircle size={16} />
-            ) : message.type === 'info' ? (
-              <Info size={16} />
-            ) : (
-              <CheckCircle size={16} />
-            )}
+            {(() => {
+              if (message.type === 'error') return <AlertCircle size={16} />;
+              if (message.type === 'info') return <Info size={16} />;
+              return <CheckCircle size={16} />;
+            })()}
             <span>{message.text || message}</span>
           </div>
         )}
@@ -124,92 +240,16 @@ export const BackupManagerModal = ({
             </div>
           ) : (
             backups.map((backup) => (
-              <div
+              <BackupItem
                 key={backup.id}
-                className={`backup-item compact ${selectedBackup?.id === backup.id ? 'selected' : ''}`}
-                onClick={() => setSelectedBackup(backup)}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  padding: '8px 12px',
-                  gap: '10px',
-                  minHeight: 'auto',
-                }}
-              >
-                {backup.type === 'auto' ? (
-                  <Save size={16} className='backup-icon auto' style={{ flexShrink: 0 }} />
-                ) : (
-                  <Archive size={16} className='backup-icon' style={{ flexShrink: 0 }} />
-                )}
-
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '6px',
-                      marginBottom: '1px',
-                    }}
-                  >
-                    <span
-                      className='backup-name'
-                      style={{ fontWeight: '600', fontSize: '13px', lineHeight: '1.2' }}
-                    >
-                      {backup.name}
-                    </span>
-                    <span style={{ fontSize: '11px', color: '#888', lineHeight: '1' }}>
-                      {formatTimestamp(backup.timestamp)}
-                    </span>
-                  </div>
-                  <div
-                    style={{
-                      display: 'flex',
-                      gap: '8px',
-                      fontSize: '11px',
-                      color: '#666',
-                      lineHeight: '1.2',
-                    }}
-                  >
-                    <span>{formatFileSize(backup.size)}</span>
-                    {backup.nodeCount !== undefined && <span>{backup.nodeCount} nodos</span>}
-                    {backup.edgeCount !== undefined && <span>{backup.edgeCount} conexiones</span>}
-                    {backup.type === 'auto' && (
-                      <span style={{ fontSize: '10px', color: '#999' }}>• Auto</span>
-                    )}
-                  </div>
-                </div>
-
-                <div style={{ display: 'flex', gap: '3px', flexShrink: 0 }}>
-                  <button
-                    className='backup-action-btn restore'
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleRestore(backup);
-                    }}
-                    title='Restaurar este backup'
-                    style={{ padding: '5px', borderRadius: '4px' }}
-                  >
-                    <RotateCcw size={15} />
-                  </button>
-                  <button
-                    className='backup-action-btn delete'
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleDelete(backup.id);
-                    }}
-                    title='Eliminar'
-                    style={{ padding: '5px', borderRadius: '4px' }}
-                  >
-                    <Trash2 size={13} />
-                  </button>
-                </div>
-                {backup.reason && (
-                  <div className='backup-reason' style={{ display: 'none' }}>
-                    <Info size={12} />
-                    <span>{backup.reason}</span>
-                  </div>
-                )}
-              </div>
+                backup={backup}
+                selectedBackup={selectedBackup}
+                setSelectedBackup={setSelectedBackup}
+                handleRestore={handleRestore}
+                handleDelete={handleDelete}
+                formatTimestampProp={formatTimestamp}
+                formatFileSizeProp={formatFileSize}
+              />
             ))
           )}
         </div>
@@ -232,8 +272,8 @@ BackupManagerModal.propTypes = {
   setSelectedBackup: PropTypes.func.isRequired,
   handleRestore: PropTypes.func.isRequired,
   handleDelete: PropTypes.func.isRequired,
-  handleExport: PropTypes.func.isRequired,
-  handleImport: PropTypes.func.isRequired,
-  handleCreate: PropTypes.func.isRequired,
+  _handleExport: PropTypes.func,
+  _handleImport: PropTypes.func,
+  _handleCreate: PropTypes.func,
   onClose: PropTypes.func.isRequired,
 };
