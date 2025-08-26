@@ -2,10 +2,10 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 import ConnectionEditor from '../flow-editor/components/ConnectionEditor.jsx';
-import EmbedModal from '../flow-editor/components/EmbedModal.jsx';
 import ImportExportModal from '../flow-editor/components/ImportExportModal.jsx';
 import SuggestionsModal from '../flow-editor/components/SuggestionsModal.jsx';
 import TemplateSelector from '../flow-editor/components/TemplateSelector.jsx';
+import ShareModal from '../modals/ShareModal.jsx';
 
 import Modal from './Modal.jsx';
 
@@ -64,23 +64,13 @@ const ModalManager = ({ modals, modalProps, onClose }) => {
         />
       </Modal>
 
-      <Modal
-        title='Incrustar Plubot'
-        isOpen={modals.showEmbedModal}
-        onClose={closeModal('showEmbedModal')}
-      >
-        <EmbedModal
+      {modals.showEmbedModal && (
+        <ShareModal
           plubotId={modalProps.plubotId}
           plubotName={modalProps.plubotName || 'Mi Plubot'}
-          nodes={modalProps.nodes}
-          edges={modalProps.edges}
           onClose={closeModal('showEmbedModal')}
-          onExport={() => {
-            // Export functionality not implemented in this context
-          }}
-          flowData={{ nodes: modalProps.nodes, edges: modalProps.edges }}
         />
-      </Modal>
+      )}
     </>
   );
 };

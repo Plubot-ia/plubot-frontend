@@ -297,9 +297,11 @@ const _renderActionButtons = ({
  * @param {Object} params - Parámetros de renderizado
  * @returns {JSX.Element} - Botón del menú renderizado
  */
-const _renderOptionsMenuButton = ({ optionsMenuRef, nodes, edges, plubotId }) => {
+const RenderOptionsMenuButton = (props) => {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
-  
+  const optionsMenuRef = React.useRef(null);
+  const { plubotId, nodes, edges } = props;
+
   return (
     <div className='epic-header-right'>
       <button
@@ -336,6 +338,18 @@ const _renderOptionsMenuButton = ({ optionsMenuRef, nodes, edges, plubotId }) =>
   );
 };
 
+RenderOptionsMenuButton.propTypes = {
+  plubotId: PropTypes.string,
+  nodes: PropTypes.array,
+  edges: PropTypes.array,
+  optionsMenuRef: PropTypes.object,
+  onOpenVersionHistory: PropTypes.func,
+  onOpenImportExport: PropTypes.func,
+  onOpenSettingsModal: PropTypes.func,
+  onOpenPathAnalysis: PropTypes.func,
+  lastSaved: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(Date)]),
+};
+
 /**
  * Helper para renderizar el header principal completo.
  * @param {Object} params - Parámetros de renderizado
@@ -365,7 +379,7 @@ const _renderMainHeader = ({
 
       {_renderActionButtons(actionButtonsProps)}
 
-      {_renderOptionsMenuButton(dropdownMenuProps)}
+      <RenderOptionsMenuButton {...dropdownMenuProps} />
     </header>
   );
 };
@@ -413,7 +427,6 @@ const EpicHeaderComponent = React.memo(
       optionsMenuRef,
       isSaving,
       saveStatus,
-      notification,
       handleLogoClick,
       handleOpenVersionHistory,
       handleOpenImportExport,
@@ -474,7 +487,6 @@ const EpicHeaderComponent = React.memo(
         nodes,
         edges,
         lastSaved,
-        notification,
       }),
       [
         optionsMenuOpen,
@@ -488,7 +500,6 @@ const EpicHeaderComponent = React.memo(
         nodes,
         edges,
         lastSaved,
-        notification,
       ],
     );
 
@@ -524,7 +535,7 @@ const EpicHeaderComponent = React.memo(
 
     return (
       <>
-        <StatusBubble notification={notification} />
+        <StatusBubble />
         {_renderMainHeader(mainHeaderProps)}
       </>
     );

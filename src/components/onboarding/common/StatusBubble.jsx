@@ -1,13 +1,14 @@
-import PropTypes from 'prop-types';
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, memo } from 'react';
+
+import useByteMessageContext from '@/hooks/useByteMessageContext';
 import './StatusBubble.css';
 
 /**
  * Componente StatusBubble - Muestra una notificación de estado temporal.
- * Lógica simplificada para manejar una sola notificación a la vez con cierre manual y automático.
- * @param {object} notification - Objeto que contiene el texto y un ID único para forzar re-render.
+ * Usa el contexto global de ByteMessage para evitar re-renders innecesarios.
  */
-const StatusBubble = ({ notification }) => {
+const StatusBubble = memo(() => {
+  const { byteMessage, byteMessageType } = useByteMessageContext();
   const [isVisible, setIsVisible] = useState(false);
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState('info');
@@ -28,20 +29,20 @@ const StatusBubble = ({ notification }) => {
   }, []);
 
   useEffect(() => {
-    // Si llega una nueva notificación con texto, la procesamos.
-    if (notification && notification.text) {
+    // Si llega un nuevo mensaje del contexto, lo procesamos.
+    if (byteMessage) {
       const currentTime = Date.now();
-      
+
       // Evitar mensajes duplicados en un corto período de tiempo
       if (
-        notification.text === lastMessageRef.current &&
+        byteMessage === lastMessageRef.current &&
         currentTime - lastMessageTimeRef.current < DUPLICATE_MESSAGE_THRESHOLD
       ) {
         return; // Ignorar mensaje duplicado
       }
 
       // Actualizar referencias
-      lastMessageRef.current = notification.text;
+      lastMessageRef.current = byteMessage;
       lastMessageTimeRef.current = currentTime;
 
       // Limpiamos cualquier temporizador anterior para evitar cierres prematuros.
@@ -50,8 +51,8 @@ const StatusBubble = ({ notification }) => {
       }
 
       // Mostramos la nueva notificación.
-      setMessage(notification.text);
-      setMessageType(notification.type || 'info');
+      setMessage(byteMessage);
+      setMessageType(byteMessageType || 'info');
       setIsVisible(true);
 
       // Configuramos un nuevo temporizador para ocultarla automáticamente.
@@ -66,7 +67,7 @@ const StatusBubble = ({ notification }) => {
         clearTimeout(hideTimer.current);
       }
     };
-  }, [notification, hideBubble]); // Dependemos de la notificación y la función de ocultar.
+  }, [byteMessage, byteMessageType, hideBubble]); // Dependemos del mensaje del contexto.
 
   // Si no es visible, no renderizamos nada.
   if (!isVisible) {
@@ -90,13 +91,8 @@ const StatusBubble = ({ notification }) => {
       <div className='status-bubble-arrow' />
     </div>
   );
-};
+});
 
-StatusBubble.propTypes = {
-  notification: PropTypes.shape({
-    text: PropTypes.string.isRequired,
-    type: PropTypes.oneOf(['success', 'error', 'info', 'warning']),
-  }),
-};
+StatusBubble.displayName = 'StatusBubble';
 
 export default StatusBubble;

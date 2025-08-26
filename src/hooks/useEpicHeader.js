@@ -22,7 +22,6 @@ const buildHeaderProps = ({
   optionsMenuRef,
   isSaving,
   saveStatus,
-  notification,
   time,
   handleSaveFlow,
   actions,
@@ -50,7 +49,6 @@ const buildHeaderProps = ({
     optionsMenuRef,
     isSaving,
     saveStatus,
-    notification,
     time,
     handleSaveFlow,
     ...actions,
@@ -101,8 +99,6 @@ const useEpicHeader = ({
     setSavingIndicator,
     saveStatus,
     setSaveStatus,
-    notification,
-    setNotification,
     time,
   } = useHeaderState();
 
@@ -138,7 +134,6 @@ const useEpicHeader = ({
     isAuthenticated,
     setSaveStatus,
     setSavingIndicator,
-    setNotification,
     isSaving,
     flowName: displayFlowName,
   });
@@ -154,7 +149,6 @@ const useEpicHeader = ({
       optionsMenuRef,
       isSaving,
       saveStatus,
-      notification,
       time,
       handleSaveFlow,
       actions,

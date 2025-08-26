@@ -134,6 +134,22 @@ const OptionsMenu = ({
       />
 
       <PathAnalysisButton onClick={() => handleMenuAction(onOpenPathAnalysis)} />
+
+      {/* Modal de Backup Manager renderizado dentro del menú */}
+      {showBackupManager && (
+        <div
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            zIndex: 1000,
+          }}
+        >
+          <BackupManager isOpen={showBackupManager} onClose={() => setShowBackupManager(false)} />
+        </div>
+      )}
     </div>
   );
 
@@ -141,11 +157,6 @@ const OptionsMenu = ({
     <>
       {/* Renderizar el menú usando un portal */}
       {portalRef.current && ReactDOM.createPortal(menuContent, portalRef.current)}
-
-      {/* Modal de Backup Manager */}
-      {showBackupManager && (
-        <BackupManager isOpen={showBackupManager} onClose={() => setShowBackupManager(false)} />
-      )}
     </>
   );
 };

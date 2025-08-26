@@ -8,7 +8,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 import EpicHeader from '../../common/EpicHeader';
-import StatusBubble from '../../common/StatusBubble';
+// StatusBubble removed - now handled by EpicHeader only
 import { MIN_ZOOM, NODE_EXTENT, TRANSLATE_EXTENT } from '../utils/flow-extents';
 
 import EmergencyRecovery from './EmergencyRecovery';
@@ -17,15 +17,7 @@ import FlowMain from './FlowMain';
 // Componente helper para la sección de estado y controles
 const StatusSection = ({ showSaveStatus, saveStatus, saveMessage, ultraModeController }) => (
   <>
-    {showSaveStatus && (
-      <StatusBubble
-        status={saveStatus}
-        message={saveMessage}
-        onClose={() => {
-          /* El hook se encarga de ocultarlo */
-        }}
-      />
-    )}
+    {/* StatusBubble removed - now handled by EpicHeader only */}
     {ultraModeController}
   </>
 );

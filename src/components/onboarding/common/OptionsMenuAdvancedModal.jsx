@@ -25,7 +25,7 @@ export const OptionsMenuAdvancedModal = ({
   menuPosition,
   analytics,
   searchQuery,
-  searchResults,
+  searchResults: _searchResults,
   recentActions,
   showMinimap,
   showGrid,
@@ -33,7 +33,7 @@ export const OptionsMenuAdvancedModal = ({
   setShowMinimap,
   setShowGrid,
   setShowAdvancedMetrics,
-  handleExportFlow,
+  handleExportFlow: _handleExportFlow,
   handleCopyId,
   handleClear,
   handleDuplicate,
@@ -44,7 +44,7 @@ export const OptionsMenuAdvancedModal = ({
   handleRefresh,
   handleNodeSearch,
   handleAutoLayout,
-  searchInputRef,
+  searchInputRef: _searchInputRef,
   plubotId,
 }) => {
   const portalRef = useRef(document.createElement('div'));

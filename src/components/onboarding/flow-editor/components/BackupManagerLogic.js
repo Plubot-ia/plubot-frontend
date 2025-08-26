@@ -27,7 +27,8 @@ export const formatSize = (bytes) => {
 export const useBackupManager = () => {
   const [backups, setBackups] = useState([]);
   const [selectedBackup, setSelectedBackup] = useState();
-  const [message, setMessage] = useState(null);
+  const [message, setMessage] = useState();
+  const [error, setError] = useState();
 
   const { nodes, edges, setNodes, setEdges } = useFlowStore();
 
@@ -42,33 +43,33 @@ export const useBackupManager = () => {
         setBackups([]);
       }
     } catch (error) {
-      console.error('Error loading backups:', error);
+      setError(`Error al cargar backups: ${error.message}`);
       setBackups([]);
     }
   }, []);
 
   useEffect(() => {
     loadBackups();
-    
+
     // Listen for storage changes to update backups when saved from EpicHeader
-    const handleStorageChange = (e) => {
-      if (e.key === 'flow_backups') {
+    const handleStorageChange = (event) => {
+      if (event.key === 'flow_backups') {
         loadBackups();
       }
     };
-    
-    window.addEventListener('storage', handleStorageChange);
-    
+
+    globalThis.addEventListener('storage', handleStorageChange);
+
     // Also listen for custom event when backup is created in same tab
     const handleBackupCreated = () => {
       loadBackups();
     };
-    
-    window.addEventListener('backup-created', handleBackupCreated);
-    
+
+    globalThis.addEventListener('backup-created', handleBackupCreated);
+
     return () => {
-      window.removeEventListener('storage', handleStorageChange);
-      window.removeEventListener('backup-created', handleBackupCreated);
+      globalThis.removeEventListener('storage', handleStorageChange);
+      globalThis.removeEventListener('backup-created', handleBackupCreated);
     };
   }, [loadBackups]);
 
@@ -90,13 +91,13 @@ export const useBackupManager = () => {
       nodeCount: nodes?.length || 0,
       edgeCount: edges?.length || 0,
       size: JSON.stringify({ nodes, edges }).length,
-      reason: 'Creado manualmente por el usuario'
+      reason: 'Creado manualmente por el usuario',
     };
 
     const updatedBackups = [newBackup, ...backups].slice(0, 10); // Keep max 10 backups
     saveBackups(updatedBackups);
     setMessage({ type: 'success', text: 'Copia de seguridad creada exitosamente' });
-    setTimeout(() => setMessage(null), 3000);
+    setTimeout(() => setMessage(), 3000);
   }, [nodes, edges, backups, saveBackups]);
 
   // Restore backup
@@ -106,7 +107,7 @@ export const useBackupManager = () => {
         setNodes(backup.nodes || []);
         setEdges(backup.edges || []);
         setMessage({ type: 'success', text: 'Copia restaurada exitosamente' });
-        setTimeout(() => setMessage(null), 3000);
+        setTimeout(() => setMessage(), 3000);
       }
     },
     [setNodes, setEdges],
@@ -119,7 +120,7 @@ export const useBackupManager = () => {
         const updatedBackups = backups.filter((b) => b.id !== backupId);
         saveBackups(updatedBackups);
         setMessage({ type: 'success', text: 'Copia eliminada correctamente' });
-        setTimeout(() => setMessage(null), 3000);
+        setTimeout(() => setMessage(), 3000);
         if (selectedBackup?.id === backupId) {
           setSelectedBackup(undefined);
         }
@@ -142,7 +143,7 @@ export const useBackupManager = () => {
     a.click();
     URL.revokeObjectURL(url);
     setMessage({ type: 'success', text: 'Copia exportada correctamente' });
-    setTimeout(() => setMessage(null), 3000);
+    setTimeout(() => setMessage(), 3000);
   }, [selectedBackup]);
 
   // Import backup
@@ -166,7 +167,7 @@ export const useBackupManager = () => {
       } catch {
         setMessage({ type: 'error', text: 'Error al importar la copia' });
       }
-      setTimeout(() => setMessage(null), 3000);
+      setTimeout(() => setMessage(), 3000);
     };
 
     input.addEventListener('change', handleFileChange);

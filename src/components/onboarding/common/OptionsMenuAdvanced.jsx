@@ -14,7 +14,14 @@ import { OptionsMenuAdvancedModal } from './OptionsMenuAdvancedModal';
 
 import './OptionsMenuAdvanced.css';
 
-const OptionsMenuAdvanced = ({ anchorRef, plubotId = 'unknown', nodes, edges, isOpen, onClose }) => {
+const OptionsMenuAdvanced = ({
+  anchorRef,
+  plubotId = 'unknown',
+  nodes,
+  edges,
+  isOpen,
+  onClose,
+}) => {
   const [activeTab, setActiveTab] = useState('actions');
   const [copiedId, setCopiedId] = useState(false);
   const [showBackupManager, setShowBackupManager] = useState(false);
@@ -31,7 +38,11 @@ const OptionsMenuAdvanced = ({ anchorRef, plubotId = 'unknown', nodes, edges, is
 
   // Custom hooks
   const analytics = useFlowAnalytics(nodes, edges);
-  const { searchQuery, searchResults, handleNodeSearch } = useNodeSearch(nodes, reactFlowInstance, setNodes);
+  const { searchQuery, searchResults, handleNodeSearch } = useNodeSearch(
+    nodes,
+    reactFlowInstance,
+    setNodes,
+  );
   const { recentActions, addRecentAction } = useRecentActions();
   const menuPosition = useMenuPosition(anchorRef, isOpen);
 
@@ -85,7 +96,7 @@ const OptionsMenuAdvanced = ({ anchorRef, plubotId = 'unknown', nodes, edges, is
   }, [clearFlow, addRecentAction]);
 
   const handleDuplicate = useCallback(() => {
-    // TODO: Implement node duplication logic
+    // Implement node duplication logic when needed
     addRecentAction('Nodos duplicados');
   }, [addRecentAction]);
 
@@ -94,12 +105,12 @@ const OptionsMenuAdvanced = ({ anchorRef, plubotId = 'unknown', nodes, edges, is
   }, [handleExportFlow]);
 
   const handleUndo = useCallback(() => {
-    // TODO: Implement undo logic
+    // Implement undo logic when needed
     addRecentAction('Deshacer acción');
   }, [addRecentAction]);
 
   const handleRedo = useCallback(() => {
-    // TODO: Implement redo logic
+    // Implement redo logic when needed
     addRecentAction('Rehacer acción');
   }, [addRecentAction]);
 
@@ -116,7 +127,7 @@ const OptionsMenuAdvanced = ({ anchorRef, plubotId = 'unknown', nodes, edges, is
   }, [reactFlowInstance, addRecentAction]);
 
   const handleAutoLayout = useCallback(() => {
-    // TODO: Implement auto layout logic
+    // Implement auto layout logic when needed
     if (reactFlowInstance) {
       reactFlowInstance.fitView({ padding: 0.2 });
       addRecentAction('Auto layout aplicado');
@@ -129,14 +140,14 @@ const OptionsMenuAdvanced = ({ anchorRef, plubotId = 'unknown', nodes, edges, is
       // This component receives isOpen as a prop, doesn't manage it internally
       // The toggle is handled by the parent component
     };
-    
+
     globalThis.addEventListener('epic-menu-toggle', handleMenuToggle);
     return () => {
       globalThis.removeEventListener('epic-menu-toggle', handleMenuToggle);
     };
   }, []);
 
-  if (!isOpen) return null;
+  if (!isOpen) return;
 
   return (
     <OptionsMenuAdvancedModal

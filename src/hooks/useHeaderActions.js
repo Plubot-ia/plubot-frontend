@@ -58,6 +58,9 @@ export const useHeaderActions = ({
       setSavingIndicator(true);
       setSaveStatus(undefined);
 
+      // Mostrar mensaje inmediato de "Guardando..."
+      showNotification('⏳ Guardando flujo...', 'info');
+
       prepareFlowForSave();
 
       const saveFunction = propertiesSaveFlow || saveFlow;
@@ -71,11 +74,11 @@ export const useHeaderActions = ({
       const currentState = useFlowStore.getState();
       const actualNodes = currentState.nodes;
       const actualEdges = currentState.edges;
-      
+
       // Crear backup en localStorage
       const backupKey = 'flow_backups';
       const existingBackups = JSON.parse(localStorage.getItem(backupKey) || '[]');
-      
+
       const newBackup = {
         id: Date.now().toString(),
         name: flowName || `Backup ${new Date().toLocaleDateString('es-ES')}`,
@@ -86,26 +89,26 @@ export const useHeaderActions = ({
         nodeCount: actualNodes.length,
         edgeCount: actualEdges.length,
         size: JSON.stringify({ nodes: actualNodes, edges: actualEdges }).length,
-        reason: 'Guardado automático'
+        reason: 'Guardado automático',
       };
-      
+
       // Mantener máximo 10 backups
       const updatedBackups = [newBackup, ...existingBackups].slice(0, 10);
       localStorage.setItem(backupKey, JSON.stringify(updatedBackups));
-      
-      // Disparar evento para actualizar el modal de backups si está abierto
-      window.dispatchEvent(new Event('backup-created'));
-      
-      const successMessage = flowName
-        ? `Flujo guardado exitosamente como "${flowName}" y backup creado`
-        : 'Flujo guardado exitosamente y backup creado';
 
-      // Usar showNotification del ByteMessageProvider que tiene mejor estilo
+      // Disparar evento para actualizar el modal de backups si está abierto
+      globalThis.dispatchEvent(new Event('backup-created'));
+
+      const successMessage = flowName
+        ? `✅ Flujo guardado exitosamente como "${flowName}" y backup creado`
+        : '✅ Flujo guardado exitosamente y backup creado';
+
+      // Actualizar con mensaje de éxito
       showNotification(successMessage, 'success');
     } catch (error) {
-      const errorMessage = `Error al guardar flujo: ${error.message || 'Error desconocido'}`;
+      const errorMessage = `❌ Error al guardar flujo: ${error.message || 'Error desconocido'}`;
 
-      // Usar showNotification del ByteMessageProvider que tiene mejor estilo
+      // Actualizar con mensaje de error
       showNotification(errorMessage, 'error');
     } finally {
       setSavingIndicator(false);

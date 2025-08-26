@@ -25,7 +25,7 @@ const getSyncStatusText = (details) => {
 const useSyncButtonLogic = () => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [syncDetails, setSyncDetails] = useState();
-  const [statusBubble, setStatusBubble] = useState();
+  const [statusBubble, setStatusBubble] = useState(); // StatusBubble removed - centralized in EpicHeader for performance
 
   const { syncAllPlubots } = useSyncService();
 
@@ -192,7 +192,7 @@ const SyncButton = () => {
 
   return (
     <>
-      <StatusBubble />
+      {/* StatusBubble removed - centralized in EpicHeader */}
       <div className='sync-button-container'>
         <MainSyncButton />
         <AnimatePresence>{isExpanded && <SyncDetailsPanel />}</AnimatePresence>

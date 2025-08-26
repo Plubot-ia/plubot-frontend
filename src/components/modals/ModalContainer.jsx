@@ -5,8 +5,8 @@ import useFlowStore from '@/stores/use-flow-store';
 
 import useByteMessageContext from '../../hooks/useByteMessageContext';
 import useModalContext from '../../hooks/useModalContext';
-import EmbedModal from '../onboarding/modals/EmbedModal';
 import ImportExportModal from '../onboarding/modals/ImportExportModal';
+import ShareModal from '../onboarding/modals/ShareModal';
 import SyncModal from '../onboarding/modals/SyncModal';
 
 // Cargar componentes pesados con lazy loading
@@ -30,10 +30,12 @@ const _renderSyncModal = (closeModal, handleSync) => (
   />
 );
 
-const _renderEmbedModal = (closeModal, plubotId) => (
-  <EmbedModal
+const _renderEmbedModal = (closeModal, plubotId, nodes, edges) => (
+  <ShareModal
     onClose={() => closeModal('embedModal')}
     plubotId={plubotId || '1'}
+    nodes={nodes}
+    edges={edges}
     plubotName='Mi Plubot'
   />
 );
@@ -173,7 +175,7 @@ const ModalContainer = () => {
           }
 
           case 'embedModal': {
-            return _renderEmbedModal(closeModal, plubotId);
+            return _renderEmbedModal(closeModal, plubotId, nodes, edges);
           }
 
           case 'importExportModal': {

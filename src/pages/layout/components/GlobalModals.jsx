@@ -7,7 +7,7 @@ import useModalContext from '../../../hooks/useModalContext';
 const TemplateSelector = lazy(
   () => import('../../../components/onboarding/modals/TemplateSelector'),
 );
-const EmbedModal = lazy(() => import('../../../components/onboarding/modals/EmbedModal'));
+const ShareModal = lazy(() => import('../../../components/onboarding/modals/ShareModal'));
 const ImportExportModal = lazy(
   () => import('../../../components/onboarding/modals/ImportExportModal'),
 );
@@ -25,12 +25,11 @@ const GlobalModals = () => {
         />
       )}
       {activeModals.embed && (
-        <EmbedModal
+        <ShareModal
           isOpen={activeModals.embed}
           onClose={() => closeModal('embed')}
           plubotId={currentFlowData?.id}
           plubotName={currentFlowData?.name || 'Mi Plubot'}
-          flowData={currentFlowData}
         />
       )}
       {activeModals.importExport && (

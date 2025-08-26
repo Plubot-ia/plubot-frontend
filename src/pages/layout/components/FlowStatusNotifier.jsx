@@ -1,26 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 
-import StatusBubble from '../../../components/onboarding/common/StatusBubble';
+// StatusBubble removed - centralized in EpicHeader for performance
+// This component is deprecated and will be removed in future refactoring
 
 const FlowStatusNotifier = () => {
-  const [statusMessage, setStatusMessage] = useState('');
-
-  useEffect(() => {
-    const handleFlowSaved = (event) => {
-      const { success, message } = event.detail ?? {};
-      const notificationMessage =
-        message || (success ? '✅ Flujo guardado con éxito' : '❌ Error al guardar el flujo');
-      setStatusMessage(notificationMessage);
-    };
-
-    globalThis.addEventListener('flow-saved', handleFlowSaved);
-
-    return () => {
-      globalThis.removeEventListener('flow-saved', handleFlowSaved);
-    };
-  }, []);
-
-  return <StatusBubble message={statusMessage} />;
+  // Component functionality moved to ByteMessageContext
+  // All status notifications now handled centrally through EpicHeader
+  return undefined;
 };
 
 export default FlowStatusNotifier;

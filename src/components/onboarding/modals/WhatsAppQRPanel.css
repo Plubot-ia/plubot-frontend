@@ -1,0 +1,654 @@
+/* WhatsApp QR Panel Premium Styles */
+
+.share-qr-container {
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* WhatsApp Connected Container */
+.whatsapp-connected-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+}
+
+/* WhatsApp Connected State */
+.whatsapp-connected {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  padding: 2rem;
+  max-width: 600px;
+  width: 100%;
+}
+
+.share-qr-success.premium-connected {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem 3rem;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  border-radius: 20px;
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+}
+
+.share-qr-success.premium-connected::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(76, 175, 80, 0.1) 0%, transparent 70%);
+  animation: rotate 20s linear infinite;
+}
+
+@keyframes rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Connected Animation */
+.connected-animation {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  margin: 2rem auto 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pulse-ring {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  height: 100%;
+  border: 2px solid rgba(37, 211, 102, 0.2);
+  border-radius: 50%;
+  animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  background: radial-gradient(circle, rgba(37, 211, 102, 0.05) 0%, transparent 70%);
+}
+
+.pulse-ring.delay-1 {
+  animation-delay: 0.5s;
+}
+
+.pulse-ring.delay-2 {
+  animation-delay: 1s;
+}
+
+@keyframes pulse {
+  0% { 
+    transform: translate(-50%, -50%) scale(0.95); 
+    opacity: 0.8;
+  }
+  50% { 
+    transform: translate(-50%, -50%) scale(1.4); 
+    opacity: 0;
+  }
+  100% { 
+    transform: translate(-50%, -50%) scale(1.4); 
+    opacity: 0;
+  }
+}
+
+.connected-icon-wrapper {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 
+    0 10px 40px rgba(37, 211, 102, 0.3),
+    0 0 80px rgba(37, 211, 102, 0.15),
+    inset 0 2px 10px rgba(255, 255, 255, 0.3);
+  z-index: 1;
+  animation: glow 3s ease-in-out infinite;
+}
+
+@keyframes glow {
+  0%, 100% { 
+    box-shadow: 
+      0 10px 40px rgba(37, 211, 102, 0.3),
+      0 0 80px rgba(37, 211, 102, 0.15),
+      inset 0 2px 10px rgba(255, 255, 255, 0.3);
+  }
+  50% { 
+    box-shadow: 
+      0 10px 50px rgba(37, 211, 102, 0.4),
+      0 0 100px rgba(37, 211, 102, 0.25),
+      inset 0 2px 10px rgba(255, 255, 255, 0.4);
+  }
+}
+
+.bot-icon {
+  color: white;
+  animation: float 4s ease-in-out infinite;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+@keyframes float {
+  0%, 100% { 
+    transform: translateY(0) rotate(0deg);
+  }
+  25% {
+    transform: translateY(-3px) rotate(-2deg);
+  }
+  50% { 
+    transform: translateY(-6px) rotate(0deg);
+  }
+  75% {
+    transform: translateY(-3px) rotate(2deg);
+  }
+}
+
+.status-badge {
+  position: absolute;
+  bottom: 5px;
+  right: 5px;
+  width: 24px;
+  height: 24px;
+  background: #4caf50;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 3px solid white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.status-badge.active {
+  animation: blink 2s ease-in-out infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+.status-badge svg {
+  color: white;
+}
+
+/* Connected Info */
+.connected-header {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.connected-header h3 {
+  font-size: 1.75rem;
+  margin: 0 0 0.5rem;
+  color: #fff;
+  font-weight: 600;
+  letter-spacing: -0.5px;
+}
+
+.connected-header p {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 1rem;
+  font-weight: 400;
+  margin-bottom: 2rem;
+}
+
+.connected-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 0.5rem;
+}
+
+.connected-details {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  width: 100%;
+  margin-bottom: 1.5rem;
+}
+
+.connection-info {
+  display: flex;
+  justify-content: center;
+  margin: 1rem 0;
+}
+
+.info-row {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.phone-number {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.phone-number svg {
+  color: #25D366;
+}
+
+.phone-number span {
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.connection-status {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.9rem;
+  padding: 0.625rem 1.25rem;
+  background: linear-gradient(135deg, rgba(37, 211, 102, 0.2) 0%, rgba(37, 211, 102, 0.1) 100%);
+  border-radius: 24px;
+  border: 1px solid rgba(37, 211, 102, 0.3);
+  backdrop-filter: blur(10px);
+  font-weight: 500;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  background: #25D366;
+  border-radius: 50%;
+  animation: pulse-dot 2s ease-in-out infinite;
+  box-shadow: 0 0 10px rgba(37, 211, 102, 0.5);
+}
+
+@keyframes pulse-dot {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.2); opacity: 0.8; }
+}
+
+/* Session Actions */
+.session-actions {
+  display: flex;
+  gap: 1.25rem;
+  margin: 2rem 0;
+  z-index: 1;
+  width: 100%;
+  justify-content: center;
+}
+
+.share-button.disconnect-btn,
+.share-button.new-session-btn {
+  padding: 0.875rem 2rem;
+  border-radius: 14px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+  text-transform: none;
+  letter-spacing: 0.3px;
+}
+
+.share-button.disconnect-btn {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  color: white;
+  box-shadow: 0 4px 14px rgba(239, 68, 68, 0.3);
+}
+
+.share-button.disconnect-btn:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 8px 24px rgba(239, 68, 68, 0.4);
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+}
+
+.share-button.new-session-btn {
+  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+  color: white;
+  box-shadow: 0 4px 14px rgba(139, 92, 246, 0.3);
+}
+
+.share-button.new-session-btn:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 8px 24px rgba(139, 92, 246, 0.4);
+  background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+}
+
+.share-button.disconnect-btn::before,
+.share-button.new-session-btn::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+
+.share-button.disconnect-btn:hover::before,
+.share-button.new-session-btn:hover::before {
+  width: 300px;
+  height: 300px;
+}
+
+/* Automation Info */
+.automation-info {
+  width: 100%;
+  z-index: 1;
+  margin-top: 1rem;
+}
+
+.automation-info .info-card {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  padding: 1.5rem;
+  background: linear-gradient(135deg, rgba(37, 211, 102, 0.15) 0%, rgba(37, 211, 102, 0.08) 100%);
+  border-radius: 16px;
+  border: 1px solid rgba(37, 211, 102, 0.25);
+  width: 100%;
+  backdrop-filter: blur(10px);
+  box-shadow: 
+    0 4px 20px rgba(37, 211, 102, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.automation-info .info-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 
+    0 8px 30px rgba(37, 211, 102, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  border-color: rgba(37, 211, 102, 0.35);
+}
+
+.automation-info .info-card svg {
+  color: #25D366;
+  flex-shrink: 0;
+  filter: drop-shadow(0 0 10px rgba(37, 211, 102, 0.5));
+  animation: pulse-icon 2s ease-in-out infinite;
+}
+
+@keyframes pulse-icon {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+.automation-info .info-card strong {
+  display: block;
+  color: rgba(255, 255, 255, 0.95);
+  font-size: 0.95rem;
+}
+
+.automation-info .info-card span {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+
+.detail-card {
+  padding: 1.25rem;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.03) 100%);
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: blur(10px);
+}
+
+.detail-card:hover {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.06) 100%);
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+.detail-card svg {
+  color: #25D366;
+  flex-shrink: 0;
+  margin-top: 2px;
+  filter: drop-shadow(0 0 8px rgba(37, 211, 102, 0.4));
+}
+
+.detail-card > div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.detail-label {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.6);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.detail-value {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 500;
+}
+
+.share-qr-instructions {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 25px 30px;
+  height: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.share-qr-instructions h4 {
+  margin-bottom: 20px;
+  font-size: 16px;
+  color: #fff;
+}
+
+.share-qr-instructions ol {
+  padding-left: 20px;
+  margin: 0;
+  line-height: 1.8;
+}
+
+.share-qr-instructions li {
+  margin-bottom: 12px;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 14px;
+}
+
+/* QR Actions */
+.qr-actions {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.share-button.refresh-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 8px 16px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  width: auto;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.share-button.refresh-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(118, 75, 162, 0.3);
+}
+
+.share-button.refresh-btn svg {
+  transition: transform 0.3s ease;
+}
+
+.share-button.refresh-btn:hover svg {
+  transform: rotate(180deg);
+}
+
+/* QR Image Enhancement */
+.share-qr-image {
+  padding: 1.5rem;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  max-width: 280px;
+  width: 100%;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+}
+
+/* Fix QR display area */
+.share-qr-code {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Layout horizontal para QR y instrucciones */
+.whatsapp-qr-layout {
+  display: flex;
+  gap: 50px;
+  align-items: flex-start;
+  width: 100%;
+  margin: 10px 0 30px 0;
+  justify-content: center;
+}
+
+.whatsapp-qr-left {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 10px;
+}
+
+.whatsapp-qr-right {
+  flex: 0 1 400px;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  padding-top: 10px;
+}
+
+/* Tip container fuera del layout principal */
+.whatsapp-tip-container {
+  width: 100%;
+  margin-top: 30px;
+}
+
+.whatsapp-tip {
+  background: rgba(255, 193, 7, 0.1);
+  border: 1px solid rgba(255, 193, 7, 0.2);
+  border-radius: 8px;
+  padding: 12px 16px;
+  color: #ffc107;
+  font-size: 13px;
+  line-height: 1.5;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.share-qr-content {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1rem 0;
+}
+
+.share-qr-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem;
+  color: #666;
+}
+
+.share-qr-placeholder svg {
+  margin-bottom: 1rem;
+  color: #999;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .whatsapp-qr-layout {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .whatsapp-qr-left,
+  .whatsapp-qr-right {
+    width: 100%;
+  }
+  
+  .whatsapp-qr-right {
+    min-width: unset;
+  }
+}
+
+@media (max-width: 600px) {
+  .session-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .share-button.disconnect-btn,
+  .share-button.new-session-btn {
+    width: 100%;
+    max-width: none;
+    justify-content: center;
+  }
+  
+  .share-qr-success.premium-connected {
+    padding: 1.5rem;
+  }
+  
+  .connected-animation {
+    width: 100px;
+    height: 100px;
+  }
+  
+  .connected-icon-wrapper {
+    width: 70px;
+    height: 70px;
+  }
+}

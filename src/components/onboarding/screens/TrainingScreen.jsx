@@ -13,7 +13,7 @@ import { EDGE_COLORS } from '@/utils/node-config.js';
 import usePlubotCreation from '../../../hooks/usePlubotCreation';
 import ByteAssistant from '../common/ByteAssistant.jsx';
 import NodePalette from '../common/NodePalette.jsx';
-import StatusBubble from '../common/StatusBubble';
+// StatusBubble removed - now handled by EpicHeader only
 import EmergencyRecovery from '../flow-editor/components/EmergencyRecovery.jsx';
 import FlowEditor from '../flow-editor/FlowEditor.jsx';
 
@@ -319,7 +319,7 @@ const useTrainingScreenData = () => {
   const { nodes, edges, onNodesChange, onEdgesChange, onConnect, setSelectedNode } =
     useFlowNodesEdges();
   const byteMessage = useTrainingStore((state) => state.byteMessage);
-  const byteMessageType = useTrainingStore((state) => state.byteMessageType);
+  const _byteMessageType = useTrainingStore((state) => state._byteMessageType);
   const setByteMessage = useTrainingStore((state) => state.setByteMessage);
   const { isLoading } = useTrainingStore();
 
@@ -363,7 +363,7 @@ const useTrainingScreenData = () => {
     setSelectedNode,
     isLoading,
     byteMessage,
-    byteMessageType,
+    _byteMessageType,
     setByteMessage,
     emergencyBackupData,
     setEmergencyBackupData,
@@ -501,7 +501,7 @@ const _renderTrainingScreenApp = ({
   plubotId,
   plubotData,
   byteMessage,
-  byteMessageType,
+  _byteMessageType,
   setByteMessage,
   handleSaveFlow,
   onNodeDrop,
@@ -544,9 +544,7 @@ const _renderTrainingScreenApp = ({
     <Suspense fallback={undefined}>
       <ByteAssistant simulationMode={activeModals.has('simulation')} />
     </Suspense>
-    {byteMessage && !activeModals.has('simulation') && (
-      <StatusBubble notification={{ text: byteMessage, type: byteMessageType }} />
-    )}
+    {/* StatusBubble removed - now handled by EpicHeader only */}
     {activeModals.has('recovery') && (
       <Suspense fallback={undefined}>
         <EmergencyRecovery
@@ -604,7 +602,7 @@ const useMainAppProps = ({
   plubotId,
   plubotData,
   byteMessage,
-  byteMessageType,
+  _byteMessageType,
   setByteMessage,
   handleSaveFlow,
   setConnectionProperties,
@@ -625,7 +623,7 @@ const useMainAppProps = ({
     plubotId,
     plubotData,
     byteMessage,
-    byteMessageType,
+    _byteMessageType,
     setByteMessage,
     handleSaveFlow,
     onNodeDrop: handleNodeDrop,
@@ -809,7 +807,7 @@ const TrainingScreenComponent = React.memo(
       setSelectedNode,
       isLoading,
       byteMessage,
-      byteMessageType,
+      _byteMessageType,
       setByteMessage,
       setEmergencyBackupData,
       hadBackup,
@@ -860,7 +858,7 @@ const TrainingScreenComponent = React.memo(
       plubotId,
       plubotData,
       byteMessage,
-      byteMessageType,
+      _byteMessageType,
       setByteMessage,
       handleSaveFlow,
       setConnectionProperties,

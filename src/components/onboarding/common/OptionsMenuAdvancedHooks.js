@@ -157,7 +157,7 @@ export const useRecentActions = () => {
   const addRecentAction = useCallback((actionName) => {
     const actionObject = {
       name: actionName,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     };
     setRecentActions((previous) => [actionObject, ...previous].slice(0, 5));
   }, []);
@@ -220,14 +220,14 @@ export const useMenuPosition = (anchorRef, isOpen) => {
       const rect = anchorRef.current.getBoundingClientRect();
       const menuWidth = 540;
       const menuHeight = 600;
-      
+
       // Position menu to the left of the button's right edge
       let left = rect.right - menuWidth;
       let top = rect.bottom + 8;
-      
+
       // Ensure minimum distance from viewport edges
       const minMargin = 40;
-      
+
       // Adjust horizontal position to keep menu fully visible
       if (left + menuWidth > window.innerWidth - minMargin) {
         left = window.innerWidth - menuWidth - minMargin;
@@ -235,18 +235,18 @@ export const useMenuPosition = (anchorRef, isOpen) => {
       if (left < minMargin) {
         left = minMargin;
       }
-      
+
       // Adjust vertical position if menu would go off screen
       if (top + menuHeight > window.innerHeight - minMargin) {
         // Try to position above the button
         top = rect.top - menuHeight - 8;
-        
+
         // If still doesn't fit, center vertically
         if (top < minMargin) {
           top = (window.innerHeight - menuHeight) / 2;
         }
       }
-      
+
       return {
         top: `${top}px`,
         left: `${left}px`,
