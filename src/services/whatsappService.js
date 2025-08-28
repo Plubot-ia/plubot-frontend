@@ -37,6 +37,13 @@ class WhatsAppService {
       console.log('[WhatsApp Service] WebSocket connected');
     });
 
+    // Listen for QR updates from server
+    this.socket.on('qr-update', (data) => {
+      console.log('[WhatsApp Service] QR update received:', data);
+      for (const callback of this.qrUpdateCallbacks) callback(data);
+    });
+
+    // Also listen for legacy 'qr' event
     this.socket.on('qr', (data) => {
       console.log('[WhatsApp Service] QR event received:', data);
       for (const callback of this.qrUpdateCallbacks) callback(data);
@@ -52,8 +59,8 @@ class WhatsAppService {
         });
     });
 
-    // Listen for ready event (not used by backend currently)
-    this.socket.on('ready', (data) => {
+    // Listen for session ready event
+    this.socket.on('session-ready', (data) => {
       console.log('[WhatsApp Service] Session ready event:', data);
       for (const callback of this.statusUpdateCallbacks)
         callback({
@@ -62,12 +69,22 @@ class WhatsAppService {
         });
     });
 
-    // Listen for ready status
-    this.socket.on('session-ready', (data) => {
-      // Global ready event received
+    // Listen for queue position updates
+    this.socket.on('queue-position', (data) => {
+      console.log('[WhatsApp Service] Queue position:', data);
       for (const callback of this.statusUpdateCallbacks)
         callback({
-          status: 'ready',
+          status: 'queued',
+          ...data,
+        });
+    });
+
+    // Listen for session activation from queue
+    this.socket.on('session-activated', (data) => {
+      console.log('[WhatsApp Service] Session activated from queue:', data);
+      for (const callback of this.statusUpdateCallbacks)
+        callback({
+          status: 'activated',
           ...data,
         });
     });
@@ -290,7 +307,9 @@ class WhatsAppService {
     // Subscribe to session room if sessionId provided
     if (sessionId) {
       console.log('[WhatsApp Service] Subscribing to session:', sessionId);
-      this.socket.emit('subscribe:session', sessionId);
+      // Extract userId and plubotId from sessionId (format: userId-plubotId)
+      const [userId, plubotId] = sessionId.split('-');
+      this.socket.emit('join-room', { userId, plubotId });
     }
 
     // QR updates
@@ -300,7 +319,8 @@ class WhatsAppService {
         callbacks.onQRUpdate(data);
       }
     };
-    this.socket.on('qr', qrHandler);
+    this.socket.on('qr-update', qrHandler);
+    this.socket.on('qr', qrHandler); // Also listen for legacy event
 
     // Session authenticated
     const authHandler = (data) => {

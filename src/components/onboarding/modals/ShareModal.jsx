@@ -4,26 +4,28 @@ import {
   Link,
   Code,
   MessageCircle,
-  Globe,
-  Sparkles,
+  Shield,
+  Zap,
   Check,
+  Sparkles,
   Loader2,
   Share2,
   Key,
   ExternalLink,
   ChevronRight,
-  Shield,
   Bot,
 } from 'lucide-react';
 import PropTypes from 'prop-types';
 import QRCode from 'qrcode';
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import ReactDOM from 'react-dom';
 
 // useAPI hook removed - not needed
 import useByteMessageContext from '@/hooks/useByteMessageContext';
 import useModalContext from '@/hooks/useModalContext';
 
 import WhatsAppQRPanel from './WhatsAppQRPanel';
+import WhatsAppMigrationModal from './WhatsAppMigrationModal';
 
 import './ShareModal.css';
 
@@ -458,6 +460,7 @@ const ShareModal = ({ plubotId, plubotName, onClose, nodes, edges }) => {
   const [isLoading, setIsLoading] = useState(false);
   const _setIsLoading = setIsLoading; // Reference to avoid unused var
   const [error, setError] = useState();
+  const [showMigrationModal, setShowMigrationModal] = useState(false);
   const [customization, setCustomization] = useState({
     theme: 'light',
     position: 'right',
@@ -506,7 +509,72 @@ const ShareModal = ({ plubotId, plubotName, onClose, nodes, edges }) => {
       case 'whatsapp': {
         return (
           activeTab === 'whatsapp' && (
-            <WhatsAppQRPanel plubotId={plubotId} nodes={nodes} edges={edges} />
+            <>
+              {/* Info Section */}
+              <div className='share-whatsapp-info'>
+                <div className='share-info-card'>
+                  <div className='share-info-icon'>
+                    <MessageCircle size={20} />
+                  </div>
+                  <div className='share-info-content'>
+                    <h4>Conexión Rápida con WhatsApp Web</h4>
+                    <p>
+                      Puedes escanear el código QR a continuación para probar tu flujo con WhatsApp Web. 
+                      Esta opción es ideal para pruebas y desarrollo.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <WhatsAppQRPanel plubotId={plubotId} nodes={nodes} edges={edges} />
+              
+              {/* Migration Section */}
+              <div className='share-migration-section'>
+                <div className='share-migration-divider'>
+                  <span>o</span>
+                </div>
+                <div className='share-migration-card premium'>
+                  <div className='share-migration-badge'>Recomendado</div>
+                  <div className='share-migration-header'>
+                    <Zap className='share-migration-icon premium' size={24} />
+                    <div>
+                      <h4>WhatsApp Business API Oficial</h4>
+                      <p className='share-migration-subtitle'>
+                        Para uso profesional y empresarial
+                      </p>
+                    </div>
+                  </div>
+                  <ul className='share-migration-features'>
+                    <li>
+                      <Check size={16} />
+                      <span>Verificación oficial de Meta</span>
+                    </li>
+                    <li>
+                      <Check size={16} />
+                      <span>Sin límites de mensajes</span>
+                    </li>
+                    <li>
+                      <Check size={16} />
+                      <span>Mayor estabilidad y confiabilidad</span>
+                    </li>
+                    <li>
+                      <Check size={16} />
+                      <span>Soporte para múltiples agentes</span>
+                    </li>
+                  </ul>
+                  <button 
+                    className='share-button primary migration-btn full-width'
+                    onClick={() => {
+                      console.log('[ShareModal] Opening migration modal');
+                      setShowMigrationModal(true);
+                    }}
+                  >
+                    <span>Iniciar Migración a API Oficial</span>
+                    <ChevronRight size={16} />
+                  </button>
+                </div>
+              </div>
+            </>
           )
         );
       }
@@ -530,22 +598,35 @@ const ShareModal = ({ plubotId, plubotName, onClose, nodes, edges }) => {
   };
 
   return (
-    <div
-      className='share-modal-overlay'
-      onClick={handleClose}
-      onKeyDown={(event) => {
-        if (event.key === 'Escape') handleClose();
-      }}
-      role='button'
-      tabIndex={0}
-    >
+    <>
+      {showMigrationModal && ReactDOM.createPortal(
+        <WhatsAppMigrationModal 
+          isOpen={showMigrationModal}
+          onClose={() => {
+            console.log('[ShareModal] Closing migration modal');
+            setShowMigrationModal(false);
+          }}
+          currentUserId={plubotId}
+        />,
+        document.body
+      )}
+      
       <div
-        ref={modalRef}
-        className='share-modal'
-        onClick={(event) => event.stopPropagation()}
-        onKeyDown={(event) => event.stopPropagation()}
-        role='presentation'
+        className='share-modal-overlay'
+        onClick={handleClose}
+        onKeyDown={(event) => {
+          if (event.key === 'Escape') handleClose();
+        }}
+        role='button'
+        tabIndex={0}
       >
+        <div
+          ref={modalRef}
+          className='share-modal'
+          onClick={(event) => event.stopPropagation()}
+          onKeyDown={(event) => event.stopPropagation()}
+          role='presentation'
+        >
         <div className='share-modal-header'>
           <div className='share-modal-title'>
             <Sparkles className='share-title-icon' size={24} />
@@ -585,6 +666,7 @@ const ShareModal = ({ plubotId, plubotName, onClose, nodes, edges }) => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 
