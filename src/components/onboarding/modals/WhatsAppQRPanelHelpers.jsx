@@ -28,6 +28,7 @@ const StatusIndicator = ({ status }) => {
     scanning: { icon: Loader2, text: 'Escaneando...', color: 'blue', spin: true },
     authenticated: { icon: CheckCircle, text: 'Autenticado', color: 'green' },
     ready: { icon: Wifi, text: 'Conectado', color: 'green' },
+    connected: { icon: Wifi, text: 'Conectado', color: 'green' },
     disconnected: { icon: WifiOff, text: 'Desconectado', color: 'gray' },
     error: { icon: AlertCircle, text: 'Error de conexión', color: 'red' },
   };
@@ -48,6 +49,9 @@ const StatusIndicator = ({ status }) => {
       }
       case 'ready': {
         return statusConfig.ready;
+      }
+      case 'connected': {
+        return statusConfig.connected;
       }
       case 'disconnected': {
         return statusConfig.disconnected;

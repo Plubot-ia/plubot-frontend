@@ -211,7 +211,7 @@ const WhatsAppQRPanel = ({ plubotId, nodes, edges }) => {
       <div className='share-panel-content'>
         <StatusIndicator status={status} />
 
-        {status === 'ready' || status === 'authenticated' ? (
+        {status === 'ready' || status === 'authenticated' || status === 'connected' ? (
           <ConnectedView
             phoneNumber={phoneNumber}
             handleDisconnect={() => {}}
