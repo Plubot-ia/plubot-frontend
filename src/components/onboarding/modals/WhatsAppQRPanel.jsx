@@ -93,13 +93,13 @@ const WhatsAppQRPanel = ({ plubotId, nodes, edges }) => {
       setErrorMessage(null);
 
       try {
-        // Clean plubotId to be alphanumeric only (remove hyphens)
-        const cleanPlubotId = plubotId ? plubotId.replaceAll(/[^a-zA-Z0-9]/g, '') : 'defaultplubot';
+        // Use plubotId as is - don't clean it
+        const sessionPlubotId = plubotId || '260';
         console.log('[WhatsAppQRPanel] Initializing session for:', {
           userId,
-          plubotId: cleanPlubotId,
+          plubotId: sessionPlubotId,
         });
-        const result = await whatsappService.createSession(userId, cleanPlubotId);
+        const result = await whatsappService.createSession(userId, sessionPlubotId);
         console.log('[WhatsAppQRPanel] Session result:', result);
 
         if (result.qr || result.qrDataUrl) {
@@ -152,8 +152,8 @@ const WhatsAppQRPanel = ({ plubotId, nodes, edges }) => {
   useEffect(() => {
     if (!userId || !plubotId || status === 'connected') return;
 
-    const cleanPlubotId = plubotId ? plubotId.replaceAll(/[^a-zA-Z0-9]/g, '') : 'defaultplubot';
-    const sessionId = `${userId}-${cleanPlubotId}`;
+    const sessionPlubotId = plubotId || '260';
+    const sessionId = `${userId}-${sessionPlubotId}`;
 
     console.log('[WhatsAppQRPanel] Setting up WebSocket for session:', sessionId);
 

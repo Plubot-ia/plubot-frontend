@@ -258,9 +258,10 @@ class WhatsAppService {
    */
   async refreshQR(userId, plubotId) {
     try {
+      const sessionId = `${userId}-${plubotId}`;
       const response = await axios.post(
-        `${this.baseURL}/api/sessions/refresh-qr`,
-        { userId, plubotId },
+        `${this.baseURL}/api/sessions/${sessionId}/refresh-qr`,
+        {},
         {
           headers: {
             'Content-Type': 'application/json',
@@ -307,9 +308,9 @@ class WhatsAppService {
     // Subscribe to session room if sessionId provided
     if (sessionId) {
       console.log('[WhatsApp Service] Subscribing to session:', sessionId);
-      // Extract userId and plubotId from sessionId (format: userId-plubotId)
-      const [userId, plubotId] = sessionId.split('-');
-      this.socket.emit('join-room', { userId, plubotId });
+      // Use the correct event name that backend expects
+      this.socket.emit('join-session', sessionId);
+      this.socket.emit('subscribe:session', sessionId); // Also emit legacy event for compatibility
     }
 
     // QR updates
@@ -338,7 +339,7 @@ class WhatsAppService {
         callbacks.onReady(data);
       }
     };
-    this.socket.on('ready', readyHandler);
+    this.socket.on('session-ready', readyHandler);
 
     // Session disconnected
     const disconnectHandler = (data) => {
@@ -348,6 +349,7 @@ class WhatsAppService {
       }
     };
     this.socket.on('disconnected', disconnectHandler);
+    this.socket.on('session-disconnected', disconnectHandler);
 
     // Return cleanup function
     return () => {
@@ -355,9 +357,10 @@ class WhatsAppService {
       if (sessionId) {
         this.socket.emit('unsubscribe:session', sessionId);
       }
+      this.socket.off('qr-update', qrHandler);
       this.socket.off('qr', qrHandler);
-      this.socket.off('authenticated', authHandler);
-      this.socket.off('ready', readyHandler);
+      this.socket.off('session-authenticated', authHandler);
+      this.socket.off('session-ready', readyHandler);
       this.socket.off('disconnected', disconnectHandler);
     };
   }
