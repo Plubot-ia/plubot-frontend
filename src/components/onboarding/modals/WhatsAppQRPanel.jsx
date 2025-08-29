@@ -168,11 +168,11 @@ const WhatsAppQRPanel = ({ plubotId, nodes, edges }) => {
         if (data.qrDataUrl || data.qr) {
           setQrCode(data.qrDataUrl || data.qr);
           // Solo cambiar a 'waiting' si estamos en 'initializing'
-          setStatus(prevStatus => {
-            if (prevStatus === 'initializing' || prevStatus === 'disconnected') {
+          setStatus((previousStatus) => {
+            if (previousStatus === 'initializing' || previousStatus === 'disconnected') {
               return 'waiting';
             }
-            return prevStatus; // Mantener el estado actual si ya es 'waiting'
+            return previousStatus; // Mantener el estado actual si ya es 'waiting'
           });
           setErrorMessage(null);
         }
@@ -249,29 +249,32 @@ const WhatsAppQRPanel = ({ plubotId, nodes, edges }) => {
                 setIsLoading(true);
                 setErrorMessage(null);
                 const sessionPlubotId = plubotId || '260';
-                
+
                 // Desconectar sesión actual
                 try {
                   await whatsappService.disconnectSession(userId, sessionPlubotId);
                 } catch (disconnectError) {
-                  console.log('[WhatsAppQRPanel] Disconnect error (might be already disconnected):', disconnectError);
+                  console.log(
+                    '[WhatsAppQRPanel] Disconnect error (might be already disconnected):',
+                    disconnectError,
+                  );
                 }
-                
+
                 // Clear state first
                 setQrCode(null);
                 setStatus('initializing');
                 setErrorMessage(null);
-                
+
                 // Create new session with forceNew flag to ensure fresh QR
                 const result = await whatsappService.createSession(userId, sessionPlubotId, true);
-                
+
                 if (result.qr) {
                   setQrCode(result.qr);
                   setStatus('waiting');
                 } else if (result.status === 'waiting_qr' || result.status === 'initializing') {
                   // Wait a bit for QR to be generated
-                  await new Promise(resolve => setTimeout(resolve, 2000));
-                  
+                  await new Promise((resolve) => setTimeout(resolve, 2000));
+
                   // Try to refresh QR
                   const refreshResult = await whatsappService.refreshQR(sessionId);
                   if (refreshResult.qr) {
@@ -295,26 +298,26 @@ const WhatsAppQRPanel = ({ plubotId, nodes, edges }) => {
                 setIsLoading(true);
                 setErrorMessage(null);
                 const sessionPlubotId = plubotId || '260';
-                
+
                 // Limpiar estado actual
                 setStatus('initializing');
                 setPhoneNumber(null);
                 setQrCode(null);
-                
+
                 // Intentar desconectar sesión existente
                 try {
                   await whatsappService.destroySession(userId, sessionPlubotId);
                 } catch (destroyError) {
                   console.log('[WhatsAppQRPanel] Session might not exist:', destroyError);
                 }
-                
+
                 // Esperar para asegurar limpieza completa
-                await new Promise(resolve => setTimeout(resolve, 2000));
-                
+                await new Promise((resolve) => setTimeout(resolve, 2000));
+
                 // Crear nueva sesión limpia con forceNew para garantizar QR fresco
                 try {
                   const result = await whatsappService.createSession(userId, sessionPlubotId, true);
-                  
+
                   if (result && (result.qr || result.qrDataUrl)) {
                     setQrCode(result.qrDataUrl || result.qr);
                     setStatus('waiting_qr');
@@ -342,8 +345,10 @@ const WhatsAppQRPanel = ({ plubotId, nodes, edges }) => {
                     } else {
                       throw createError;
                     }
-                  } catch (refreshError) {
-                    setErrorMessage('Error al crear nueva sesión. Recarga la página para intentar de nuevo.');
+                  } catch {
+                    setErrorMessage(
+                      'Error al crear nueva sesión. Recarga la página para intentar de nuevo.',
+                    );
                     setStatus('error');
                   }
                 }

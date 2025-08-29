@@ -225,24 +225,24 @@ class WhatsAppService {
     if (!this.socket) {
       this.initializeSocket();
     }
-    
+
     const roomId = `qr-${userId}:${plubotId}`;
     console.log('[WhatsApp Service] Joining room:', roomId);
     this.socket.emit('join-room', roomId);
-    
+
     this.qrUpdateCallbacks.add(callback);
     return () => {
       this.qrUpdateCallbacks.delete(callback);
     };
   }
-  
+
   /**
    * Unsubscribe from QR updates
    */
   unsubscribeFromQRUpdates(callback) {
     this.qrUpdateCallbacks.delete(callback);
   }
-  
+
   /**
    * Subscribe to QR updates
    */
@@ -286,7 +286,7 @@ class WhatsAppService {
       this.statusUpdateCallbacks.delete(callback);
     };
   }
-  
+
   /**
    * Unsubscribe from status updates
    */
@@ -382,31 +382,6 @@ class WhatsAppService {
     return response.data;
   }
 
-  /**
-   * Disconnect WhatsApp session
-   */
-  async disconnectSession(userId, plubotId) {
-    const sessionId = `${userId}-${plubotId}`;
-    try {
-      // Try disconnect endpoint first
-      const response = await axios.post(
-        `${WHATSAPP_SERVICE_URL}/api/sessions/${sessionId}/disconnect`,
-        {},
-        {
-          headers: {
-            'x-api-key': WHATSAPP_API_KEY,
-          },
-        },
-      );
-      return response.data;
-    } catch (error) {
-      // If disconnect fails, try destroy/delete
-      if (error.response?.status === 404) {
-        return this.destroySession(userId, plubotId);
-      }
-      throw error;
-    }
-  }
 
   /**
    * Create a new WhatsApp session
@@ -441,45 +416,46 @@ class WhatsAppService {
       });
 
       const response = await axios.post(
-        `${this.baseURL}/api/sessions/create`,
-        { userId, plubotId: finalPlubotId, forceNew },
-        { headers: this.getHeaders() }
+        `${WHATSAPP_SERVICE_URL}/api/sessions/create`,
+        {
+          userId,
+          plubotId: finalPlubotId,
+          forceNew,
+        },
+        {
+          headers: {
+            'x-api-key': WHATSAPP_API_KEY,
+          },
+        },
       );
 
       // If session is already connected but no QR, force recreate
       if (response.data.status === 'connected' && !response.data.qr && !forceNew) {
         console.log('Session connected but no QR, forcing recreation...');
-        
+
         // Retry with forceNew flag
         const newResponse = await axios.post(
-          `${this.baseURL}/api/sessions/create`,
-          { userId, plubotId: finalPlubotId, forceNew: true },
-          { headers: this.getHeaders() }
+          `${WHATSAPP_SERVICE_URL}/api/sessions/create`,
+          {
+            userId,
+            plubotId: finalPlubotId,
+            forceNew: true,
+          },
+          {
+            headers: {
+              'x-api-key': WHATSAPP_API_KEY,
+            },
+          },
         );
-        
+
         return newResponse.data;
       }
 
       return response.data;
     } catch (error) {
-      console.error('Error creating session:', error);
+      console.error('[WhatsApp Service] Error creating session:', error);
       throw error;
     }
-  }
-
-  /**
-   * Destroy WhatsApp session
-   */
-  async destroySession(sessionIdOrUserId, plubotId) {
-    // Handle both sessionId string and userId/plubotId params
-    const sessionId = plubotId ? `${sessionIdOrUserId}-${plubotId}` : sessionIdOrUserId;
-
-    const response = await axios.delete(`${WHATSAPP_SERVICE_URL}/api/sessions/${sessionId}`, {
-      headers: {
-        'x-api-key': 'internal-api-key',
-      },
-    });
-    return response.data;
   }
 
   /**

@@ -26,8 +26,8 @@ import useByteMessageContext from '@/hooks/useByteMessageContext';
 import useModalContext from '@/hooks/useModalContext';
 import { useFlowMeta } from '@/stores/selectors';
 
-import WhatsAppQRPanel from './WhatsAppQRPanel';
 import WhatsAppMigrationModal from './WhatsAppMigrationModal';
+import WhatsAppQRPanel from './WhatsAppQRPanel';
 
 import './ShareModal.css';
 
@@ -523,7 +523,7 @@ const ShareModal = ({ plubotId, plubotName, onClose, nodes, edges }) => {
                   <div className='share-info-content'>
                     <h4>Conexión Rápida con WhatsApp</h4>
                     <p>
-                      Escanea el código QR a continuación para conectar tu Plubot con WhatsApp. 
+                      Escanea el código QR a continuación para conectar tu Plubot con WhatsApp.
                       Conexión directa y segura con tu cuenta de WhatsApp.
                     </p>
                   </div>
@@ -531,7 +531,7 @@ const ShareModal = ({ plubotId, plubotName, onClose, nodes, edges }) => {
               </div>
 
               <WhatsAppQRPanel plubotId={plubotId} nodes={nodes} edges={edges} />
-              
+
               {/* Migration Section */}
               <div className='share-migration-section'>
                 <div className='share-migration-divider'>
@@ -543,9 +543,7 @@ const ShareModal = ({ plubotId, plubotName, onClose, nodes, edges }) => {
                     <Zap className='share-migration-icon premium' size={24} />
                     <div>
                       <h4>WhatsApp Business API Oficial</h4>
-                      <p className='share-migration-subtitle'>
-                        Para uso profesional y empresarial
-                      </p>
+                      <p className='share-migration-subtitle'>Para uso profesional y empresarial</p>
                     </div>
                   </div>
                   <ul className='share-migration-features'>
@@ -566,7 +564,7 @@ const ShareModal = ({ plubotId, plubotName, onClose, nodes, edges }) => {
                       <span>Soporte para múltiples sesiones</span>
                     </li>
                   </ul>
-                  <button 
+                  <button
                     className='share-button primary migration-btn full-width'
                     onClick={() => {
                       console.log('[ShareModal] Opening migration modal');
@@ -603,18 +601,19 @@ const ShareModal = ({ plubotId, plubotName, onClose, nodes, edges }) => {
 
   return (
     <>
-      {showMigrationModal && ReactDOM.createPortal(
-        <WhatsAppMigrationModal 
-          isOpen={showMigrationModal}
-          onClose={() => {
-            console.log('[ShareModal] Closing migration modal');
-            setShowMigrationModal(false);
-          }}
-          currentUserId={plubotId}
-        />,
-        document.body
-      )}
-      
+      {showMigrationModal &&
+        ReactDOM.createPortal(
+          <WhatsAppMigrationModal
+            isOpen={showMigrationModal}
+            onClose={() => {
+              console.log('[ShareModal] Closing migration modal');
+              setShowMigrationModal(false);
+            }}
+            currentUserId={plubotId}
+          />,
+          document.body,
+        )}
+
       <div
         className='share-modal-overlay'
         onClick={handleClose}
@@ -631,45 +630,45 @@ const ShareModal = ({ plubotId, plubotName, onClose, nodes, edges }) => {
           onKeyDown={(event) => event.stopPropagation()}
           role='presentation'
         >
-        <div className='share-modal-header'>
-          <div className='share-modal-title'>
-            <Sparkles className='share-title-icon' size={24} />
-            <div>
-              <h2>Vincula tu Plubot</h2>
-              <p>Conecta &ldquo;{flowName || plubotName || 'Brillo'}&rdquo; con el mundo</p>
+          <div className='share-modal-header'>
+            <div className='share-modal-title'>
+              <Sparkles className='share-title-icon' size={24} />
+              <div>
+                <h2>Vincula tu Plubot</h2>
+                <p>Conecta &ldquo;{flowName || plubotName || 'Brillo'}&rdquo; con el mundo</p>
+              </div>
             </div>
+            <button className='share-modal-close' onClick={handleClose}>
+              <X size={20} />
+            </button>
           </div>
-          <button className='share-modal-close' onClick={handleClose}>
-            <X size={20} />
-          </button>
-        </div>
 
-        <div className='share-modal-tabs'>
-          {tabs.map((tab) => (
-            <TabButton
-              key={tab.id}
-              icon={tab.icon}
-              label={tab.label}
-              isActive={activeTab === tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              badge={tab.badge}
-            />
-          ))}
-        </div>
-
-        <div className='share-modal-content'>{renderActivePanel()}</div>
-
-        <div className='share-modal-footer'>
-          <div className='share-footer-info'>
-            <Shield size={16} />
-            <span>Todas las integraciones son seguras y encriptadas</span>
+          <div className='share-modal-tabs'>
+            {tabs.map((tab) => (
+              <TabButton
+                key={tab.id}
+                icon={tab.icon}
+                label={tab.label}
+                isActive={activeTab === tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                badge={tab.badge}
+              />
+            ))}
           </div>
-          <button className='share-button primary' onClick={handleClose}>
-            Listo
-          </button>
+
+          <div className='share-modal-content'>{renderActivePanel()}</div>
+
+          <div className='share-modal-footer'>
+            <div className='share-footer-info'>
+              <Shield size={16} />
+              <span>Todas las integraciones son seguras y encriptadas</span>
+            </div>
+            <button className='share-button primary' onClick={handleClose}>
+              Listo
+            </button>
+          </div>
         </div>
       </div>
-    </div>
     </>
   );
 };

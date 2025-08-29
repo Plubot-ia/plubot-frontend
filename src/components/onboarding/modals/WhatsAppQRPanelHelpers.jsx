@@ -117,7 +117,7 @@ const QRDisplay = ({ qrCode, status }) => {
       </div>
     );
   }
-  
+
   // Si estamos esperando QR pero aún no lo tenemos, mostrar "Generando QR..."
   if (status === 'waiting' || status === 'waiting_qr') {
     return (
