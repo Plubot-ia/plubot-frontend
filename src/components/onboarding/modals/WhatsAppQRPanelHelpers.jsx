@@ -108,11 +108,20 @@ const QRDisplay = ({ qrCode, status }) => {
     return <img src={qrDataUrl} alt='WhatsApp QR Code' className='share-qr-image' />;
   }
 
-  if (status === 'disconnected') {
+  if (status === 'waiting' || status === 'waiting_qr' || status === 'initializing') {
     return (
       <div className='share-qr-placeholder'>
         <Loader2 className='share-loading-spinner' size={48} />
-        <p>Esperando código QR...</p>
+        <p>Inicializando...</p>
+      </div>
+    );
+  }
+
+  if (status === 'disconnected') {
+    return (
+      <div className='share-qr-placeholder'>
+        <Smartphone size={48} />
+        <p>Desconectado</p>
       </div>
     );
   }
@@ -144,14 +153,12 @@ const ConnectedView = ({ phoneNumber, handleDisconnect, handleCreateNewSession, 
           </div>
         </div>
         <h3 className='connected-title'>¡WhatsApp Conectado!</h3>
-        {phoneNumber && phoneNumber !== '+1234567890' && (
-          <div className='connection-info'>
-            <div className='phone-number'>
-              <Phone size={16} />
-              <span>{phoneNumber}</span>
-            </div>
+        <div className='connection-info'>
+          <div className='phone-number'>
+            <Phone size={16} />
+            <span>{phoneNumber || 'Obteniendo número...'}</span>
           </div>
-        )}
+        </div>
       </div>
 
       <div className='connected-features'>

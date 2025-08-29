@@ -260,17 +260,17 @@ class WhatsAppService {
     try {
       const sessionId = `${userId}-${plubotId}`;
       const response = await axios.post(
-        `${this.baseURL}/api/sessions/${sessionId}/refresh-qr`,
-        {},
+        `${this.baseURL}/api/sessions/refresh-qr`,
+        { sessionId },
         {
           headers: {
             'Content-Type': 'application/json',
-            'x-api-key': this.apiKey,
+            'x-api-key': 'internal-api-key',
           },
         },
       );
 
-      return response.data.data || response.data;
+      return response.data;
     } catch (error) {
       console.error('[WhatsAppService] Error refreshing QR:', error);
       throw error;
@@ -418,11 +418,8 @@ class WhatsAppService {
       );
 
       console.log('[WhatsApp Service] Session created successfully:', response.data);
-
-      // Handle the nested data structure from the API
-      if (response.data && response.data.data) {
-        return response.data.data;
-      }
+      
+      // Return the response data directly
       return response.data;
     } catch (error) {
       console.error(

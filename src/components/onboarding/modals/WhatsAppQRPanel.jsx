@@ -102,18 +102,21 @@ const WhatsAppQRPanel = ({ plubotId, nodes, edges }) => {
         const result = await whatsappService.createSession(userId, sessionPlubotId);
         console.log('[WhatsAppQRPanel] Session result:', result);
 
-        if (result.qr || result.qrDataUrl) {
+        if (result.status === 'connected') {
+          console.log('[WhatsAppQRPanel] Session already connected');
+          setStatus('connected');
+          setPhoneNumber(result.phoneNumber || 'Connected');
+        } else if (result.qr || result.qrDataUrl) {
           const qr = result.qrDataUrl || result.qr;
           console.log('[WhatsAppQRPanel] Setting QR code');
           setQrCode(qr);
           setStatus('waiting_qr');
-          setErrorMessage(null); // Clear any error message when QR is received
-        } else if (result.status === 'ready' || result.status === 'connected') {
-          console.log('[WhatsAppQRPanel] Session already connected');
-          setStatus('connected');
-          setPhoneNumber(result.phoneNumber);
+          setErrorMessage(null);
+        } else if (result.status === 'waiting_qr') {
+          console.log('[WhatsAppQRPanel] Waiting for QR');
+          setStatus('waiting_qr');
         } else {
-          console.log('[WhatsAppQRPanel] Unexpected result status:', result.status);
+          console.log('[WhatsAppQRPanel] Status:', result.status);
           setStatus('waiting');
         }
       } catch (error) {
@@ -169,18 +172,22 @@ const WhatsAppQRPanel = ({ plubotId, nodes, edges }) => {
         }
       },
       onAuthenticated: (data) => {
-        console.log('[WhatsAppQRPanel] Session authenticated:', data);
+        console.log('[WhatsAppQRPanel] 🎉 SESSION AUTHENTICATED:', data);
+        console.log('[WhatsAppQRPanel] Setting status to connected');
         setStatus('connected');
         setPhoneNumber(data.phoneNumber || 'Connected');
         setQrCode(null);
         setErrorMessage(null);
+        console.log('[WhatsAppQRPanel] Status should now be connected');
       },
       onReady: (data) => {
-        console.log('[WhatsAppQRPanel] Session ready:', data);
+        console.log('[WhatsAppQRPanel] ✅ SESSION READY:', data);
+        console.log('[WhatsAppQRPanel] Setting status to connected');
         setStatus('connected');
         setPhoneNumber(data.phoneNumber || 'Connected');
         setQrCode(null);
         setErrorMessage(null);
+        console.log('[WhatsAppQRPanel] Status should now be connected');
       },
       onDisconnected: () => {
         console.log('[WhatsAppQRPanel] Session disconnected');
@@ -214,8 +221,34 @@ const WhatsAppQRPanel = ({ plubotId, nodes, edges }) => {
         {status === 'ready' || status === 'authenticated' || status === 'connected' ? (
           <ConnectedView
             phoneNumber={phoneNumber}
-            handleDisconnect={() => {}}
-            handleCreateNewSession={() => {}}
+            handleDisconnect={async () => {
+              try {
+                setIsLoading(true);
+                await whatsappService.disconnectSession(userId, plubotId);
+                setStatus('disconnected');
+                setPhoneNumber(null);
+                setQrCode(null);
+                // Reiniciar el componente para obtener nuevo QR
+                window.location.reload();
+              } catch (error) {
+                console.error('[WhatsAppQRPanel] Error disconnecting:', error);
+              } finally {
+                setIsLoading(false);
+              }
+            }}
+            handleCreateNewSession={async () => {
+              try {
+                setIsLoading(true);
+                // Primero desconectar sesión actual si existe
+                await whatsappService.disconnectSession(userId, plubotId);
+                // Reiniciar para crear nueva sesión
+                window.location.reload();
+              } catch (error) {
+                console.error('[WhatsAppQRPanel] Error creating new session:', error);
+              } finally {
+                setIsLoading(false);
+              }
+            }}
             isLoading={isLoading}
           />
         ) : (

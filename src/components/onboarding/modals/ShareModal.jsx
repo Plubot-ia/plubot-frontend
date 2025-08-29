@@ -7,13 +7,14 @@ import {
   Shield,
   Zap,
   Check,
-  Sparkles,
+  Globe,
   Loader2,
   Share2,
   Key,
   ExternalLink,
   ChevronRight,
   Bot,
+  Sparkles,
 } from 'lucide-react';
 import PropTypes from 'prop-types';
 import QRCode from 'qrcode';
@@ -23,6 +24,7 @@ import ReactDOM from 'react-dom';
 // useAPI hook removed - not needed
 import useByteMessageContext from '@/hooks/useByteMessageContext';
 import useModalContext from '@/hooks/useModalContext';
+import { useFlowMeta } from '@/stores/selectors';
 
 import WhatsAppQRPanel from './WhatsAppQRPanel';
 import WhatsAppMigrationModal from './WhatsAppMigrationModal';
@@ -453,6 +455,8 @@ LinkPanel.propTypes = {
 
 // Modal Principal
 const ShareModal = ({ plubotId, plubotName, onClose, nodes, edges }) => {
+  // Obtener el nombre real del Plubot desde el store
+  const { flowName } = useFlowMeta();
   const { showNotification } = useByteMessageContext();
   const _showNotification = showNotification; // Reference to avoid unused var
   const { closeModal } = useModalContext();
@@ -517,10 +521,10 @@ const ShareModal = ({ plubotId, plubotName, onClose, nodes, edges }) => {
                     <MessageCircle size={20} />
                   </div>
                   <div className='share-info-content'>
-                    <h4>Conexión Rápida con WhatsApp Web</h4>
+                    <h4>Conexión Rápida con WhatsApp</h4>
                     <p>
-                      Puedes escanear el código QR a continuación para probar tu flujo con WhatsApp Web. 
-                      Esta opción es ideal para pruebas y desarrollo.
+                      Escanea el código QR a continuación para conectar tu Plubot con WhatsApp. 
+                      Utilizamos la tecnología Baileys para una conexión estable y confiable.
                     </p>
                   </div>
                 </div>
@@ -555,11 +559,11 @@ const ShareModal = ({ plubotId, plubotName, onClose, nodes, edges }) => {
                     </li>
                     <li>
                       <Check size={16} />
-                      <span>Mayor estabilidad y confiabilidad</span>
+                      <span>Mayor estabilidad con Baileys</span>
                     </li>
                     <li>
                       <Check size={16} />
-                      <span>Soporte para múltiples agentes</span>
+                      <span>Soporte para múltiples sesiones</span>
                     </li>
                   </ul>
                   <button 
@@ -632,7 +636,7 @@ const ShareModal = ({ plubotId, plubotName, onClose, nodes, edges }) => {
             <Sparkles className='share-title-icon' size={24} />
             <div>
               <h2>Vincula tu Plubot</h2>
-              <p>Conecta &ldquo;{plubotName || 'Mi Plubot'}&rdquo; con el mundo</p>
+              <p>Conecta &ldquo;{flowName || plubotName || 'Mi Plubot'}&rdquo; con el mundo</p>
             </div>
           </div>
           <button className='share-modal-close' onClick={handleClose}>
