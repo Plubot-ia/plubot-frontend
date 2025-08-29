@@ -524,7 +524,7 @@ const ShareModal = ({ plubotId, plubotName, onClose, nodes, edges }) => {
                     <h4>Conexión Rápida con WhatsApp</h4>
                     <p>
                       Escanea el código QR a continuación para conectar tu Plubot con WhatsApp. 
-                      Utilizamos la tecnología Baileys para una conexión estable y confiable.
+                      Conexión directa y segura con tu cuenta de WhatsApp.
                     </p>
                   </div>
                 </div>
@@ -559,7 +559,7 @@ const ShareModal = ({ plubotId, plubotName, onClose, nodes, edges }) => {
                     </li>
                     <li>
                       <Check size={16} />
-                      <span>Mayor estabilidad con Baileys</span>
+                      <span>Mayor estabilidad y confiabilidad</span>
                     </li>
                     <li>
                       <Check size={16} />
@@ -636,7 +636,7 @@ const ShareModal = ({ plubotId, plubotName, onClose, nodes, edges }) => {
             <Sparkles className='share-title-icon' size={24} />
             <div>
               <h2>Vincula tu Plubot</h2>
-              <p>Conecta &ldquo;{flowName || plubotName || 'Mi Plubot'}&rdquo; con el mundo</p>
+              <p>Conecta &ldquo;{flowName || plubotName || 'Brillo'}&rdquo; con el mundo</p>
             </div>
           </div>
           <button className='share-modal-close' onClick={handleClose}>

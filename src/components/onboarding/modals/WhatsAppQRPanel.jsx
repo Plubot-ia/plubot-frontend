@@ -167,7 +167,13 @@ const WhatsAppQRPanel = ({ plubotId, nodes, edges }) => {
         console.log('[WhatsAppQRPanel] QR Update received:', data);
         if (data.qrDataUrl || data.qr) {
           setQrCode(data.qrDataUrl || data.qr);
-          setStatus('waiting');
+          // Solo cambiar a 'waiting' si estamos en 'initializing'
+          setStatus(prevStatus => {
+            if (prevStatus === 'initializing' || prevStatus === 'disconnected') {
+              return 'waiting';
+            }
+            return prevStatus; // Mantener el estado actual si ya es 'waiting'
+          });
           setErrorMessage(null);
         }
       },
@@ -192,7 +198,24 @@ const WhatsAppQRPanel = ({ plubotId, nodes, edges }) => {
       onDisconnected: () => {
         console.log('[WhatsAppQRPanel] Session disconnected');
         setStatus('disconnected');
-        setErrorMessage('WhatsApp desconectado. Por favor, reconecta.');
+        setPhoneNumber(null);
+        setQrCode(null);
+        setErrorMessage('WhatsApp desconectado. Generando nuevo QR...');
+        // Reiniciar para obtener nuevo QR automáticamente
+        setTimeout(async () => {
+          try {
+            setStatus('initializing');
+            const sessionPlubotId = plubotId || '260';
+            const result = await whatsappService.createSession(userId, sessionPlubotId, true);
+            if (result.qr) {
+              setQrCode(result.qr);
+              setStatus('waiting');
+              setErrorMessage(null);
+            }
+          } catch (error) {
+            console.error('[WhatsAppQRPanel] Error recreating session:', error);
+          }
+        }, 2000);
       },
     });
 
@@ -224,14 +247,45 @@ const WhatsAppQRPanel = ({ plubotId, nodes, edges }) => {
             handleDisconnect={async () => {
               try {
                 setIsLoading(true);
-                await whatsappService.disconnectSession(userId, plubotId);
-                setStatus('disconnected');
-                setPhoneNumber(null);
+                setErrorMessage(null);
+                const sessionPlubotId = plubotId || '260';
+                
+                // Desconectar sesión actual
+                try {
+                  await whatsappService.disconnectSession(userId, sessionPlubotId);
+                } catch (disconnectError) {
+                  console.log('[WhatsAppQRPanel] Disconnect error (might be already disconnected):', disconnectError);
+                }
+                
+                // Clear state first
                 setQrCode(null);
-                // Reiniciar el componente para obtener nuevo QR
-                window.location.reload();
+                setStatus('initializing');
+                setErrorMessage(null);
+                
+                // Create new session with forceNew flag to ensure fresh QR
+                const result = await whatsappService.createSession(userId, sessionPlubotId, true);
+                
+                if (result.qr) {
+                  setQrCode(result.qr);
+                  setStatus('waiting');
+                } else if (result.status === 'waiting_qr' || result.status === 'initializing') {
+                  // Wait a bit for QR to be generated
+                  await new Promise(resolve => setTimeout(resolve, 2000));
+                  
+                  // Try to refresh QR
+                  const refreshResult = await whatsappService.refreshQR(sessionId);
+                  if (refreshResult.qr) {
+                    setQrCode(refreshResult.qr);
+                    setStatus('waiting');
+                  } else {
+                    throw new Error('No se pudo generar el código QR');
+                  }
+                } else if (result.status === 'connected') {
+                  setStatus('connected');
+                }
               } catch (error) {
-                console.error('[WhatsAppQRPanel] Error disconnecting:', error);
+                console.error('[WhatsAppQRPanel] Unexpected error:', error);
+                setErrorMessage('Error inesperado. Intenta recargar la página.');
               } finally {
                 setIsLoading(false);
               }
@@ -239,12 +293,64 @@ const WhatsAppQRPanel = ({ plubotId, nodes, edges }) => {
             handleCreateNewSession={async () => {
               try {
                 setIsLoading(true);
-                // Primero desconectar sesión actual si existe
-                await whatsappService.disconnectSession(userId, plubotId);
-                // Reiniciar para crear nueva sesión
-                window.location.reload();
+                setErrorMessage(null);
+                const sessionPlubotId = plubotId || '260';
+                
+                // Limpiar estado actual
+                setStatus('initializing');
+                setPhoneNumber(null);
+                setQrCode(null);
+                
+                // Intentar desconectar sesión existente
+                try {
+                  await whatsappService.destroySession(userId, sessionPlubotId);
+                } catch (destroyError) {
+                  console.log('[WhatsAppQRPanel] Session might not exist:', destroyError);
+                }
+                
+                // Esperar para asegurar limpieza completa
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                
+                // Crear nueva sesión limpia con forceNew para garantizar QR fresco
+                try {
+                  const result = await whatsappService.createSession(userId, sessionPlubotId, true);
+                  
+                  if (result && (result.qr || result.qrDataUrl)) {
+                    setQrCode(result.qrDataUrl || result.qr);
+                    setStatus('waiting_qr');
+                    setErrorMessage(null);
+                  } else if (result && result.status === 'waiting_qr') {
+                    // Si está esperando QR pero no lo devolvió, intentar refresh
+                    const refreshResult = await whatsappService.refreshQR(userId, sessionPlubotId);
+                    if (refreshResult && (refreshResult.qr || refreshResult.qrDataUrl)) {
+                      setQrCode(refreshResult.qrDataUrl || refreshResult.qr);
+                      setStatus('waiting_qr');
+                      setErrorMessage(null);
+                    }
+                  } else {
+                    throw new Error('No se pudo generar el código QR');
+                  }
+                } catch (createError) {
+                  console.error('[WhatsAppQRPanel] Error creating session:', createError);
+                  // Intentar una vez más con refresh
+                  try {
+                    const refreshResult = await whatsappService.refreshQR(userId, sessionPlubotId);
+                    if (refreshResult && (refreshResult.qr || refreshResult.qrDataUrl)) {
+                      setQrCode(refreshResult.qrDataUrl || refreshResult.qr);
+                      setStatus('waiting_qr');
+                      setErrorMessage(null);
+                    } else {
+                      throw createError;
+                    }
+                  } catch (refreshError) {
+                    setErrorMessage('Error al crear nueva sesión. Recarga la página para intentar de nuevo.');
+                    setStatus('error');
+                  }
+                }
               } catch (error) {
-                console.error('[WhatsAppQRPanel] Error creating new session:', error);
+                console.error('[WhatsAppQRPanel] Unexpected error:', error);
+                setErrorMessage('Error inesperado. Recarga la página para intentar de nuevo.');
+                setStatus('error');
               } finally {
                 setIsLoading(false);
               }

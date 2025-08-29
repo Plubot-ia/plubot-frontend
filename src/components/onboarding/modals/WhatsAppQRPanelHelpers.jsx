@@ -108,11 +108,22 @@ const QRDisplay = ({ qrCode, status }) => {
     return <img src={qrDataUrl} alt='WhatsApp QR Code' className='share-qr-image' />;
   }
 
-  if (status === 'waiting' || status === 'waiting_qr' || status === 'initializing') {
+  // Solo mostrar "Inicializando..." si el estado es 'initializing'
+  if (status === 'initializing') {
     return (
       <div className='share-qr-placeholder'>
         <Loader2 className='share-loading-spinner' size={48} />
         <p>Inicializando...</p>
+      </div>
+    );
+  }
+  
+  // Si estamos esperando QR pero aún no lo tenemos, mostrar "Generando QR..."
+  if (status === 'waiting' || status === 'waiting_qr') {
+    return (
+      <div className='share-qr-placeholder'>
+        <Loader2 className='share-loading-spinner' size={48} />
+        <p>Generando código QR...</p>
       </div>
     );
   }
