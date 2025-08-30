@@ -3,7 +3,7 @@ import { io } from 'socket.io-client';
 
 // API_BASE_URL is defined in authService
 const WHATSAPP_SERVICE_URL = import.meta.env.VITE_WHATSAPP_SERVICE_URL || 'http://localhost:3001';
-const WHATSAPP_API_KEY = import.meta.env.VITE_WHATSAPP_API_KEY || 'internal-api-key';
+const WHATSAPP_API_KEY = import.meta.env.VITE_WHATSAPP_API_KEY || 'dev-api-key-2024-secure';
 
 class WhatsAppService {
   constructor() {
@@ -167,7 +167,7 @@ class WhatsAppService {
   async getQRStatus(userId, plubotId, _token) {
     const response = await axios.get(`${WHATSAPP_SERVICE_URL}/api/sessions/${userId}/${plubotId}`, {
       headers: {
-        'x-api-key': 'internal-api-key',
+        'x-api-key': 'dev-api-key-2024-secure',
       },
     });
     return response.data;
@@ -179,7 +179,7 @@ class WhatsAppService {
   async getQRCode(userId, plubotId) {
     const response = await axios.get(`${WHATSAPP_SERVICE_URL}/api/qr/${userId}/${plubotId}`, {
       headers: {
-        'x-api-key': 'internal-api-key',
+        'x-api-key': 'dev-api-key-2024-secure',
       },
     });
     return response.data;
@@ -260,12 +260,12 @@ class WhatsAppService {
     try {
       const sessionId = `${userId}-${plubotId}`;
       const response = await axios.post(
-        `${this.baseURL}/api/sessions/refresh-qr`,
-        { sessionId },
+        `${this.baseURL}/api/sessions/${sessionId}/refresh-qr`,
+        {},
         {
           headers: {
             'Content-Type': 'application/json',
-            'x-api-key': 'internal-api-key',
+            'x-api-key': 'dev-api-key-2024-secure',
           },
         },
       );

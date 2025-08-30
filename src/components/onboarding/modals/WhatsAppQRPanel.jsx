@@ -200,22 +200,9 @@ const WhatsAppQRPanel = ({ plubotId, nodes, edges }) => {
         setStatus('disconnected');
         setPhoneNumber(null);
         setQrCode(null);
-        setErrorMessage('WhatsApp desconectado. Generando nuevo QR...');
-        // Reiniciar para obtener nuevo QR automáticamente
-        setTimeout(async () => {
-          try {
-            setStatus('initializing');
-            const sessionPlubotId = plubotId || '260';
-            const result = await whatsappService.createSession(userId, sessionPlubotId, true);
-            if (result.qr) {
-              setQrCode(result.qr);
-              setStatus('waiting');
-              setErrorMessage(null);
-            }
-          } catch (error) {
-            console.error('[WhatsAppQRPanel] Error recreating session:', error);
-          }
-        }, 2000);
+        setErrorMessage('WhatsApp desconectado');
+        // NO auto-reconectar para evitar loops infinitos
+        // El usuario puede hacer click en "Reintentar" si lo desea
       },
     });
 

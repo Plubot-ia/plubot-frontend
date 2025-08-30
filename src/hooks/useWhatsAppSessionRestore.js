@@ -31,7 +31,7 @@ export const useWhatsAppSessionRestore = (userId, plubotId) => {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
-            'x-api-key': 'internal-api-key',
+            'x-api-key': 'dev-api-key-2024-secure',
           },
         });
 
