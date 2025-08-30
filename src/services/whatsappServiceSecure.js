@@ -28,10 +28,12 @@ class WhatsAppServiceSecure {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(credentials || {
-          username: 'default_user',
-          password: 'default_pass'
-        })
+        body: JSON.stringify(
+          credentials || {
+            username: 'default_user',
+            password: 'default_pass',
+          },
+        ),
       });
 
       if (!response.ok) {
@@ -41,7 +43,7 @@ class WhatsAppServiceSecure {
       const data = await response.json();
       this.token = data.token;
       this.tokenExpiry = new Date(Date.now() + this.parseExpiry(data.expiresIn));
-      
+
       // Store token in localStorage for persistence
       localStorage.setItem('whatsapp_jwt', this.token);
       localStorage.setItem('whatsapp_jwt_expiry', this.tokenExpiry.toISOString());
@@ -78,7 +80,7 @@ class WhatsAppServiceSecure {
 
     const now = new Date();
     const timeUntilExpiry = this.tokenExpiry - now;
-    
+
     // Refresh if less than 5 minutes until expiry
     if (timeUntilExpiry < 5 * 60 * 1000) {
       await this.refreshAuthToken();
@@ -108,18 +110,18 @@ class WhatsAppServiceSecure {
   async initializeAuth() {
     const storedToken = localStorage.getItem('whatsapp_jwt');
     const storedExpiry = localStorage.getItem('whatsapp_jwt_expiry');
-    
+
     if (storedToken && storedExpiry) {
       this.token = storedToken;
       this.tokenExpiry = new Date(storedExpiry);
-      
+
       // Check if token is still valid
       if (this.tokenExpiry > new Date()) {
         await this.checkTokenExpiry();
         return true;
       }
     }
-    
+
     // No valid stored credentials, need to authenticate
     return false;
   }
@@ -130,15 +132,15 @@ class WhatsAppServiceSecure {
   async createSession(userId, plubotId, forceNew = false) {
     try {
       await this.checkTokenExpiry();
-      
+
       const response = await fetch(`${this.baseURL}/api/sessions/create`, {
         method: 'POST',
         headers: this.getAuthHeaders(),
         body: JSON.stringify({
           userId,
           plubotId,
-          forceNew
-        })
+          forceNew,
+        }),
       });
 
       if (response.status === 401) {
@@ -166,10 +168,10 @@ class WhatsAppServiceSecure {
   async getQRCode(userId, plubotId) {
     try {
       await this.checkTokenExpiry();
-      
+
       const response = await fetch(`${this.baseURL}/api/qr/${userId}/${plubotId}`, {
         method: 'GET',
-        headers: this.getAuthHeaders()
+        headers: this.getAuthHeaders(),
       });
 
       if (response.status === 401) {
@@ -200,10 +202,10 @@ class WhatsAppServiceSecure {
   async getSessionStatus(sessionId) {
     try {
       await this.checkTokenExpiry();
-      
+
       const response = await fetch(`${this.baseURL}/api/sessions/${sessionId}/status`, {
         method: 'GET',
-        headers: this.getAuthHeaders()
+        headers: this.getAuthHeaders(),
       });
 
       if (response.status === 401) {
@@ -230,7 +232,7 @@ class WhatsAppServiceSecure {
   async sendMessage(sessionId, to, message, type = 'text') {
     try {
       await this.checkTokenExpiry();
-      
+
       const response = await fetch(`${this.baseURL}/api/messages/send`, {
         method: 'POST',
         headers: this.getAuthHeaders(),
@@ -238,8 +240,8 @@ class WhatsAppServiceSecure {
           sessionId,
           to,
           message,
-          type
-        })
+          type,
+        }),
       });
 
       if (response.status === 401) {
@@ -271,10 +273,10 @@ class WhatsAppServiceSecure {
   async disconnectSession(sessionId) {
     try {
       await this.checkTokenExpiry();
-      
+
       const response = await fetch(`${this.baseURL}/api/sessions/${sessionId}/disconnect`, {
         method: 'POST',
-        headers: this.getAuthHeaders()
+        headers: this.getAuthHeaders(),
       });
 
       if (response.status === 401) {
@@ -302,10 +304,10 @@ class WhatsAppServiceSecure {
   async destroySession(sessionId) {
     try {
       await this.checkTokenExpiry();
-      
+
       const response = await fetch(`${this.baseURL}/api/sessions/${sessionId}`, {
         method: 'DELETE',
-        headers: this.getAuthHeaders()
+        headers: this.getAuthHeaders(),
       });
 
       if (response.status === 401) {
@@ -358,11 +360,13 @@ class WhatsAppServiceSecure {
       console.error('WebSocket connection error:', error.message);
       if (error.message === 'Authentication required') {
         // Try to re-authenticate
-        this.refreshAuthToken().then(() => {
-          this.initializeWebSocket(sessionId);
-        }).catch(err => {
-          console.error('Failed to re-authenticate WebSocket:', err);
-        });
+        this.refreshAuthToken()
+          .then(() => {
+            this.initializeWebSocket(sessionId);
+          })
+          .catch((error_) => {
+            console.error('Failed to re-authenticate WebSocket:', error_);
+          });
       }
     });
 
@@ -411,16 +415,26 @@ class WhatsAppServiceSecure {
   parseExpiry(expiresIn) {
     const match = expiresIn.match(/(\d+)([dhms])/);
     if (!match) return 24 * 60 * 60 * 1000; // Default 24 hours
-    
-    const value = parseInt(match[1]);
+
+    const value = Number.parseInt(match[1]);
     const unit = match[2];
-    
+
     switch (unit) {
-      case 'd': return value * 24 * 60 * 60 * 1000;
-      case 'h': return value * 60 * 60 * 1000;
-      case 'm': return value * 60 * 1000;
-      case 's': return value * 1000;
-      default: return 24 * 60 * 60 * 1000;
+      case 'd': {
+        return value * 24 * 60 * 60 * 1000;
+      }
+      case 'h': {
+        return value * 60 * 60 * 1000;
+      }
+      case 'm': {
+        return value * 60 * 1000;
+      }
+      case 's': {
+        return value * 1000;
+      }
+      default: {
+        return 24 * 60 * 60 * 1000;
+      }
     }
   }
 
@@ -430,7 +444,7 @@ class WhatsAppServiceSecure {
   async getHealthStatus() {
     try {
       const response = await fetch(`${this.baseURL}/health`);
-      
+
       if (!response.ok) {
         throw new Error('Health check failed');
       }
@@ -449,10 +463,10 @@ class WhatsAppServiceSecure {
   async getDetailedHealthStatus() {
     try {
       await this.checkTokenExpiry();
-      
+
       const response = await fetch(`${this.baseURL}/health/detailed`, {
         method: 'GET',
-        headers: this.getAuthHeaders()
+        headers: this.getAuthHeaders(),
       });
 
       if (response.status === 401) {

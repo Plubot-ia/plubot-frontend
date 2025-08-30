@@ -382,7 +382,6 @@ class WhatsAppService {
     return response.data;
   }
 
-
   /**
    * Create a new WhatsApp session
    */
